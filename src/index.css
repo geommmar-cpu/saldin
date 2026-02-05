@@ -1,0 +1,307 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&family=Playfair+Display:wght@500;600;700&display=swap');
+
+/* 
+  CONSCIÊNCIA FINANCEIRA - Design System
+  Warm, human, supportive - not banking/accounting
+  Focus on behavior change, not numbers
+*/
+
+@layer base {
+  :root {
+    /* Core backgrounds - warm cream tones */
+    --background: 40 30% 97%;
+    --foreground: 25 25% 15%;
+
+    /* Cards and surfaces */
+    --card: 40 25% 99%;
+    --card-foreground: 25 25% 15%;
+
+    --popover: 40 25% 99%;
+    --popover-foreground: 25 25% 15%;
+
+    /* Primary - Warm terracotta/amber */
+    --primary: 25 65% 50%;
+    --primary-foreground: 40 30% 98%;
+
+    /* Secondary - Soft warm gray */
+    --secondary: 35 15% 92%;
+    --secondary-foreground: 25 25% 25%;
+
+    /* Muted - Warm neutral */
+    --muted: 35 12% 90%;
+    --muted-foreground: 25 15% 45%;
+
+    /* Accent - Golden amber highlight */
+    --accent: 38 80% 55%;
+    --accent-foreground: 25 25% 12%;
+
+    /* Destructive - Warm coral for impulse/warning */
+    --destructive: 12 75% 55%;
+    --destructive-foreground: 40 30% 98%;
+
+    /* Essential - Calm sage green */
+    --essential: 145 35% 45%;
+    --essential-foreground: 40 30% 98%;
+
+    /* Obligation - Steady blue-gray */
+    --obligation: 210 25% 50%;
+    --obligation-foreground: 40 30% 98%;
+
+    /* Pleasure - Warm amber */
+    --pleasure: 35 75% 55%;
+    --pleasure-foreground: 25 25% 12%;
+
+    /* Impulse - Alert coral */
+    --impulse: 12 75% 55%;
+    --impulse-foreground: 40 30% 98%;
+
+    /* UI elements */
+    --border: 35 20% 88%;
+    --input: 35 20% 88%;
+    --ring: 25 65% 50%;
+
+    --radius: 1rem;
+
+    /* Sidebar */
+    --sidebar-background: 40 25% 96%;
+    --sidebar-foreground: 25 25% 25%;
+    --sidebar-primary: 25 65% 50%;
+    --sidebar-primary-foreground: 40 30% 98%;
+    --sidebar-accent: 35 15% 92%;
+    --sidebar-accent-foreground: 25 25% 25%;
+    --sidebar-border: 35 20% 88%;
+    --sidebar-ring: 25 65% 50%;
+
+    /* Custom gradients */
+    --gradient-warm: linear-gradient(135deg, hsl(25 65% 50%) 0%, hsl(38 80% 55%) 100%);
+    --gradient-calm: linear-gradient(135deg, hsl(145 35% 45%) 0%, hsl(160 30% 50%) 100%);
+    --gradient-alert: linear-gradient(135deg, hsl(12 75% 55%) 0%, hsl(25 70% 50%) 100%);
+    --gradient-soft: linear-gradient(180deg, hsl(40 30% 97%) 0%, hsl(35 25% 94%) 100%);
+    
+    /* Shadows */
+    --shadow-soft: 0 2px 12px -2px hsl(25 25% 15% / 0.08);
+    --shadow-medium: 0 4px 20px -4px hsl(25 25% 15% / 0.12);
+    --shadow-large: 0 8px 32px -8px hsl(25 25% 15% / 0.15);
+  }
+
+  .dark {
+    --background: 25 20% 8%;
+    --foreground: 40 20% 92%;
+
+    --card: 25 18% 12%;
+    --card-foreground: 40 20% 92%;
+
+    --popover: 25 18% 12%;
+    --popover-foreground: 40 20% 92%;
+
+    --primary: 30 60% 55%;
+    --primary-foreground: 25 20% 8%;
+
+    --secondary: 25 15% 18%;
+    --secondary-foreground: 40 15% 85%;
+
+    --muted: 25 12% 20%;
+    --muted-foreground: 35 12% 60%;
+
+    --accent: 38 70% 50%;
+    --accent-foreground: 25 20% 8%;
+
+    --destructive: 12 65% 50%;
+    --destructive-foreground: 40 20% 95%;
+
+    --essential: 145 30% 50%;
+    --essential-foreground: 25 20% 8%;
+
+    --obligation: 210 20% 55%;
+    --obligation-foreground: 25 20% 8%;
+
+    --pleasure: 35 65% 50%;
+    --pleasure-foreground: 25 20% 8%;
+
+    --impulse: 12 65% 50%;
+    --impulse-foreground: 40 20% 95%;
+
+    --border: 25 15% 22%;
+    --input: 25 15% 22%;
+    --ring: 30 60% 55%;
+
+    --sidebar-background: 25 18% 10%;
+    --sidebar-foreground: 40 15% 85%;
+    --sidebar-primary: 30 60% 55%;
+    --sidebar-primary-foreground: 25 20% 8%;
+    --sidebar-accent: 25 15% 18%;
+    --sidebar-accent-foreground: 40 15% 85%;
+    --sidebar-border: 25 15% 22%;
+    --sidebar-ring: 30 60% 55%;
+
+    --gradient-warm: linear-gradient(135deg, hsl(30 60% 55%) 0%, hsl(38 70% 50%) 100%);
+    --gradient-calm: linear-gradient(135deg, hsl(145 30% 50%) 0%, hsl(160 25% 45%) 100%);
+    --gradient-alert: linear-gradient(135deg, hsl(12 65% 50%) 0%, hsl(25 60% 45%) 100%);
+    --gradient-soft: linear-gradient(180deg, hsl(25 20% 8%) 0%, hsl(25 18% 12%) 100%);
+
+    --shadow-soft: 0 2px 12px -2px hsl(0 0% 0% / 0.3);
+    --shadow-medium: 0 4px 20px -4px hsl(0 0% 0% / 0.4);
+    --shadow-large: 0 8px 32px -8px hsl(0 0% 0% / 0.5);
+  }
+
+  /* High Contrast Mode */
+  .high-contrast {
+    --background: 0 0% 100%;
+    --foreground: 0 0% 0%;
+    --card: 0 0% 100%;
+    --card-foreground: 0 0% 0%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 0 0% 0%;
+    --primary: 25 90% 35%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 0 0% 92%;
+    --secondary-foreground: 0 0% 0%;
+    --muted: 0 0% 88%;
+    --muted-foreground: 0 0% 30%;
+    --accent: 38 100% 40%;
+    --accent-foreground: 0 0% 0%;
+    --destructive: 0 100% 40%;
+    --destructive-foreground: 0 0% 100%;
+    --essential: 145 60% 30%;
+    --essential-foreground: 0 0% 100%;
+    --obligation: 210 50% 35%;
+    --obligation-foreground: 0 0% 100%;
+    --pleasure: 35 100% 40%;
+    --pleasure-foreground: 0 0% 0%;
+    --impulse: 0 100% 40%;
+    --impulse-foreground: 0 0% 100%;
+    --border: 0 0% 0%;
+    --input: 0 0% 0%;
+    --ring: 0 0% 0%;
+  }
+
+  .high-contrast.dark {
+    --background: 0 0% 0%;
+    --foreground: 0 0% 100%;
+    --card: 0 0% 5%;
+    --card-foreground: 0 0% 100%;
+    --popover: 0 0% 5%;
+    --popover-foreground: 0 0% 100%;
+    --primary: 38 100% 60%;
+    --primary-foreground: 0 0% 0%;
+    --secondary: 0 0% 15%;
+    --secondary-foreground: 0 0% 100%;
+    --muted: 0 0% 20%;
+    --muted-foreground: 0 0% 70%;
+    --accent: 38 100% 65%;
+    --accent-foreground: 0 0% 0%;
+    --destructive: 0 100% 60%;
+    --destructive-foreground: 0 0% 0%;
+    --essential: 145 70% 55%;
+    --essential-foreground: 0 0% 0%;
+    --obligation: 210 60% 60%;
+    --obligation-foreground: 0 0% 0%;
+    --pleasure: 35 100% 55%;
+    --pleasure-foreground: 0 0% 0%;
+    --impulse: 0 100% 60%;
+    --impulse-foreground: 0 0% 0%;
+    --border: 0 0% 100%;
+    --input: 0 0% 100%;
+    --ring: 0 0% 100%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  html {
+    font-family: 'DM Sans', system-ui, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  body {
+    @apply bg-background text-foreground;
+    font-feature-settings: "cv02", "cv03", "cv04", "cv11";
+  }
+
+  h1, h2, h3 {
+    font-family: 'Playfair Display', serif;
+    @apply font-semibold tracking-tight;
+  }
+}
+
+@layer components {
+  /* Emotion category badges */
+  .badge-essential {
+    @apply bg-essential text-essential-foreground;
+  }
+  
+  .badge-obligation {
+    @apply bg-obligation text-obligation-foreground;
+  }
+  
+  .badge-pleasure {
+    @apply bg-pleasure text-pleasure-foreground;
+  }
+  
+  .badge-impulse {
+    @apply bg-impulse text-impulse-foreground;
+  }
+
+  /* Glass effect for cards */
+  .glass {
+    @apply bg-card/80 backdrop-blur-md border border-border/50;
+  }
+
+  /* Floating action button */
+  .fab {
+    @apply fixed bottom-6 right-6 w-16 h-16 rounded-full shadow-large flex items-center justify-center;
+    background: var(--gradient-warm);
+  }
+
+  /* Interpretive text styling */
+  .interpretive-text {
+    @apply text-muted-foreground leading-relaxed;
+  }
+
+  /* Smooth page transitions */
+  .page-transition {
+    @apply transition-all duration-300 ease-out;
+  }
+}
+
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
+  }
+
+  .gradient-warm {
+    background: var(--gradient-warm);
+  }
+
+  .gradient-calm {
+    background: var(--gradient-calm);
+  }
+
+  .gradient-alert {
+    background: var(--gradient-alert);
+  }
+
+  .gradient-soft {
+    background: var(--gradient-soft);
+  }
+
+  .shadow-soft {
+    box-shadow: var(--shadow-soft);
+  }
+
+  .shadow-medium {
+    box-shadow: var(--shadow-medium);
+  }
+
+  .shadow-large {
+    box-shadow: var(--shadow-large);
+  }
+}
