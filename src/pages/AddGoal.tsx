@@ -1,11 +1,12 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { CurrencyInput } from "@/components/ui/currency-input";
 import { FadeIn } from "@/components/ui/motion";
+import { BottomNav } from "@/components/BottomNav";
 import { 
   ArrowLeft, 
   Target, 
@@ -17,7 +18,6 @@ import {
 } from "lucide-react";
 import { useCreateGoal } from "@/hooks/useGoals";
 import { cn } from "@/lib/utils";
-import { parseCurrency } from "@/lib/currency";
 
 // Cores disponíveis
 const colorOptions = [
@@ -42,7 +42,7 @@ export default function AddGoal() {
   const createGoal = useCreateGoal();
 
   const [step, setStep] = useState<'amount' | 'details'>('amount');
-  const [targetAmountStr, setTargetAmountStr] = useState('');
+  const [amount, setAmount] = useState('');
   const [initialAmount, setInitialAmount] = useState('');
   const [name, setName] = useState('');
   const [targetDate, setTargetDate] = useState('');
@@ -50,8 +50,21 @@ export default function AddGoal() {
   const [selectedColor, setSelectedColor] = useState('green');
   const [selectedIcon, setSelectedIcon] = useState('target');
 
-  const targetAmount = parseCurrency(targetAmountStr);
+  const targetAmount = amount ? parseFloat(amount.replace(',', '.')) : 0;
   const initialAmountNum = parseFloat(initialAmount.replace(',', '.')) || 0;
+
+  const handleKeyPress = (key: string) => {
+    if (key === "backspace") {
+      setAmount((prev) => prev.slice(0, -1));
+    } else if (key === "," && !amount.includes(",")) {
+      setAmount((prev) => prev + ",");
+    } else if (key !== ",") {
+      // Limit decimal places
+      const parts = amount.split(",");
+      if (parts[1]?.length >= 2) return;
+      setAmount((prev) => prev + key);
+    }
+  };
 
   const handleAmountSubmit = () => {
     if (targetAmount > 0) {
@@ -82,49 +95,77 @@ export default function AddGoal() {
       currency: "BRL",
     }).format(value);
 
+  const keys = ["1", "2", "3", "4", "5", "6", "7", "8", "9", ",", "0", "backspace"];
+
   if (step === 'amount') {
     return (
-      <div className="min-h-screen bg-background flex flex-col">
+      <div className="min-h-screen bg-background flex flex-col pb-24">
         {/* Header */}
-        <header className="px-5 pt-safe-top bg-background border-b border-border">
-          <div className="py-4 flex items-center gap-3">
+        <header className="px-5 pt-safe-top">
+          <div className="pt-4 pb-2 flex items-center gap-4">
             <Button variant="ghost" size="icon" onClick={() => navigate(-1)}>
               <ArrowLeft className="w-5 h-5" />
             </Button>
-            <div>
-              <h1 className="font-serif text-xl font-bold">Nova Meta</h1>
-              <p className="text-sm text-muted-foreground">Valor objetivo</p>
-            </div>
+            <h1 className="font-serif text-xl font-semibold">Nova Meta</h1>
           </div>
         </header>
 
-        <main className="flex-1 flex flex-col px-5 py-6">
-          <FadeIn className="flex-1 flex flex-col justify-center">
-            <div className="text-center mb-8">
-              <p className="text-muted-foreground mb-2">Quanto você quer guardar?</p>
-              <div className="text-4xl font-serif font-bold text-essential">
-                {formatCurrency(targetAmount)}
-              </div>
+        <main className="flex-1 flex flex-col px-5">
+          {/* Amount Display */}
+          <FadeIn className="flex-1 flex flex-col items-center justify-center">
+            <p className="text-muted-foreground mb-2">Quanto você quer guardar?</p>
+            <div className="flex items-baseline gap-1">
+              <span className="text-2xl text-muted-foreground">R$</span>
+              <motion.span
+                key={amount}
+                initial={{ scale: 1.1 }}
+                animate={{ scale: 1 }}
+                className="font-serif text-6xl font-semibold tabular-nums text-essential"
+              >
+                {amount || "0,00"}
+              </motion.span>
             </div>
-
-            <CurrencyInput
-              value={targetAmountStr}
-              onChange={setTargetAmountStr}
-              autoFocus
-            />
+            <p className="text-sm text-muted-foreground mt-4 text-center max-w-xs">
+              Defina o valor objetivo da sua meta financeira
+            </p>
           </FadeIn>
 
-          <div className="mt-6">
-            <Button 
-              className="w-full" 
+          {/* Keypad */}
+          <FadeIn delay={0.2} className="pb-6">
+            <div className="grid grid-cols-3 gap-2 max-w-sm mx-auto">
+              {keys.map((key) => (
+                <motion.button
+                  key={key}
+                  type="button"
+                  whileTap={{ scale: 0.95 }}
+                  onClick={() => handleKeyPress(key)}
+                  className={`h-16 rounded-xl text-2xl font-medium transition-colors ${
+                    key === "backspace"
+                      ? "bg-muted text-muted-foreground"
+                      : "bg-card border border-border hover:bg-secondary"
+                  }`}
+                >
+                  {key === "backspace" ? "⌫" : key}
+                </motion.button>
+              ))}
+            </div>
+          </FadeIn>
+
+          {/* Continue Button */}
+          <FadeIn delay={0.3} className="pb-4">
+            <Button
+              variant="warm"
               size="lg"
+              className="w-full"
               onClick={handleAmountSubmit}
               disabled={targetAmount <= 0}
             >
               Continuar
             </Button>
-          </div>
+          </FadeIn>
         </main>
+
+        <BottomNav />
       </div>
     );
   }
