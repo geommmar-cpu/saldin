@@ -4,6 +4,8 @@ import { generateFinancialReport } from "@/lib/exportPdf";
 import { useExpenses } from "@/hooks/useExpenses";
 import { useIncomes } from "@/hooks/useIncomes";
 import { useDebts } from "@/hooks/useDebts";
+import { useReceivables } from "@/hooks/useReceivables";
+import { useGoals, useGoalStats } from "@/hooks/useGoals";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Switch } from "@/components/ui/switch";
@@ -64,6 +66,9 @@ export const Settings = () => {
   const { data: allExpenses } = useExpenses("confirmed");
   const { data: allIncomes } = useIncomes();
   const { data: allDebts } = useDebts("active");
+  const { data: allReceivables } = useReceivables("pending");
+  const { data: allGoals } = useGoals("all");
+  const { data: goalStats } = useGoalStats();
   
   const [editingAiName, setEditingAiName] = useState(false);
   const [tempAiName, setTempAiName] = useState(profile?.ai_name || preferences.aiName);
@@ -153,8 +158,11 @@ export const Settings = () => {
         incomes: allIncomes || [],
         expenses: allExpenses || [],
         debts: allDebts || [],
-        userName: user?.user_metadata?.full_name,
+        receivables: allReceivables || [],
+        goals: allGoals || [],
+        userName: user?.user_metadata?.full_name || profile?.full_name,
         selectedMonth: new Date(),
+        goalsSaved: goalStats?.totalSaved || 0,
       });
       toast({ title: "PDF gerado com sucesso!" });
     } catch (error) {
