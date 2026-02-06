@@ -6,6 +6,7 @@ import { NumericKeypad } from "@/components/ui/numeric-keypad";
 import { AmountDisplay } from "@/components/ui/amount-display";
 import { ArrowLeft, MessageCircle } from "lucide-react";
 import { useUserPreferences } from "@/hooks/useUserPreferences";
+import { parseCurrency } from "@/lib/currency";
 
 const AddReceivable = () => {
   const navigate = useNavigate();
@@ -13,9 +14,8 @@ const AddReceivable = () => {
   const [amount, setAmount] = useState("");
 
   const handleContinue = () => {
-    if (!amount || parseFloat(amount.replace(",", ".")) <= 0) return;
-    
-    const numericAmount = parseFloat(amount.replace(",", "."));
+    const numericAmount = parseCurrency(amount);
+    if (numericAmount <= 0) return;
     navigate("/receivables/confirm", { state: { amount: numericAmount } });
   };
 
@@ -75,7 +75,7 @@ const AddReceivable = () => {
             size="lg"
             className="w-full"
             onClick={handleContinue}
-            disabled={!amount || parseFloat(amount.replace(",", ".")) <= 0}
+            disabled={parseCurrency(amount) <= 0}
           >
             Continuar
           </Button>

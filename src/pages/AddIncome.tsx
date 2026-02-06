@@ -6,6 +6,7 @@ import { NumericKeypad } from "@/components/ui/numeric-keypad";
 import { AmountDisplay } from "@/components/ui/amount-display";
 import { ArrowLeft, MessageCircle } from "lucide-react";
 import { useUserPreferences } from "@/hooks/useUserPreferences";
+import { parseCurrency } from "@/lib/currency";
 
 export const AddIncome = () => {
   const navigate = useNavigate();
@@ -13,9 +14,8 @@ export const AddIncome = () => {
   const [amount, setAmount] = useState("");
 
   const handleContinue = () => {
-    if (!amount || parseFloat(amount.replace(",", ".")) <= 0) return;
-    
-    const numericAmount = parseFloat(amount.replace(",", "."));
+    const numericAmount = parseCurrency(amount);
+    if (numericAmount <= 0) return;
     navigate("/income/confirm", { state: { amount: numericAmount } });
   };
 
@@ -75,7 +75,7 @@ export const AddIncome = () => {
             size="lg"
             className="w-full"
             onClick={handleContinue}
-            disabled={!amount || parseFloat(amount.replace(",", ".")) <= 0}
+            disabled={parseCurrency(amount) <= 0}
           >
             Continuar
           </Button>

@@ -18,6 +18,7 @@ import {
 } from "lucide-react";
 import { useCreateGoal } from "@/hooks/useGoals";
 import { cn } from "@/lib/utils";
+import { formatCurrencyInput, parseCurrency } from "@/lib/currency";
 
 // Cores disponíveis
 const colorOptions = [
@@ -50,19 +51,19 @@ export default function AddGoal() {
   const [selectedColor, setSelectedColor] = useState('green');
   const [selectedIcon, setSelectedIcon] = useState('target');
 
-  const targetAmount = amount ? parseFloat(amount.replace(',', '.')) : 0;
+  const targetAmount = parseCurrency(amount);
   const initialAmountNum = parseFloat(initialAmount.replace(',', '.')) || 0;
 
   const handleKeyPress = (key: string) => {
+    const currentDigits = amount.replace(/[^\d]/g, "");
+    
     if (key === "backspace") {
-      setAmount((prev) => prev.slice(0, -1));
-    } else if (key === "," && !amount.includes(",")) {
-      setAmount((prev) => prev + ",");
-    } else if (key !== ",") {
-      // Limit decimal places
-      const parts = amount.split(",");
-      if (parts[1]?.length >= 2) return;
-      setAmount((prev) => prev + key);
+      const newDigits = currentDigits.slice(0, -1);
+      setAmount(newDigits ? formatCurrencyInput(newDigits) : "");
+    } else if (key >= "0" && key <= "9") {
+      if (currentDigits.length >= 12) return;
+      const newDigits = currentDigits + key;
+      setAmount(formatCurrencyInput(newDigits));
     }
   };
 
@@ -133,21 +134,24 @@ export default function AddGoal() {
           {/* Keypad */}
           <FadeIn delay={0.2} className="pb-6">
             <div className="grid grid-cols-3 gap-2 max-w-sm mx-auto">
-              {keys.map((key) => (
-                <motion.button
-                  key={key}
-                  type="button"
-                  whileTap={{ scale: 0.95 }}
-                  onClick={() => handleKeyPress(key)}
-                  className={`h-16 rounded-xl text-2xl font-medium transition-colors ${
-                    key === "backspace"
-                      ? "bg-muted text-muted-foreground"
-                      : "bg-card border border-border hover:bg-secondary"
-                  }`}
-                >
-                  {key === "backspace" ? "⌫" : key}
-                </motion.button>
-              ))}
+                {keys.map((key) => (
+                  <motion.button
+                    key={key}
+                    type="button"
+                    whileTap={{ scale: 0.95 }}
+                    onClick={() => key !== "," && handleKeyPress(key)}
+                    disabled={key === ","}
+                    className={`h-16 rounded-xl text-2xl font-medium transition-colors ${
+                      key === "backspace"
+                        ? "bg-muted text-muted-foreground"
+                        : key === ","
+                        ? "bg-card border border-border text-muted-foreground/30 cursor-default"
+                        : "bg-card border border-border hover:bg-secondary"
+                    }`}
+                  >
+                    {key === "backspace" ? "⌫" : key}
+                  </motion.button>
+                ))}
             </div>
           </FadeIn>
 

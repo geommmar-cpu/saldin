@@ -7,21 +7,10 @@ interface AmountDisplayProps {
 
 /**
  * AmountDisplay - Exibe o valor formatado com animação
+ * Suporta tanto formato auto-formatado (1.234,56) quanto raw digits
  */
 export const AmountDisplay = ({ amount, label = "Valor" }: AmountDisplayProps) => {
-  // Format amount for display
-  const formatDisplayAmount = (value: string) => {
-    if (!value) return "0,00";
-    
-    // If there's no comma, add ,00
-    if (!value.includes(",")) {
-      return value + ",00";
-    }
-    
-    // Pad decimal places
-    const [integer, decimal] = value.split(",");
-    return `${integer || "0"},${(decimal || "").padEnd(2, "0")}`;
-  };
+  const displayValue = amount || "0,00";
 
   return (
     <div className="flex flex-col items-center justify-center">
@@ -34,7 +23,7 @@ export const AmountDisplay = ({ amount, label = "Valor" }: AmountDisplayProps) =
           animate={{ scale: 1 }}
           className="font-serif text-6xl font-semibold tabular-nums"
         >
-          {formatDisplayAmount(amount)}
+          {displayValue}
         </motion.span>
       </div>
     </div>

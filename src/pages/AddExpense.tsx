@@ -6,6 +6,7 @@ import { BottomNav } from "@/components/BottomNav";
 import { FadeIn } from "@/components/ui/motion";
 import { ArrowLeft, MessageCircle } from "lucide-react";
 import { useUserPreferences } from "@/hooks/useUserPreferences";
+import { formatCurrencyInput, parseCurrency } from "@/lib/currency";
 
 export const AddExpense = () => {
   const navigate = useNavigate();
@@ -13,23 +14,21 @@ export const AddExpense = () => {
   const [amount, setAmount] = useState("");
 
   const handleKeyPress = (key: string) => {
+    const currentDigits = amount.replace(/[^\d]/g, "");
+    
     if (key === "backspace") {
-      setAmount((prev) => prev.slice(0, -1));
-    } else if (key === "," && !amount.includes(",")) {
-      setAmount((prev) => prev + ",");
-    } else if (key !== ",") {
-      // Limit decimal places
-      const parts = amount.split(",");
-      if (parts[1]?.length >= 2) return;
-      setAmount((prev) => prev + key);
+      const newDigits = currentDigits.slice(0, -1);
+      setAmount(newDigits ? formatCurrencyInput(newDigits) : "");
+    } else if (key >= "0" && key <= "9") {
+      if (currentDigits.length >= 12) return;
+      const newDigits = currentDigits + key;
+      setAmount(formatCurrencyInput(newDigits));
     }
   };
 
   const handleContinue = () => {
-    if (!amount || parseFloat(amount.replace(",", ".")) <= 0) return;
-    
-    // Store amount and navigate to confirmation
-    const numericAmount = parseFloat(amount.replace(",", "."));
+    const numericAmount = parseCurrency(amount);
+    if (numericAmount <= 0) return;
     navigate("/confirm/new", { state: { amount: numericAmount } });
   };
 
@@ -97,10 +96,13 @@ export const AddExpense = () => {
               <motion.button
                 key={key}
                 whileTap={{ scale: 0.95 }}
-                onClick={() => handleKeyPress(key)}
+                onClick={() => key !== "," && handleKeyPress(key)}
+                disabled={key === ","}
                 className={`h-16 rounded-xl text-2xl font-medium transition-colors ${
                   key === "backspace"
                     ? "bg-muted text-muted-foreground"
+                    : key === ","
+                    ? "bg-card border border-border text-muted-foreground/30 cursor-default"
                     : "bg-card border border-border hover:bg-secondary"
                 }`}
               >
@@ -117,7 +119,7 @@ export const AddExpense = () => {
             size="lg"
             className="w-full"
             onClick={handleContinue}
-            disabled={!amount || parseFloat(amount.replace(",", ".")) <= 0}
+            disabled={parseCurrency(amount) <= 0}
           >
             Continuar
           </Button>
