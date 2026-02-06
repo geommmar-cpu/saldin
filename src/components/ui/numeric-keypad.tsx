@@ -1,34 +1,35 @@
 import { motion } from "framer-motion";
+import { formatCurrencyInput } from "@/lib/currency";
 
 interface NumericKeypadProps {
   value: string;
   onChange: (value: string) => void;
-  maxDecimalPlaces?: number;
 }
 
 /**
  * NumericKeypad - Teclado numérico para entrada de valores monetários
  * 
  * Comportamento:
- * - Permite dígitos de 0-9
- * - Vírgula para separador decimal (máximo 2 casas)
+ * - A vírgula é posicionada automaticamente (últimos 2 dígitos são centavos)
+ * - Apenas números são aceitos
  * - Backspace para apagar
  */
 export const NumericKeypad = ({ 
   value, 
   onChange, 
-  maxDecimalPlaces = 2 
 }: NumericKeypadProps) => {
   const handleKeyPress = (key: string) => {
+    // Extract raw digits from current formatted value
+    const currentDigits = value.replace(/[^\d]/g, "");
+    
     if (key === "backspace") {
-      onChange(value.slice(0, -1));
-    } else if (key === "," && !value.includes(",")) {
-      onChange(value + ",");
-    } else if (key !== ",") {
-      // Limit decimal places
-      const parts = value.split(",");
-      if (parts[1]?.length >= maxDecimalPlaces) return;
-      onChange(value + key);
+      const newDigits = currentDigits.slice(0, -1);
+      onChange(newDigits ? formatCurrencyInput(newDigits) : "");
+    } else if (key >= "0" && key <= "9") {
+      // Limit to reasonable amount (max 12 digits)
+      if (currentDigits.length >= 12) return;
+      const newDigits = currentDigits + key;
+      onChange(formatCurrencyInput(newDigits));
     }
   };
 
@@ -41,10 +42,13 @@ export const NumericKeypad = ({
           key={key}
           type="button"
           whileTap={{ scale: 0.95 }}
-          onClick={() => handleKeyPress(key)}
+          onClick={() => key !== "," && handleKeyPress(key)}
+          disabled={key === ","}
           className={`h-16 rounded-xl text-2xl font-medium transition-colors ${
             key === "backspace"
               ? "bg-muted text-muted-foreground"
+              : key === ","
+              ? "bg-card border border-border text-muted-foreground/30 cursor-default"
               : "bg-card border border-border hover:bg-secondary"
           }`}
         >
