@@ -716,7 +716,7 @@ export const Home = () => {
                         ) : isReceivable ? (
                           <span>🤝</span>
                         ) : (
-                          <span>{transaction.emotion ? emotionEmojis[transaction.emotion] || "💸" : "💸"}</span>
+                          <span>🧾</span>
                         )}
                       </div>
                       <div className="flex-1 text-left min-w-0">
