@@ -1,5 +1,5 @@
-import { useState, useCallback } from "react";
-import { useNavigate } from "react-router-dom";
+import { useState, useCallback, useEffect } from "react";
+import { useNavigate, useLocation } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { FadeIn } from "@/components/ui/motion";
 import { ArrowLeft, Upload, FileText, Check, Loader2, AlertCircle, X, Tag, CreditCard, Package } from "lucide-react";
@@ -15,16 +15,29 @@ type Step = "upload" | "parsing" | "review" | "importing" | "done";
 
 export default function ImportStatement() {
   const navigate = useNavigate();
+  const location = useLocation();
+  const fromOnboarding = (location.state as any)?.fromOnboarding === true;
+  const preselectedCardId = (location.state as any)?.preselectedCardId as string | undefined;
   const { data: cards = [] } = useCreditCards();
   const createPurchase = useCreateCreditCardPurchase();
 
   const [step, setStep] = useState<Step>("upload");
   const [parseResult, setParseResult] = useState<ParseResult | null>(null);
   const [transactions, setTransactions] = useState<ParsedTransaction[]>([]);
-  const [selectedCardId, setSelectedCardId] = useState<string>("");
+  const [selectedCardId, setSelectedCardId] = useState<string>(preselectedCardId || "");
   const [categorizingIndex, setCategorizingIndex] = useState<number | null>(null);
   const [importProgress, setImportProgress] = useState(0);
   const [importedCount, setImportedCount] = useState(0);
+
+  // Auto-select the preselected card or the only available card
+  useEffect(() => {
+    if (selectedCardId) return;
+    if (preselectedCardId) {
+      setSelectedCardId(preselectedCardId);
+    } else if (cards.length === 1) {
+      setSelectedCardId(cards[0].id);
+    }
+  }, [cards, preselectedCardId, selectedCardId]);
 
   const handleFileChange = useCallback(async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -151,7 +164,7 @@ export default function ImportStatement() {
               <p className="text-xs text-muted-foreground">{stepDescription[step]}</p>
             </div>
           </div>
-          <Button variant="ghost" size="sm" className="text-muted-foreground" onClick={() => navigate("/")}>
+          <Button variant="ghost" size="sm" className="text-muted-foreground" onClick={() => navigate("/", { replace: true })}>
             Cancelar
           </Button>
         </div>
@@ -452,12 +465,20 @@ export default function ImportStatement() {
               )}
             </div>
             <div className="flex gap-3 justify-center">
-              <Button variant="outline" onClick={() => navigate("/cards")}>
-                Ver cartões
-              </Button>
-              <Button variant="warm" onClick={() => { setStep("upload"); setTransactions([]); setParseResult(null); }}>
-                Importar outra
-              </Button>
+              {fromOnboarding ? (
+                <Button variant="warm" onClick={() => navigate("/", { replace: true })}>
+                  Ir para o Início
+                </Button>
+              ) : (
+                <>
+                  <Button variant="outline" onClick={() => navigate("/cards")}>
+                    Ver cartões
+                  </Button>
+                  <Button variant="warm" onClick={() => { setStep("upload"); setTransactions([]); setParseResult(null); }}>
+                    Importar outra
+                  </Button>
+                </>
+              )}
             </div>
           </FadeIn>
         )}
