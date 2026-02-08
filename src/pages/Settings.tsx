@@ -1,7 +1,6 @@
 import { useNavigate } from "react-router-dom";
 import { useState, useEffect } from "react";
 import { generateFinancialReport } from "@/lib/exportPdf";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { useExpenses } from "@/hooks/useExpenses";
 import { useIncomes } from "@/hooks/useIncomes";
 import { useDebts } from "@/hooks/useDebts";
@@ -73,12 +72,6 @@ export const Settings = () => {
   const { data: goalStats } = useGoalStats();
   const { data: ccInstallments = [] } = useCardInstallmentsByMonth(new Date());
   
-  const [editingAiName, setEditingAiName] = useState(false);
-  const [tempAiName, setTempAiName] = useState(profile?.ai_name || preferences.aiName);
-
-  // Sync aiName from profile (DB) to local preferences when profile loads
-  const displayAiName = profile?.ai_name || preferences.aiName;
-  
   // Keep localStorage in sync with DB value
   useEffect(() => {
     if (profile?.ai_name && profile.ai_name !== preferences.aiName) {
@@ -101,15 +94,6 @@ export const Settings = () => {
   // Get user's biometric credentials
   const userCredentials = user?.id ? getCredentialsForUser(user.id) : [];
   const hasBiometricEnabled = userCredentials.length > 0;
-
-  const saveAiName = async () => {
-    if (tempAiName.trim().length >= 2) {
-      updatePreference("aiName", tempAiName.trim());
-      // Also save to database
-      await updateProfile.mutateAsync({ ai_name: tempAiName.trim() });
-    }
-    setEditingAiName(false);
-  };
 
   const openWhatsApp = () => {
     window.open("https://wa.me/5511999999999", "_blank");
@@ -202,32 +186,6 @@ export const Settings = () => {
       </header>
 
       <main className="px-5 space-y-5">
-        {/* AI Name Editor Dialog */}
-        <Dialog open={editingAiName} onOpenChange={setEditingAiName}>
-          <DialogContent className="sm:max-w-sm">
-            <DialogHeader>
-              <DialogTitle className="text-base">Nome do gerenciador</DialogTitle>
-            </DialogHeader>
-            <div className="space-y-3">
-              <Input
-                value={tempAiName}
-                onChange={(e) => setTempAiName(e.target.value)}
-                placeholder="Ex: Luna, Max, Cris..."
-                maxLength={20}
-                autoFocus
-              />
-              <div className="flex gap-2">
-                <Button variant="ghost" size="sm" onClick={() => setEditingAiName(false)} className="flex-1">
-                  Cancelar
-                </Button>
-                <Button variant="warm" size="sm" onClick={saveAiName} className="flex-1">
-                  Salvar
-                </Button>
-              </div>
-            </div>
-          </DialogContent>
-        </Dialog>
-
         {/* Bloco 1 - Conta */}
         <FadeIn>
           <SettingsSection title="Conta">
@@ -262,24 +220,13 @@ export const Settings = () => {
           </SettingsSection>
         </FadeIn>
 
-        {/* Bloco 2 - Gerenciador no WhatsApp */}
+        {/* Bloco 2 - Assistente WhatsApp */}
         <FadeIn delay={0.05}>
-          <SettingsSection title="Gerenciador no WhatsApp">
+          <SettingsSection title="Assistente WhatsApp">
             <SettingsItem
               icon={MessageCircle}
-              label="Nome do gerenciador"
-              value={displayAiName}
-              action={
-                <button
-                  onClick={() => {
-                    setTempAiName(displayAiName);
-                    setEditingAiName(true);
-                  }}
-                  className="p-1.5 rounded-full hover:bg-muted transition-colors"
-                >
-                  <Edit2 className="w-4 h-4 text-muted-foreground" />
-                </button>
-              }
+              label="Assistente"
+              value="Saldin"
             />
             <SettingsItem
               icon={Smartphone}
@@ -293,23 +240,11 @@ export const Settings = () => {
               value={whatsappStatus.connected ? "Conectado" : "Desconectado"}
               valueColor={whatsappStatus.connected ? "text-essential" : "text-impulse"}
             />
-            <div className="flex gap-2 p-3 border-t border-border">
+            <div className="p-3 border-t border-border">
               <Button
                 variant="outline"
                 size="sm"
-                className="flex-1 gap-2"
-                onClick={() => {
-                  setTempAiName(displayAiName);
-                  setEditingAiName(true);
-                }}
-              >
-                <Edit2 className="w-4 h-4" />
-                Alterar nome
-              </Button>
-              <Button
-                variant="outline"
-                size="sm"
-                className="flex-1 gap-2"
+                className="w-full gap-2"
                 onClick={openWhatsApp}
               >
                 <RefreshCw className="w-4 h-4" />

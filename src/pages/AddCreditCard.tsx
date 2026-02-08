@@ -41,7 +41,7 @@ export default function AddCreditCard() {
 
   const handleSubmit = async () => {
     if (!canSubmit) return;
-    await createCard.mutateAsync({
+    const newCard = await createCard.mutateAsync({
       card_name: cardName.trim(),
       card_brand: cardBrand.trim() || null,
       last_four_digits: lastFour.trim() || null,
@@ -50,10 +50,22 @@ export default function AddCreditCard() {
       due_day: parseInt(dueDay),
       color: cardColor,
     });
-    if (fromOnboarding) {
-      navigate("/cards/import", { replace: true });
+    if (fromOnboarding && newCard?.id) {
+      // Go directly to import with the new card pre-selected
+      navigate("/cards/import", { replace: true, state: { fromOnboarding: true, preselectedCardId: newCard.id } });
+    } else if (fromOnboarding) {
+      navigate("/cards/import", { replace: true, state: { fromOnboarding: true } });
     } else {
       navigate("/cards");
+    }
+  };
+
+  const handleCancel = () => {
+    if (fromOnboarding) {
+      // User doesn't want to add a card - go home
+      navigate("/");
+    } else {
+      navigate(-1);
     }
   };
 
@@ -61,7 +73,7 @@ export default function AddCreditCard() {
     <div className="min-h-screen bg-background flex flex-col">
       <header className="px-5 pt-safe-top">
         <div className="pt-4 pb-2 flex items-center gap-4">
-          <Button variant="ghost" size="icon" onClick={() => navigate(-1)}>
+          <Button variant="ghost" size="icon" onClick={handleCancel}>
             <ArrowLeft className="w-5 h-5" />
           </Button>
           <h1 className="font-serif text-xl font-semibold">Novo Cartão</h1>
@@ -236,7 +248,7 @@ export default function AddCreditCard() {
       {/* Footer */}
       <div className="px-5 pb-safe-bottom">
         <div className="pb-4 flex gap-3">
-          <Button variant="outline" size="lg" className="flex-1 h-14" onClick={() => navigate(-1)}>
+          <Button variant="outline" size="lg" className="flex-1 h-14" onClick={handleCancel}>
             Cancelar
           </Button>
           <Button
