@@ -119,8 +119,8 @@ export const BottomNav = () => {
                 />
                 <RegisterOption
                   icon={CreditCard}
-                  label="Compra no cartão"
-                  desc="Registre uma compra parcelada ou à vista"
+                  label="Meus cartões"
+                  desc="Gerenciar cartões e faturas"
                   colorClass="primary"
                   onClick={() => handleOptionClick("/cards")}
                 />
