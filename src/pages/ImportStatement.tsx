@@ -464,21 +464,18 @@ export default function ImportStatement() {
                 </p>
               )}
             </div>
-            <div className="flex gap-3 justify-center">
-              {fromOnboarding ? (
-                <Button variant="warm" onClick={() => navigate("/", { replace: true })}>
-                  Ir para o Início
+            <div className="flex flex-col gap-3 items-center w-full max-w-xs mx-auto">
+              <Button variant="warm" className="w-full" onClick={() => navigate("/", { replace: true })}>
+                Ir para o Início
+              </Button>
+              <div className="flex gap-3 w-full">
+                <Button variant="outline" className="flex-1" onClick={() => navigate("/cards")}>
+                  Ver cartões
                 </Button>
-              ) : (
-                <>
-                  <Button variant="outline" onClick={() => navigate("/cards")}>
-                    Ver cartões
-                  </Button>
-                  <Button variant="warm" onClick={() => { setStep("upload"); setTransactions([]); setParseResult(null); }}>
-                    Importar outra
-                  </Button>
-                </>
-              )}
+                <Button variant="outline" className="flex-1" onClick={() => { setStep("upload"); setTransactions([]); setParseResult(null); }}>
+                  Importar outra
+                </Button>
+              </div>
             </div>
           </FadeIn>
         )}
