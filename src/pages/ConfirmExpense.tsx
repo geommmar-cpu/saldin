@@ -178,7 +178,7 @@ export const ConfirmExpense = () => {
           description: description || selectedCategory?.name || "Compra no cartão",
           total_amount: amount,
           total_installments: totalInstallments,
-          category_id: category || undefined,
+          // category_id omitido: categorias locais não são UUIDs válidos para FK
           purchase_date: new Date().toISOString().split("T")[0],
         });
       } else {
