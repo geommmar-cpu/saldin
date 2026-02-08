@@ -116,8 +116,8 @@ export default function ImportStatement() {
     const file = e.target.files?.[0];
     if (!file) return;
 
-    if (!file.name.endsWith(".csv") && !file.name.endsWith(".txt")) {
-      toast.error("Formato não suportado. Use arquivos CSV.");
+    if (!file.name.endsWith(".csv") && !file.name.endsWith(".pdf")) {
+      toast.error("Formato não suportado. Use arquivos CSV ou PDF.");
       return;
     }
 
@@ -221,11 +221,11 @@ export default function ImportStatement() {
               <div className="border-2 border-dashed border-border rounded-2xl p-8 text-center hover:border-primary/50 transition-colors">
                 <FileText className="w-8 h-8 text-muted-foreground mx-auto mb-3" />
                 <p className="font-medium text-sm">Clique para selecionar arquivo</p>
-                <p className="text-xs text-muted-foreground mt-1">CSV ou TXT</p>
+                <p className="text-xs text-muted-foreground mt-1">CSV ou PDF</p>
               </div>
               <input
                 type="file"
-                accept=".csv,.txt"
+                accept=".csv,.pdf"
                 className="hidden"
                 onChange={handleFileChange}
               />
