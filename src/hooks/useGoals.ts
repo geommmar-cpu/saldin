@@ -84,7 +84,7 @@ export const useGoalStats = () => {
 
       const { data, error } = await supabase
         .from("goals" as any)
-        .select("current_amount, target_amount, status");
+        .select("current_amount, target_amount, status, is_personal");
 
       if (error) {
         // Table doesn't exist yet - return empty stats
