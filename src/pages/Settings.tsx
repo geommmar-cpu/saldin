@@ -359,12 +359,6 @@ export const Settings = () => {
         {/* Bloco 5 - Integrações */}
         <FadeIn delay={0.2}>
           <SettingsSection title="Integrações">
-             <SettingsItem
-              icon={CreditCard}
-              label="Bancos e cartões"
-              value="Em breve"
-              valueColor="text-muted-foreground"
-            />
             <SettingsItem
               icon={MessageCircle}
               iconColor="text-[#25D366]"
