@@ -32,7 +32,7 @@ import { AlertsSection } from "@/components/home/AlertsSection";
 import { CreditCardSummary } from "@/components/home/CreditCardSummary";
 import { TransactionsSection } from "@/components/home/TransactionsSection";
 import { GoalsSummary } from "@/components/home/GoalsSummary";
-import { QuickActions } from "@/components/home/QuickActions";
+// QuickActions removed — Home now follows: Saldo > Bancos > Cartões > Metas > Alertas > Movimentações
 import { BankAccountsSummary } from "@/components/home/BankAccountsSummary";
 
 export const Home = () => {
@@ -171,19 +171,31 @@ export const Home = () => {
               />
             </FadeIn>
 
-            {/* Quick action cards */}
+            {/* 2. CONTAS BANCÁRIAS */}
             <FadeIn delay={0.08}>
-              <QuickActions
-                totalIncome={totalIncome}
-                totalSpent={totalSpent}
-                totalCardInstallments={totalCCInstallments}
-                totalReceivables={totalPendingReceivables}
+              <BankAccountsSummary />
+            </FadeIn>
+
+            {/* 3. CARTÃO DE CRÉDITO */}
+            <FadeIn delay={0.10}>
+              <CreditCardSummary
+                cards={creditCards}
+                installments={ccInstallments}
                 selectedMonth={selectedMonth}
               />
             </FadeIn>
 
-            {/* 2. ALERTAS */}
-            <FadeIn delay={0.1}>
+            {/* 4. METAS */}
+            <FadeIn delay={0.12}>
+              <GoalsSummary
+                goals={goals}
+                totalSaved={goalStats?.totalSaved || 0}
+                totalTarget={goalStats?.totalTarget || 0}
+              />
+            </FadeIn>
+
+            {/* 5. ALERTAS */}
+            <FadeIn delay={0.14}>
               <AlertsSection
                 debts={filteredDebts}
                 goals={goals}
@@ -193,30 +205,7 @@ export const Home = () => {
               />
             </FadeIn>
 
-            {/* 3. CARTÃO DE CRÉDITO - Fatura Atual */}
-            <FadeIn delay={0.12}>
-              <CreditCardSummary
-                cards={creditCards}
-                installments={ccInstallments}
-                selectedMonth={selectedMonth}
-              />
-            </FadeIn>
-
-            {/* 4. CONTAS BANCÁRIAS */}
-            <FadeIn delay={0.13}>
-              <BankAccountsSummary />
-            </FadeIn>
-
-            {/* 5. METAS */}
-            <FadeIn delay={0.14}>
-              <GoalsSummary
-                goals={goals}
-                totalSaved={goalStats?.totalSaved || 0}
-                totalTarget={goalStats?.totalTarget || 0}
-              />
-            </FadeIn>
-
-            {/* 5. MOVIMENTAÇÕES */}
+            {/* 6. MOVIMENTAÇÕES */}
             <FadeIn delay={0.16}>
               <TransactionsSection
                 expenses={filteredExpenses}

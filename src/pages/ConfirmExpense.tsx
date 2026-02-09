@@ -158,6 +158,7 @@ export const ConfirmExpense = () => {
   const canContinueExpense = () => {
     if (!description.trim() || !category || !paymentMethod) return false;
     if (paymentMethod === "credit" && !selectedCardId) return false;
+    if (paymentMethod !== "credit" && bankAccounts.length > 0 && !selectedBankId) return false;
     return true;
   };
 
@@ -531,14 +532,14 @@ export const ConfirmExpense = () => {
             )}
 
             {/* Bank Account Selector (for non-credit payments) */}
-            {paymentMethod && paymentMethod !== "credit" && bankAccounts.length > 0 && (
+            {paymentMethod && paymentMethod !== "credit" && (
               <motion.div
                 initial={{ opacity: 0, height: 0 }}
                 animate={{ opacity: 1, height: "auto" }}
                 className="mb-5"
               >
                 <label className="text-sm text-muted-foreground mb-3 block">
-                  Conta bancária (opcional)
+                  Conta de origem *
                 </label>
                 <div className="space-y-2">
                   {bankAccounts.map((account) => (

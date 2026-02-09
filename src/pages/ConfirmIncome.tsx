@@ -89,7 +89,7 @@ export const ConfirmIncome = () => {
     }
   };
 
-  const canSave = amount > 0 && description.trim() && selectedType && !createIncome.isPending;
+  const canSave = amount > 0 && description.trim() && selectedType && (bankAccounts.length === 0 || selectedBankId) && !createIncome.isPending;
 
   // Redirect if no amount
   if (!amount) {
@@ -216,15 +216,13 @@ export const ConfirmIncome = () => {
         )}
 
         {/* Bank Account Selector */}
-        {bankAccounts.length > 0 && (
-          <FadeIn delay={0.4}>
-            <BankAccountSelector
-              selectedId={selectedBankId}
-              onSelect={(id) => setSelectedBankId(selectedBankId === id ? "" : id)}
-              label="Conta de destino (opcional)"
-            />
-          </FadeIn>
-        )}
+        <FadeIn delay={0.4}>
+          <BankAccountSelector
+            selectedId={selectedBankId}
+            onSelect={(id) => setSelectedBankId(selectedBankId === id ? "" : id)}
+            label="Conta de destino *"
+          />
+        </FadeIn>
       </main>
 
       {/* Save Button */}

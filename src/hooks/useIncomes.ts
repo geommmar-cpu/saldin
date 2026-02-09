@@ -124,16 +124,41 @@ export const useCreateIncome = () => {
 
 export const useDeleteIncome = () => {
   const queryClient = useQueryClient();
+  const db = supabase as any;
 
   return useMutation({
     mutationFn: async (id: string) => {
-      const { error } = await supabase.from("incomes").delete().eq("id", id);
+      // Fetch income to check for bank_account_id (to reverse balance)
+      const { data: income } = await db
+        .from("incomes")
+        .select("amount, bank_account_id")
+        .eq("id", id)
+        .maybeSingle();
+
+      // Reverse bank balance before deleting
+      if (income?.bank_account_id) {
+        const { data: account } = await db
+          .from("bank_accounts")
+          .select("current_balance")
+          .eq("id", income.bank_account_id)
+          .single();
+        if (account) {
+          await db
+            .from("bank_accounts")
+            .update({ current_balance: Number(account.current_balance) - Number(income.amount), updated_at: new Date().toISOString() })
+            .eq("id", income.bank_account_id);
+        }
+      }
+
+      const { error } = await db.from("incomes").delete().eq("id", id);
       if (error) throw error;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["incomes"] });
       queryClient.invalidateQueries({ queryKey: ["income-stats"] });
       queryClient.invalidateQueries({ queryKey: ["income"] });
+      queryClient.invalidateQueries({ queryKey: ["bank-accounts"] });
+      queryClient.invalidateQueries({ queryKey: ["bank-account"] });
       toast.success("Receita removida!");
     },
     onError: (error) => {
