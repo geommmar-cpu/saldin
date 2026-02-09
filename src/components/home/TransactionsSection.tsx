@@ -56,7 +56,7 @@ export const TransactionsSection = ({
         description: e.description,
         date: new Date(e.date || e.created_at),
         icon: Receipt,
-        color: "text-foreground",
+        color: "text-impulse",
       });
     });
 
@@ -210,7 +210,7 @@ export const TransactionsSection = ({
                   tx.type === "debt" ? "bg-impulse/10" :
                   tx.type === "credit_card" ? "bg-obligation/10" :
                   tx.type === "receivable" ? "bg-essential/10" :
-                  "bg-muted"
+                  "bg-impulse/10"
                 )}>
                   <tx.icon className={cn("w-4 h-4", tx.color)} />
                 </div>
