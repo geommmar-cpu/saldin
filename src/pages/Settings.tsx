@@ -104,8 +104,17 @@ export const Settings = () => {
     try {
       // Clear all React Query cache
       queryClient.clear();
-      // Reset local preferences
+      // Reset local preferences but preserve dark mode
+      const currentDarkMode = preferences.darkMode;
       resetPreferences();
+      // Restore dark mode preference
+      if (currentDarkMode) {
+        const stored = localStorage.getItem("user_preferences");
+        const prefs = stored ? JSON.parse(stored) : {};
+        prefs.darkMode = true;
+        localStorage.setItem("user_preferences", JSON.stringify(prefs));
+        document.documentElement.classList.add("dark");
+      }
       // Sign out from Supabase
       await signOut();
       // Navigate to auth
