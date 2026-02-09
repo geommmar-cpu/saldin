@@ -247,27 +247,61 @@ export const useUpdateExpense = () => {
 
 export const useDeleteExpense = () => {
   const queryClient = useQueryClient();
+  const db = supabase as any;
 
   return useMutation({
     mutationFn: async ({ id, softDelete = false }: { id: string; softDelete?: boolean }) => {
+      // Fetch expense to check for bank_account_id (to reverse balance)
+      const { data: expense } = await db
+        .from("expenses")
+        .select("amount, bank_account_id")
+        .eq("id", id)
+        .maybeSingle();
+
       if (softDelete) {
-        // For expenses from integrations, mark as deleted instead of actually deleting
         const { data, error } = await supabase
           .from("expenses")
           .update({ status: "deleted" })
           .eq("id", id)
           .select()
           .single();
-
         if (error) throw error;
+
+        // Reverse bank balance
+        if (expense?.bank_account_id) {
+          const { data: account } = await db
+            .from("bank_accounts")
+            .select("current_balance")
+            .eq("id", expense.bank_account_id)
+            .single();
+          if (account) {
+            await db
+              .from("bank_accounts")
+              .update({ current_balance: Number(account.current_balance) + Number(expense.amount), updated_at: new Date().toISOString() })
+              .eq("id", expense.bank_account_id);
+          }
+        }
         return data;
       } else {
-        // Hard delete for manual expenses
+        // Reverse bank balance before deleting
+        if (expense?.bank_account_id) {
+          const { data: account } = await db
+            .from("bank_accounts")
+            .select("current_balance")
+            .eq("id", expense.bank_account_id)
+            .single();
+          if (account) {
+            await db
+              .from("bank_accounts")
+              .update({ current_balance: Number(account.current_balance) + Number(expense.amount), updated_at: new Date().toISOString() })
+              .eq("id", expense.bank_account_id);
+          }
+        }
+
         const { error } = await supabase
           .from("expenses")
           .delete()
           .eq("id", id);
-
         if (error) throw error;
         return { id };
       }
@@ -277,6 +311,8 @@ export const useDeleteExpense = () => {
       queryClient.invalidateQueries({ queryKey: ["expense-stats"] });
       queryClient.invalidateQueries({ queryKey: ["pending-expenses"] });
       queryClient.invalidateQueries({ queryKey: ["expense"] });
+      queryClient.invalidateQueries({ queryKey: ["bank-accounts"] });
+      queryClient.invalidateQueries({ queryKey: ["bank-account"] });
       toast.success("Gasto excluído com sucesso!");
     },
     onError: (error) => {
