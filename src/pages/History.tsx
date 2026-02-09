@@ -102,7 +102,7 @@ const HistoryItemCard = ({ item, onClick }: HistoryItemCardProps) => {
       <div
         className={cn(
           "flex h-10 w-10 items-center justify-center rounded-full text-lg flex-shrink-0",
-          isIncome ? "bg-essential/15" : isDebt ? "bg-impulse/10" : isCreditCard ? "bg-obligation/10" : "bg-muted"
+          isIncome ? "bg-essential/15" : isDebt ? "bg-impulse/10" : isCreditCard ? "bg-obligation/10" : "bg-impulse/10"
         )}
       >
         {isIncome ? (
@@ -112,7 +112,7 @@ const HistoryItemCard = ({ item, onClick }: HistoryItemCardProps) => {
         ) : isCreditCard ? (
           <CreditCard className="w-5 h-5 text-obligation" />
         ) : (
-          <Receipt className="w-5 h-5 text-muted-foreground" />
+          <Receipt className="w-5 h-5 text-impulse" />
         )}
       </div>
 
