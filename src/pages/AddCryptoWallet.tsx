@@ -1,13 +1,16 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { FadeIn } from "@/components/ui/motion";
-import { ArrowLeft, Check, Loader2, Bitcoin } from "lucide-react";
+import { ArrowLeft, Check, Loader2, Bitcoin, AlertTriangle } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useCreateCryptoWallet } from "@/hooks/useCryptoWallets";
 import { CRYPTO_LIST } from "@/types/cryptoWallet";
+import { fetchCryptoPrices, formatCryptoValue, formatCryptoQuantity } from "@/lib/cryptoPrices";
+
+type InputMode = "brl" | "quantity";
 
 export const AddCryptoWallet = () => {
   const navigate = useNavigate();
@@ -17,8 +20,14 @@ export const AddCryptoWallet = () => {
   const [customName, setCustomName] = useState("");
   const [customSymbol, setCustomSymbol] = useState("");
   const [customCoinGeckoId, setCustomCoinGeckoId] = useState("");
-  const [quantity, setQuantity] = useState("");
+  const [inputMode, setInputMode] = useState<InputMode>("brl");
+  const [inputValue, setInputValue] = useState("");
   const [displayCurrency, setDisplayCurrency] = useState<"BRL" | "USD">("BRL");
+
+  // Price state
+  const [currentPrice, setCurrentPrice] = useState<number | null>(null);
+  const [priceLoading, setPriceLoading] = useState(false);
+  const [priceError, setPriceError] = useState(false);
 
   const cryptoInfo = CRYPTO_LIST.find(c => c.id === selectedCrypto);
   const isCustom = selectedCrypto === "custom";
@@ -27,7 +36,43 @@ export const AddCryptoWallet = () => {
   const symbol = isCustom ? customSymbol.toUpperCase() : cryptoInfo?.symbol || "";
   const cryptoId = isCustom ? customCoinGeckoId : cryptoInfo?.id || "";
 
-  const canSave = name.trim().length > 0 && symbol.trim().length > 0 && parseFloat(quantity) >= 0;
+  // Fetch price when crypto is selected
+  useEffect(() => {
+    const id = isCustom ? customCoinGeckoId : cryptoId;
+    if (!id) {
+      setCurrentPrice(null);
+      return;
+    }
+
+    setPriceLoading(true);
+    setPriceError(false);
+    fetchCryptoPrices([id])
+      .then((prices) => {
+        const p = prices[id];
+        if (p) {
+          setCurrentPrice(displayCurrency === "USD" ? p.usd : p.brl);
+        } else {
+          setCurrentPrice(null);
+          setPriceError(true);
+        }
+      })
+      .catch(() => {
+        setCurrentPrice(null);
+        setPriceError(true);
+      })
+      .finally(() => setPriceLoading(false));
+  }, [cryptoId, customCoinGeckoId, isCustom, displayCurrency]);
+
+  // Computed values
+  const rawValue = parseFloat(inputValue) || 0;
+  const computedQuantity = inputMode === "brl" && currentPrice && currentPrice > 0
+    ? rawValue / currentPrice
+    : inputMode === "quantity" ? rawValue : 0;
+  const computedValue = inputMode === "quantity" && currentPrice
+    ? rawValue * currentPrice
+    : inputMode === "brl" ? rawValue : 0;
+
+  const canSave = name.trim().length > 0 && symbol.trim().length > 0 && computedQuantity > 0;
 
   const handleSave = async () => {
     if (!canSave) return;
@@ -36,13 +81,15 @@ export const AddCryptoWallet = () => {
       crypto_id: cryptoId || symbol.toLowerCase(),
       symbol: symbol.trim(),
       name: name.trim(),
-      quantity: parseFloat(quantity) || 0,
+      quantity: computedQuantity,
       display_currency: displayCurrency,
       active: true,
     });
 
     navigate("/crypto");
   };
+
+  const showCryptoSelected = selectedCrypto && (isCustom ? customName && customSymbol : true);
 
   return (
     <div className="min-h-screen bg-background flex flex-col">
@@ -83,7 +130,6 @@ export const AddCryptoWallet = () => {
                 <span className="text-xs font-medium truncate w-full text-center">{crypto.name}</span>
               </motion.button>
             ))}
-            {/* Outro */}
             <motion.button
               whileTap={{ scale: 0.95 }}
               onClick={() => setSelectedCrypto("custom")}
@@ -105,58 +151,130 @@ export const AddCryptoWallet = () => {
           <FadeIn className="mb-6 space-y-4">
             <div>
               <label className="text-sm text-muted-foreground mb-2 block">Nome</label>
-              <Input
-                placeholder="Ex: Avalanche"
-                value={customName}
-                onChange={(e) => setCustomName(e.target.value)}
-                maxLength={40}
-                className="h-12"
-              />
+              <Input placeholder="Ex: Avalanche" value={customName} onChange={(e) => setCustomName(e.target.value)} maxLength={40} className="h-12" />
             </div>
             <div>
               <label className="text-sm text-muted-foreground mb-2 block">Símbolo</label>
-              <Input
-                placeholder="Ex: AVAX"
-                value={customSymbol}
-                onChange={(e) => setCustomSymbol(e.target.value.toUpperCase())}
-                maxLength={10}
-                className="h-12"
-              />
+              <Input placeholder="Ex: AVAX" value={customSymbol} onChange={(e) => setCustomSymbol(e.target.value.toUpperCase())} maxLength={10} className="h-12" />
             </div>
             <div>
               <label className="text-sm text-muted-foreground mb-2 block">ID CoinGecko (opcional)</label>
-              <Input
-                placeholder="Ex: avalanche-2"
-                value={customCoinGeckoId}
-                onChange={(e) => setCustomCoinGeckoId(e.target.value)}
-                maxLength={60}
-                className="h-12"
-              />
-              <p className="text-xs text-muted-foreground mt-1">
-                Usado para atualizar a cotação automaticamente
-              </p>
+              <Input placeholder="Ex: avalanche-2" value={customCoinGeckoId} onChange={(e) => setCustomCoinGeckoId(e.target.value)} maxLength={60} className="h-12" />
+              <p className="text-xs text-muted-foreground mt-1">Usado para atualizar a cotação automaticamente</p>
             </div>
           </FadeIn>
         )}
 
-        {/* Quantity */}
-        <FadeIn delay={0.05} className="mb-6">
-          <label className="text-sm text-muted-foreground mb-2 block">
-            Quantidade {symbol && `(${symbol})`}
-          </label>
-          <Input
-            type="number"
-            step="any"
-            min="0"
-            placeholder="0.00"
-            value={quantity}
-            onChange={(e) => setQuantity(e.target.value)}
-            className="h-12 text-lg font-medium"
-          />
-          <p className="text-xs text-muted-foreground mt-2">
-            Informe a quantidade que você possui, não o valor em reais
-          </p>
-        </FadeIn>
+        {/* Input mode toggle + value */}
+        {showCryptoSelected && (
+          <>
+            <FadeIn delay={0.05} className="mb-4">
+              <label className="text-sm text-muted-foreground mb-3 block">Como deseja informar?</label>
+              <div className="grid grid-cols-2 gap-2">
+                <motion.button
+                  whileTap={{ scale: 0.95 }}
+                  onClick={() => { setInputMode("brl"); setInputValue(""); }}
+                  className={cn(
+                    "p-3 rounded-xl border-2 text-center transition-all text-sm",
+                    inputMode === "brl"
+                      ? "border-primary bg-primary/10 text-primary font-medium"
+                      : "border-border bg-card hover:bg-secondary"
+                  )}
+                >
+                  💰 Valor em {displayCurrency === "BRL" ? "reais" : "dólares"}
+                </motion.button>
+                <motion.button
+                  whileTap={{ scale: 0.95 }}
+                  onClick={() => { setInputMode("quantity"); setInputValue(""); }}
+                  className={cn(
+                    "p-3 rounded-xl border-2 text-center transition-all text-sm",
+                    inputMode === "quantity"
+                      ? "border-primary bg-primary/10 text-primary font-medium"
+                      : "border-border bg-card hover:bg-secondary"
+                  )}
+                >
+                  🪙 Quantidade de {symbol}
+                </motion.button>
+              </div>
+            </FadeIn>
+
+            {/* Price status */}
+            {priceLoading && (
+              <FadeIn className="mb-4">
+                <div className="flex items-center gap-2 text-sm text-muted-foreground p-3 rounded-xl bg-muted/50">
+                  <Loader2 className="w-4 h-4 animate-spin" />
+                  Buscando cotação...
+                </div>
+              </FadeIn>
+            )}
+
+            {priceError && !priceLoading && (
+              <FadeIn className="mb-4">
+                <div className="flex items-center gap-2 text-sm text-warning p-3 rounded-xl bg-warning/10 border border-warning/20">
+                  <AlertTriangle className="w-4 h-4" />
+                  Cotação indisponível. {inputMode === "brl" ? "Use o modo quantidade." : "O valor em reais não será calculado."}
+                </div>
+              </FadeIn>
+            )}
+
+            {currentPrice !== null && !priceLoading && (
+              <FadeIn className="mb-4">
+                <div className="text-xs text-muted-foreground p-3 rounded-xl bg-muted/50">
+                  Cotação atual: <strong>{formatCryptoValue(currentPrice, displayCurrency)}</strong> por {symbol}
+                </div>
+              </FadeIn>
+            )}
+
+            {/* Input field */}
+            <FadeIn delay={0.05} className="mb-4">
+              <label className="text-sm text-muted-foreground mb-2 block">
+                {inputMode === "brl"
+                  ? `Valor (${displayCurrency})`
+                  : `Quantidade (${symbol})`
+                }
+              </label>
+              <Input
+                type="number"
+                step="any"
+                min="0"
+                placeholder="0.00"
+                value={inputValue}
+                onChange={(e) => setInputValue(e.target.value)}
+                className="h-12 text-lg font-medium"
+                disabled={inputMode === "brl" && currentPrice === null && !priceLoading}
+              />
+            </FadeIn>
+
+            {/* Conversion preview */}
+            {rawValue > 0 && currentPrice !== null && currentPrice > 0 && (
+              <FadeIn className="mb-6">
+                <div className="p-4 rounded-xl bg-card border border-border space-y-2">
+                  <p className="text-sm text-muted-foreground font-medium">Resumo da conversão</p>
+                  <div className="grid grid-cols-2 gap-3">
+                    <div>
+                      <p className="text-xs text-muted-foreground">Quantidade</p>
+                      <p className="text-sm font-semibold">
+                        {formatCryptoQuantity(computedQuantity, symbol)} {symbol}
+                      </p>
+                    </div>
+                    <div>
+                      <p className="text-xs text-muted-foreground">Valor</p>
+                      <p className="text-sm font-semibold">
+                        {formatCryptoValue(computedValue, displayCurrency)}
+                      </p>
+                    </div>
+                    <div>
+                      <p className="text-xs text-muted-foreground">Cotação usada</p>
+                      <p className="text-sm font-medium">
+                        {formatCryptoValue(currentPrice, displayCurrency)}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </FadeIn>
+            )}
+          </>
+        )}
 
         {/* Display currency */}
         <FadeIn delay={0.1} className="mb-6">

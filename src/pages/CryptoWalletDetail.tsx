@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -6,7 +6,7 @@ import { BottomNav } from "@/components/BottomNav";
 import { FadeIn } from "@/components/ui/motion";
 import {
   ArrowLeft, Loader2, RefreshCw, TrendingUp, TrendingDown,
-  Edit2, Trash2, Plus, Minus, ArrowUpDown, Bitcoin
+  Edit2, Trash2, Plus, Minus, ArrowUpDown, Bitcoin, AlertTriangle
 } from "lucide-react";
 import {
   useCryptoWalletById,
@@ -49,7 +49,8 @@ export const CryptoWalletDetail = () => {
   const [showDelete, setShowDelete] = useState(false);
   const [showTxDialog, setShowTxDialog] = useState(false);
   const [txType, setTxType] = useState<CryptoTransactionType>("deposit");
-  const [txQuantity, setTxQuantity] = useState("");
+  const [txInputMode, setTxInputMode] = useState<"brl" | "quantity">("brl");
+  const [txInputValue, setTxInputValue] = useState("");
   const [txBankId, setTxBankId] = useState<string>("");
   const [txNotes, setTxNotes] = useState("");
 
@@ -82,30 +83,41 @@ export const CryptoWalletDetail = () => {
     navigate("/crypto");
   };
 
+  const walletPrice = Number(wallet.last_price);
+  const hasPriceData = walletPrice > 0;
+
+  // Computed tx values
+  const txRawValue = parseFloat(txInputValue) || 0;
+  const txComputedQuantity = txInputMode === "brl" && hasPriceData
+    ? txRawValue / walletPrice
+    : txInputMode === "quantity" ? txRawValue : 0;
+  const txComputedValue = txInputMode === "quantity" && hasPriceData
+    ? txRawValue * walletPrice
+    : txInputMode === "brl" ? txRawValue : 0;
+
   const openTxDialog = (type: CryptoTransactionType) => {
     setTxType(type);
-    setTxQuantity("");
+    setTxInputMode(type === "adjustment" ? "quantity" : "brl");
+    setTxInputValue("");
     setTxBankId("");
     setTxNotes("");
     setShowTxDialog(true);
   };
 
   const handleSubmitTx = async () => {
-    const qty = parseFloat(txQuantity);
+    const qty = txComputedQuantity;
     if (!qty || qty <= 0) return;
 
     if (txType === "withdraw" && qty > Number(wallet.quantity)) {
       return;
     }
 
-    const totalVal = qty * Number(wallet.last_price);
-
     await createTransaction.mutateAsync({
       wallet_id: wallet.id,
       type: txType,
       quantity: txType === "adjustment" ? qty : qty,
-      price_at_time: Number(wallet.last_price),
-      total_value: txType === "adjustment" ? null : totalVal,
+      price_at_time: walletPrice,
+      total_value: txType === "adjustment" ? null : txComputedValue,
       bank_account_id: (txBankId && txBankId !== "none") ? txBankId : null,
       notes: txNotes || null,
     });
@@ -280,19 +292,68 @@ export const CryptoWalletDetail = () => {
             </DialogTitle>
           </DialogHeader>
           <div className="space-y-4 pt-2">
+            {/* Input mode toggle (not for adjustment) */}
+            {txType !== "adjustment" && (
+              <div className="grid grid-cols-2 gap-2">
+                <motion.button
+                  whileTap={{ scale: 0.95 }}
+                  onClick={() => { setTxInputMode("brl"); setTxInputValue(""); }}
+                  className={cn(
+                    "p-2.5 rounded-xl border-2 text-center transition-all text-sm",
+                    txInputMode === "brl"
+                      ? "border-primary bg-primary/10 text-primary font-medium"
+                      : "border-border bg-card hover:bg-secondary"
+                  )}
+                >
+                  💰 Valor em {wallet.display_currency === "BRL" ? "reais" : "dólares"}
+                </motion.button>
+                <motion.button
+                  whileTap={{ scale: 0.95 }}
+                  onClick={() => { setTxInputMode("quantity"); setTxInputValue(""); }}
+                  className={cn(
+                    "p-2.5 rounded-xl border-2 text-center transition-all text-sm",
+                    txInputMode === "quantity"
+                      ? "border-primary bg-primary/10 text-primary font-medium"
+                      : "border-border bg-card hover:bg-secondary"
+                  )}
+                >
+                  🪙 Quantidade ({wallet.symbol})
+                </motion.button>
+              </div>
+            )}
+
+            {/* Price info */}
+            {hasPriceData && txType !== "adjustment" && (
+              <div className="text-xs text-muted-foreground p-3 rounded-xl bg-muted/50">
+                Cotação atual: <strong>{formatCryptoValue(walletPrice, wallet.display_currency)}</strong> por {wallet.symbol}
+              </div>
+            )}
+
+            {!hasPriceData && txInputMode === "brl" && txType !== "adjustment" && (
+              <div className="flex items-center gap-2 text-sm text-warning p-3 rounded-xl bg-warning/10 border border-warning/20">
+                <AlertTriangle className="w-4 h-4 flex-shrink-0" />
+                Cotação indisponível. Atualize a cotação ou use o modo quantidade.
+              </div>
+            )}
+
             <div>
               <label className="text-sm text-muted-foreground mb-2 block">
-                {txType === "adjustment" ? `Nova quantidade total (${wallet.symbol})` : `Quantidade (${wallet.symbol})`}
+                {txType === "adjustment"
+                  ? `Nova quantidade total (${wallet.symbol})`
+                  : txInputMode === "brl"
+                    ? `Valor (${wallet.display_currency})`
+                    : `Quantidade (${wallet.symbol})`
+                }
               </label>
               <Input
                 type="number"
                 step="any"
                 min="0"
-                max={txType === "withdraw" ? Number(wallet.quantity) : undefined}
                 placeholder="0.00"
-                value={txQuantity}
-                onChange={(e) => setTxQuantity(e.target.value)}
+                value={txInputValue}
+                onChange={(e) => setTxInputValue(e.target.value)}
                 className="h-12 text-lg"
+                disabled={txInputMode === "brl" && !hasPriceData && txType !== "adjustment"}
               />
               {txType === "withdraw" && (
                 <p className="text-xs text-muted-foreground mt-1">
@@ -305,6 +366,27 @@ export const CryptoWalletDetail = () => {
                 </p>
               )}
             </div>
+
+            {/* Conversion preview */}
+            {txRawValue > 0 && hasPriceData && txType !== "adjustment" && (
+              <div className="p-3 rounded-xl bg-card border border-border space-y-1.5">
+                <p className="text-xs text-muted-foreground font-medium">Resumo</p>
+                <div className="grid grid-cols-2 gap-2">
+                  <div>
+                    <p className="text-xs text-muted-foreground">Quantidade</p>
+                    <p className="text-sm font-semibold">
+                      {formatCryptoQuantity(txComputedQuantity, wallet.symbol)} {wallet.symbol}
+                    </p>
+                  </div>
+                  <div>
+                    <p className="text-xs text-muted-foreground">Valor</p>
+                    <p className="text-sm font-semibold">
+                      {formatCryptoValue(txComputedValue, wallet.display_currency)}
+                    </p>
+                  </div>
+                </div>
+              </div>
+            )}
 
             {txType !== "adjustment" && bankAccounts.length > 0 && (
               <div>
@@ -347,7 +429,7 @@ export const CryptoWalletDetail = () => {
               variant="warm"
               className="w-full"
               onClick={handleSubmitTx}
-              disabled={createTransaction.isPending || !txQuantity || parseFloat(txQuantity) <= 0}
+              disabled={createTransaction.isPending || txComputedQuantity <= 0}
             >
               {createTransaction.isPending ? (
                 <Loader2 className="w-4 h-4 animate-spin mr-2" />
