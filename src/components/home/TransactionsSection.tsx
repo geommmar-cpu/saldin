@@ -1,7 +1,7 @@
 import { useMemo, useState } from "react";
 import { motion } from "framer-motion";
 import { useNavigate } from "react-router-dom";
-import { CreditCard, Banknote, HandCoins, Receipt } from "lucide-react";
+import { CreditCard, Banknote, HandCoins, Receipt, LucideIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { formatCurrency } from "@/lib/balanceCalculations";
@@ -20,7 +20,7 @@ interface TransactionItem {
   amount: number;
   description: string;
   date: Date;
-  icon: string;
+  icon: LucideIcon;
   color: string;
 }
 
@@ -55,7 +55,7 @@ export const TransactionsSection = ({
         amount: Number(e.amount),
         description: e.description,
         date: new Date(e.date || e.created_at),
-        icon: "🧾",
+        icon: Receipt,
         color: "text-foreground",
       });
     });
@@ -71,7 +71,7 @@ export const TransactionsSection = ({
         amount: Number(i.amount),
         description: i.is_recurring ? `${i.description} (recorrente)` : i.description,
         date: displayDate,
-        icon: "💰",
+        icon: Banknote,
         color: "text-essential",
       });
     });
@@ -84,7 +84,7 @@ export const TransactionsSection = ({
         amount: Number(d.installment_amount || d.total_amount),
         description: `${d.creditor_name}${d.is_installment ? ` ${d.current_installment}/${d.total_installments}` : ''}`,
         date: new Date(d.created_at),
-        icon: "💳",
+        icon: CreditCard,
         color: "text-impulse",
       });
     });
@@ -97,7 +97,7 @@ export const TransactionsSection = ({
         amount: Number(r.amount),
         description: `${r.debtor_name}${r.description ? ` · ${r.description}` : ''}`,
         date: new Date(r.due_date || r.created_at),
-        icon: "🤝",
+        icon: HandCoins,
         color: "text-essential",
       });
     });
@@ -110,7 +110,7 @@ export const TransactionsSection = ({
         amount: Number(inst.amount),
         description: `${inst.purchase?.description || "Cartão"} · ${inst.purchase?.card?.card_name || ""}`,
         date: new Date(inst.created_at),
-        icon: "💳",
+        icon: CreditCard,
         color: "text-obligation",
       });
     });
@@ -204,8 +204,15 @@ export const TransactionsSection = ({
                 onClick={() => handleClick(tx)}
                 className="w-full p-3 rounded-xl bg-card border border-border shadow-soft flex items-center gap-3"
               >
-                <div className="w-9 h-9 rounded-full bg-muted flex items-center justify-center text-lg shrink-0">
-                  {tx.icon}
+                <div className={cn(
+                  "w-9 h-9 rounded-full flex items-center justify-center shrink-0",
+                  tx.type === "income" ? "bg-essential/15" :
+                  tx.type === "debt" ? "bg-impulse/10" :
+                  tx.type === "credit_card" ? "bg-obligation/10" :
+                  tx.type === "receivable" ? "bg-essential/10" :
+                  "bg-muted"
+                )}>
+                  <tx.icon className={cn("w-4 h-4", tx.color)} />
                 </div>
                 <div className="flex-1 text-left min-w-0">
                   <p className="font-medium text-sm truncate">{tx.description}</p>

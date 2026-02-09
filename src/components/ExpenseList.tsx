@@ -3,6 +3,7 @@ import { cn } from "@/lib/utils";
 import { EmotionCategory } from "./EmotionSelector";
 import { formatDistanceToNow } from "date-fns";
 import { ptBR } from "date-fns/locale";
+import { ShieldCheck, Target, Smile, Flame, Receipt, LucideIcon } from "lucide-react";
 
 export interface Expense {
   id: string;
@@ -21,11 +22,11 @@ interface ExpenseItemProps {
   onClick?: () => void;
 }
 
-const categoryEmojis: Record<EmotionCategory, string> = {
-  essential: "✅",
-  obligation: "🎯",
-  pleasure: "😊",
-  impulse: "🔥",
+const categoryIcons: Record<EmotionCategory, LucideIcon> = {
+  essential: ShieldCheck,
+  obligation: Target,
+  pleasure: Smile,
+  impulse: Flame,
 };
 
 const sourceLabels: Record<Expense["source"], string> = {
@@ -43,6 +44,8 @@ export const ExpenseItem = ({ expense, onClick }: ExpenseItemProps) => {
     currency: "BRL",
   }).format(expense.amount);
 
+  const CategoryIcon = expense.category ? categoryIcons[expense.category] : Receipt;
+
   return (
     <motion.button
       initial={{ opacity: 0, x: -20 }}
@@ -59,9 +62,9 @@ export const ExpenseItem = ({ expense, onClick }: ExpenseItemProps) => {
     >
       <div
         className={cn(
-          "flex h-12 w-12 items-center justify-center rounded-full text-xl",
+          "flex h-12 w-12 items-center justify-center rounded-full",
           expense.category
-            ? `bg-${expense.category}/10`
+            ? ""
             : "bg-muted"
         )}
         style={
@@ -72,7 +75,19 @@ export const ExpenseItem = ({ expense, onClick }: ExpenseItemProps) => {
             : undefined
         }
       >
-        {expense.category ? categoryEmojis[expense.category] : "💳"}
+        <CategoryIcon
+          className={cn(
+            "w-5 h-5",
+            expense.category
+              ? ""
+              : "text-muted-foreground"
+          )}
+          style={
+            expense.category
+              ? { color: `hsl(var(--${expense.category}))` }
+              : undefined
+          }
+        />
       </div>
       <div className="flex-1 min-w-0">
         <p className="font-medium truncate">
