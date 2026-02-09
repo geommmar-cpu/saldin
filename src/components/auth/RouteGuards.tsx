@@ -120,6 +120,7 @@ export const OnboardingRoute = ({ children }: { children: React.ReactNode }) => 
     return (
       <BiometricLockScreen
         userEmail={user.email || ""}
+        userName={user.user_metadata?.name || user.user_metadata?.full_name || ""}
         onUnlock={() => {
           sessionStorage.setItem(BIOMETRIC_UNLOCKED_KEY, "true");
           setIsUnlocked(true);

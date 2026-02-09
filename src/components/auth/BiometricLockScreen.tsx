@@ -8,12 +8,14 @@ import logoSaldin from "@/assets/logo-saldin-final.png";
 
 interface BiometricLockScreenProps {
   userEmail: string;
+  userName?: string;
   onUnlock: () => void;
   onUsePassword: () => void;
 }
 
 export function BiometricLockScreen({ 
   userEmail, 
+  userName,
   onUnlock, 
   onUsePassword 
 }: BiometricLockScreenProps) {
@@ -65,11 +67,13 @@ export function BiometricLockScreen({
           {/* User greeting */}
           <div className="space-y-2">
             <h1 className="font-serif text-2xl font-semibold">
-              Olá novamente!
+              Olá{userName ? `, ${userName}` : " novamente"}!
             </h1>
-            <p className="text-muted-foreground text-sm">
-              {userEmail}
-            </p>
+            {userEmail && (
+              <p className="text-muted-foreground text-xs">
+                {userEmail}
+              </p>
+            )}
           </div>
 
           {/* Biometric button */}
