@@ -65,7 +65,7 @@ export const ExpenseItem = ({ expense, onClick }: ExpenseItemProps) => {
           "flex h-12 w-12 items-center justify-center rounded-full",
           expense.category
             ? ""
-            : "bg-muted"
+            : "bg-impulse/10"
         )}
         style={
           expense.category
@@ -80,7 +80,7 @@ export const ExpenseItem = ({ expense, onClick }: ExpenseItemProps) => {
             "w-5 h-5",
             expense.category
               ? ""
-              : "text-muted-foreground"
+              : "text-impulse"
           )}
           style={
             expense.category
