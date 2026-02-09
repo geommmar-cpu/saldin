@@ -2,7 +2,7 @@ import { useState, useCallback, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { FadeIn } from "@/components/ui/motion";
-import { ArrowLeft, Upload, FileText, Check, Loader2, AlertCircle, X, Tag, CreditCard, Package } from "lucide-react";
+import { ArrowLeft, Upload, FileText, Check, Loader2, AlertCircle, X, Tag, CreditCard, Package, RefreshCw } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useCreditCards, useCreateCreditCardPurchase } from "@/hooks/useCreditCards";
 import { defaultCategories } from "@/lib/categories";
@@ -332,8 +332,8 @@ export default function ImportStatement() {
                         </button>
                       )}
                       {tx.type !== "purchase" && (
-                        <div className="w-6 h-6 shrink-0 flex items-center justify-center text-xs text-muted-foreground">
-                          {tx.type === "payment" ? "💳" : "↩️"}
+                        <div className="w-6 h-6 shrink-0 flex items-center justify-center text-muted-foreground">
+                          {tx.type === "payment" ? <CreditCard className="w-4 h-4" /> : <RefreshCw className="w-4 h-4" />}
                         </div>
                       )}
 

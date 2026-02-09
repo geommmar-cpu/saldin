@@ -59,15 +59,26 @@ const paymentOptions: PaymentOption[] = [
   { value: "credit", label: "Crédito", icon: <CreditCardIcon className="w-5 h-5" /> },
 ];
 
+const emotionIcons: Record<EmotionType, React.ElementType> = {
+  pilar: Home,
+  essencial: Check,
+  impulso: CreditCard,
+};
+
 const emotionOptions = [
-  { value: "pilar" as EmotionType, label: "Pilar", emoji: "🏠", description: "Essencial para viver" },
-  { value: "essencial" as EmotionType, label: "Essencial", emoji: "✅", description: "Necessário" },
-  { value: "impulso" as EmotionType, label: "Impulso", emoji: "⚡", description: "Compra por impulso" },
+  { value: "pilar" as EmotionType, label: "Pilar", description: "Essencial para viver" },
+  { value: "essencial" as EmotionType, label: "Essencial", description: "Necessário" },
+  { value: "impulso" as EmotionType, label: "Impulso", description: "Compra por impulso" },
 ];
 
+const confirmationIcons = {
+  yes: Check,
+  no: MoreHorizontal,
+};
+
 const confirmationOptions = [
-  { value: true, label: "Sim", emoji: "👍" },
-  { value: false, label: "Não", emoji: "👎" },
+  { value: true, label: "Sim", iconKey: "yes" as const },
+  { value: false, label: "Não", iconKey: "no" as const },
 ];
 
 export const ConfirmExpense = () => {
@@ -767,7 +778,12 @@ export const ConfirmExpense = () => {
                         : "border-border bg-card hover:bg-secondary"
                     )}
                   >
-                    <span className="text-2xl">{opt.emoji}</span>
+                    <div className={cn(
+                      "w-10 h-10 rounded-full flex items-center justify-center mb-1",
+                      selectedEmotion === opt.value ? "bg-white/20" : "bg-muted"
+                    )}>
+                      {(() => { const Icon = emotionIcons[opt.value]; return <Icon className="w-5 h-5" />; })()}
+                    </div>
                     <span className="text-sm font-medium">{opt.label}</span>
                     <span className="text-xs text-muted-foreground">{opt.description}</span>
                   </motion.button>
@@ -793,7 +809,7 @@ export const ConfirmExpense = () => {
                         : "border-border bg-card hover:bg-secondary"
                     )}
                   >
-                    <span className="text-xl">{opt.emoji}</span>
+                    {(() => { const Icon = confirmationIcons[opt.iconKey]; return <Icon className="w-5 h-5" />; })()}
                     <span className="font-medium">{opt.label}</span>
                   </motion.button>
                 ))}
