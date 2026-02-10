@@ -112,10 +112,8 @@ export const Home = () => {
 
   // Bank total = soma dos saldos reais de todas as contas bancárias
   const bankTotal = bankAccounts.reduce((sum, acc) => sum + Number(acc.current_balance), 0);
-  // Saldo bruto = bancos + cripto (se ativo)
-  const saldoBrutoReal = bankTotal + (preferences.cryptoEnabled ? cryptoTotal : 0);
 
-  // Balance calculation (usando saldo real dos bancos como base)
+  // Balance calculation (usando APENAS saldo bancário como base — cripto é patrimônio separado)
   const balanceBreakdown = calculateBalances(
     filteredIncomes,
     filteredExpenses,
@@ -123,7 +121,7 @@ export const Home = () => {
     selectedMonth,
     goalStats?.totalSaved || 0,
     totalCCInstallments,
-    saldoBrutoReal
+    bankTotal
   );
 
   // Navigation
@@ -181,6 +179,8 @@ export const Home = () => {
                 balance={balanceBreakdown}
                 totalIncome={totalIncome}
                 totalSpent={totalSpent}
+                cryptoTotal={preferences.cryptoEnabled ? cryptoTotal : 0}
+                cryptoEnabled={preferences.cryptoEnabled}
               />
             </FadeIn>
 

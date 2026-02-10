@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Coins, ChevronDown, ChevronUp, Wallet, Lock, PiggyBank, Info, CreditCard } from "lucide-react";
+import { Coins, ChevronDown, ChevronUp, Wallet, Lock, PiggyBank, Info, CreditCard, Bitcoin, TrendingUp } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { BalanceBreakdown, formatCurrency } from "@/lib/balanceCalculations";
 import {
@@ -13,11 +13,14 @@ interface BalanceHeroProps {
   balance: BalanceBreakdown;
   totalIncome: number;
   totalSpent: number;
+  cryptoTotal?: number;
+  cryptoEnabled?: boolean;
 }
 
-export const BalanceHero = ({ balance, totalIncome, totalSpent }: BalanceHeroProps) => {
+export const BalanceHero = ({ balance, totalIncome, totalSpent, cryptoTotal = 0, cryptoEnabled = false }: BalanceHeroProps) => {
   const [expanded, setExpanded] = useState(false);
   const usagePercentage = totalIncome > 0 ? (totalSpent / totalIncome) * 100 : 0;
+  const patrimonioTotal = balance.saldoBruto + cryptoTotal;
 
   return (
     <motion.div
@@ -113,7 +116,7 @@ export const BalanceHero = ({ balance, totalIncome, totalSpent }: BalanceHeroPro
                 </div>
                 <div>
                   <p className="text-sm font-medium">Saldo Bruto</p>
-                  <p className="text-xs text-muted-foreground">Receitas − Gastos</p>
+                  <p className="text-xs text-muted-foreground">Saldo nas contas bancárias</p>
                 </div>
               </div>
               <p className={cn("font-semibold", balance.saldoBruto >= 0 ? "text-foreground" : "text-impulse")}>
@@ -151,6 +154,42 @@ export const BalanceHero = ({ balance, totalIncome, totalSpent }: BalanceHeroPro
                 </div>
                 <p className="font-semibold text-essential">
                   − {formatCurrency(balance.saldoGuardado)}
+                </p>
+              </div>
+            )}
+
+            {/* Crypto Investment - separate from available balance */}
+            {cryptoEnabled && cryptoTotal > 0 && (
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <div className="w-8 h-8 rounded-full bg-[#F7931A]/10 flex items-center justify-center">
+                    <Bitcoin className="w-4 h-4 text-[#F7931A]" />
+                  </div>
+                  <div>
+                    <p className="text-sm font-medium">Investimentos</p>
+                    <p className="text-xs text-muted-foreground">Patrimônio em cripto</p>
+                  </div>
+                </div>
+                <p className="font-semibold text-[#F7931A]">
+                  {formatCurrency(cryptoTotal)}
+                </p>
+              </div>
+            )}
+
+            {/* Patrimônio Total */}
+            {cryptoEnabled && cryptoTotal > 0 && (
+              <div className="flex items-center justify-between p-3 rounded-xl bg-primary/5 border border-primary/10">
+                <div className="flex items-center gap-2">
+                  <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center">
+                    <TrendingUp className="w-4 h-4 text-primary" />
+                  </div>
+                  <div>
+                    <p className="text-sm font-medium">Patrimônio Total</p>
+                    <p className="text-xs text-muted-foreground">Bancos + Investimentos</p>
+                  </div>
+                </div>
+                <p className="font-semibold text-primary">
+                  {formatCurrency(patrimonioTotal)}
                 </p>
               </div>
             )}
