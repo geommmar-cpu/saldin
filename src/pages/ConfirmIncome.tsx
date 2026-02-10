@@ -116,10 +116,13 @@ export const ConfirmIncome = () => {
 
     try {
       // Calculate income date
-      let incomeDate: string | undefined;
+      let incomeDate: string;
       if (isRecurring && paymentDay) {
         const nextDate = getNextPaymentDate(Number(paymentDay));
         incomeDate = nextDate.toISOString().split("T")[0];
+      } else {
+        // Non-recurring: always use today's date explicitly
+        incomeDate = new Date().toISOString().split("T")[0];
       }
 
       await createIncome.mutateAsync({
@@ -128,7 +131,7 @@ export const ConfirmIncome = () => {
         type: selectedType,
         is_recurring: isRecurring,
         bank_account_id: selectedBankId || undefined,
-        ...(incomeDate ? { date: incomeDate } : {}),
+        date: incomeDate,
         ...(paymentDay ? { notes: `payment_day:${paymentDay}` } : {}),
       } as any);
 
@@ -163,7 +166,7 @@ export const ConfirmIncome = () => {
     <div className="min-h-screen bg-background flex flex-col">
       {/* Header */}
       <header className="px-5 pt-safe-top">
-        <div className="pt-4 pb-4 flex items-center gap-4">
+        <div className="pt-4 pb-3 flex items-center gap-4">
           <Button variant="ghost" size="icon" onClick={() => navigate("/")}>
             <ArrowLeft className="w-5 h-5" />
           </Button>
