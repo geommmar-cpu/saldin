@@ -1,5 +1,6 @@
 import { motion } from "framer-motion";
-import { Landmark, ChevronRight, Plus } from "lucide-react";
+import { Landmark, ChevronRight, Plus, AlertTriangle } from "lucide-react";
+import { cn } from "@/lib/utils";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { useBankAccounts } from "@/hooks/useBankAccounts";
@@ -35,7 +36,15 @@ export const BankAccountsSummary = () => {
       {/* Total */}
       <div className="mb-3 px-1">
         <p className="text-xs text-muted-foreground">Saldo total</p>
-        <p className="font-serif text-lg font-semibold">{formatCurrency(totalBalance)}</p>
+        <p className={cn("font-serif text-lg font-semibold", totalBalance < 0 && "text-impulse")}>
+          {formatCurrency(totalBalance)}
+        </p>
+        {totalBalance < 0 && (
+          <div className="flex items-center gap-1 mt-1">
+            <AlertTriangle className="w-3 h-3 text-impulse" />
+            <p className="text-xs text-impulse">Saldo negativo</p>
+          </div>
+        )}
       </div>
 
       {/* Account cards */}
@@ -60,7 +69,10 @@ export const BankAccountsSummary = () => {
               <div className="flex-1 min-w-0">
                 <p className="text-sm font-medium truncate">{account.bank_name}</p>
               </div>
-              <p className="font-semibold text-sm tabular-nums">
+              <p className={cn(
+                "font-semibold text-sm tabular-nums",
+                Number(account.current_balance) < 0 && "text-impulse"
+              )}>
                 {formatCurrency(Number(account.current_balance))}
               </p>
             </motion.button>
