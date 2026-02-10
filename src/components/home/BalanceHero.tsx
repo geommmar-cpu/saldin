@@ -72,25 +72,17 @@ export const BalanceHero = ({ balance, cryptoTotal = 0, cryptoEnabled = false, t
       {/* Resultado do mês - sempre visível quando há dados */}
       {hasMonthlyData && (
         <div className="mt-4 pt-3 border-t border-border">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2">
-              {isDeficit ? (
-                <AlertTriangle className="w-4 h-4 text-impulse" />
-              ) : (
-                <CheckCircle className="w-4 h-4 text-essential" />
-              )}
-              <p className={cn("text-xs font-medium", isDeficit ? "text-impulse" : "text-essential")}>
-                {isDeficit
-                  ? "Este mês você gastou mais do que ganhou"
-                  : "Você está dentro do orçamento este mês"}
-              </p>
-            </div>
-            <span className={cn(
-              "text-sm font-bold",
-              isDeficit ? "text-impulse" : "text-essential"
-            )}>
-              {isDeficit ? "" : "+ "}{formatCurrency(resultadoMes)}
-            </span>
+          <div className="flex items-center gap-2">
+            {isDeficit ? (
+              <AlertTriangle className="w-4 h-4 text-impulse shrink-0" />
+            ) : (
+              <CheckCircle className="w-4 h-4 text-essential shrink-0" />
+            )}
+            <p className={cn("text-xs font-medium", isDeficit ? "text-impulse" : "text-essential")}>
+              {isDeficit
+                ? "Você gastou mais do que ganhou este mês"
+                : "Dentro do orçamento este mês"}
+            </p>
           </div>
         </div>
       )}
