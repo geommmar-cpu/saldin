@@ -143,7 +143,7 @@ const ReceivableDetail = () => {
       <div className="min-h-screen bg-background flex flex-col items-center justify-center p-5">
         <span className="text-4xl mb-4">🔍</span>
         <p className="text-muted-foreground mb-4">Valor a receber não encontrado</p>
-        <Button variant="ghost" onClick={() => navigate(-1)}>
+        <Button variant="ghost" onClick={() => navigate("/")}>
           Voltar
         </Button>
       </div>
@@ -166,7 +166,7 @@ const ReceivableDetail = () => {
                 variant="ghost"
                 size="icon"
                 className="h-9 w-9"
-                onClick={() => navigate(-1)}
+                onClick={() => navigate("/")}
               >
                 <ArrowLeft className="h-5 w-5" />
               </Button>

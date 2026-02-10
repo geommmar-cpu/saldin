@@ -95,7 +95,7 @@ const ConfirmReceivable = () => {
                 variant="ghost"
                 size="icon"
                 className="h-9 w-9"
-                onClick={() => navigate(-1)}
+                onClick={() => navigate("/")}
               >
                 <ArrowLeft className="h-5 w-5" />
               </Button>

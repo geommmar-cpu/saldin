@@ -49,7 +49,7 @@ export default function CreditCardDetail() {
   const handleDelete = async () => {
     if (!id) return;
     await deleteCard.mutateAsync(id);
-    navigate("/cards");
+    navigate("/");
   };
 
   if (isLoading) {
@@ -64,7 +64,7 @@ export default function CreditCardDetail() {
     return (
       <div className="min-h-screen bg-background flex flex-col items-center justify-center p-5">
         <p className="text-muted-foreground">Cartão não encontrado</p>
-        <Button variant="outline" className="mt-4" onClick={() => navigate("/cards")}>
+        <Button variant="outline" className="mt-4" onClick={() => navigate("/")}>
           Voltar
         </Button>
       </div>
@@ -75,7 +75,7 @@ export default function CreditCardDetail() {
     <div className="min-h-screen bg-background pb-24">
       <header className="px-5 pt-safe-top">
         <div className="pt-4 pb-2 flex items-center gap-4">
-          <Button variant="ghost" size="icon" onClick={() => navigate("/cards")}>
+          <Button variant="ghost" size="icon" onClick={() => navigate("/")}>
             <ArrowLeft className="w-5 h-5" />
           </Button>
           <h1 className="font-serif text-xl font-semibold flex-1">{card.card_name}</h1>

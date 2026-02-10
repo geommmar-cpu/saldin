@@ -94,7 +94,7 @@ export default function GoalDetail() {
       <div className="min-h-screen bg-background flex flex-col items-center justify-center p-5">
         <AlertTriangle className="w-12 h-12 text-muted-foreground mb-4" />
         <h2 className="font-serif text-xl font-bold mb-2">Meta não encontrada</h2>
-        <Button onClick={() => navigate('/goals')}>Voltar para metas</Button>
+        <Button onClick={() => navigate('/')}>Voltar</Button>
       </div>
     );
   }
@@ -138,7 +138,7 @@ export default function GoalDetail() {
 
   const handleDelete = async () => {
     await deleteGoal.mutateAsync(goal.id);
-    navigate('/goals');
+    navigate('/');
   };
 
   return (
@@ -147,7 +147,7 @@ export default function GoalDetail() {
       <header className="px-5 pt-safe-top bg-background sticky top-0 z-10 border-b border-border">
         <div className="py-4 flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <Button variant="ghost" size="icon" onClick={() => navigate('/goals')}>
+            <Button variant="ghost" size="icon" onClick={() => navigate('/')}>
               <ArrowLeft className="w-5 h-5" />
             </Button>
             <div>

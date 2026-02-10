@@ -56,7 +56,7 @@ export default function AddCreditCard() {
     } else if (fromOnboarding) {
       navigate("/cards/import", { replace: true, state: { fromOnboarding: true } });
     } else {
-      navigate("/cards");
+      navigate("/");
     }
   };
 
@@ -65,7 +65,7 @@ export default function AddCreditCard() {
       // User doesn't want to add a card - go home
       navigate("/");
     } else {
-      navigate(-1);
+      navigate("/");
     }
   };
 

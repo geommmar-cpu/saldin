@@ -66,7 +66,7 @@ export const EditExpense = () => {
     return (
       <div className="min-h-screen bg-background flex flex-col items-center justify-center p-5">
         <p className="text-muted-foreground">Gasto não encontrado</p>
-        <Button variant="ghost" onClick={() => navigate(-1)} className="mt-4">Voltar</Button>
+        <Button variant="ghost" onClick={() => navigate("/")} className="mt-4">Voltar</Button>
       </div>
     );
   }
@@ -75,7 +75,7 @@ export const EditExpense = () => {
     <div className="min-h-screen bg-background flex flex-col">
       <header className="px-5 pt-safe-top">
         <div className="pt-4 pb-2 flex items-center gap-4">
-          <Button variant="ghost" size="icon" onClick={() => navigate(-1)}>
+          <Button variant="ghost" size="icon" onClick={() => navigate("/")}>
             <ArrowLeft className="w-5 h-5" />
           </Button>
           <h1 className="font-serif text-xl font-semibold">Editar Gasto</h1>

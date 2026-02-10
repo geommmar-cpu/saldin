@@ -121,7 +121,7 @@ export default function Overview() {
               <Button
                 variant="ghost"
                 size="icon"
-                onClick={() => navigate(-1)}
+                onClick={() => navigate("/")}
                 className="h-9 w-9"
               >
                 <ChevronLeft className="h-5 w-5" />

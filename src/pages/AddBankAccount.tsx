@@ -47,7 +47,7 @@ export const AddBankAccount = () => {
     if (returnTo) {
       navigate(returnTo, { state: { ...returnState, preSelectedBankId: result?.id || "latest" } });
     } else {
-      navigate("/banks");
+      navigate("/");
     }
   };
 
@@ -55,7 +55,7 @@ export const AddBankAccount = () => {
     <div className="min-h-screen bg-background flex flex-col">
       <header className="px-5 pt-safe-top">
         <div className="pt-4 pb-2 flex items-center gap-4">
-          <Button variant="ghost" size="icon" onClick={() => navigate(-1)}>
+          <Button variant="ghost" size="icon" onClick={() => navigate("/")}>
             <ArrowLeft className="w-5 h-5" />
           </Button>
           <h1 className="font-serif text-xl font-semibold">Nova Conta Bancária</h1>

@@ -154,7 +154,7 @@ export default function ImportStatement() {
         <div className="pt-4 pb-2 flex items-center justify-between">
           <div className="flex items-center gap-4">
             <Button variant="ghost" size="icon" onClick={() => {
-              if (step === "upload" || step === "done") navigate(-1);
+              if (step === "upload" || step === "done") navigate("/");
               else setStep("upload");
             }}>
               <ArrowLeft className="w-5 h-5" />

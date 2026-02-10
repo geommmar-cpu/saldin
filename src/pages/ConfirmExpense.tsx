@@ -153,7 +153,7 @@ export const ConfirmExpense = () => {
     } else if (step === "recurring") {
       setStep("expense");
     } else {
-      navigate(-1);
+      navigate("/");
     }
   };
 
