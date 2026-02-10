@@ -50,7 +50,7 @@ export const Alerts = () => {
       {/* Header */}
       <header className="px-5 pt-safe-top">
         <div className="pt-4 pb-4 flex items-center gap-4">
-          <Button variant="ghost" size="icon" onClick={() => navigate(-1)}>
+          <Button variant="ghost" size="icon" onClick={() => navigate("/")}>
             <ArrowLeft className="w-5 h-5" />
           </Button>
           <div>

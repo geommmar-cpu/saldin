@@ -129,7 +129,7 @@ export const DebtDetail = () => {
       <div className="min-h-screen bg-background flex flex-col items-center justify-center p-5">
         <span className="text-4xl mb-4">🔍</span>
         <p className="text-muted-foreground mb-4">Dívida não encontrada</p>
-        <Button variant="ghost" onClick={() => navigate(-1)}>
+        <Button variant="ghost" onClick={() => navigate("/")}>
           Voltar
         </Button>
       </div>
@@ -147,7 +147,7 @@ export const DebtDetail = () => {
       {/* Header */}
       <header className="px-5 pt-safe-top sticky top-0 bg-background/95 backdrop-blur-sm z-10">
         <div className="pt-4 pb-3 flex items-center gap-3">
-          <Button variant="ghost" size="icon" onClick={() => navigate(-1)}>
+          <Button variant="ghost" size="icon" onClick={() => navigate("/")}>
             <ArrowLeft className="w-5 h-5" />
           </Button>
           <div className="flex-1">

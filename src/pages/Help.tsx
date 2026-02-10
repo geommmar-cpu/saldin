@@ -32,7 +32,7 @@ const Help = () => {
     <div className="min-h-screen bg-background pb-24">
       <header className="px-5 pt-safe-top">
         <div className="pt-4 pb-3 flex items-center gap-4">
-          <Button variant="ghost" size="icon" onClick={() => navigate(-1)}>
+          <Button variant="ghost" size="icon" onClick={() => navigate("/")}>
             <ArrowLeft className="w-5 h-5" />
           </Button>
           <h1 className="font-serif text-xl font-semibold">Ajuda</h1>

@@ -59,7 +59,7 @@ export const IncomeDetail = () => {
       <div className="min-h-screen bg-background flex flex-col items-center justify-center p-5">
         <span className="text-4xl mb-4">🔍</span>
         <p className="text-muted-foreground mb-4">Receita não encontrada</p>
-        <Button variant="ghost" onClick={() => navigate(-1)}>
+        <Button variant="ghost" onClick={() => navigate("/")}>
           Voltar
         </Button>
       </div>
@@ -73,7 +73,7 @@ export const IncomeDetail = () => {
       {/* Header */}
       <header className="px-5 pt-safe-top">
         <div className="pt-4 pb-2 flex items-center gap-4">
-          <Button variant="ghost" size="icon" onClick={() => navigate(-1)}>
+          <Button variant="ghost" size="icon" onClick={() => navigate("/")}>
             <ArrowLeft className="w-5 h-5" />
           </Button>
           <h1 className="font-serif text-xl font-semibold flex-1">Detalhe da Receita</h1>
