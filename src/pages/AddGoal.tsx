@@ -189,13 +189,13 @@ export default function AddGoal() {
   return (
     <div className="min-h-screen bg-background pb-24">
       {/* Header */}
-      <header className="px-5 pt-safe-top bg-background sticky top-0 z-10 border-b border-border">
-        <div className="py-4 flex items-center gap-3">
+      <header className="px-5 pt-safe-top bg-background/95 backdrop-blur-sm sticky top-0 z-10 border-b border-border">
+        <div className="pt-4 pb-3 flex items-center gap-3">
           <Button variant="ghost" size="icon" onClick={() => setStep('amount')}>
             <ArrowLeft className="w-5 h-5" />
           </Button>
           <div className="flex-1">
-            <h1 className="font-serif text-xl font-bold">Detalhes da Meta</h1>
+            <h1 className="font-serif text-xl font-semibold">Detalhes da Meta</h1>
             <p className="text-sm text-muted-foreground">
               Objetivo: {formatCurrency(targetAmount)}
             </p>
