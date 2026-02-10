@@ -49,7 +49,7 @@ export const BankAccountDetail = () => {
 
   const handleDelete = async () => {
     await deleteAccount.mutateAsync(account.id);
-    navigate("/banks");
+    navigate("/");
   };
 
   return (
