@@ -119,9 +119,21 @@ export function calculateBalances(
    const valoresParaTerceiros = 0;
    
    // Cálculos principais
-   // Se bankTotal foi informado, usar saldo real das contas como base
-   // Caso contrário, fallback para receitas - gastos (compatibilidade)
-   const saldoBruto = bankTotal !== undefined ? bankTotal : (receitasTotal - gastosTotal);
+   // Saldo Bruto = saldo real das contas bancárias
+   // + receitas sem vínculo bancário (dinheiro em espécie, etc.)
+   // - gastos sem vínculo bancário (não foram descontados de nenhuma conta)
+   // Isso garante que transações antigas sem bank_account_id ainda sejam consideradas
+   if (bankTotal !== undefined) {
+     const unlinkedIncome = filteredIncomes
+       .filter(i => !(i as any).bank_account_id)
+       .reduce((sum, i) => sum + Number(i.amount), 0);
+     const unlinkedExpenses = filteredExpenses
+       .filter(e => !(e as any).bank_account_id)
+       .reduce((sum, e) => sum + Number(e.amount), 0);
+     var saldoBruto = bankTotal + unlinkedIncome - unlinkedExpenses;
+   } else {
+     var saldoBruto = receitasTotal - gastosTotal;
+   }
    const saldoComprometido = dividasAtivas + valoresParaTerceiros + ccInstallmentsTotal;
    const saldoGuardado = goalsSaved;
    const saldoLivre = saldoBruto - saldoComprometido - saldoGuardado;
