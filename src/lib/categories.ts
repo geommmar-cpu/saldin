@@ -35,13 +35,14 @@
    LucideIcon,
  } from "lucide-react";
  
- export interface CategoryConfig {
-   id: string;
-   name: string;
-   icon: LucideIcon;
-   group: CategoryGroup;
-   color: string; // CSS class
- }
+export interface CategoryConfig {
+  id: string;
+  name: string;
+  icon: LucideIcon;
+  group: CategoryGroup;
+  color: string; // CSS class
+  isCustom?: boolean;
+}
  
  export type CategoryGroup = 
    | "contas_fixas"

@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { toLocalDateString } from "@/lib/dateUtils";
 import { useNavigate, useLocation, useParams } from "react-router-dom";
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
@@ -8,7 +9,7 @@ import {
   ArrowLeft, Check, Utensils, Car, Gamepad2, Home, CreditCard, 
   MoreHorizontal, RefreshCw, Calendar, Users, User, ChevronDown,
   Banknote, Smartphone, CreditCard as CreditCardIcon, Loader2, QrCode,
-  Search
+  Search, Plus
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useCreateExpense } from "@/hooks/useExpenses";
@@ -25,6 +26,8 @@ import {
   type CategoryConfig,
   type CategoryGroup 
 } from "@/lib/categories";
+import { useAllCategories } from "@/hooks/useCategories";
+import { Tag } from "lucide-react";
 import {
   Sheet,
   SheetContent,
@@ -97,6 +100,7 @@ export const ConfirmExpense = () => {
   const { ensureCashAccount, cashAccountId, isCreating: isCreatingCash } = useCashAccount();
   
   const amount = location.state?.amount || 67.50;
+  const { allCategories, customCategories } = useAllCategories();
   const isNew = id === "new";
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [categorySheetOpen, setCategorySheetOpen] = useState(false);
@@ -125,19 +129,19 @@ export const ConfirmExpense = () => {
 
   // Filtered categories for search
   const filteredCategories = categorySearch.trim()
-    ? defaultCategories.filter(c => 
+    ? allCategories.filter(c => 
         c.name.toLowerCase().includes(categorySearch.toLowerCase())
       )
-    : defaultCategories;
+    : allCategories;
 
   // Get selected category object
   const selectedCategory = category 
-    ? defaultCategories.find(c => c.id === category) 
+    ? allCategories.find(c => c.id === category) 
     : undefined;
 
   // Quick categories to show
   const quickCategoryObjects = quickCategories
-    .map(id => defaultCategories.find(c => c.id === id))
+    .map(id => allCategories.find(c => c.id === id))
     .filter((c): c is CategoryConfig => c !== undefined);
 
   const formattedAmount = new Intl.NumberFormat("pt-BR", {
@@ -198,7 +202,7 @@ export const ConfirmExpense = () => {
           total_amount: amount,
           total_installments: totalInstallments,
           // category_id omitido: categorias locais não são UUIDs válidos para FK
-          purchase_date: new Date().toISOString().split("T")[0],
+          purchase_date: toLocalDateString(),
         });
       } else {
         // For cash payments, ensure the cash account exists
@@ -231,8 +235,9 @@ export const ConfirmExpense = () => {
 
       // Se há reembolso, criar receivable em ambos os casos
       if (isForOtherPerson && reimbursementPersonName) {
-        const today = new Date();
-        const dueDate = new Date(today.setMonth(today.getMonth() + 1)).toISOString().split("T")[0];
+        const futureDate = new Date();
+        futureDate.setMonth(futureDate.getMonth() + 1);
+        const dueDate = toLocalDateString(futureDate);
 
         await createReceivable.mutateAsync({
           debtor_name: reimbursementPersonName.trim(),
@@ -395,9 +400,56 @@ export const ConfirmExpense = () => {
                   
                   <ScrollArea className="h-[calc(80vh-140px)]">
                     <div className="space-y-4 pr-4">
+                      {/* Custom categories first */}
+                      {customCategories.length > 0 && (() => {
+                        const customFiltered = filteredCategories.filter(c => c.isCustom);
+                        if (customFiltered.length === 0) return null;
+                        return (
+                          <div>
+                            <div className="flex items-center gap-2 mb-2">
+                              <Tag className="w-4 h-4 text-primary" />
+                              <span className="text-sm font-medium text-primary">
+                                Minhas Categorias
+                              </span>
+                            </div>
+                            <div className="grid grid-cols-2 gap-2">
+                              {customFiltered.map((cat) => {
+                                const Icon = cat.icon;
+                                return (
+                                  <motion.button
+                                    key={cat.id}
+                                    whileTap={{ scale: 0.98 }}
+                                    onClick={() => {
+                                      setCategory(cat.id);
+                                      setCategorySheetOpen(false);
+                                      setCategorySearch("");
+                                    }}
+                                    className={cn(
+                                      "flex items-center gap-2 p-3 rounded-xl border transition-all text-left",
+                                      category === cat.id
+                                        ? "border-primary bg-primary/10"
+                                        : "border-primary/20 bg-card hover:bg-secondary"
+                                    )}
+                                  >
+                                    <div className={cn(
+                                      "w-8 h-8 rounded-lg flex items-center justify-center",
+                                      category === cat.id ? "bg-primary/20" : "bg-primary/10"
+                                    )}>
+                                      <Icon className={cn("w-4 h-4", category === cat.id ? "text-primary" : cat.color)} />
+                                    </div>
+                                    <span className="text-sm font-medium truncate">{cat.name}</span>
+                                  </motion.button>
+                                );
+                              })}
+                            </div>
+                          </div>
+                        );
+                      })()}
+
+                      {/* Default category groups */}
                       {Object.entries(categoryGroups).map(([groupKey, groupInfo]) => {
                         const groupCategories = filteredCategories.filter(
-                          c => c.group === groupKey
+                          c => c.group === groupKey && !c.isCustom
                         );
                         
                         if (groupCategories.length === 0) return null;
@@ -450,6 +502,19 @@ export const ConfirmExpense = () => {
                           </div>
                         );
                       })}
+
+                      {/* Create new category link */}
+                      <Button
+                        variant="outline"
+                        className="w-full gap-2"
+                        onClick={() => {
+                          setCategorySheetOpen(false);
+                          navigate("/categories");
+                        }}
+                      >
+                        <Plus className="w-4 h-4" />
+                        Criar nova categoria
+                      </Button>
                     </div>
                   </ScrollArea>
                 </SheetContent>

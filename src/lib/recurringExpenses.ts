@@ -3,6 +3,7 @@
 
 import { ExpenseRow } from "@/hooks/useExpenses";
 import { startOfMonth, endOfMonth, addMonths, isWithinInterval, isBefore } from "date-fns";
+import { toLocalDateString } from "@/lib/dateUtils";
 
 /**
  * Filtra gastos para um mês, incluindo parcelas futuras de gastos parcelados.
@@ -37,11 +38,11 @@ export function getExpensesForMonth(
           ...expense,
           installment_number: installmentNumber,
           // Ajustar a data para o mês virtual (mantém o dia original)
-          date: new Date(
+          date: toLocalDateString(new Date(
             monthStart.getFullYear(),
             monthStart.getMonth(),
             Math.min(expenseDate.getDate(), monthEnd.getDate())
-          ).toISOString().split("T")[0],
+          )),
         });
       }
     } else {

@@ -51,17 +51,12 @@ export const useExpenseStats = (month?: number, year?: number) => {
     queryFn: async () => {
       if (!user) return null;
 
-      const startOfMonth = new Date(targetYear, targetMonth, 1);
-      startOfMonth.setHours(0, 0, 0, 0);
-      const endOfMonth = new Date(targetYear, targetMonth + 1, 1);
-      endOfMonth.setHours(0, 0, 0, 0);
-
       const { data, error } = await supabase
         .from("expenses")
         .select("amount, emotion, date")
         .neq("status", "deleted")
-        .gte("date", startOfMonth.toISOString().split('T')[0])
-        .lt("date", endOfMonth.toISOString().split('T')[0]);
+        .gte("date", `${targetYear}-${String(targetMonth + 1).padStart(2, '0')}-01`)
+        .lt("date", `${targetMonth === 11 ? targetYear + 1 : targetYear}-${String(targetMonth === 11 ? 1 : targetMonth + 2).padStart(2, '0')}-01`);
 
       if (error) {
         console.error("Error fetching expense stats:", error);
@@ -99,10 +94,10 @@ export const useExpensesByCategory = (month?: number, year?: number) => {
     queryFn: async () => {
       if (!user) return [];
 
-      const startOfMonth = new Date(targetYear, targetMonth, 1);
-      startOfMonth.setHours(0, 0, 0, 0);
-      const endOfMonth = new Date(targetYear, targetMonth + 1, 1);
-      endOfMonth.setHours(0, 0, 0, 0);
+      const monthStartStr = `${targetYear}-${String(targetMonth + 1).padStart(2, '0')}-01`;
+      const nextYear = targetMonth === 11 ? targetYear + 1 : targetYear;
+      const nextMonth = targetMonth === 11 ? 1 : targetMonth + 2;
+      const monthEndStr = `${nextYear}-${String(nextMonth).padStart(2, '0')}-01`;
 
       // Fetch expenses with category join
       const { data, error } = await supabase
@@ -116,8 +111,8 @@ export const useExpensesByCategory = (month?: number, year?: number) => {
           )
         `)
         .neq("status", "deleted")
-        .gte("date", startOfMonth.toISOString().split('T')[0])
-        .lt("date", endOfMonth.toISOString().split('T')[0]);
+        .gte("date", monthStartStr)
+        .lt("date", monthEndStr);
 
       if (error) {
         console.error("Error fetching expenses by category:", error);
