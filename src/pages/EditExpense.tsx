@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { toLocalDateString } from "@/lib/dateUtils";
 import { useNavigate, useParams } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
@@ -46,7 +47,7 @@ export const EditExpense = () => {
         id,
         amount: parsedAmount,
         description: description.trim() || "Gasto",
-        date: date?.toISOString().split("T")[0],
+        date: date ? toLocalDateString(date) : undefined,
       });
       navigate("/");
     } catch (error) {

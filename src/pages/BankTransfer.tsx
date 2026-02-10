@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { toLocalDateString } from "@/lib/dateUtils";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { CurrencyInput } from "@/components/ui/currency-input";
@@ -34,7 +35,7 @@ export const BankTransfer = () => {
       to_account_id: toAccountId,
       amount: parsedAmount,
       description: description.trim() || "Transferência entre contas",
-      date: new Date().toISOString().split("T")[0],
+      date: toLocalDateString(),
     });
 
     navigate("/");

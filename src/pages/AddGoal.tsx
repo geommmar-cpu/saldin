@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { toLocalDateString } from "@/lib/dateUtils";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
@@ -250,7 +251,7 @@ export default function AddGoal() {
                 className="pl-10"
                 value={targetDate}
                 onChange={(e) => setTargetDate(e.target.value)}
-                min={new Date().toISOString().split('T')[0]}
+                min={toLocalDateString()}
               />
             </div>
           </div>

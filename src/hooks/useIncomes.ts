@@ -43,18 +43,18 @@ export const useIncomeStats = (month?: number, year?: number) => {
     queryFn: async () => {
       if (!user) return null;
 
-      const startOfMonth = new Date(targetYear, targetMonth, 1);
-      startOfMonth.setHours(0, 0, 0, 0);
-      const endOfMonth = new Date(targetYear, targetMonth + 1, 1);
-      endOfMonth.setHours(0, 0, 0, 0);
+      const monthStartStr = `${targetYear}-${String(targetMonth + 1).padStart(2, '0')}-01`;
+      const nextYear = targetMonth === 11 ? targetYear + 1 : targetYear;
+      const nextMonth = targetMonth === 11 ? 1 : targetMonth + 2;
+      const monthEndStr = `${nextYear}-${String(nextMonth).padStart(2, '0')}-01`;
 
       // Fetch non-recurring incomes for the specific month
       const { data: monthlyIncomes, error: monthlyError } = await supabase
         .from("incomes")
         .select("amount, type, is_recurring, date")
         .eq("is_recurring", false)
-        .gte("date", startOfMonth.toISOString().split('T')[0])
-        .lt("date", endOfMonth.toISOString().split('T')[0]);
+        .gte("date", monthStartStr)
+        .lt("date", monthEndStr);
 
       if (monthlyError) {
         console.error("Error fetching monthly incomes:", monthlyError);
@@ -66,7 +66,7 @@ export const useIncomeStats = (month?: number, year?: number) => {
         .from("incomes")
         .select("amount, type, is_recurring, date")
         .eq("is_recurring", true)
-        .lte("date", endOfMonth.toISOString().split('T')[0]);
+        .lte("date", monthEndStr);
 
       if (recurringError) {
         console.error("Error fetching recurring incomes:", recurringError);

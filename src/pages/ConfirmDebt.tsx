@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { toLocalDateString } from "@/lib/dateUtils";
 import { useNavigate, useLocation } from "react-router-dom";
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
@@ -35,9 +36,7 @@ export const ConfirmDebt = () => {
   const [creditorName, setCreditorName] = useState("");
   const [type, setType] = useState<DebtType>("installment");
   const [installments, setInstallments] = useState("");
-  const [dueDate, setDueDate] = useState(
-    new Date().toISOString().split("T")[0]
-  );
+  const [dueDate, setDueDate] = useState(toLocalDateString());
   const [validationError, setValidationError] = useState<string | null>(null);
 
   // Calculate installment amount

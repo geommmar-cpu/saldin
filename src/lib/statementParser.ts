@@ -3,6 +3,7 @@
  * Supports all major Brazilian banks (Nubank, Itaú, Bradesco, Santander, Inter, BB, Caixa, C6, etc.)
  * Handles noise filtering, installment detection, and auto-categorization.
  */
+import { toLocalDateString } from "@/lib/dateUtils";
 
 import { defaultCategories } from "@/lib/categories";
 
@@ -252,7 +253,7 @@ function parseCSVContent(text: string): ParsedTransaction[] {
       const installment = detectInstallment(description);
       const type = detectTransactionType(description, amount);
       results.push({
-        date: date || new Date().toISOString().split("T")[0],
+        date: date || toLocalDateString(),
         description,
         amount: Math.abs(amount),
         categoryId: autoDetectCategory(description),

@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { toLocalDateString } from "@/lib/dateUtils";
 import { useNavigate, useParams } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -50,7 +51,7 @@ export const EditReceivable = () => {
         debtor_name: debtorName.trim(),
         amount: parsedAmount,
         description: description.trim() || null,
-        due_date: dueDate.toISOString().split("T")[0],
+        due_date: toLocalDateString(dueDate),
       });
       navigate("/");
     } catch (error) {

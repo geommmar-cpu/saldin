@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { toLocalDateString } from "@/lib/dateUtils";
 import { useNavigate, useLocation } from "react-router-dom";
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
@@ -119,10 +120,10 @@ export const ConfirmIncome = () => {
       let incomeDate: string;
       if (isRecurring && paymentDay) {
         const nextDate = getNextPaymentDate(Number(paymentDay));
-        incomeDate = nextDate.toISOString().split("T")[0];
+        incomeDate = toLocalDateString(nextDate);
       } else {
         // Non-recurring: always use today's date explicitly
-        incomeDate = new Date().toISOString().split("T")[0];
+        incomeDate = toLocalDateString();
       }
 
       await createIncome.mutateAsync({

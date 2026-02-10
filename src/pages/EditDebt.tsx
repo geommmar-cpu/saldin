@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { toLocalDateString } from "@/lib/dateUtils";
 import { useNavigate, useParams } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -56,7 +57,7 @@ export const EditDebt = () => {
         total_amount: parsedTotal,
         total_installments: parsedInstallments,
         installment_amount: parsedTotal / parsedInstallments,
-        due_date: dueDate?.toISOString().split("T")[0],
+        due_date: dueDate ? toLocalDateString(dueDate) : undefined,
       });
       navigate("/");
     } catch (error) {
