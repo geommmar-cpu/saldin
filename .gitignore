@@ -48,3 +48,5 @@ Thumbs.db
 ngrok
 .temp/
 *.temp
+vite.config.ts.timestamp-*
+*.mjs
