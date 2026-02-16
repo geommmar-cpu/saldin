@@ -10,6 +10,7 @@ export interface FinancialIntent {
     valor: number;
     descricao: string;
     categoria_sugerida: string;
+    metodo_pagamento?: "pix" | "debito" | "credito" | "dinheiro" | "boleto" | "indefinido";
     status: "ok" | "incompleto";
     conta_sugerida?: string;
     raw_text?: string;
@@ -26,6 +27,7 @@ REGRAS:
    - Extraia o VALOR numérico.
    - Identifique a CATEGORIA.
    - Crie uma DESCRIÇÃO curta.
+   - Identifique o MÉTODO DE PAGAMENTO (pix, debito, credito, dinheiro, boleto). Se não for claro, use "indefinido".
    - Se faltar valor ou descrição, "status": "incompleto".
 
 RETORNO OBRIGATÓRIO (JSON):
@@ -34,12 +36,13 @@ RETORNO OBRIGATÓRIO (JSON):
   "valor": number (0 se for consulta), 
   "descricao": string (vazio se for consulta),
   "categoria_sugerida": string,
+  "metodo_pagamento": "pix" | "debito" | "credito" | "dinheiro" | "boleto" | "indefinido",
   "status": "ok" | "incompleto"
 }`;
 
 export async function analyzeText(text: string): Promise<FinancialIntent> {
     try {
-        console.log("🤖 Analyzing with GPT-4...");
+        console.log("🤖 Analyzing with GPT-4o-mini...");
 
         const response = await openai.chat.completions.create({
             model: "gpt-4o-mini", // Fast and cost-effective

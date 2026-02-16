@@ -85,3 +85,35 @@ export async function getLastTransactions(userId: string, limit = 5) {
 
     return all.slice(0, limit);
 }
+
+export async function getPreferredAccount(userId: string, method?: string): Promise<string | null> {
+    // If method implies a bank transaction (Pix, Debit, Transfer), find a Checking Account
+    if (method && ['pix', 'debito', 'transferencia', 'dinheiro', 'boleto'].includes(method.toLowerCase())) {
+
+        // 1. Try to get the default income account (often used as main checking) from profile
+        const { data: profile } = await supabaseAdmin
+            .from('profiles')
+            .select('wa_default_income_account_id, wa_default_expense_account_id')
+            .eq('user_id', userId)
+            .single();
+
+        if (profile?.wa_default_expense_account_id) return profile.wa_default_expense_account_id;
+        if (profile?.wa_default_income_account_id) return profile.wa_default_income_account_id;
+
+        // 2. Fallback: Any active checking account
+        const { data: acc } = await supabaseAdmin
+            .from('bank_accounts')
+            .select('id')
+            .eq('user_id', userId)
+            .eq('active', true)
+            // Prioritize checking, then wallet/others
+            .order('account_type', { ascending: true })
+            .limit(1)
+            .maybeSingle();
+
+        return acc?.id || null;
+    }
+
+    // For Credit, we return null so the RPC can pick the default card
+    return null;
+}

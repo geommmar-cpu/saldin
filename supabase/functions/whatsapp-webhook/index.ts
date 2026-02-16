@@ -4,7 +4,7 @@ import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 import { analyzeText } from "./ai-service.ts";
 import { processImage } from "./image-service.ts";
 import { transcribeAudio } from "./audio-service.ts";
-import { processTransaction, getBalance, getLastTransactions } from "./financial-service.ts";
+import { processTransaction, getBalance, getLastTransactions, getPreferredAccount } from "./financial-service.ts";
 
 const SUPABASE_URL = Deno.env.get("SUPABASE_URL")!;
 const SERVICE_ROLE_KEY = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
@@ -294,7 +294,11 @@ serve(async (req) => {
         // 6. Map Category
         const categoryId = await getCategoryId(userId, intent.categoria_sugerida, intent.tipo === "receita" ? "income" : "expense");
 
-        // 7. Execute Transaction
+        // 7. Resolve Payment Method & Account
+        const targetAccountId = await getPreferredAccount(userId, intent.metodo_pagamento);
+        console.log(`💳 Method: ${intent.metodo_pagamento} -> Account ID: ${targetAccountId}`);
+
+        // 8. Execute Transaction
         console.log("💾 Processing transaction...");
         const result = await processTransaction({
             userId,
@@ -302,9 +306,10 @@ serve(async (req) => {
             amount: intent.valor,
             description: intent.descricao,
             categoryId: categoryId || undefined,
+            bankAccountId: targetAccountId || undefined,
         });
 
-        // 8. Success Response
+        // 9. Success Response
         const balance = result.new_balance;
         const isCard = result.is_credit_card;
         const destName = result.dest_name || "Conta";
