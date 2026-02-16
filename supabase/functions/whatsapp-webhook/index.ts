@@ -106,25 +106,24 @@ serve(async (req) => {
         // 1. Log Request & Deduplicate
         console.log("🚀 [WEBHOOK] Processing ID:", messageId, "From:", phoneOrLid, isLid ? "(LID)" : "(Phone)");
 
-        const currentHash = getMessageHash(data);
-        const minuteBucket = Math.floor(Date.now() / 60000);
-        const dedupKey = `${phoneOrLid}_${currentHash}_${minuteBucket}`;
+        // We rely on message_id (Hardware Idempotency) to catch webhook retries.
+        // We removed 'dedupKey' (Content+Minute) because it blocked valid repeated commands (e.g. "Saldo" twice).
 
         const { data: logData, error: logError } = await supabaseAdmin
             .from("whatsapp_logs")
             .insert({
-                phone_number: phoneOrLid, // Stores either phone or LID
+                phone_number: phoneOrLid,
                 message_content: JSON.stringify(data),
                 message_type: messageType,
                 processed: false,
                 message_id: messageId,
-                dedup_key: dedupKey
+                dedup_key: null // Allow logs to just rely on message_id uniqueness
             })
             .select()
             .single();
 
         if (logError && logError.code === "23505") {
-            console.log("🔁 Duplicate message blocked by DB:", messageId || dedupKey);
+            console.log("🔁 Duplicate message blocked by DB:", messageId);
             return new Response("Duplicate", { status: 200 });
         }
         if (logData) logId = logData.id;
