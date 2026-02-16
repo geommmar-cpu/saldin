@@ -119,8 +119,16 @@ export const AppLayout = ({ children, className }: AppLayoutProps) => {
             {/* User Info (Optional - consistent with sidebar design) */}
             <div className="px-6 mb-4">
                 <div className="flex items-center gap-3 p-3 rounded-xl bg-secondary/50">
-                    <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center text-primary">
-                        <User className="w-5 h-5" />
+                    <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center text-primary overflow-hidden">
+                        {profile?.avatar_url ? (
+                            <img src={profile.avatar_url} alt="Avatar" className="w-full h-full object-cover" />
+                        ) : (
+                            <span className="font-bold text-sm">
+                                {profile?.full_name
+                                    ? profile.full_name.split(" ").map(n => n[0]).join("").substring(0, 2).toUpperCase()
+                                    : <User className="w-5 h-5" />}
+                            </span>
+                        )}
                     </div>
                     <div className="flex-1 min-w-0">
                         <p className="font-semibold text-sm truncate">{profile?.full_name || "Usuário"}</p>

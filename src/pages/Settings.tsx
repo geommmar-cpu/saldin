@@ -1,5 +1,6 @@
 import { useNavigate } from "react-router-dom";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef, ChangeEvent } from "react";
+import { supabase } from "@/lib/backendClient";
 import { generateFinancialReport } from "@/lib/exportPdf";
 import { useExpenses } from "@/hooks/useExpenses";
 import { useIncomes } from "@/hooks/useIncomes";
@@ -38,7 +39,10 @@ import {
   Moon,
   Fingerprint,
   Trash2,
-  Bitcoin
+  Trash2,
+  Bitcoin,
+  Camera,
+  Loader2
 } from "lucide-react";
 import { useUserPreferences } from "@/hooks/useUserPreferences";
 import { useAuth } from "@/hooks/useAuth";
@@ -115,7 +119,48 @@ export const Settings = () => {
 
   // Get user's biometric credentials
   const userCredentials = user?.id ? getCredentialsForUser(user.id) : [];
+
   const hasBiometricEnabled = userCredentials.length > 0;
+
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const [uploadingAvatar, setUploadingAvatar] = useState(false);
+
+  const handleAvatarChange = async (event: ChangeEvent<HTMLInputElement>) => {
+    try {
+      setUploadingAvatar(true);
+      if (!event.target.files || event.target.files.length === 0) {
+        return;
+      }
+
+      const file = event.target.files[0];
+      const fileExt = file.name.split('.').pop();
+      const fileName = `${user?.id}-${Math.random()}.${fileExt}`;
+      const filePath = `${fileName}`;
+
+      const { error: uploadError } = await supabase.storage
+        .from('avatars')
+        .upload(filePath, file);
+
+      if (uploadError) throw uploadError;
+
+      const { data: { publicUrl } } = supabase.storage
+        .from('avatars')
+        .getPublicUrl(filePath);
+
+      await updateProfile.mutateAsync({ avatar_url: publicUrl });
+      toast({ title: "Foto de perfil atualizada!" });
+
+    } catch (error: any) {
+      console.error("Erro ao atualizar avatar:", error);
+      toast({
+        title: "Erro ao atualizar foto",
+        description: error.message,
+        variant: "destructive"
+      });
+    } finally {
+      setUploadingAvatar(false);
+    }
+  };
 
   const openWhatsApp = () => {
     window.open("https://wa.me/5511999999999", "_blank");
@@ -232,6 +277,39 @@ export const Settings = () => {
       </header>
 
       <main className="px-5 space-y-5">
+
+        {/* Perfil e Foto */}
+        <div className="flex flex-col items-center justify-center py-4">
+          <div className="relative group cursor-pointer" onClick={() => fileInputRef.current?.click()}>
+            <div className="w-24 h-24 rounded-full overflow-hidden border-4 border-background shadow-lg bg-secondary">
+              {profile?.avatar_url ? (
+                <img src={profile.avatar_url} alt="Avatar" className="w-full h-full object-cover" />
+              ) : (
+                <div className="w-full h-full flex items-center justify-center bg-primary/10 text-primary text-2xl font-bold">
+                  {profile?.full_name?.split(" ").map((n: string) => n[0]).join("").substring(0, 2).toUpperCase() || <User className="w-10 h-10" />}
+                </div>
+              )}
+              {uploadingAvatar && (
+                <div className="absolute inset-0 bg-black/50 flex items-center justify-center">
+                  <Loader2 className="w-8 h-8 text-white animate-spin" />
+                </div>
+              )}
+            </div>
+            <div className="absolute bottom-0 right-0 bg-primary text-primary-foreground p-2 rounded-full shadow-md">
+              <Camera className="w-4 h-4" />
+            </div>
+          </div>
+          <input
+            type="file"
+            ref={fileInputRef}
+            onChange={handleAvatarChange}
+            className="hidden"
+            accept="image/*"
+          />
+          <h2 className="mt-3 text-lg font-semibold">{profile?.full_name || "Usuário"}</h2>
+          <p className="text-sm text-muted-foreground">{user?.email}</p>
+        </div>
+
         {/* Bloco 1 - Conta */}
         <FadeIn>
           <SettingsSection title="Conta">
