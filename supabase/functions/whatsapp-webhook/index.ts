@@ -5,6 +5,7 @@ import { analyzeText } from "./ai-service.ts";
 import { processImage } from "./image-service.ts";
 import { transcribeAudio } from "./audio-service.ts";
 import { processTransaction, getBalance, getLastTransactions, getPreferredAccount } from "./financial-service.ts";
+import { generateTransactionCode, formatPremiumMessage, handleExcluirCommand, handleEditarCommand, processEditStep } from "./transactionCommandHandler.ts";
 
 const SUPABASE_URL = Deno.env.get("SUPABASE_URL")!;
 const SERVICE_ROLE_KEY = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
@@ -199,14 +200,26 @@ serve(async (req) => {
 
         // 3. Process Content
         let textToAnalyze = "";
-
         let intent: any = null;
 
         if (messageType === "conversation" || messageType === "extendedTextMessage") {
             textToAnalyze = data?.message?.conversation || data?.message?.extendedTextMessage?.text || "";
+            textToAnalyze = textToAnalyze.trim();
             console.log("💬 Text:", textToAnalyze);
         }
-        else if (messageType === "audioMessage") {
+
+        // 3.0 Check Conversation State (Edit Flow) for text messages
+        if (textToAnalyze) {
+            const editResult = await processEditStep(userId, textToAnalyze);
+            if (editResult.success) {
+                // If message prompts user (done=false) or confirms completion (done=true), send it
+                await sendWhatsApp(phoneToSend, editResult.message, instanceName);
+                if (logId) await supabaseAdmin.from("whatsapp_logs").update({ processed: true, processing_result: { flow: "edit_step", success: true } }).eq("id", logId);
+                return new Response("Edit Step Processed", { status: 200 });
+            }
+        }
+
+        if (messageType === "audioMessage") {
             console.log("🎤 Audio message received");
             try {
                 const audioInput = data;
@@ -241,6 +254,26 @@ serve(async (req) => {
         const normalizedCmd = textToAnalyze?.toLowerCase().trim();
 
         if (!intent && normalizedCmd) {
+            // EXCLUIR COMMAND
+            const deleteMatch = normalizedCmd.match(/^excluir\s+(txn-\d{8}-[a-z0-9]{6})/i);
+            if (deleteMatch) {
+                const code = deleteMatch[1].toUpperCase().trim();
+                const res = await handleExcluirCommand(userId, code);
+                await sendWhatsApp(phoneToSend, res.message, instanceName);
+                if (logId) await supabaseAdmin.from("whatsapp_logs").update({ processed: true, processing_result: { flow: "delete", success: res.success } }).eq("id", logId);
+                return new Response("Delete Command Executed", { status: 200 });
+            }
+
+            // EDITAR COMMAND
+            const editMatch = normalizedCmd.match(/^editar\s+(txn-\d{8}-[a-z0-9]{6})/i);
+            if (editMatch) {
+                const code = editMatch[1].toUpperCase().trim();
+                const res = await handleEditarCommand(userId, code);
+                await sendWhatsApp(phoneToSend, res.message, instanceName);
+                if (logId) await supabaseAdmin.from("whatsapp_logs").update({ processed: true, processing_result: { flow: "edit_start", success: res.success } }).eq("id", logId);
+                return new Response("Edit Command Executed", { status: 200 });
+            }
+
             // SALDO
             if (normalizedCmd.match(/^\/?saldo$/)) {
                 try {
@@ -309,7 +342,9 @@ serve(async (req) => {
         console.log(`💳 Method: ${intent.metodo_pagamento} -> Account ID: ${targetAccountId}`);
 
         // 8. Execute Transaction
-        console.log("💾 Processing transaction...");
+        const tCode = generateTransactionCode();
+        console.log("💾 Processing transaction...", tCode);
+
         const result = await processTransaction({
             userId,
             type: intent.tipo === "receita" ? "income" : "expense",
@@ -317,15 +352,37 @@ serve(async (req) => {
             description: intent.descricao,
             categoryId: categoryId || undefined,
             bankAccountId: targetAccountId || undefined,
+            transactionCode: tCode
         });
 
         // 9. Success Response
-        const balance = result.new_balance;
-        const isCard = result.is_credit_card;
-        const destName = result.dest_name || "Conta";
-        const emoji = intent.tipo === "receita" ? "💰" : (isCard ? "💳" : "💸");
-        const tipoLabel = intent.tipo === "receita" ? "Receita" : (isCard ? "Gasto no Cartão" : "Gasto");
-        const msg = `✅ *${tipoLabel} registrado!*\n\n${emoji} *Valor:* R$ ${intent.valor.toFixed(2)}\n📝 *Descrição:* ${intent.descricao}\n🏷️ *Categoria:* ${intent.categoria_sugerida}\n🏦 *Destino:* ${destName}\n\n📊 *Saldo Geral (Cofre):* R$ ${balance.toFixed(2)}`;
+        // Calculate previous balance (approximate based on current operation)
+        let prevBal = Number(result.new_balance) || 0;
+        const amountNum = Number(result.amount) || 0;
+
+        if (intent.tipo === 'receita') {
+            prevBal -= amountNum;
+        } else {
+            prevBal += amountNum;
+        }
+
+        const balanceData = {
+            previous_balance: prevBal,
+            new_balance: result.new_balance,
+            invoice: 0, // Placeholder until credit card logic is fully integrated
+            available_balance: result.new_balance // Placeholder
+        };
+
+        const msg = formatPremiumMessage({
+            id: result.id,
+            description: result.description,
+            amount: result.amount,
+            date: result.created_at || new Date().toISOString(),
+            category: intent.categoria_sugerida,
+            account: result.is_credit_card ? "Cartão de Crédito" : (result.dest_name || "Conta"),
+            type: intent.tipo === 'receita' ? 'income' : 'expense',
+            transaction_code: tCode
+        }, balanceData);
 
         await sendWhatsApp(phoneToSend, msg, instanceName);
 
