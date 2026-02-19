@@ -75,10 +75,15 @@ export const TransactionsSection = ({
     incomes.forEach(i => {
       const paymentDayMatch = i.notes?.match(/payment_day:(\d+)/);
       const paymentDay = paymentDayMatch ? Number(paymentDayMatch[1]) : null;
-      const incomeDate = i.date ? parseLocalDate(i.date) : new Date(i.created_at);
-      const displayDate = i.is_recurring
-        ? new Date(selectedMonth.getFullYear(), selectedMonth.getMonth(), incomeDate.getDate())
-        : incomeDate;
+      let displayDate: Date;
+
+      if (i.is_recurring) {
+        const day = i.date ? parseLocalDate(i.date).getDate() : new Date(i.created_at).getDate();
+        displayDate = new Date(selectedMonth.getFullYear(), selectedMonth.getMonth(), day);
+      } else {
+        // Use created_at to show the exact time of entry
+        displayDate = new Date(i.created_at);
+      }
       const isFuture = i.is_recurring && paymentDay ? displayDate > new Date() : false;
       items.push({
         id: i.id,
