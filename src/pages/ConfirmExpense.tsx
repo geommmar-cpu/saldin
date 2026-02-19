@@ -294,9 +294,10 @@ export const ConfirmExpense = () => {
 
       toast.success(isCreditCard ? "Compra registrada no cartão!" : "Gasto confirmado com sucesso!");
       navigate("/", { state: { success: true } });
-    } catch (error) {
+    } catch (error: any) {
       console.error("Failed to save:", error);
-      toast.error("Erro ao salvar. Tente novamente.");
+      // Show more detailed error message to help debugging
+      toast.error(error?.message || "Erro ao salvar. Tente novamente.");
     } finally {
       setIsSubmitting(false);
     }
