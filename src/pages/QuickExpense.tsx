@@ -1,13 +1,11 @@
 import { useState, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
-import { format } from "date-fns";
-import { ptBR } from "date-fns/locale";
-import { addMonths } from "date-fns";
+import { format, addMonths } from "date-fns";
 import {
     ArrowLeft, QrCode, Banknote, Smartphone, CreditCard,
-    ChevronDown, Calendar, User, Check, Minus, Plus,
-    Loader2, Tag, Layers
+    Calendar, User, Check, Minus, Plus, Loader2,
+    RepeatIcon, ChevronDown, ChevronUp
 } from "lucide-react";
 import { toast } from "sonner";
 
@@ -27,7 +25,7 @@ import { useCashAccount } from "@/hooks/useCashAccount";
 import { NumericKeypad } from "@/components/ui/numeric-keypad";
 import { BankLogo } from "@/components/BankLogo";
 
-// ── Types ─────────────────────────────────────────────────────────────────────
+// ── Types ────────────────────────────────────────────────────────────────────
 type PaymentMethod = "pix" | "cash" | "debit" | "credit";
 
 const PAYMENT_OPTIONS: { value: PaymentMethod; label: string; Icon: React.ElementType }[] = [
@@ -37,14 +35,19 @@ const PAYMENT_OPTIONS: { value: PaymentMethod; label: string; Icon: React.Elemen
     { value: "credit", label: "Crédito", Icon: CreditCard },
 ];
 
-// Quick categories to display by default (slug IDs)
-const QUICK_CAT_SLUGS = [
-    "alimentacao", "transporte_publico", "mercado", "lazer", "delivery", "outros",
+// Names of default quick categories (matched by name, not slug)
+const QUICK_CAT_NAMES = [
+    "Alimentação",
+    "Transporte",
+    "Mercado",
+    "Lazer",
+    "Delivery",
+    "Outros",
 ];
 
-// ── UUID helper ───────────────────────────────────────────────────────────────
-function isValidUuid(str: string): boolean {
-    return /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(str);
+function isValidUuid(s: string | null | undefined): boolean {
+    if (!s) return false;
+    return /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(s);
 }
 
 // ── Component ─────────────────────────────────────────────────────────────────
@@ -52,11 +55,11 @@ export const QuickExpense = () => {
     const navigate = useNavigate();
     const { user } = useAuth();
 
-    // Data hooks
-    const { allCategories } = useAllCategories();
+    const { allCategories, isLoading: catsLoading } = useAllCategories();
     const { data: bankAccounts = [] } = useBankAccounts();
     const { data: creditCards = [] } = useCreditCards();
     const { ensureCashAccount } = useCashAccount();
+
     const createExpense = useCreateExpense();
     const createBulkExpenses = useCreateBulkExpenses();
     const createCreditCardPurchase = useCreateCreditCardPurchase();
@@ -67,92 +70,87 @@ export const QuickExpense = () => {
     const [amount, setAmount] = useState("");
     const [categoryId, setCategoryId] = useState<string | undefined>();
     const [paymentMethod, setPaymentMethod] = useState<PaymentMethod | undefined>();
-    const [selectedBankId, setSelectedBankId] = useState<string | undefined>(
-        bankAccounts[0]?.id // pre-select first account
-    );
+    const [selectedBankId, setSelectedBankId] = useState<string | undefined>(bankAccounts[0]?.id);
     const [selectedCardId, setSelectedCardId] = useState<string | undefined>();
     const [date, setDate] = useState(toLocalDateString());
     const [description, setDescription] = useState("");
 
+    // Installments / recurrence
+    const [installments, setInstallments] = useState(1);
+    const [isRecurring, setIsRecurring] = useState(false);
+
     // Third-party
     const [isForOtherPerson, setIsForOtherPerson] = useState(false);
     const [reimbName, setReimbName] = useState("");
-    const [reimbAmount, setReimbAmount] = useState(""); // partial reimbursement
+    const [reimbAmount, setReimbAmount] = useState("");
     const [reimbDate, setReimbDate] = useState(() => {
         const d = new Date();
         d.setMonth(d.getMonth() + 1);
         return toLocalDateString(d);
     });
 
-    // Credit installments
-    const [installments, setInstallments] = useState(1);
-
-    // UI state
+    // UI
     const [showKeypad, setShowKeypad] = useState(true);
     const [showAllCategories, setShowAllCategories] = useState(false);
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [showSuccess, setShowSuccess] = useState(false);
 
-    // ── Derived ─────────────────────────────────────────────────────────────────
+    // ── Derived values ───────────────────────────────────────────────────────────
     const numericAmount = parseCurrency(amount);
     const selectedCategory = categoryId ? allCategories.find(c => c.id === categoryId) : undefined;
-    const quickCategories = QUICK_CAT_SLUGS
-        .map(slug => allCategories.find(c => c.id === slug))
+
+    // Quick categories matched by name
+    const quickCategories = QUICK_CAT_NAMES
+        .map(name => allCategories.find(c => c.name.toLowerCase() === name.toLowerCase()))
         .filter(Boolean) as typeof allCategories;
 
-    const displayedCategories = showAllCategories ? allCategories : quickCategories;
+    // Fallback: if quick cats are empty (still loading), show first 6 of allCategories
+    const quickOrFirst = quickCategories.length > 0
+        ? quickCategories
+        : allCategories.slice(0, 6);
 
+    const displayedCategories = showAllCategories ? allCategories : quickOrFirst;
+
+    const isCreditCard = paymentMethod === "credit" && !!selectedCardId;
     const canSubmit = numericAmount > 0 && !!paymentMethod &&
         (paymentMethod === "credit" ? !!selectedCardId : true);
 
-    // ── Category UUID resolver ───────────────────────────────────────────────────
-    async function resolveCategoryId(catId: string | undefined): Promise<string | null> {
-        if (!catId || !user) return null;
-        if (isValidUuid(catId) && catId.length >= 30) return catId;
+    // ── Reimbursement shortcuts ──────────────────────────────────────────────────
+    const setReimbFraction = (frac: number) => {
+        if (!numericAmount) return;
+        const val = Math.round(numericAmount * frac * 100);
+        setReimbAmount(formatCurrencyInput(String(val)));
+    };
 
-        const cat = allCategories.find(c => c.id === catId);
+    // ── UUID resolver ────────────────────────────────────────────────────────────
+    async function resolveCategoryId(id: string | undefined): Promise<string | null> {
+        if (!id || !user) return null;
+        if (isValidUuid(id) && id.length >= 30) return id;
+
+        const cat = allCategories.find(c => c.id === id);
         if (!cat) return null;
 
-        // Try to find by name in DB
         const { data: existing } = await supabase
-            .from("categories")
-            .select("id")
-            .ilike("name", cat.name)
-            .eq("user_id", user.id)
-            .maybeSingle();
-
+            .from("categories").select("id")
+            .ilike("name", cat.name).eq("user_id", user.id).maybeSingle();
         if (existing) return existing.id;
 
-        // Create it
-        const { data: newCat } = await supabase
-            .from("categories")
-            .insert({
-                user_id: user.id,
-                name: cat.name,
-                icon: "Tag",
-                color: cat.color,
-                type: "expense",
-                group_name: cat.group,
-                nature: cat.nature as any,
-                is_default: true,
-                allow_expense: cat.allowExpense ?? true,
-                allow_card: cat.allowCard ?? true,
-                allow_subscription: cat.allowSubscription ?? true,
-            })
-            .select()
-            .single();
+        const { data: created } = await supabase.from("categories").insert({
+            user_id: user.id, name: cat.name, icon: "Tag", color: cat.color,
+            type: "expense", group_name: cat.group, nature: cat.nature as any,
+            is_default: true, allow_expense: cat.allowExpense ?? true,
+            allow_card: cat.allowCard ?? true, allow_subscription: cat.allowSubscription ?? true,
+        }).select().single();
 
-        return newCat?.id ?? null;
+        return created?.id ?? null;
     }
 
-    // ── Save handler ─────────────────────────────────────────────────────────────
+    // ── Save ─────────────────────────────────────────────────────────────────────
     const handleSave = async () => {
         if (!canSubmit || !user || isSubmitting) return;
         setIsSubmitting(true);
-
         try {
             const finalCategoryId = await resolveCategoryId(categoryId);
-            const isCreditCard = paymentMethod === "credit" && selectedCardId;
 
             if (isCreditCard) {
                 await createCreditCardPurchase.mutateAsync({
@@ -168,28 +166,29 @@ export const QuickExpense = () => {
                 if (paymentMethod === "cash") bankId = await ensureCashAccount();
 
                 const purchaseDate = new Date(date + "T12:00:00");
+                const totalInstalls = installments > 1 ? installments : 1;
 
-                if (installments > 1) {
+                if (totalInstalls > 1) {
                     const groupId = crypto.randomUUID();
-                    const bulk = Array.from({ length: installments }, (_, i) => ({
-                        amount: numericAmount,
-                        description: description || selectedCategory?.name || "Gasto registrado",
-                        emotion: undefined,
-                        status: "confirmed" as const,
-                        source: "manual" as const,
-                        is_installment: false,
-                        total_installments: installments,
-                        installment_number: i + 1,
-                        installment_group_id: groupId,
-                        bank_account_id: bankId ?? undefined,
-                        date: format(addMonths(purchaseDate, i), "yyyy-MM-dd"),
-                        category_id: finalCategoryId,
-                    }));
-                    await createBulkExpenses.mutateAsync(bulk as any);
+                    await createBulkExpenses.mutateAsync(
+                        Array.from({ length: totalInstalls }, (_, i) => ({
+                            amount: numericAmount,
+                            description: description || selectedCategory?.name || "Gasto",
+                            status: "confirmed" as const,
+                            source: "manual" as const,
+                            is_installment: false,
+                            total_installments: totalInstalls,
+                            installment_number: i + 1,
+                            installment_group_id: groupId,
+                            bank_account_id: bankId ?? undefined,
+                            date: format(addMonths(purchaseDate, i), "yyyy-MM-dd"),
+                            category_id: finalCategoryId,
+                        })) as any
+                    );
                 } else {
                     await createExpense.mutateAsync({
                         amount: numericAmount,
-                        description: description || selectedCategory?.name || "Gasto registrado",
+                        description: description || selectedCategory?.name || "Gasto",
                         status: "confirmed",
                         source: "manual",
                         is_installment: false,
@@ -205,52 +204,41 @@ export const QuickExpense = () => {
                 }
             }
 
-            // Reimbursement for third party
             if (isForOtherPerson && reimbName.trim()) {
                 const reimbValue = parseCurrency(reimbAmount) || numericAmount;
                 await createReceivable.mutateAsync({
                     debtor_name: reimbName.trim(),
                     amount: reimbValue,
-                    description: `Reembolso - ${description || selectedCategory?.name || "Gasto"}`,
+                    description: `Reembolso – ${description || selectedCategory?.name || "Gasto"}`,
                     due_date: reimbDate,
                     status: "pending",
                 });
             }
 
             setShowSuccess(true);
-            setTimeout(() => {
-                navigate("/", { state: { success: true } });
-            }, 1800);
+            setTimeout(() => navigate("/", { state: { success: true } }), 1800);
         } catch (err: any) {
-            console.error("QuickExpense save error:", err);
+            console.error(err);
             toast.error(err?.message || "Erro ao salvar. Tente novamente.");
         } finally {
             setIsSubmitting(false);
         }
     };
 
-    // ── Success Screen ────────────────────────────────────────────────────────────
+    // ── Success ──────────────────────────────────────────────────────────────────
     if (showSuccess) {
         return (
             <div className="min-h-screen bg-background flex flex-col items-center justify-center gap-6 px-6">
                 <motion.div
-                    initial={{ scale: 0, opacity: 0 }}
-                    animate={{ scale: 1, opacity: 1 }}
-                    transition={{ type: "spring", damping: 14, stiffness: 200 }}
+                    initial={{ scale: 0 }} animate={{ scale: 1 }}
+                    transition={{ type: "spring", damping: 14 }}
                     className="w-24 h-24 rounded-full bg-green-500/15 flex items-center justify-center"
                 >
                     <Check className="w-12 h-12 text-green-500" strokeWidth={2.5} />
                 </motion.div>
-                <motion.div
-                    initial={{ opacity: 0, y: 12 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: 0.2 }}
-                    className="text-center"
-                >
-                    <p className="text-2xl font-bold text-foreground">Gasto registrado!</p>
-                    <p className="text-muted-foreground mt-1">
-                        {formatCurrency(numericAmount)} debitado{isForOtherPerson && reimbName ? ` · ${reimbName} deve te pagar` : ""}
-                    </p>
+                <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }} className="text-center">
+                    <p className="text-2xl font-bold">Gasto registrado!</p>
+                    <p className="text-muted-foreground mt-1">{formatCurrency(numericAmount)} debitado</p>
                     {isForOtherPerson && reimbName && (
                         <p className="text-sm text-primary font-medium mt-2">
                             💬 Valor a receber criado para {reimbName}
@@ -261,94 +249,97 @@ export const QuickExpense = () => {
         );
     }
 
-    // ── Main Screen ───────────────────────────────────────────────────────────────
+    // ── Keypad height: ~284px. Bottom button: ~72px. Total fixed: ~356px. ────────
+    const keypadOpen = showKeypad;
+    const bottomOffset = keypadOpen ? "pb-[370px]" : "pb-24";
+
+    // ── Render ───────────────────────────────────────────────────────────────────
     return (
         <div className="min-h-screen bg-background flex flex-col">
-            {/* ── Header ── */}
-            <div className="flex items-center gap-3 px-4 pt-safe pt-4 pb-2">
-                <button
-                    onClick={() => navigate(-1)}
-                    className="w-9 h-9 rounded-full bg-muted flex items-center justify-center"
-                >
-                    <ArrowLeft className="w-4 h-4 text-foreground" />
+
+            {/* Header */}
+            <div className="flex items-center gap-3 px-4 pt-4 pb-2 border-b border-border">
+                <button onClick={() => navigate(-1)} className="w-9 h-9 rounded-full bg-muted flex items-center justify-center">
+                    <ArrowLeft className="w-4 h-4" />
                 </button>
-                <h1 className="text-base font-bold text-foreground">Novo Gasto</h1>
+                <h1 className="font-bold text-base flex-1">Novo Gasto</h1>
             </div>
 
-            {/* ── Scrollable Content ── */}
-            <div className="flex-1 overflow-y-auto px-4 pb-56 space-y-6 pt-2">
+            {/* Scrollable form */}
+            <div className={cn("flex-1 overflow-y-auto px-4 pt-4 space-y-5", bottomOffset)}>
 
-                {/* ── Amount Display ── */}
-                <motion.button
+                {/* ── Amount ── */}
+                <button
                     onClick={() => setShowKeypad(v => !v)}
-                    className="w-full text-center py-4"
-                    whileTap={{ scale: 0.98 }}
+                    className="w-full text-center py-3 rounded-2xl bg-card border border-border"
                 >
-                    <p className="text-xs text-muted-foreground uppercase tracking-widest mb-1">Valor do Gasto</p>
+                    <p className="text-[10px] uppercase tracking-widest text-muted-foreground mb-0.5">Valor do Gasto</p>
                     <p className={cn(
-                        "text-5xl font-bold tracking-tight transition-colors",
-                        numericAmount > 0 ? "text-foreground" : "text-muted-foreground/40"
+                        "text-5xl font-bold tabular-nums tracking-tight",
+                        numericAmount > 0 ? "text-foreground" : "text-muted-foreground/30"
                     )}>
                         {amount ? formatCurrency(numericAmount) : "R$ 0,00"}
                     </p>
-                    <p className="text-xs text-primary mt-2 font-medium">
-                        {showKeypad ? "Toque para esconder teclado" : "Toque para digitar"}
+                    <p className="text-[10px] text-primary mt-1 font-medium">
+                        {showKeypad ? "▼ Fechar teclado" : "▲ Abrir teclado"}
                     </p>
-                </motion.button>
+                </button>
 
                 {/* ── Categories ── */}
                 <section>
                     <div className="flex items-center justify-between mb-2">
-                        <p className="text-xs font-bold uppercase tracking-widest text-muted-foreground">Categoria</p>
-                        <button
-                            onClick={() => setShowAllCategories(v => !v)}
-                            className="text-xs text-primary font-medium"
-                        >
-                            {showAllCategories ? "Ver menos" : "Ver todas"}
+                        <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground">Categoria</p>
+                        <button onClick={() => setShowAllCategories(v => !v)} className="text-[11px] text-primary font-semibold">
+                            {showAllCategories ? "Ver menos ▲" : "Ver todas ▼"}
                         </button>
                     </div>
-                    <div className="flex gap-2 overflow-x-auto pb-1 no-scrollbar">
-                        {displayedCategories.map(cat => {
-                            const Icon = cat.icon;
-                            const isSelected = categoryId === cat.id;
-                            return (
-                                <motion.button
-                                    key={cat.id}
-                                    whileTap={{ scale: 0.95 }}
-                                    onClick={() => setCategoryId(isSelected ? undefined : cat.id)}
-                                    className={cn(
-                                        "flex-shrink-0 flex flex-col items-center gap-1.5 px-3 py-2.5 rounded-2xl border transition-all min-w-[64px]",
-                                        isSelected
-                                            ? "border-primary bg-primary/10 text-primary"
-                                            : "border-border bg-card text-muted-foreground"
-                                    )}
-                                >
-                                    <Icon className="w-5 h-5" />
-                                    <span className="text-[10px] font-semibold text-center leading-tight w-12 truncate">
-                                        {cat.name}
-                                    </span>
-                                </motion.button>
-                            );
-                        })}
-                    </div>
+
+                    {catsLoading && allCategories.length === 0 ? (
+                        <div className="flex gap-2 overflow-x-auto pb-1">
+                            {Array.from({ length: 6 }).map((_, i) => (
+                                <div key={i} className="flex-shrink-0 w-16 h-16 rounded-2xl bg-muted animate-pulse" />
+                            ))}
+                        </div>
+                    ) : (
+                        <div className="flex gap-2 overflow-x-auto pb-1 no-scrollbar">
+                            {displayedCategories.map(cat => {
+                                const Icon = cat.icon;
+                                const isSelected = categoryId === cat.id;
+                                return (
+                                    <motion.button
+                                        key={cat.id}
+                                        whileTap={{ scale: 0.93 }}
+                                        onClick={() => setCategoryId(isSelected ? undefined : cat.id)}
+                                        className={cn(
+                                            "flex-shrink-0 flex flex-col items-center gap-1 px-3 py-2.5 rounded-2xl border transition-all min-w-[64px]",
+                                            isSelected
+                                                ? "border-primary bg-primary/10 text-primary shadow-sm"
+                                                : "border-border bg-card text-muted-foreground"
+                                        )}
+                                    >
+                                        <Icon className="w-5 h-5" />
+                                        <span className="text-[9px] font-bold text-center leading-tight w-12 truncate">{cat.name}</span>
+                                    </motion.button>
+                                );
+                            })}
+                        </div>
+                    )}
                 </section>
 
-                {/* ── Payment Method ── */}
+                {/* ── Payment method ── */}
                 <section>
-                    <p className="text-xs font-bold uppercase tracking-widest text-muted-foreground mb-2">Forma de Pagamento</p>
+                    <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground mb-2">Forma de Pagamento</p>
                     <div className="grid grid-cols-4 gap-2">
                         {PAYMENT_OPTIONS.map(({ value, label, Icon }) => {
                             const isSelected = paymentMethod === value;
                             return (
                                 <motion.button
                                     key={value}
-                                    whileTap={{ scale: 0.93 }}
+                                    whileTap={{ scale: 0.92 }}
                                     onClick={() => {
                                         setPaymentMethod(value);
                                         setSelectedCardId(undefined);
-                                        if (value !== "credit") {
-                                            setInstallments(1);
-                                        }
+                                        if (value !== "credit") setInstallments(1);
                                     }}
                                     className={cn(
                                         "flex flex-col items-center gap-1.5 py-3 rounded-2xl border transition-all",
@@ -358,136 +349,170 @@ export const QuickExpense = () => {
                                     )}
                                 >
                                     <Icon className="w-5 h-5" />
-                                    <span className="text-[10px] font-semibold">{label}</span>
+                                    <span className="text-[10px] font-bold">{label}</span>
                                 </motion.button>
                             );
                         })}
                     </div>
                 </section>
 
-                {/* ── Account / Card selector ── */}
-                <AnimatePresence mode="wait">
+                {/* ── Account / Card ── */}
+                <AnimatePresence>
                     {paymentMethod && paymentMethod !== "cash" && (
                         <motion.section
-                            key={paymentMethod}
                             initial={{ opacity: 0, height: 0 }}
                             animate={{ opacity: 1, height: "auto" }}
                             exit={{ opacity: 0, height: 0 }}
                         >
-                            {paymentMethod === "credit" ? (
-                                <>
-                                    <p className="text-xs font-bold uppercase tracking-widest text-muted-foreground mb-2">Cartão</p>
-                                    <div className="flex gap-2 overflow-x-auto pb-1 no-scrollbar">
-                                        {creditCards.map(card => (
-                                            <motion.button
-                                                key={card.id}
-                                                whileTap={{ scale: 0.95 }}
-                                                onClick={() => setSelectedCardId(card.id)}
-                                                className={cn(
-                                                    "flex-shrink-0 flex items-center gap-2 px-3 py-2 rounded-xl border transition-all",
-                                                    selectedCardId === card.id
-                                                        ? "border-primary bg-primary/10"
-                                                        : "border-border bg-card"
-                                                )}
-                                            >
-                                                <BankLogo bankName={card.card_name || card.bank} className="w-6 h-6" size="sm" />
-                                                <span className="text-sm font-medium truncate max-w-[100px]">{card.card_name || card.bank}</span>
-                                            </motion.button>
-                                        ))}
-                                        {creditCards.length === 0 && (
-                                            <p className="text-sm text-muted-foreground py-2">Nenhum cartão cadastrado</p>
-                                        )}
-                                    </div>
+                            <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground mb-2">
+                                {paymentMethod === "credit" ? "Cartão" : "Conta"}
+                            </p>
+                            <div className="flex gap-2 overflow-x-auto pb-1 no-scrollbar">
+                                {paymentMethod === "credit"
+                                    ? creditCards.map(card => (
+                                        <motion.button key={card.id} whileTap={{ scale: 0.95 }}
+                                            onClick={() => setSelectedCardId(card.id)}
+                                            className={cn(
+                                                "flex-shrink-0 flex items-center gap-2 px-3 py-2 rounded-xl border transition-all",
+                                                selectedCardId === card.id ? "border-primary bg-primary/10" : "border-border bg-card"
+                                            )}>
+                                            <BankLogo bankName={card.card_name || card.bank} className="w-6 h-6" size="sm" />
+                                            <span className="text-xs font-medium max-w-[90px] truncate">{card.card_name || card.bank}</span>
+                                        </motion.button>
+                                    ))
+                                    : bankAccounts.map(acc => (
+                                        <motion.button key={acc.id} whileTap={{ scale: 0.95 }}
+                                            onClick={() => setSelectedBankId(acc.id)}
+                                            className={cn(
+                                                "flex-shrink-0 flex items-center gap-2 px-3 py-2 rounded-xl border transition-all",
+                                                selectedBankId === acc.id ? "border-primary bg-primary/10" : "border-border bg-card"
+                                            )}>
+                                            <BankLogo bankName={acc.bank_name} className="w-6 h-6" size="sm" />
+                                            <div className="text-left">
+                                                <p className="text-[11px] font-semibold max-w-[80px] truncate">{acc.bank_name}</p>
+                                                <p className="text-[9px] text-muted-foreground">{formatCurrency(Number(acc.current_balance))}</p>
+                                            </div>
+                                        </motion.button>
+                                    ))
+                                }
+                            </div>
+                        </motion.section>
+                    )}
+                </AnimatePresence>
 
-                                    {/* Installments */}
-                                    <div className="flex items-center justify-between mt-4 p-3 bg-card rounded-xl border border-border">
-                                        <div className="flex items-center gap-2">
-                                            <Layers className="w-4 h-4 text-muted-foreground" />
-                                            <span className="text-sm font-medium">Parcelas</span>
-                                        </div>
-                                        <div className="flex items-center gap-3">
-                                            <button
-                                                onClick={() => setInstallments(v => Math.max(1, v - 1))}
-                                                className="w-7 h-7 rounded-full bg-muted flex items-center justify-center"
-                                            >
-                                                <Minus className="w-3 h-3" />
-                                            </button>
-                                            <span className="text-base font-bold w-8 text-center">{installments}x</span>
-                                            <button
-                                                onClick={() => setInstallments(v => Math.min(48, v + 1))}
-                                                className="w-7 h-7 rounded-full bg-muted flex items-center justify-center"
-                                            >
-                                                <Plus className="w-3 h-3" />
-                                            </button>
-                                        </div>
-                                    </div>
-                                    {installments > 1 && numericAmount > 0 && (
-                                        <p className="text-xs text-muted-foreground mt-1 ml-1">
-                                            {installments}x de {formatCurrency(numericAmount / installments)} por mês
-                                        </p>
-                                    )}
-                                </>
-                            ) : (
-                                <>
-                                    <p className="text-xs font-bold uppercase tracking-widest text-muted-foreground mb-2">Conta</p>
-                                    <div className="flex gap-2 overflow-x-auto pb-1 no-scrollbar">
-                                        {bankAccounts.map(acc => (
-                                            <motion.button
-                                                key={acc.id}
-                                                whileTap={{ scale: 0.95 }}
-                                                onClick={() => setSelectedBankId(acc.id)}
-                                                className={cn(
-                                                    "flex-shrink-0 flex items-center gap-2 px-3 py-2 rounded-xl border transition-all",
-                                                    selectedBankId === acc.id
-                                                        ? "border-primary bg-primary/10"
-                                                        : "border-border bg-card"
-                                                )}
-                                            >
-                                                <BankLogo bankName={acc.bank_name} className="w-6 h-6" size="sm" />
-                                                <div className="text-left">
-                                                    <p className="text-xs font-semibold truncate max-w-[80px]">{acc.bank_name}</p>
-                                                    <p className="text-[10px] text-muted-foreground">{formatCurrency(Number(acc.current_balance))}</p>
-                                                </div>
-                                            </motion.button>
-                                        ))}
-                                    </div>
-                                </>
+                {/* ── Credit: Installments ── */}
+                <AnimatePresence>
+                    {paymentMethod === "credit" && (
+                        <motion.section
+                            initial={{ opacity: 0, height: 0 }}
+                            animate={{ opacity: 1, height: "auto" }}
+                            exit={{ opacity: 0, height: 0 }}
+                            className="bg-card rounded-2xl border border-border p-3"
+                        >
+                            <div className="flex items-center justify-between">
+                                <div className="flex items-center gap-2">
+                                    <CreditCard className="w-4 h-4 text-muted-foreground" />
+                                    <span className="text-sm font-semibold">Parcelas</span>
+                                </div>
+                                <div className="flex items-center gap-3">
+                                    <button onClick={() => setInstallments(v => Math.max(1, v - 1))}
+                                        className="w-8 h-8 rounded-full bg-muted flex items-center justify-center">
+                                        <Minus className="w-3 h-3" />
+                                    </button>
+                                    <span className="text-base font-bold w-8 text-center">{installments}x</span>
+                                    <button onClick={() => setInstallments(v => Math.min(48, v + 1))}
+                                        className="w-8 h-8 rounded-full bg-muted flex items-center justify-center">
+                                        <Plus className="w-3 h-3" />
+                                    </button>
+                                </div>
+                            </div>
+                            {installments > 1 && numericAmount > 0 && (
+                                <p className="text-xs text-muted-foreground mt-2 text-right">
+                                    {installments}× de {formatCurrency(numericAmount / installments)}/mês
+                                </p>
                             )}
                         </motion.section>
                     )}
                 </AnimatePresence>
 
-                {/* ── Date ── */}
-                <section className="flex items-center gap-3">
-                    <div className="flex items-center gap-2 flex-1 p-3 bg-card rounded-xl border border-border">
+                {/* ── Recorrente (non-credit only) ── */}
+                <AnimatePresence>
+                    {paymentMethod && paymentMethod !== "credit" && (
+                        <motion.section
+                            initial={{ opacity: 0, height: 0 }}
+                            animate={{ opacity: 1, height: "auto" }}
+                            exit={{ opacity: 0, height: 0 }}
+                        >
+                            <button
+                                onClick={() => setIsRecurring(v => !v)}
+                                className={cn(
+                                    "w-full flex items-center justify-between px-4 py-3 rounded-2xl border transition-all",
+                                    isRecurring ? "border-primary bg-primary/10 text-primary" : "border-border bg-card text-muted-foreground"
+                                )}
+                            >
+                                <div className="flex items-center gap-2">
+                                    <RepeatIcon className="w-4 h-4" />
+                                    <span className="text-sm font-semibold">Gasto recorrente</span>
+                                </div>
+                                <span className="text-xs font-bold">{isRecurring ? "Sim ✓" : "Não"}</span>
+                            </button>
+
+                            <AnimatePresence>
+                                {isRecurring && (
+                                    <motion.div
+                                        initial={{ height: 0, opacity: 0 }}
+                                        animate={{ height: "auto", opacity: 1 }}
+                                        exit={{ height: 0, opacity: 0 }}
+                                        className="overflow-hidden mt-2"
+                                    >
+                                        <div className="bg-card rounded-2xl border border-border p-3 space-y-2">
+                                            <p className="text-xs text-muted-foreground">Quantas vezes se repete?</p>
+                                            <div className="flex items-center gap-3">
+                                                <button onClick={() => setInstallments(v => Math.max(2, v - 1))}
+                                                    className="w-8 h-8 rounded-full bg-muted flex items-center justify-center">
+                                                    <Minus className="w-3 h-3" />
+                                                </button>
+                                                <span className="text-base font-bold w-16 text-center">{installments} meses</span>
+                                                <button onClick={() => setInstallments(v => Math.min(36, v + 1))}
+                                                    className="w-8 h-8 rounded-full bg-muted flex items-center justify-center">
+                                                    <Plus className="w-3 h-3" />
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </motion.div>
+                                )}
+                            </AnimatePresence>
+                        </motion.section>
+                    )}
+                </AnimatePresence>
+
+                {/* ── Date & Description ── */}
+                <section className="flex gap-2">
+                    <div className="flex-1 flex items-center gap-2 p-3 bg-card rounded-xl border border-border">
                         <Calendar className="w-4 h-4 text-muted-foreground flex-shrink-0" />
                         <input
-                            type="date"
-                            value={date}
-                            onChange={e => setDate(e.target.value)}
+                            type="date" value={date} onChange={e => setDate(e.target.value)}
                             className="flex-1 bg-transparent text-sm font-medium outline-none min-w-0"
                         />
                     </div>
                 </section>
 
-                {/* ── Description ── */}
                 <section>
                     <input
-                        type="text"
-                        value={description}
-                        onChange={e => setDescription(e.target.value)}
+                        type="text" value={description} onChange={e => setDescription(e.target.value)}
                         placeholder="Descrição (opcional)"
-                        className="w-full p-3 bg-card rounded-xl border border-border text-sm outline-none placeholder:text-muted-foreground/50"
+                        className="w-full p-3 bg-card rounded-xl border border-border text-sm outline-none placeholder:text-muted-foreground/40"
                     />
                 </section>
 
-                {/* ── Toggle: Gasto meu / Outra pessoa ── */}
-                <section className="bg-card rounded-2xl border border-border overflow-hidden">
+                {/* ── Gasto meu / Para outra pessoa ── */}
+                <section className="rounded-2xl border border-border overflow-hidden bg-card">
+                    {/* Toggle header */}
                     <div className="flex">
                         <button
                             onClick={() => setIsForOtherPerson(false)}
                             className={cn(
-                                "flex-1 py-3 text-sm font-semibold transition-all",
+                                "flex-1 py-3.5 text-sm font-bold transition-all",
                                 !isForOtherPerson ? "bg-primary text-primary-foreground" : "text-muted-foreground"
                             )}
                         >
@@ -496,7 +521,7 @@ export const QuickExpense = () => {
                         <button
                             onClick={() => setIsForOtherPerson(true)}
                             className={cn(
-                                "flex-1 py-3 text-sm font-semibold transition-all",
+                                "flex-1 py-3.5 text-sm font-bold transition-all",
                                 isForOtherPerson ? "bg-primary text-primary-foreground" : "text-muted-foreground"
                             )}
                         >
@@ -504,59 +529,57 @@ export const QuickExpense = () => {
                         </button>
                     </div>
 
+                    {/* Third-party fields */}
                     <AnimatePresence>
                         {isForOtherPerson && (
                             <motion.div
                                 initial={{ height: 0, opacity: 0 }}
                                 animate={{ height: "auto", opacity: 1 }}
                                 exit={{ height: 0, opacity: 0 }}
-                                className="border-t border-border overflow-hidden"
+                                className="overflow-hidden border-t border-border"
                             >
                                 <div className="p-4 space-y-3">
-                                    <div className="flex items-center gap-2">
-                                        <User className="w-4 h-4 text-muted-foreground" />
+                                    {/* Name */}
+                                    <div className="flex items-center gap-2 p-2 bg-muted rounded-xl">
+                                        <User className="w-4 h-4 text-muted-foreground flex-shrink-0" />
                                         <input
-                                            type="text"
-                                            value={reimbName}
-                                            onChange={e => setReimbName(e.target.value)}
+                                            type="text" value={reimbName} onChange={e => setReimbName(e.target.value)}
                                             placeholder="Nome da pessoa"
                                             className="flex-1 bg-transparent text-sm outline-none placeholder:text-muted-foreground/50"
                                         />
                                     </div>
-                                    <div className="h-px bg-border" />
+
+                                    {/* Partial amount */}
                                     <div>
-                                        <p className="text-xs text-muted-foreground mb-1">Valor a receber de volta</p>
+                                        <p className="text-[10px] text-muted-foreground mb-1 ml-1">Valor a receber de volta</p>
                                         <input
-                                            type="text"
-                                            value={reimbAmount}
-                                            onChange={e => setReimbAmount(e.target.value)}
-                                            placeholder={`Parcial (padrão: ${amount || "total"})`}
-                                            className="w-full bg-muted rounded-lg px-3 py-2 text-sm outline-none placeholder:text-muted-foreground/50"
+                                            type="text" value={reimbAmount} onChange={e => setReimbAmount(e.target.value)}
+                                            placeholder={`Total: ${amount || "R$ 0,00"}`}
+                                            className="w-full p-2.5 bg-muted rounded-xl text-sm outline-none placeholder:text-muted-foreground/40"
                                         />
                                         {numericAmount > 0 && (
                                             <div className="flex gap-2 mt-2">
-                                                {[0.5, 0.33, 0.25].map(frac => (
+                                                {[{ label: "50%", frac: 0.5 }, { label: "33%", frac: 1 / 3 }, { label: "25%", frac: 0.25 }].map(({ label, frac }) => (
                                                     <button
-                                                        key={frac}
-                                                        onClick={() => setReimbAmount(formatCurrencyInput(String(Math.round(numericAmount * frac * 100))))}
-                                                        className="text-[10px] px-2 py-1 rounded-full bg-primary/10 text-primary font-medium"
+                                                        key={label}
+                                                        onClick={() => setReimbFraction(frac)}
+                                                        className="text-[10px] px-2.5 py-1 rounded-full bg-primary/10 text-primary font-bold"
                                                     >
-                                                        {Math.round(frac * 100)}%
+                                                        {label} – {formatCurrency(numericAmount * frac)}
                                                     </button>
                                                 ))}
                                             </div>
                                         )}
                                     </div>
-                                    <div className="h-px bg-border" />
-                                    <div className="flex items-center gap-2">
-                                        <Calendar className="w-4 h-4 text-muted-foreground" />
+
+                                    {/* Due date */}
+                                    <div className="flex items-center gap-2 p-2 bg-muted rounded-xl">
+                                        <Calendar className="w-4 h-4 text-muted-foreground flex-shrink-0" />
                                         <input
-                                            type="date"
-                                            value={reimbDate}
-                                            onChange={e => setReimbDate(e.target.value)}
+                                            type="date" value={reimbDate} onChange={e => setReimbDate(e.target.value)}
                                             className="flex-1 bg-transparent text-xs outline-none"
                                         />
-                                        <span className="text-xs text-muted-foreground">previsão devolução</span>
+                                        <span className="text-[9px] text-muted-foreground whitespace-nowrap">previsão devolução</span>
                                     </div>
                                 </div>
                             </motion.div>
@@ -564,45 +587,44 @@ export const QuickExpense = () => {
                     </AnimatePresence>
                 </section>
 
+                {/* Bottom spacer */}
+                <div className="h-4" />
             </div>
 
-            {/* ── Fixed Bottom: Keypad + Button ── */}
-            <div className="fixed bottom-0 left-0 right-0 bg-background border-t border-border">
+            {/* ── Fixed bottom: keypad + button ── */}
+            <div className="fixed bottom-0 left-0 right-0 z-50 bg-background/95 backdrop-blur-sm border-t border-border">
                 <AnimatePresence>
                     {showKeypad && (
                         <motion.div
                             initial={{ height: 0, opacity: 0 }}
                             animate={{ height: "auto", opacity: 1 }}
                             exit={{ height: 0, opacity: 0 }}
-                            transition={{ type: "spring", damping: 24, stiffness: 300 }}
+                            transition={{ type: "spring", damping: 26, stiffness: 320 }}
                             className="overflow-hidden"
                         >
-                            <div className="p-3 pb-0">
+                            <div className="px-3 pt-3">
                                 <NumericKeypad value={amount} onChange={setAmount} />
                             </div>
                         </motion.div>
                     )}
                 </AnimatePresence>
 
-                <div className="px-4 py-3 pb-safe">
+                <div className="px-4 py-3">
                     <motion.button
                         whileTap={{ scale: 0.97 }}
                         onClick={handleSave}
                         disabled={!canSubmit || isSubmitting}
                         className={cn(
-                            "w-full h-14 rounded-2xl text-base font-bold transition-all flex items-center justify-center gap-2",
+                            "w-full h-14 rounded-2xl text-base font-bold transition-all flex items-center justify-center gap-2 shadow-lg",
                             canSubmit && !isSubmitting
-                                ? "bg-primary text-primary-foreground shadow-lg shadow-primary/30"
+                                ? "bg-primary text-primary-foreground shadow-primary/25"
                                 : "bg-muted text-muted-foreground cursor-not-allowed"
                         )}
                     >
                         {isSubmitting ? (
                             <Loader2 className="w-5 h-5 animate-spin" />
                         ) : (
-                            <>
-                                <Check className="w-5 h-5" />
-                                Registrar Gasto
-                            </>
+                            <><Check className="w-5 h-5" /> Registrar Gasto</>
                         )}
                     </motion.button>
                 </div>
