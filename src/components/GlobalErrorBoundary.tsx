@@ -25,6 +25,19 @@ export class GlobalErrorBoundary extends Component<Props, State> {
     public componentDidCatch(error: Error, errorInfo: ErrorInfo) {
         console.error("Uncaught error:", error, errorInfo);
         this.setState({ errorInfo });
+
+        // Auto-reload on chunk load error (deployment update)
+        if (error.message?.includes("Failed to fetch dynamically imported module") ||
+            error.message?.includes("Importing a module script failed")) {
+
+            const lastReload = sessionStorage.getItem("chunk_reload");
+            const now = Date.now();
+
+            if (!lastReload || (now - Number(lastReload) > 10000)) {
+                sessionStorage.setItem("chunk_reload", String(now));
+                window.location.reload();
+            }
+        }
     }
 
     public render() {
