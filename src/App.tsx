@@ -21,6 +21,7 @@ const Pending = lazy(() => import("./pages/Pending"));
 const Onboarding = lazy(() => import("./pages/Onboarding"));
 const EditAccount = lazy(() => import("./pages/EditAccount"));
 const AddExpense = lazy(() => import("./pages/AddExpense"));
+const QuickExpense = lazy(() => import("./pages/QuickExpense"));
 const ExpenseDetail = lazy(() => import("./pages/ExpenseDetail"));
 const EditExpense = lazy(() => import("./pages/EditExpense"));
 const ConfirmExpense = lazy(() => import("./pages/ConfirmExpense"));
@@ -109,10 +110,12 @@ const App = () => (
 
             {/* Expenses */}
             <Route path="/expenses" element={<OnboardingRoute><Expenses /></OnboardingRoute>} />
-            <Route path="/expenses/add" element={<OnboardingRoute><AddExpense /></OnboardingRoute>} />
+            <Route path="/expenses/add" element={<OnboardingRoute><QuickExpense /></OnboardingRoute>} />
+            <Route path="/expenses/quick" element={<OnboardingRoute><QuickExpense /></OnboardingRoute>} />
             <Route path="/expenses/:id" element={<OnboardingRoute><ExpenseDetail /></OnboardingRoute>} />
             <Route path="/expenses/:id/edit" element={<OnboardingRoute><EditExpense /></OnboardingRoute>} />
-            <Route path="/confirm/:id" element={<OnboardingRoute><ConfirmExpense /></OnboardingRoute>} />
+            {/* Legacy confirm route → now handled inside QuickExpense */}
+            <Route path="/confirm/:id" element={<Navigate to="/expenses/add" replace />} />
 
             {/* Income */}
             <Route path="/income" element={<OnboardingRoute><Income /></OnboardingRoute>} />
