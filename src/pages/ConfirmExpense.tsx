@@ -225,7 +225,7 @@ export const ConfirmExpense = () => {
         const { data: existing } = await supabase
           .from("categories")
           .select("id")
-          .eq("name", selectedCategory.name)
+          .ilike("name", selectedCategory.name)
           .eq("user_id", user.id)
           .maybeSingle();
 
@@ -254,10 +254,18 @@ export const ConfirmExpense = () => {
 
           if (createError) {
             console.error("Error creating category:", createError);
-            throw createError;
+            finalCategoryId = null;
+          } else if (newCat) {
+            finalCategoryId = newCat.id;
           }
-          if (newCat) finalCategoryId = newCat.id;
         }
+      }
+
+      // FINAL SAFETY CHECK: If it's still not a valid UUID, force it to null
+      const isFinalUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(finalCategoryId || "");
+      if (!isFinalUuid) {
+        console.warn("Invalid Category ID detected. Forcing to NULL.", finalCategoryId);
+        finalCategoryId = null;
       }
 
       const isCreditCard = paymentMethod === "credit" && selectedCardId;
