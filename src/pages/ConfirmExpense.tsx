@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { supabase } from "@/lib/backendClient";
 import { toLocalDateString } from "@/lib/dateUtils";
 import { useNavigate, useLocation, useParams } from "react-router-dom";
 import { motion } from "framer-motion";
@@ -209,6 +210,56 @@ export const ConfirmExpense = () => {
     setIsSubmitting(true);
 
     try {
+      // ----------------------------------------------------------------------
+      // FIX: Ensure Category has a valid UUID (Handle Default Categories)
+      // ----------------------------------------------------------------------
+      let finalCategoryId = selectedCategory?.id;
+
+      // Check if ID is a UUID. If not (e.g. "outros"), we must resolve it.
+      const isUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(finalCategoryId || "");
+
+      if (finalCategoryId && !isUuid && selectedCategory) {
+        console.log("Resolving static category ID:", finalCategoryId);
+
+        // 1. Try to find existing category by name for this user
+        const { data: existing } = await supabase
+          .from("categories")
+          .select("id")
+          .eq("name", selectedCategory.name)
+          .eq("user_id", user.id)
+          .maybeSingle();
+
+        if (existing) {
+          finalCategoryId = existing.id;
+        } else {
+          // 2. Create the category in DB if it doesn't exist
+          console.log("Creating missing default category:", selectedCategory.name);
+          const { data: newCat, error: createError } = await supabase
+            .from("categories")
+            .insert({
+              user_id: user.id,
+              name: selectedCategory.name,
+              icon: "Tag", // Default string, local config overrides this based on name
+              color: selectedCategory.color,
+              type: "expense",
+              group_name: selectedCategory.group,
+              nature: selectedCategory.nature as any, // Cast to match DB enum/text
+              is_default: true, // Mark as default so it maps back to local config
+              allow_expense: selectedCategory.allowExpense ?? true,
+              allow_card: selectedCategory.allowCard ?? true,
+              allow_subscription: selectedCategory.allowSubscription ?? true,
+            })
+            .select()
+            .single();
+
+          if (createError) {
+            console.error("Error creating category:", createError);
+            throw createError;
+          }
+          if (newCat) finalCategoryId = newCat.id;
+        }
+      }
+
       const isCreditCard = paymentMethod === "credit" && selectedCardId;
 
       if (isCreditCard) {
@@ -219,7 +270,7 @@ export const ConfirmExpense = () => {
           description: description || selectedCategory?.name || "Compra no cartão",
           total_amount: amount,
           total_installments: totalInstallments,
-          category_id: selectedCategory?.id || null,
+          category_id: finalCategoryId || null,
           purchase_date: toLocalDateString(),
         });
       } else {
@@ -249,7 +300,7 @@ export const ConfirmExpense = () => {
               installment_group_id: installmentGroupId,
               bank_account_id: bankId || undefined,
               date: format(date, "yyyy-MM-dd"),
-              category_id: selectedCategory?.id || null,
+              category_id: finalCategoryId || null,
             };
           });
           await createBulkExpenses.mutateAsync(bulkExpenses as any);
@@ -264,7 +315,7 @@ export const ConfirmExpense = () => {
             installment_number: 1,
             bank_account_id: bankId || undefined,
             date: toLocalDateString(),
-            category_id: selectedCategory?.id || null,
+            category_id: finalCategoryId || null,
           } as any);
         }
 
