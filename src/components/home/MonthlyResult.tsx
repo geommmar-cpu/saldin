@@ -39,9 +39,7 @@ export const MonthlyResult = ({ totalIncome, totalSpent, investedAmount = 0, sub
           <div className="h-2 w-full bg-muted/50 rounded-full overflow-hidden flex">
             {/* Saídas normais */}
             <div
-              className={cn("h-full transition-all duration-500",
-                percentSpent > 90 ? "bg-impulse" : "bg-essential"
-              )}
+              className="h-full transition-all duration-500 bg-impulse"
               style={{ width: `${Math.min((totalSpent / (totalIncome || 1)) * 100, 100)}%` }}
             />
             {/* Investimentos (cor diferente) */}
