@@ -35,7 +35,7 @@ export const CryptoSummary = () => {
           variant="ghost"
           size="sm"
           className="h-7 text-xs gap-1"
-          onClick={() => navigate("/crypto")}
+          onClick={() => navigate("/crypto-wallet")}
         >
           Ver todas
           <ChevronRight className="w-3 h-3" />
@@ -59,7 +59,7 @@ export const CryptoSummary = () => {
             <motion.button
               key={wallet.id}
               whileTap={{ scale: 0.98 }}
-              onClick={() => navigate(`/crypto/${wallet.id}`)}
+              onClick={() => navigate(`/crypto-wallet/${wallet.id}`)}
               className="w-full flex items-center gap-3 p-3 rounded-xl bg-muted/40 hover:bg-muted/60 transition-colors text-left"
             >
               <div className="w-8 h-8 rounded-full overflow-hidden flex items-center justify-center bg-background border border-border shrink-0">

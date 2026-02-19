@@ -33,7 +33,7 @@ interface AppLayoutProps {
 }
 
 const navItems = [
-    { label: "Início", icon: Home, path: "/" },
+    { label: "Início", icon: Home, path: "/app" },
     { label: "Cartões", icon: CreditCard, path: "/cards" },
     { label: "Contas", icon: Wallet, path: "/banks" },
     { label: "Carteira Cripto", icon: Bitcoin, path: "/crypto-wallet" },

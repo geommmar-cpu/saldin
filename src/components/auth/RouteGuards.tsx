@@ -183,5 +183,5 @@ export const PublicRoute = ({ children }: { children: React.ReactNode }) => {
   }
 
   // Step 5: User exists and onboarding done → redirect to home
-  return <Navigate to="/" replace />;
+  return <Navigate to="/app" replace />;
 };

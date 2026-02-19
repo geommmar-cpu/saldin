@@ -29,7 +29,7 @@ import { cn } from "@/lib/utils";
 import { motion, AnimatePresence } from "framer-motion";
 
 const navItems = [
-  { path: "/", icon: Home, label: "Início" },
+  { path: "/app", icon: Home, label: "Início" },
   { path: "/banks", icon: Landmark, label: "Contas" },
   { path: "/cards", icon: CreditCard, label: "Cartões" },
   { path: "/subscriptions", icon: Calendar, label: "Assinaturas" },
@@ -55,7 +55,7 @@ export const BottomNav = React.forwardRef<HTMLDivElement>((_, ref) => {
 
     ];
     if (preferences.cryptoEnabled) {
-      items.push({ icon: Bitcoin, label: "Carteira Cripto", path: "/crypto", desc: "Investimentos em criptomoedas" });
+      items.push({ icon: Bitcoin, label: "Carteira Cripto", path: "/crypto-wallet", desc: "Investimentos em criptomoedas" });
     }
     items.push(
       { icon: Upload, label: "Importar Fatura", path: "/cards/import", desc: "Importar PDF ou CSV de fatura" },
@@ -83,8 +83,8 @@ export const BottomNav = React.forwardRef<HTMLDivElement>((_, ref) => {
       navigate("/goals/add");
     } else if (location.pathname.startsWith("/receivables")) {
       navigate("/receivables/add");
-    } else if (location.pathname.startsWith("/crypto")) {
-      navigate("/crypto/add");
+    } else if (location.pathname.startsWith("/crypto-wallet")) {
+      navigate("/crypto-wallet/add");
     } else {
       setIsSheetOpen(true);
     }
@@ -242,7 +242,7 @@ export const BottomNav = React.forwardRef<HTMLDivElement>((_, ref) => {
               <div className="px-6 pb-3">
                 <motion.button
                   whileTap={{ scale: 0.98 }}
-                  onClick={() => handleOptionClick("/")}
+                  onClick={() => handleOptionClick("/app")}
                   className="w-full p-3 rounded-xl bg-primary/10 border-2 border-primary/30 flex items-center gap-3 text-left hover:bg-primary/15 transition-colors"
                 >
                   <div className="w-10 h-10 rounded-full bg-primary/20 flex items-center justify-center shrink-0">

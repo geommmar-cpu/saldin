@@ -10,6 +10,7 @@ import ScrollToTop from "@/components/ScrollToTop";
 // Lazy-loaded pages
 const Home = lazy(() => import("./pages/Home"));
 const Auth = lazy(() => import("./pages/Auth"));
+const Landing = lazy(() => import("./pages/Landing"));
 const Settings = lazy(() => import("./pages/Settings"));
 const History = lazy(() => import("./pages/History"));
 const Alerts = lazy(() => import("./pages/Alerts"));
@@ -88,6 +89,7 @@ const App = () => (
         <Suspense fallback={<LoadingScreen />}>
           <Routes>
             {/* Public Routes */}
+            <Route path="/" element={<PublicRoute><Landing /></PublicRoute>} />
             <Route path="/auth" element={<PublicRoute><Auth /></PublicRoute>} />
             <Route path="/login" element={<Navigate to="/auth" replace />} />
 
@@ -95,7 +97,7 @@ const App = () => (
             <Route path="/onboarding" element={<AuthRoute><Onboarding /></AuthRoute>} />
 
             {/* Protected Routes (require auth + onboarding) */}
-            <Route path="/" element={<OnboardingRoute><Home /></OnboardingRoute>} />
+            <Route path="/app" element={<OnboardingRoute><Home /></OnboardingRoute>} />
             <Route path="/settings" element={<OnboardingRoute><Settings /></OnboardingRoute>} />
             <Route path="/history" element={<OnboardingRoute><History /></OnboardingRoute>} />
             <Route path="/alerts" element={<OnboardingRoute><Alerts /></OnboardingRoute>} />
