@@ -74,15 +74,53 @@ const AccountCard = ({ account, isDefault }: AccountCardProps) => {
   );
 };
 
+import { useCashAccount } from "@/hooks/useCashAccount";
+import { Banknote } from "lucide-react";
+
+// ... existing imports ...
+
 export const BankAccountsSummary = () => {
   const navigate = useNavigate();
   const { data: accounts = [] } = useBankAccounts();
   const { data: profile } = useProfile();
+  const { cashAccount, ensureCashAccount } = useCashAccount();
 
   const defaultIncomeId = (profile as any)?.wa_default_income_account_id;
   const defaultExpenseId = (profile as any)?.wa_default_expense_account_id;
 
-  if (accounts.length === 0) return null;
+  // Filter out cash account from main list to avoid duplication if we handle it manually
+  // But wait, if useBankAccounts returns it, we should just let it be?
+  // The user wants it "added", maybe it's missing because it wasn't created.
+
+  // Let's create a "virtual" cash card if it doesn't exist
+  const cashCard = cashAccount ? null : {
+    id: "virtual-cash",
+    bank_name: "Dinheiro em mãos",
+    current_balance: 0,
+    bank_key: "cash_account",
+    account_type: "cash",
+    color: "#6B7280",
+    active: true
+  } as BankAccount;
+
+  // Combine accounts, ensuring Cash is first if we want, or just present.
+  // If cashAccount exists in `accounts`, it's already there. 
+  // If not, we append `cashCard`.
+  const displayAccounts = cashAccount
+    ? accounts
+    : (cashCard ? [cashCard, ...accounts] : accounts);
+
+  const handleAccountClick = async (account: BankAccount) => {
+    if (account.id === "virtual-cash") {
+      // Create it first
+      const newId = await ensureCashAccount();
+      navigate(`/banks/${newId}`);
+    } else {
+      navigate(`/banks/${account.id}`);
+    }
+  };
+
+  if (displayAccounts.length === 0) return null;
 
   return (
     <div className="space-y-4">
@@ -114,12 +152,13 @@ export const BankAccountsSummary = () => {
           }}
         >
           {/* Account Cards */}
-          {accounts.map((account) => (
-            <AccountCard
-              key={account.id}
-              account={account}
-              isDefault={account.id === defaultIncomeId || account.id === defaultExpenseId}
-            />
+          {displayAccounts.map((account) => (
+            <div key={account.id} onClick={() => handleAccountClick(account)}>
+              <AccountCard
+                account={account}
+                isDefault={account.id === defaultIncomeId || account.id === defaultExpenseId}
+              />
+            </div>
           ))}
 
           {/* Add New Card */}

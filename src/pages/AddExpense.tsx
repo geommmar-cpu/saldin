@@ -16,7 +16,7 @@ export const AddExpense = () => {
 
   const handleContinue = () => {
     const numericAmount = parseCurrency(amount);
-    if (numericAmount <= 0) return;
+    if (isNaN(numericAmount) || numericAmount < 0) return;
     navigate("/confirm/new", { state: { amount: numericAmount } });
   };
 
@@ -88,7 +88,7 @@ export const AddExpense = () => {
             size="lg"
             className="w-full"
             onClick={handleContinue}
-            disabled={parseCurrency(amount) <= 0}
+            disabled={isNaN(parseCurrency(amount)) || parseCurrency(amount) < 0}
             data-testid="btn-continue"
           >
             Continuar
