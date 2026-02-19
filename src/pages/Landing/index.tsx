@@ -29,7 +29,7 @@ const Section = ({ children, className = "", id = "" }: { children: React.ReactN
     );
 };
 
-// ─── Phone Mockup Component ───
+// ─── Phone Mockup Component (iPhone 15 Pro Style) ───
 const PhoneMockup = () => {
     const [messages, setMessages] = useState<{ type: 'user' | 'bot', text: string | React.ReactNode }[]>([]);
 
@@ -72,57 +72,76 @@ const PhoneMockup = () => {
     }, []);
 
     return (
-        <div className="relative mx-auto border-gray-900 bg-gray-900 border-[14px] rounded-[2.5rem] h-[500px] w-[280px] shadow-2xl">
-            <div className="w-[148px] h-[18px] bg-gray-800 top-0 rounded-b-[1rem] left-1/2 -translate-x-1/2 absolute"></div>
-            <div className="h-[32px] w-[3px] bg-gray-800 absolute -start-[17px] top-[72px] rounded-s-lg"></div>
-            <div className="h-[46px] w-[3px] bg-gray-800 absolute -start-[17px] top-[124px] rounded-s-lg"></div>
-            <div className="h-[46px] w-[3px] bg-gray-800 absolute -start-[17px] top-[178px] rounded-s-lg"></div>
-            <div className="h-[64px] w-[3px] bg-gray-800 absolute -end-[17px] top-[142px] rounded-e-lg"></div>
-            <div className="rounded-[2rem] overflow-hidden w-full h-full bg-[#0b141a] relative flex flex-col">
-                {/* Header */}
-                <div className="bg-[#1f2c34] px-4 py-3 flex items-center gap-3 shadow-sm z-10">
-                    <div className="w-8 h-8 rounded-full bg-emerald-500 flex items-center justify-center text-white font-bold text-xs">
-                        S
+        <div className="relative mx-auto w-[300px] h-[600px]">
+            {/* iPhone 15 Pro Frame */}
+            <div className="relative h-full w-full bg-[#1b1b1f] rounded-[55px] shadow-[0_0_2px_2px_rgba(255,255,255,0.1),0_0_10px_rgba(0,0,0,0.5)] ring-8 ring-[#3a3a3c] ring-opacity-50 border-[6px] border-[#29292c]">
+
+                {/* Dynamic Island */}
+                <div className="absolute top-4 left-1/2 transform -translate-x-1/2 w-[100px] h-[28px] bg-black rounded-full z-20 transition-all duration-300"></div>
+
+                {/* Screen Content */}
+                <div className="absolute top-0 left-0 w-full h-full rounded-[50px] overflow-hidden bg-[#0b141a] flex flex-col">
+
+                    {/* Header */}
+                    <div className="bg-[#1f2c34] px-4 pt-12 pb-3 flex items-center gap-3 shadow-md z-10 border-b border-[#2a3942]">
+                        <div className="w-9 h-9 rounded-full bg-white flex items-center justify-center overflow-hidden">
+                            <img src={logoSaldin} alt="Saldin Logo" className="w-full h-full object-cover" />
+                        </div>
+                        <div>
+                            <p className="text-white text-sm font-semibold">Saldin</p>
+                            <p className="text-emerald-400 text-[10px] font-medium">Online</p>
+                        </div>
                     </div>
-                    <div>
-                        <p className="text-white text-sm font-semibold">Saldin</p>
-                        <p className="text-emerald-400 text-[10px]">Online</p>
+
+                    {/* Chat Area */}
+                    <div className="flex-1 p-3 overflow-y-auto space-y-3 bg-[url('https://camo.githubusercontent.com/c50ae4df9e6141a4a4023b08e54737782da2685714081c7f9996b79417852a3b/68747470733a2f2f7765622e776861736170702e636f6d2f696d672f62672d636861742d74696c652d6461726b5f61346265353132653731393562366237333364393131306234303866303735642e706e67')] bg-repeat opacity-90 relative">
+                        {/* Overlay to darken bg slightly */}
+                        <div className="absolute inset-0 bg-black/30 pointer-events-none"></div>
+
+                        <div className="relative z-10 flex flex-col gap-3">
+                            <p className="text-center text-[10px] text-gray-300 my-2 bg-[#1f2c34]/80 backdrop-blur-sm inline-block px-3 py-1 rounded-full mx-auto w-fit shadow-sm">Hoje</p>
+
+                            <AnimatePresence>
+                                {messages.map((msg, i) => (
+                                    <motion.div
+                                        key={i}
+                                        initial={{ opacity: 0, y: 10, scale: 0.95 }}
+                                        animate={{ opacity: 1, y: 0, scale: 1 }}
+                                        className={`flex ${msg.type === 'user' ? 'justify-end' : 'justify-start'}`}
+                                    >
+                                        <div className={`max-w-[85%] rounded-2xl p-2.5 text-sm text-white shadow-sm ${msg.type === 'user' ? 'bg-[#005c4b] rounded-tr-sm' : 'bg-[#1f2c34] rounded-tl-sm'
+                                            }`}>
+                                            {msg.text}
+                                            <div className={`text-[9px] text-right mt-1 ${msg.type === 'user' ? 'text-emerald-200' : 'text-gray-400'}`}>
+                                                {new Date().toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}
+                                                {msg.type === 'user' && <span className="ml-1 text-blue-300">✓✓</span>}
+                                            </div>
+                                        </div>
+                                    </motion.div>
+                                ))}
+                            </AnimatePresence>
+                        </div>
+                    </div>
+
+                    {/* Input Area */}
+                    <div className="bg-[#1f2c34] px-3 py-2 pb-6 flex items-center gap-2 border-t border-[#2a3942]">
+                        <div className="w-7 h-7 rounded-full bg-gray-600/30 flex items-center justify-center">
+                            <span className="text-gray-400 text-xs">+</span>
+                        </div>
+                        <div className="flex-1 h-9 bg-[#2a3942] rounded-full px-3 flex items-center text-gray-400 text-sm">
+                            Mensagem
+                        </div>
+                        <div className="w-9 h-9 rounded-full bg-[#00a884] flex items-center justify-center shadow-lg">
+                            <Send className="w-4 h-4 text-white ml-0.5" />
+                        </div>
                     </div>
                 </div>
 
-                {/* Chat Area */}
-                <div className="flex-1 p-3 overflow-y-auto space-y-3 bg-[url('https://camo.githubusercontent.com/c50ae4df9e6141a4a4023b08e54737782da2685714081c7f9996b79417852a3b/68747470733a2f2f7765622e77686174736170702e636f6d2f696d672f62672d636861742d74696c652d6461726b5f61346265353132653731393562366237333364393131306234303866303735642e706e67')] bg-repeat opacity-90">
-                    <p className="text-center text-[10px] text-gray-400 my-2 bg-[#1f2c34] inline-block px-2 py-1 rounded-lg mx-auto w-fit">Hoje</p>
-
-                    <AnimatePresence>
-                        {messages.map((msg, i) => (
-                            <motion.div
-                                key={i}
-                                initial={{ opacity: 0, y: 10, scale: 0.9 }}
-                                animate={{ opacity: 1, y: 0, scale: 1 }}
-                                className={`flex ${msg.type === 'user' ? 'justify-end' : 'justify-start'}`}
-                            >
-                                <div className={`max-w-[80%] rounded-lg p-2 text-sm text-white shadow-sm ${msg.type === 'user' ? 'bg-[#005c4b] rounded-tr-none' : 'bg-[#1f2c34] rounded-tl-none'
-                                    }`}>
-                                    {msg.text}
-                                    <div className={`text-[9px] text-right mt-1 ${msg.type === 'user' ? 'text-emerald-200' : 'text-gray-400'}`}>
-                                        {new Date().toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}
-                                        {msg.type === 'user' && <span className="ml-1 text-blue-300">✓✓</span>}
-                                    </div>
-                                </div>
-                            </motion.div>
-                        ))}
-                    </AnimatePresence>
-                </div>
-
-                {/* Input Area */}
-                <div className="bg-[#1f2c34] p-2 flex items-center gap-2">
-                    <div className="w-6 h-6 rounded-full bg-gray-600/50"></div>
-                    <div className="flex-1 h-8 bg-[#2a3942] rounded-full"></div>
-                    <div className="w-8 h-8 rounded-full bg-[#00a884] flex items-center justify-center">
-                        <Send className="w-4 h-4 text-white" />
-                    </div>
-                </div>
+                {/* Buttons (Side) */}
+                <div className="absolute top-28 -left-[2px] w-[3px] h-8 bg-gray-700 rounded-l-md"></div>
+                <div className="absolute top-44 -left-[2px] w-[3px] h-14 bg-gray-700 rounded-l-md"></div>
+                <div className="absolute top-60 -left-[2px] w-[3px] h-14 bg-gray-700 rounded-l-md"></div>
+                <div className="absolute top-48 -right-[2px] w-[3px] h-20 bg-gray-700 rounded-r-md"></div>
             </div>
         </div>
     );
