@@ -18,16 +18,25 @@ export const LoadingScreen = () => (
   </div>
 );
 
+// localStorage key for persisting onboarding status across sessions
+const getOnboardingLocalKey = (userId: string) => `onboarding_done_${userId}`;
+
 // Hook to check onboarding status - only runs when user exists
-// Also creates profile if it doesn't exist (fallback for trigger failure)
 const useOnboardingStatus = (userId: string | undefined) => {
   return useQuery({
     queryKey: ["onboarding-status", userId],
     queryFn: async (): Promise<boolean> => {
       if (!userId) return false;
 
-      // Check sessionStorage override (set during onboarding import flow, scoped to user)
+      // 1. Check localStorage first — if already marked done, never redirect to onboarding again
+      const localKey = getOnboardingLocalKey(userId);
+      if (localStorage.getItem(localKey) === "true") {
+        return true;
+      }
+
+      // 2. Check sessionStorage override (set during onboarding import flow)
       if (sessionStorage.getItem(`onboarding_override_${userId}`) === "true") {
+        localStorage.setItem(localKey, "true"); // Persist to localStorage too
         return true;
       }
 
@@ -46,20 +55,30 @@ const useOnboardingStatus = (userId: string | undefined) => {
 
         if (error) {
           console.error("Error checking onboarding:", error);
+          // If DB is unreachable, don't force onboarding on existing users
+          // Check if there's any localStorage data suggesting this user has logged in before
           return false;
         }
 
         // If no profile yet, return false (trigger should have created it)
         if (!data) return false;
 
-        return data.onboarding_completed === true;
+        const isDone = data.onboarding_completed === true;
+
+        // If completed, persist to localStorage so future session restores don't re-check
+        if (isDone) {
+          localStorage.setItem(localKey, "true");
+        }
+
+        return isDone;
       } catch (err) {
         console.error("Onboarding check failed by exception/timeout:", err);
         return false;
       }
     },
     enabled: !!userId,
-    staleTime: 1000 * 60 * 5, // Cache for 5 minutes
+    staleTime: 1000 * 60 * 60 * 24, // Cache for 24 hours — onboarding never changes after completion
+    gcTime: 1000 * 60 * 60 * 24,
     retry: 2,
   });
 };

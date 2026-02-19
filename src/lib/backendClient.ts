@@ -15,8 +15,9 @@ if (!SUPABASE_URL || !SUPABASE_ANON_KEY) {
 
 export const supabase = createClient<Database>(SUPABASE_URL, SUPABASE_ANON_KEY, {
   auth: {
-    storage: localStorage, // Keep session persistent
-    persistSession: true,
-    autoRefreshToken: true,
+    storage: localStorage,       // Persist session across page reloads
+    persistSession: true,        // Never drop session unless explicitly signed out
+    autoRefreshToken: true,      // Silently refresh JWT before it expires
+    detectSessionInUrl: true,    // Capture session from URL (magic links, OAuth)
   },
 });
