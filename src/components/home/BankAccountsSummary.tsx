@@ -4,12 +4,20 @@ import { cn } from "@/lib/utils";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { useBankAccounts } from "@/hooks/useBankAccounts";
-import { detectBank } from "@/lib/cardBranding";
+import { detectBank, BANK_THEMES } from "@/lib/cardBranding";
 import { formatCurrency } from "@/lib/balanceCalculations";
 import type { BankAccount } from "@/types/bankAccount";
+import { CASH_ACCOUNT_KEY } from "@/types/bankAccount";
 import { BankLogo } from "@/components/BankLogo";
 import { useProfile } from "@/hooks/useProfile";
 import { Smartphone as PhoneIcon } from "lucide-react";
+import { useCashAccount } from "@/hooks/useCashAccount";
+
+// Check if account is the cash account
+const isCashAccount = (account: BankAccount) =>
+  account.bank_key === CASH_ACCOUNT_KEY ||
+  account.bank_key === "cash_account" ||
+  account.account_type === "cash";
 
 interface AccountCardProps {
   account: BankAccount;
@@ -17,16 +25,15 @@ interface AccountCardProps {
 }
 
 const AccountCard = ({ account, isDefault }: AccountCardProps) => {
-  const navigate = useNavigate();
-  const bankTheme = detectBank(account.bank_name, account.bank_key);
+  const isCash = isCashAccount(account);
+  // Use the emerald/teal theme for cash, otherwise detect from bank name
+  const bankTheme = isCash ? BANK_THEMES.dinheiro : detectBank(account.bank_name, account.bank_key);
   const isNegative = Number(account.current_balance) < 0;
 
   return (
     <motion.div
-      onClick={() => navigate(`/banks/${account.id}`)}
       className="snap-center shrink-0 w-[160px] h-[160px] rounded-[1.5rem] p-4 relative overflow-hidden shadow-md group cursor-pointer transition-transform active:scale-95 border-0"
     >
-
       {/* Dynamic Background */}
       <div className={cn(
         "absolute inset-0 bg-gradient-to-br opacity-100 transition-all duration-300",
@@ -34,10 +41,10 @@ const AccountCard = ({ account, isDefault }: AccountCardProps) => {
       )} />
 
       {/* Special Image for Cash Account (Hands holding money) */}
-      {(account.bank_key === "cash_account" || account.account_type === "cash") && (
+      {isCash && (
         <div
-          className="absolute inset-0 bg-cover bg-center opacity-30 mix-blend-overlay"
-          style={{ backgroundImage: "url('https://images.unsplash.com/photo-1559589689-577aabd1db4f?q=80&w=400&auto=format&fit=crop')" }}
+          className="absolute inset-0 bg-cover bg-center opacity-25 mix-blend-overlay"
+          style={{ backgroundImage: "url('https://images.unsplash.com/photo-1607863680077-0b23b0c07abe?q=80&w=400&auto=format&fit=crop')" }}
         />
       )}
 
@@ -82,11 +89,6 @@ const AccountCard = ({ account, isDefault }: AccountCardProps) => {
   );
 };
 
-import { useCashAccount } from "@/hooks/useCashAccount";
-import { Banknote } from "lucide-react";
-
-// ... existing imports ...
-
 export const BankAccountsSummary = () => {
   const navigate = useNavigate();
   const { data: accounts = [] } = useBankAccounts();
@@ -96,31 +98,30 @@ export const BankAccountsSummary = () => {
   const defaultIncomeId = (profile as any)?.wa_default_income_account_id;
   const defaultExpenseId = (profile as any)?.wa_default_expense_account_id;
 
-  // Filter out cash account from main list to avoid duplication if we handle it manually
-  // But wait, if useBankAccounts returns it, we should just let it be?
-  // The user wants it "added", maybe it's missing because it wasn't created.
-
-  // Let's create a "virtual" cash card if it doesn't exist
+  // Create a virtual cash card if the real one doesn't exist yet
   const cashCard = cashAccount ? null : {
     id: "virtual-cash",
     bank_name: "Dinheiro em mãos",
     current_balance: 0,
-    bank_key: "cash_account",
-    account_type: "cash",
-    color: "#6B7280",
-    active: true
+    bank_key: CASH_ACCOUNT_KEY,
+    account_type: "cash" as const,
+    color: "#10B981",
+    active: true,
+    user_id: "",
+    initial_balance: 0,
+    created_at: "",
+    updated_at: "",
   } as BankAccount;
 
-  // Combine accounts, ensuring Cash is first if we want, or just present.
-  // If cashAccount exists in `accounts`, it's already there. 
-  // If not, we append `cashCard`.
+  // Cash always first; if it already exists in accounts list, keep it; otherwise prepend virtual
   const displayAccounts = cashAccount
     ? accounts
-    : (cashCard ? [cashCard, ...accounts] : accounts);
+    : cashCard
+      ? [cashCard, ...accounts]
+      : accounts;
 
   const handleAccountClick = async (account: BankAccount) => {
     if (account.id === "virtual-cash") {
-      // Create it first
       const newId = await ensureCashAccount();
       navigate(`/banks/${newId}`);
     } else {
@@ -155,11 +156,8 @@ export const BankAccountsSummary = () => {
       <div className="relative w-full">
         <div
           className="flex gap-4 overflow-x-auto pb-6 px-4 -mx-4 snap-x snap-mandatory no-scrollbar touch-pan-x"
-          style={{
-            WebkitOverflowScrolling: 'touch',
-          }}
+          style={{ WebkitOverflowScrolling: 'touch' }}
         >
-          {/* Account Cards */}
           {displayAccounts.map((account) => (
             <div key={account.id} onClick={() => handleAccountClick(account)}>
               <AccountCard
@@ -169,7 +167,7 @@ export const BankAccountsSummary = () => {
             </div>
           ))}
 
-          {/* Add New Card */}
+          {/* Add New Account */}
           <div
             onClick={() => navigate("/banks/add")}
             className="snap-center shrink-0 w-[60px] h-[160px] rounded-[1.5rem] border-2 border-dashed border-muted-foreground/20 bg-muted/30 hover:bg-muted/50 flex flex-col items-center justify-center gap-2 cursor-pointer transition-colors"
@@ -182,7 +180,7 @@ export const BankAccountsSummary = () => {
             </span>
           </div>
 
-          {/* Spacer for right padding */}
+          {/* Spacer */}
           <div className="w-2 shrink-0" />
         </div>
       </div>
