@@ -1,4 +1,4 @@
-import { useState, useRef } from "react";
+import { useState, useRef, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { format, addMonths } from "date-fns";
@@ -91,9 +91,18 @@ export const QuickExpense = () => {
 
     // UI
     const [showKeypad, setShowKeypad] = useState(true);
+    const keypadTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
     const [showAllCategories, setShowAllCategories] = useState(false);
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [showSuccess, setShowSuccess] = useState(false);
+
+    // Auto-hide keypad 1.5s after last keystroke
+    const handleAmountChange = useCallback((val: string) => {
+        setAmount(val);
+        setShowKeypad(true);
+        if (keypadTimerRef.current) clearTimeout(keypadTimerRef.current);
+        keypadTimerRef.current = setTimeout(() => setShowKeypad(false), 1500);
+    }, []);
 
     // ── Derived values ───────────────────────────────────────────────────────────
     const numericAmount = parseCurrency(amount);
@@ -603,7 +612,7 @@ export const QuickExpense = () => {
                             className="overflow-hidden"
                         >
                             <div className="px-3 pt-3">
-                                <NumericKeypad value={amount} onChange={setAmount} />
+                                <NumericKeypad value={amount} onChange={handleAmountChange} />
                             </div>
                         </motion.div>
                     )}
