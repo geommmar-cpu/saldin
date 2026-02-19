@@ -19,19 +19,65 @@ export const useCryptoWallets = () => {
   return useQuery({
     queryKey: ["crypto-wallets", user?.id],
     queryFn: async () => {
+      // 1. Fetch wallets
       const { data, error } = await db
         .from("crypto_wallets")
         .select("*")
         .eq("active", true)
         .order("created_at", { ascending: false });
+
       if (error) {
         if (error.code === "PGRST205") return [];
         throw error;
       }
-      return (data || []) as CryptoWallet[];
+
+      const wallets = (data || []) as CryptoWallet[];
+
+      try {
+        // 2. Automatically refresh prices in background if we have wallets
+        if (wallets.length > 0) {
+          // Check if any wallet hasn't been updated in the last 5 minutes
+          const now = new Date();
+          const needsUpdate = wallets.some(w => {
+            if (!w.last_price_updated_at) return true;
+            const lastUpdate = new Date(w.last_price_updated_at);
+            return (now.getTime() - lastUpdate.getTime()) > 5 * 60 * 1000; // 5 mins
+          });
+
+          if (needsUpdate) {
+            // Fire and forget update - don't await to return UI data faster
+            const ids = [...new Set(wallets.map(w => w.crypto_id))];
+            fetchCryptoPrices(ids).then(async (prices) => {
+              for (const wallet of wallets) {
+                const priceData = prices[wallet.crypto_id];
+                if (!priceData) continue;
+
+                const newPrice = wallet.display_currency === "USD" ? priceData.usd : priceData.brl;
+                const currentPrice = Number(wallet.last_price || 0);
+
+                // Update if price changed significantly or if it was never set
+                if (Math.abs(currentPrice - newPrice) > 0.000001 || !wallet.last_price_updated_at) {
+                  await db
+                    .from("crypto_wallets")
+                    .update({
+                      last_price: newPrice,
+                      last_price_updated_at: new Date().toISOString(),
+                    })
+                    .eq("id", wallet.id);
+                }
+              }
+            }).catch(err => console.error("Auto-refresh crypto prices failed:", err));
+          }
+        }
+      } catch (err) {
+        console.warn("Error in crypto auto-refresh logic:", err);
+      }
+
+      return wallets;
     },
     enabled: !!user,
     retry: (count: number, err: any) => err?.code !== "PGRST205" && count < 3,
+    refetchInterval: 60000, // Update every minute
   });
 };
 
@@ -50,6 +96,7 @@ export const useCryptoWalletById = (id: string | undefined) => {
       return data as CryptoWallet | null;
     },
     enabled: !!user && !!id,
+    refetchInterval: 30000,
   });
 };
 
