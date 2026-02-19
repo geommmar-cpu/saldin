@@ -485,6 +485,16 @@ const Landing = () => {
 
     return (
         <div className="min-h-screen bg-white text-gray-900 font-sans selection:bg-orange-100 selection:text-orange-900 overflow-x-hidden">
+            {/* ─── URGENCY NOTICE BAR ─── */}
+            <div className="bg-gray-900 text-white py-2 px-4 text-center text-xs sm:text-sm font-medium relative overflow-hidden">
+                <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-orange-500 via-pink-500 to-orange-500 animate-gradient-x"></div>
+                <p className="flex items-center justify-center gap-2">
+                    <Clock className="w-3 h-3 sm:w-4 sm:h-4 text-orange-400" />
+                    <span className="opacity-90">Oferta de Lançamento: Bônus Exclusivos para os primeiros 100 assinantes.</span>
+                    <span className="text-orange-300 font-bold ml-1 hidden sm:inline">Restam 14 vagas.</span>
+                </p>
+            </div>
+
             {/* ─── NAVBAR ─── */}
             <nav className="fixed top-0 left-0 right-0 z-50 bg-white/80 backdrop-blur-md border-b border-gray-100">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 md:h-20 flex items-center justify-between">
@@ -493,7 +503,7 @@ const Landing = () => {
                     <div className="hidden md:flex items-center gap-8 text-sm font-medium text-gray-600">
                         <button onClick={() => scrollTo("problema")} className="hover:text-primary transition-colors">O Problema</button>
                         <button onClick={() => scrollTo("funcionalidades")} className="hover:text-primary transition-colors">Funcionalidades</button>
-                        <button onClick={() => scrollTo("depoimentos")} className="hover:text-primary transition-colors">Depoimentos</button>
+                        <button onClick={() => scrollTo("pricing")} className="hover:text-primary transition-colors">Planos</button>
                         <button onClick={() => scrollTo("faq")} className="hover:text-primary transition-colors">FAQ</button>
                     </div>
 
@@ -858,9 +868,9 @@ const Landing = () => {
                         </div>
 
                         {/* Semester - Highlighted */}
-                        <div className="relative p-8 rounded-3xl bg-gray-900 text-white shadow-2xl scale-100 sm:scale-105 border border-gray-800 order-1 md:order-2">
-                            <div className="absolute -top-4 left-1/2 -translate-x-1/2 px-4 py-1.5 rounded-full bg-gradient-to-r from-orange-500 to-pink-500 text-white text-xs font-bold uppercase tracking-wide">
-                                Recomendado
+                        <div className="relative p-8 rounded-3xl bg-gray-900 text-white shadow-2xl scale-100 sm:scale-105 border border-gray-800 order-1 md:order-2 ring-4 ring-orange-500/20">
+                            <div className="absolute -top-4 left-1/2 -translate-x-1/2 px-4 py-1.5 rounded-full bg-gradient-to-r from-orange-500 to-pink-500 text-white text-xs font-bold uppercase tracking-wide shadow-lg border border-white/20">
+                                🔥 Oferta Limitada
                             </div>
                             <h3 className="text-xl font-bold mb-2">Semestral</h3>
                             <div className="flex items-baseline gap-1 mb-2">
@@ -869,8 +879,18 @@ const Landing = () => {
                             </div>
                             <p className="text-xs text-gray-400 mb-6">Cobrado R$ 89,90 a cada 6 meses</p>
 
-                            <Button className="w-full rounded-full gradient-warm border-0 font-bold h-12 mb-8" onClick={() => navigate("/auth")}>
-                                Testar Grátis Agora
+                            {/* Bonuses */}
+                            <div className="mb-6 p-4 rounded-xl bg-white/5 border border-white/10">
+                                <p className="text-xs font-bold text-orange-300 uppercase tracking-wider mb-3">🎁 Bônus Inclusos:</p>
+                                <ul className="space-y-2 text-xs text-gray-300">
+                                    <li className="flex gap-2 items-start"><Star className="w-3.5 h-3.5 text-yellow-400 shrink-0 mt-0.5" /> <span>Guia: "Como sair das Dívidas em 30 Dias"</span></li>
+                                    <li className="flex gap-2 items-start"><Star className="w-3.5 h-3.5 text-yellow-400 shrink-0 mt-0.5" /> <span>Planilha Mestra de Planejamento</span></li>
+                                    <li className="flex gap-2 items-start"><Star className="w-3.5 h-3.5 text-yellow-400 shrink-0 mt-0.5" /> <span>Grupo Vip de Suporte</span></li>
+                                </ul>
+                            </div>
+
+                            <Button className="w-full rounded-full gradient-warm border-0 font-bold h-12 mb-8 shadow-lg shadow-orange-500/25 hover:shadow-orange-500/50 hover:scale-105 transition-all" onClick={() => navigate("/auth")}>
+                                Garantir Bônus Agora
                             </Button>
                             <ul className="space-y-3 text-sm text-gray-300">
                                 <li className="flex gap-2"><Check className="w-4 h-4 text-emerald-400" /> Tudo do Mensal</li>
