@@ -15,8 +15,8 @@ export const LoadingScreen = () => (
   <div className="min-h-screen flex flex-col items-center justify-center bg-background p-6 text-center animate-in fade-in duration-500">
     <div className="relative mb-8">
       <div className="absolute inset-0 bg-primary/20 blur-2xl rounded-full animate-pulse"></div>
-      <div className="relative w-20 h-20 bg-gradient-to-tr from-primary to-accent rounded-3xl rotate-12 flex items-center justify-center shadow-lg animate-bounce-slow">
-        <span className="text-white text-3xl font-bold -rotate-12">S</span>
+      <div className="relative w-16 h-16 bg-gradient-to-tr from-primary to-accent rounded-2xl rotate-12 flex items-center justify-center shadow-lg animate-bounce-slow">
+        <span className="text-white text-2xl font-bold -rotate-12">S</span>
       </div>
     </div>
     <h2 className="text-2xl font-serif font-bold text-foreground mb-2">Saldin</h2>

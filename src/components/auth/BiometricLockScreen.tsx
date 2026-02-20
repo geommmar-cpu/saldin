@@ -66,7 +66,7 @@ export function BiometricLockScreen({
           {/* Logo Container */}
           <div className="relative inline-block">
             <div className="absolute inset-0 bg-primary/20 blur-3xl rounded-full animate-pulse-slow"></div>
-            <img src={logoSaldin} alt="Saldin" className="h-24 mx-auto relative z-10" />
+            <img src={logoSaldin} alt="Saldin" className="h-20 mx-auto relative z-10" />
           </div>
 
           {/* User greeting */}

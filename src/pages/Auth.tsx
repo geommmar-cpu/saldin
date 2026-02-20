@@ -451,7 +451,7 @@ const LoginForm = ({
 }: LoginFormProps) => (
   <form onSubmit={onSubmit} className="space-y-6 max-w-sm mx-auto w-full">
     <div className="text-center mb-8">
-      <img src={logoSaldin} alt="Saldin" className="h-32 mx-auto mb-4" />
+      <img src={logoSaldin} alt="Saldin" className="h-20 mx-auto mb-4" />
       <h1 className="font-serif text-3xl font-semibold tracking-tight">Entrar</h1>
       <p className="text-muted-foreground mt-2">
         Acesse seu painel financeiro
@@ -597,7 +597,7 @@ const SignupForm = ({
 }: SignupFormProps) => (
   <form onSubmit={onSubmit} className="space-y-6 max-w-sm mx-auto w-full">
     <div className="text-center mb-6">
-      <img src={logoSaldin} alt="Saldin" className="h-24 mx-auto mb-4" />
+      <img src={logoSaldin} alt="Saldin" className="h-20 mx-auto mb-4" />
       <h1 className="font-serif text-3xl font-semibold tracking-tight">Criar conta</h1>
       <p className="text-muted-foreground mt-2">
         Comece sua jornada para a liberdade financeira
@@ -730,7 +730,7 @@ const RecoveryForm = ({
 }: RecoveryFormProps) => (
   <form onSubmit={onSubmit} className="space-y-6 max-w-sm mx-auto w-full">
     <div className="text-center mb-8">
-      <img src={logoSaldin} alt="Saldin" className="h-28 mx-auto mb-4" />
+      <img src={logoSaldin} alt="Saldin" className="h-20 mx-auto mb-4" />
       <h1 className="font-serif text-3xl font-semibold tracking-tight">Recuperar senha</h1>
       <p className="text-muted-foreground mt-2">
         Enviaremos um link de acesso com segurança
