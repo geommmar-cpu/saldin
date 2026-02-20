@@ -12,9 +12,20 @@ const BIOMETRIC_UNLOCKED_KEY = "biometric_unlocked";
 
 // Loading component to avoid repetition
 export const LoadingScreen = () => (
-  <div className="min-h-screen flex flex-col items-center justify-center bg-background p-4 text-center">
-    <div className="animate-pulse text-primary text-xl font-bold mb-2">Saldin</div>
-    <div className="text-muted-foreground text-sm">Carregando seus dados...</div>
+  <div className="min-h-screen flex flex-col items-center justify-center bg-background p-6 text-center animate-in fade-in duration-500">
+    <div className="relative mb-8">
+      <div className="absolute inset-0 bg-primary/20 blur-2xl rounded-full animate-pulse"></div>
+      <div className="relative w-20 h-20 bg-gradient-to-tr from-primary to-accent rounded-3xl rotate-12 flex items-center justify-center shadow-lg animate-bounce-slow">
+        <span className="text-white text-3xl font-bold -rotate-12">S</span>
+      </div>
+    </div>
+    <h2 className="text-2xl font-serif font-bold text-foreground mb-2">Saldin</h2>
+    <div className="flex items-center gap-1 justify-center">
+      <div className="w-1.5 h-1.5 bg-primary rounded-full animate-bounce [animation-delay:-0.3s]"></div>
+      <div className="w-1.5 h-1.5 bg-primary rounded-full animate-bounce [animation-delay:-0.15s]"></div>
+      <div className="w-1.5 h-1.5 bg-primary rounded-full animate-bounce"></div>
+    </div>
+    <p className="text-muted-foreground text-sm mt-4 font-medium">Preparando seu ambiente financeiro...</p>
   </div>
 );
 

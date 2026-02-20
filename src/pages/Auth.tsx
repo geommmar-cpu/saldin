@@ -39,6 +39,7 @@ export const Auth = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [autoBiometricTriggered, setAutoBiometricTriggered] = useState(false);
 
   // Biometric states
   const [showBiometricSetup, setShowBiometricSetup] = useState(false);
@@ -119,8 +120,8 @@ export const Auth = () => {
     const userEmail = data?.user?.email;
 
     if (userId && userEmail && isBiometricSupported && !isEnabledForUser(userId)) {
-      // Check if user dismissed the prompt this session
-      const dismissed = sessionStorage.getItem("biometric_prompt_dismissed");
+      // Check if user dismissed the prompt before
+      const dismissed = localStorage.getItem("biometric_prompt_dismissed");
       if (!dismissed) {
         setPendingBiometricUser({ userId, userEmail });
         setShowBiometricSetup(true);
@@ -134,6 +135,17 @@ export const Auth = () => {
     });
     // Navigation is handled by the auth state change in PublicRoute
   };
+
+  // Auto-trigger biometric login on mount if enabled
+  useEffect(() => {
+    if (view === "login" && isBiometricSupported && isBiometricEnabled && !autoBiometricTriggered && !authLoading) {
+      setAutoBiometricTriggered(true);
+      const timer = setTimeout(() => {
+        handleBiometricLogin();
+      }, 800);
+      return () => clearTimeout(timer);
+    }
+  }, [view, isBiometricSupported, isBiometricEnabled, autoBiometricTriggered, authLoading]);
 
   // Handle manual biometric login button click
   const handleBiometricLogin = async () => {
@@ -324,7 +336,7 @@ export const Auth = () => {
         </div>
       </header>
 
-      <main className="flex-1 flex flex-col justify-center px-6 pb-12">
+      <main className="flex-1 flex flex-col px-6 pb-20 pt-8 overflow-y-auto no-scrollbar">
         <FadeIn key={view}>
           {view === "login" && (
             <LoginForm
@@ -437,12 +449,12 @@ const LoginForm = ({
   onBiometricLogin,
   isBiometricLoading,
 }: LoginFormProps) => (
-  <form onSubmit={onSubmit} className="space-y-6">
+  <form onSubmit={onSubmit} className="space-y-6 max-w-sm mx-auto w-full">
     <div className="text-center mb-8">
-      <img src={logoSaldin} alt="Saldin" className="h-36 mx-auto mb-6" />
-      <h1 className="font-serif text-3xl font-semibold">Entrar</h1>
-      <p className="text-muted-foreground">
-        Acesse seu painel de controle financeiro
+      <img src={logoSaldin} alt="Saldin" className="h-32 mx-auto mb-4" />
+      <h1 className="font-serif text-3xl font-semibold tracking-tight">Entrar</h1>
+      <p className="text-muted-foreground mt-2">
+        Acesse seu painel financeiro
       </p>
     </div>
 
@@ -451,13 +463,13 @@ const LoginForm = ({
       <div className="space-y-4">
         <Button
           type="button"
+          className="w-full h-14 gap-3 bg-primary/10 hover:bg-primary/20 text-primary border-primary/20 transition-all duration-300"
           variant="outline"
-          className="w-full h-14 gap-3"
           onClick={onBiometricLogin}
           disabled={isBiometricLoading || isLoading}
         >
-          <Fingerprint className="w-6 h-6" />
-          <span className="text-base">
+          <Fingerprint className="w-6 h-6 animate-pulse-slow" />
+          <span className="text-base font-medium">
             {isBiometricLoading ? "Verificando..." : "Entrar com biometria"}
           </span>
         </Button>
@@ -477,16 +489,16 @@ const LoginForm = ({
 
     <div className="space-y-4">
       <div className="space-y-2">
-        <Label htmlFor="email">Email</Label>
+        <Label htmlFor="email" className="text-foreground/80 ml-1">Email</Label>
         <div className="relative">
-          <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+          <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-primary/60" />
           <Input
             id="email"
             type="email"
             placeholder="seu@email.com"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
-            className="pl-10"
+            className="pl-10 h-12 rounded-xl focus:ring-primary/20 transition-all"
             autoComplete="email"
             data-testid="login-email"
           />
@@ -494,25 +506,25 @@ const LoginForm = ({
       </div>
 
       <div className="space-y-2">
-        <Label htmlFor="password">Senha</Label>
+        <Label htmlFor="password" className="text-foreground/80 ml-1">Senha</Label>
         <div className="relative">
-          <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+          <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-primary/60" />
           <Input
             id="password"
             type={showPassword ? "text" : "password"}
-            placeholder="Sua senha"
+            placeholder="••••••••"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
-            className="pl-10 pr-10"
+            className="pl-10 pr-10 h-12 rounded-xl focus:ring-primary/20 transition-all"
             autoComplete="current-password"
             data-testid="login-password"
           />
           <button
             type="button"
             onClick={() => setShowPassword(!showPassword)}
-            className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
+            className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-primary transition-colors pr-1"
           >
-            {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+            {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
           </button>
         </div>
       </div>
@@ -583,27 +595,27 @@ const SignupForm = ({
   onSubmit,
   onBackToLogin,
 }: SignupFormProps) => (
-  <form onSubmit={onSubmit} className="space-y-6">
-    <div className="text-center mb-8">
-      <img src={logoSaldin} alt="Saldin" className="h-36 mx-auto mb-6" />
-      <h1 className="font-serif text-3xl font-semibold">Criar conta</h1>
-      <p className="text-muted-foreground">
-        Preencha os dados para começar
+  <form onSubmit={onSubmit} className="space-y-6 max-w-sm mx-auto w-full">
+    <div className="text-center mb-6">
+      <img src={logoSaldin} alt="Saldin" className="h-24 mx-auto mb-4" />
+      <h1 className="font-serif text-3xl font-semibold tracking-tight">Criar conta</h1>
+      <p className="text-muted-foreground mt-2">
+        Comece sua jornada para a liberdade financeira
       </p>
     </div>
 
     <div className="space-y-4">
       <div className="space-y-2">
-        <Label htmlFor="name">Nome</Label>
+        <Label htmlFor="name" className="text-foreground/80 ml-1">Nome completo</Label>
         <div className="relative">
-          <User className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+          <User className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-primary/60" />
           <Input
             id="name"
             type="text"
-            placeholder="Seu nome"
+            placeholder="Como quer ser chamado?"
             value={name}
             onChange={(e) => setName(e.target.value)}
-            className="pl-10"
+            className="pl-10 h-12 rounded-xl focus:ring-primary/20 transition-all"
             autoComplete="name"
             maxLength={50}
             data-testid="signup-name"
@@ -716,27 +728,27 @@ const RecoveryForm = ({
   onSubmit,
   onBackToLogin,
 }: RecoveryFormProps) => (
-  <form onSubmit={onSubmit} className="space-y-6">
+  <form onSubmit={onSubmit} className="space-y-6 max-w-sm mx-auto w-full">
     <div className="text-center mb-8">
-      <img src={logoSaldin} alt="Saldin" className="h-36 mx-auto mb-6" />
-      <h1 className="font-serif text-3xl font-semibold">Recuperar senha</h1>
-      <p className="text-muted-foreground">
-        Digite seu email para receber o link de recuperação
+      <img src={logoSaldin} alt="Saldin" className="h-28 mx-auto mb-4" />
+      <h1 className="font-serif text-3xl font-semibold tracking-tight">Recuperar senha</h1>
+      <p className="text-muted-foreground mt-2">
+        Enviaremos um link de acesso com segurança
       </p>
     </div>
 
     <div className="space-y-4">
       <div className="space-y-2">
-        <Label htmlFor="recovery-email">Email</Label>
+        <Label htmlFor="recovery-email" className="text-foreground/80 ml-1">Seu email cadastrado</Label>
         <div className="relative">
-          <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+          <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-primary/60" />
           <Input
             id="recovery-email"
             type="email"
             placeholder="seu@email.com"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
-            className="pl-10"
+            className="pl-10 h-12 rounded-xl"
             autoComplete="email"
             data-testid="recovery-email"
           />
