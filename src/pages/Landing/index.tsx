@@ -317,25 +317,48 @@ const CountdownTimer = () => {
 };
 
 // ─── Marquee Component ───
+const MARQUEE_ITEMS = [
+    { icon: Star, text: "Destaque da Semana", color: "text-yellow-500 fill-current" },
+    { icon: Users, text: "+5.000 Usuários Ativos", color: "text-blue-500" },
+    { icon: Shield, text: "Segurança Bancária", color: "text-green-500" },
+    { icon: Zap, text: "Atendimento em 10s", color: "text-orange-500" },
+    { icon: Smartphone, text: "100% via WhatsApp", color: "text-purple-500" },
+];
+
 const Marquee = () => {
     return (
-        <div className="bg-gray-900 overflow-hidden py-3 border-y border-gray-800">
-            <div className="relative w-full flex overflow-x-hidden">
-                <div className="animate-marquee whitespace-nowrap flex items-center gap-12 text-gray-400 text-xs sm:text-sm font-bold uppercase tracking-widest">
-                    <span className="flex items-center gap-2"><Star className="w-4 h-4 text-yellow-500 fill-current" /> Destaque da Semana</span>
-                    <span className="flex items-center gap-2"><Users className="w-4 h-4 text-blue-500" /> +5.000 Usuários Ativos</span>
-                    <span className="flex items-center gap-2"><Shield className="w-4 h-4 text-green-500" /> Segurança Bancária</span>
-                    <span className="flex items-center gap-2"><Zap className="w-4 h-4 text-orange-500" /> Atendimento em 10s</span>
-                    <span className="flex items-center gap-2"><Smartphone className="w-4 h-4 text-purple-500" /> 100% via WhatsApp</span>
+        <div className="bg-gray-900 overflow-hidden py-3 border-y border-gray-800 flex relative z-40">
+            <motion.div
+                className="flex items-center gap-12 shrink-0 pr-12"
+                animate={{ x: "-100%" }}
+                transition={{
+                    repeat: Infinity,
+                    ease: "linear",
+                    duration: 30, // 30s for a full cycle (smooth & readable)
+                }}
+            >
+                {[...MARQUEE_ITEMS, ...MARQUEE_ITEMS].map((item, i) => (
+                    <span key={i} className="flex items-center gap-2 text-gray-400 text-xs sm:text-sm font-bold uppercase tracking-widest whitespace-nowrap">
+                        <item.icon className={`w-4 h-4 ${item.color}`} /> {item.text}
+                    </span>
+                ))}
+            </motion.div>
 
-                    {/* Duplicate for infinite loop */}
-                    <span className="flex items-center gap-2"><Star className="w-4 h-4 text-yellow-500 fill-current" /> Destaque da Semana</span>
-                    <span className="flex items-center gap-2"><Users className="w-4 h-4 text-blue-500" /> +5.000 Usuários Ativos</span>
-                    <span className="flex items-center gap-2"><Shield className="w-4 h-4 text-green-500" /> Segurança Bancária</span>
-                    <span className="flex items-center gap-2"><Zap className="w-4 h-4 text-orange-500" /> Atendimento em 10s</span>
-                    <span className="flex items-center gap-2"><Smartphone className="w-4 h-4 text-purple-500" /> 100% via WhatsApp</span>
-                </div>
-            </div>
+            <motion.div
+                className="flex items-center gap-12 shrink-0 pr-12"
+                animate={{ x: "-100%" }}
+                transition={{
+                    repeat: Infinity,
+                    ease: "linear",
+                    duration: 30,
+                }}
+            >
+                {[...MARQUEE_ITEMS, ...MARQUEE_ITEMS].map((item, i) => (
+                    <span key={i} className="flex items-center gap-2 text-gray-400 text-xs sm:text-sm font-bold uppercase tracking-widest whitespace-nowrap">
+                        <item.icon className={`w-4 h-4 ${item.color}`} /> {item.text}
+                    </span>
+                ))}
+            </motion.div>
         </div>
     );
 };
@@ -432,6 +455,107 @@ const faqs = [
     { q: "Posso cancelar quando quiser?", a: "Sim. Sem fidelidade, sem letras miúdas. Você gerencia sua assinatura direto no painel com um clique." },
     { q: "O WhatsApp é um robô ou humano?", a: "É uma Inteligência Artificial avançada, treinada para entender linguagem natural. Você fala como falaria com um amigo e ela entende." },
 ];
+
+// ─── Comparison Table Component ───
+const ComparisonTable = () => (
+    <Section className="py-16 bg-white border-b border-gray-100">
+        <div className="max-w-4xl mx-auto px-4">
+            <div className="text-center mb-12">
+                <h2 className="font-serif text-3xl sm:text-4xl font-bold text-gray-900 mb-4">Por que o Saldin vence?</h2>
+                <p className="text-gray-500">A evolução natural do controle financeiro.</p>
+            </div>
+            <div className="overflow-x-auto pb-4">
+                <table className="w-full text-left border-collapse min-w-[600px]">
+                    <thead>
+                        <tr>
+                            <th className="p-4 text-gray-400 font-medium text-sm w-1/4"></th>
+                            <th className="p-4 text-center text-gray-400 font-medium text-sm w-1/4">Apps de Banco</th>
+                            <th className="p-4 text-center text-gray-400 font-medium text-sm w-1/4">Planilhas</th>
+                            <th className="p-4 text-center text-orange-600 font-bold text-lg bg-orange-50 rounded-t-xl border-t border-x border-orange-100 w-1/4 relative">
+                                <span className="absolute -top-3 left-1/2 -translate-x-1/2 bg-orange-600 text-white text-[10px] font-bold px-2 py-0.5 rounded-full uppercase tracking-wider whitespace-nowrap shadow-sm">Melhor Escolha</span>
+                                Saldin
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody className="text-sm sm:text-base">
+                        <tr className="border-b border-gray-50">
+                            <td className="p-4 font-bold text-gray-700">Esforço Diário</td>
+                            <td className="p-4 text-center text-gray-500">Alto <span className="block text-xs opacity-70 font-normal">(Categorizar)</span></td>
+                            <td className="p-4 text-center text-gray-500">Infinito <span className="block text-xs opacity-70 font-normal">(Manual)</span></td>
+                            <td className="p-4 text-center font-bold text-gray-900 bg-orange-50 border-x border-orange-100">Zero <span className="block text-xs font-normal text-orange-700 opacity-80">(Só falar)</span></td>
+                        </tr>
+                        <tr className="border-b border-gray-50">
+                            <td className="p-4 font-bold text-gray-700">Tempo Gasto</td>
+                            <td className="p-4 text-center text-gray-500">15 min/dia</td>
+                            <td className="p-4 text-center text-gray-500">1 hora/semana</td>
+                            <td className="p-4 text-center font-bold text-gray-900 bg-orange-50 border-x border-orange-100">5 seg/transação</td>
+                        </tr>
+                        <tr className="border-b border-gray-50">
+                            <td className="p-4 font-bold text-gray-700">Visão de Futuro</td>
+                            <td className="p-4 text-center text-gray-500">Não <span className="block text-xs opacity-70 font-normal">(Só passado)</span></td>
+                            <td className="p-4 text-center text-gray-500">Só se configurar</td>
+                            <td className="p-4 text-center font-bold text-gray-900 bg-orange-50 border-x border-orange-100">Sim <span className="block text-xs font-normal text-orange-700 opacity-80">(Saldo Livre)</span></td>
+                        </tr>
+                        <tr>
+                            <td className="p-4 font-bold text-gray-700">Interface</td>
+                            <td className="p-4 text-center text-gray-500">App Pesado</td>
+                            <td className="p-4 text-center text-gray-500">Complexa</td>
+                            <td className="p-4 text-center font-bold text-gray-900 bg-orange-50 rounded-b-xl border-b border-x border-orange-100">WhatsApp</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </Section>
+);
+
+// ─── Security Section Component ───
+const SecuritySection = () => (
+    <Section className="py-16 sm:py-24 bg-white border-t border-b border-gray-100 relative overflow-hidden">
+        <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-emerald-400 to-teal-500 opacity-20"></div>
+        <div className="max-w-4xl mx-auto px-4 text-center relative z-10">
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-50 text-emerald-700 text-xs font-bold uppercase tracking-wider mb-6 border border-emerald-100">
+                <Lock className="w-3 h-3" /> Blindagem de Dados
+            </div>
+            <h2 className="font-serif text-3xl sm:text-4xl font-bold text-gray-900 mb-6">
+                Sua privacidade é nossa obsessão.
+            </h2>
+            <p className="text-gray-500 max-w-2xl mx-auto mb-12 text-base sm:text-lg">
+                Nós não vendemos seus dados. Nós não treinamos IA com suas informações pessoais. O que é seu, fica com você.
+            </p>
+
+            <div className="grid sm:grid-cols-3 gap-8 text-left sm:text-center">
+                <div className="flex sm:flex-col items-center gap-4 sm:gap-2">
+                    <div className="shrink-0 w-14 h-14 bg-emerald-50 rounded-2xl flex items-center justify-center mb-0 sm:mb-4 text-emerald-600 border border-emerald-100">
+                        <Shield className="w-7 h-7" />
+                    </div>
+                    <div>
+                        <h3 className="font-bold text-gray-900 mb-1">Criptografia Militar</h3>
+                        <p className="text-sm text-gray-500 leading-relaxed">Seus dados são embaralhados de ponta a ponta. Nem nossa equipe consegue ler.</p>
+                    </div>
+                </div>
+                <div className="flex sm:flex-col items-center gap-4 sm:gap-2">
+                    <div className="shrink-0 w-14 h-14 bg-emerald-50 rounded-2xl flex items-center justify-center mb-0 sm:mb-4 text-blue-600 border border-blue-100">
+                        <EyeOff className="w-7 h-7" />
+                    </div>
+                    <div>
+                        <h3 className="font-bold text-gray-900 mb-1">Sem Conexão Bancária</h3>
+                        <p className="text-sm text-gray-500 leading-relaxed">Nunca pediremos sua senha do banco. O Saldin funciona sem risco de vazamentos.</p>
+                    </div>
+                </div>
+                <div className="flex sm:flex-col items-center gap-4 sm:gap-2">
+                    <div className="shrink-0 w-14 h-14 bg-emerald-50 rounded-2xl flex items-center justify-center mb-0 sm:mb-4 text-purple-600 border border-purple-100">
+                        <UserCheck className="w-7 h-7" />
+                    </div>
+                    <div>
+                        <h3 className="font-bold text-gray-900 mb-1">Dados Anônimos</h3>
+                        <p className="text-sm text-gray-500 leading-relaxed">Para nossa IA, você é apenas um código. Sua identidade real é preservada.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </Section>
+);
 
 const Landing = () => {
     const navigate = useNavigate();
@@ -817,6 +941,9 @@ const Landing = () => {
                 </div>
             </Section>
 
+            {/* ─── COMPARISON TABLE ─── */}
+            <ComparisonTable />
+
             {/* ─── TESTIMONIALS ─── */}
             <Section id="depoimentos" className="py-16 sm:py-24 px-4 bg-gray-50">
                 <div className="max-w-7xl mx-auto">
@@ -975,6 +1102,9 @@ const Landing = () => {
                     </div>
                 </div>
             </Section>
+
+            {/* ─── SECURITY SECTION ─── */}
+            <SecuritySection />
 
             {/* ─── FAQ ─── */}
             <Section id="faq" className="py-16 sm:py-24 px-4 bg-gray-50">
