@@ -122,14 +122,15 @@ export const GoalsSummary = ({ goals, totalSaved, totalTarget }: GoalsSummaryPro
         </Button>
       </div>
 
-      <div className="relative w-full">
-        <div
-          className="flex gap-4 overflow-x-auto pb-6 pt-2 px-4 -mx-4 snap-x snap-mandatory scroll-smooth"
-          style={{
-            WebkitOverflowScrolling: 'touch',
-            scrollbarWidth: 'auto',
-          }}
-        >
+      <div
+        className="w-full max-w-full pb-6 pt-2"
+        style={{
+          overflowX: 'auto',
+          WebkitOverflowScrolling: 'touch',
+          scrollBehavior: 'smooth'
+        }}
+      >
+        <div className="flex gap-4 snap-x snap-mandatory min-w-full w-max px-4">
           {activeGoals.map((goal) => {
             const theme = getGoalTheme(goal.name);
             const Icon = theme.icon;

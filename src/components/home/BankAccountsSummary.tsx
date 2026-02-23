@@ -153,14 +153,15 @@ export const BankAccountsSummary = () => {
         </div>
       </div>
 
-      <div className="relative w-full">
-        <div
-          className="flex gap-4 overflow-x-auto pb-6 pt-2 px-4 -mx-4 snap-x snap-mandatory scroll-smooth"
-          style={{
-            WebkitOverflowScrolling: 'touch',
-            scrollbarWidth: 'auto', // Ensure scrollbar is visible if system/browser allows
-          }}
-        >
+      <div
+        className="w-full max-w-full pb-6 pt-2"
+        style={{
+          overflowX: 'auto',
+          WebkitOverflowScrolling: 'touch',
+          scrollBehavior: 'smooth'
+        }}
+      >
+        <div className="flex gap-4 snap-x snap-mandatory min-w-full w-max px-4">
           {displayAccounts.map((account) => (
             <div
               key={account.id}
@@ -186,9 +187,6 @@ export const BankAccountsSummary = () => {
               Nova<br />Conta
             </span>
           </div>
-
-          {/* Spacer */}
-          <div className="w-2 shrink-0" />
         </div>
       </div>
     </div>
