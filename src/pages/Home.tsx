@@ -234,8 +234,8 @@ export default function Home() {
 
                 {/* 4. Credit Cards Carousel - Glass Box */}
                 {creditCards.length > 0 && (
-                  <FadeIn delay={0.15} className="glass-premium p-8 rounded-[3rem]">
-                    <div className="flex items-center justify-between px-1 mb-8">
+                  <div className="glass-premium p-6 rounded-[3rem]">
+                    <div className="flex items-center justify-between px-1 mb-6">
                       <div className="flex items-center gap-3">
                         <div className="w-12 h-12 rounded-2xl bg-obligation/10 flex items-center justify-center border border-obligation/10 shadow-inner">
                           <Wallet className="w-6 h-6 text-obligation" />
@@ -254,16 +254,16 @@ export default function Home() {
                         selectedMonth={selectedMonth}
                       />
                     </div>
-                  </FadeIn>
+                  </div>
                 )}
 
                 {/* 5. Bank Accounts - Glass Box */}
-                <FadeIn delay={0.2} className="glass-premium p-8 rounded-[3rem]">
-                  <div className="flex items-center gap-3 mb-8">
+                <div className="glass-premium p-6 rounded-[3rem]">
+                  <div className="flex items-center gap-3 mb-6">
                     <h3 className="text-sm font-black text-foreground uppercase tracking-[0.2em]">Cofre e Bancos</h3>
                   </div>
                   <BankAccountsSummary />
-                </FadeIn>
+                </div>
 
                 {/* 5.1 Crypto - Glass Box */}
                 {preferences.cryptoEnabled && (
@@ -273,8 +273,8 @@ export default function Home() {
                 )}
 
                 {/* 6. Goals - Glass Box */}
-                <FadeIn delay={0.25} className="glass-premium p-8 rounded-[3rem]">
-                  <div className="flex items-center gap-3 mb-8">
+                <div className="glass-premium p-6 rounded-[3rem]">
+                  <div className="flex items-center gap-3 mb-6">
                     <h3 className="text-sm font-black text-foreground uppercase tracking-[0.2em]">Metas de Futuro</h3>
                   </div>
                   <GoalsSummary
@@ -282,7 +282,7 @@ export default function Home() {
                     totalSaved={goalStats?.totalSaved || 0}
                     totalTarget={goalStats?.totalTarget || 0}
                   />
-                </FadeIn>
+                </div>
               </div>
             </div>
           ) : (

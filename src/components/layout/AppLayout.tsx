@@ -120,12 +120,12 @@ export const AppLayout = ({ children, className }: AppLayoutProps) => {
 
             {/* User Info (Premium Glass Card) */}
             <div className="px-6 mb-4">
-                <div className="flex items-center gap-3 p-3 rounded-xl bg-white/5 border border-white/5 backdrop-blur-sm shadow-sm ring-1 ring-white/10">
-                    <div className="w-10 h-10 rounded-full bg-primary/20 flex items-center justify-center text-primary overflow-hidden shadow-inner border border-white/20">
+                <div className="flex items-center gap-3 p-3 rounded-xl bg-black/5 border border-black/5 backdrop-blur-sm shadow-sm">
+                    <div className="w-10 h-10 rounded-full bg-primary/20 flex items-center justify-center text-primary overflow-hidden shadow-inner border border-primary/20">
                         {profile?.avatar_url ? (
                             <img src={profile.avatar_url} alt="Avatar" className="w-full h-full object-cover" />
                         ) : (
-                            <span className="font-bold text-sm text-white drop-shadow-sm">
+                            <span className="font-bold text-sm text-primary">
                                 {profile?.full_name
                                     ? profile.full_name.split(" ").map(n => n[0]).join("").substring(0, 2).toUpperCase()
                                     : <User className="w-5 h-5" />}
@@ -133,8 +133,8 @@ export const AppLayout = ({ children, className }: AppLayoutProps) => {
                         )}
                     </div>
                     <div className="flex-1 min-w-0">
-                        <p className="font-bold text-sm truncate text-white leading-tight">{profile?.full_name || "Usuário"}</p>
-                        <p className="text-[10px] text-white/50 truncate tracking-wide">{user?.email || ""}</p>
+                        <p className="font-bold text-sm truncate text-foreground leading-tight">{profile?.full_name || "Usuário"}</p>
+                        <p className="text-[10px] text-muted-foreground truncate tracking-wide">{user?.email || ""}</p>
                     </div>
                 </div>
             </div>
@@ -151,14 +151,14 @@ export const AppLayout = ({ children, className }: AppLayoutProps) => {
                             key={item.path}
                             to={item.path}
                             className={cn(
-                                "flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-semibold transition-all duration-300",
+                                "flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-semibold transition-all duration-200",
                                 isActive
-                                    ? "bg-white/10 text-white border border-white/10 shadow-lg backdrop-blur-md"
-                                    : "text-white/60 hover:bg-white/5 hover:text-white"
+                                    ? "bg-primary/10 text-primary border border-primary/10 shadow-sm"
+                                    : "text-muted-foreground hover:bg-black/5 hover:text-foreground"
                             )}
                             onClick={() => setOpen(false)}
                         >
-                            <item.icon className={cn("w-5 h-5 transition-transform group-hover:scale-110", isActive ? "text-primary shadow-sm" : "text-white/40")} />
+                            <item.icon className={cn("w-5 h-5", isActive ? "text-primary" : "text-muted-foreground/60")} />
                             {item.label}
                         </Link>
                     );
@@ -175,14 +175,14 @@ export const AppLayout = ({ children, className }: AppLayoutProps) => {
                                 key={item.path}
                                 to={item.path}
                                 className={cn(
-                                    "flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-semibold transition-all duration-300",
+                                    "flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-semibold transition-all duration-200",
                                     isActive
-                                        ? "bg-white/10 text-white border border-white/10 shadow-lg"
-                                        : "text-white/60 hover:bg-white/5 hover:text-white"
+                                        ? "bg-primary/10 text-primary border border-primary/10"
+                                        : "text-muted-foreground hover:bg-black/5 hover:text-foreground"
                                 )}
                                 onClick={() => setOpen(false)}
                             >
-                                <item.icon className={cn("w-5 h-5", isActive ? "text-primary" : "text-white/40")} />
+                                <item.icon className={cn("w-5 h-5", isActive ? "text-primary" : "text-muted-foreground/60")} />
                                 {item.label}
                             </Link>
                         );

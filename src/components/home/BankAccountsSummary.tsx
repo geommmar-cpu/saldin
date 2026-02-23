@@ -157,8 +157,7 @@ export const BankAccountsSummary = () => {
         className="w-full max-w-full pb-6 pt-2"
         style={{
           overflowX: 'auto',
-          WebkitOverflowScrolling: 'touch',
-          scrollBehavior: 'smooth'
+          WebkitOverflowScrolling: 'touch'
         }}
       >
         <div className="flex gap-4 snap-x snap-mandatory min-w-full w-max px-4">

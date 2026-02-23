@@ -41,8 +41,7 @@ export const CreditCardsCarousel = ({ cards, installments, selectedMonth }: Cred
             className="w-full max-w-full pb-6 pt-2 px-1"
             style={{
                 overflowX: 'auto',
-                WebkitOverflowScrolling: 'touch',
-                scrollBehavior: 'smooth'
+                WebkitOverflowScrolling: 'touch'
             }}
         >
             <div className="flex gap-4 snap-x snap-mandatory min-w-full w-max px-4 sm:px-0">
