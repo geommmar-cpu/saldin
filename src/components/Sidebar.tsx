@@ -48,6 +48,7 @@ const mainNavItems: NavItem[] = [
   { path: "/debts", icon: CreditCard, label: "Dívidas" },
   { path: "/receivables", icon: HandCoins, label: "Valores a Receber" },
   { path: "/categories", icon: Tag, label: "Categorias" },
+  { path: "/settings", icon: MessageCircle, label: "Assistente WhatsApp", highlight: true },
 ];
 
 const secondaryNavItems: NavItem[] = [
@@ -56,7 +57,6 @@ const secondaryNavItems: NavItem[] = [
 ];
 
 const comingSoonItems: NavItem[] = [
-  { path: "#", icon: MessageCircle, label: "WhatsApp", comingSoon: true },
   { path: "#", icon: Building2, label: "Conectar Bancos", comingSoon: true },
 ];
 

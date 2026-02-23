@@ -188,7 +188,7 @@ export default function Home() {
                 <MonthlyResult
                   totalIncome={totalIncome}
                   totalSpent={totalSpent + totalCCInstallments}
-                  investedAmount={preferences.cryptoEnabled ? cryptoInvested : 0}
+                  investedAmount={cryptoInvested}
                   subscriptionsAmount={activeSubs.reduce((sum, s) => sum + Number(s.amount), 0)}
                 />
               </FadeIn>

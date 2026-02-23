@@ -344,9 +344,9 @@ export const Settings = () => {
           </SettingsSection>
         </FadeIn>
 
-        {/* Bloco 2 - Assistente WhatsApp */}
+        {/* Bloco 2 - WhatsApp & Assistente */}
         <FadeIn delay={0.05}>
-          <SettingsSection title="Assistente WhatsApp">
+          <SettingsSection title="WhatsApp & Assistente">
             <SettingsItem
               icon={MessageCircle}
               label="Assistente"
@@ -500,21 +500,6 @@ export const Settings = () => {
               icon={History}
               label="Histórico completo"
               onClick={() => navigate("/history")}
-              showArrow
-            />
-          </SettingsSection>
-        </FadeIn>
-
-        {/* Bloco 5 - Integrações */}
-        <FadeIn delay={0.2}>
-          <SettingsSection title="Integrações">
-            <SettingsItem
-              icon={MessageCircle}
-              iconColor="text-[#25D366]"
-              label="WhatsApp"
-              value={whatsappStatus.connected ? "Conectado" : "Desconectado"}
-              valueColor={whatsappStatus.connected ? "text-essential" : "text-impulse"}
-              onClick={openWhatsApp}
               showArrow
             />
           </SettingsSection>
