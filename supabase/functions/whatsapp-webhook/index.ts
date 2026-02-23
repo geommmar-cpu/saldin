@@ -277,28 +277,29 @@ Deno.serve(async (req: Request) => {
             const cleanText = textToAnalyze.trim();
             const normalizedCmd = cleanText.toLowerCase().replace(/[^\w\s]/gi, ''); // Remove emojis/pontuação
 
-            // 1. Check Edit/Conversation State First
+            // A. TESTE DE TEMPLATE (Prioridade Máxima)
+            if (normalizedCmd === 'template' || normalizedCmd === 'teste template') {
+                console.log("🧪 Template test triggered for:", phoneToSend);
+                await sendWhatsAppTemplate(phoneToSend);
+                if (logId) await supabaseAdmin.from("whatsapp_logs").update({ processed: true }).eq("id", logId);
+                return new Response("Template Test OK", { status: 200 });
+            }
+
+            // B. SAUDAÇÕES (Prioridade Alta)
+            const greetings = ['oi', 'ola', 'olá', 'teste', 'bom dia', 'boa tarde', 'boa noite', 'hey', 'hello', 'oie'];
+            if (greetings.includes(normalizedCmd) || greetings.some(g => normalizedCmd.startsWith(g + " "))) {
+                console.log("👋 Greeting detected.");
+                await sendWhatsApp(phoneToSend, "Olá! 👋 Sou o assistente do Saldin. \nComo posso ajudar? Você pode registrar um gasto (ex: 'Almoço 35.00'), ou pedir seu 'saldo' ou 'extrato'.");
+                if (logId) await supabaseAdmin.from("whatsapp_logs").update({ processed: true }).eq("id", logId);
+                return new Response("Greeting OK", { status: 200 });
+            }
+
+            // C. FLOW DE EDIÇÃO
             const editResult = await processEditStep(userId, cleanText);
             if (editResult.success) {
                 await sendWhatsApp(phoneToSend, editResult.message);
                 if (logId) await supabaseAdmin.from("whatsapp_logs").update({ processed: true }).eq("id", logId);
-                return new Response("Edit Step", { status: 200 });
-            }
-
-            // 2. Greeting & Template check (Robusto)
-            const greetings = ['oi', 'ola', 'olá', 'teste', 'bom dia', 'boa tarde', 'boa noite', 'hey', 'hello', 'oie'];
-            if (normalizedCmd === 'template' || normalizedCmd === 'teste template') {
-                console.log("🧪 Template test triggered.");
-                await sendWhatsAppTemplate(phoneToSend);
-                if (logId) await supabaseAdmin.from("whatsapp_logs").update({ processed: true }).eq("id", logId);
-                return new Response("Template Test", { status: 200 });
-            }
-
-            if (greetings.includes(normalizedCmd) || greetings.some(g => normalizedCmd.startsWith(g + " "))) {
-                console.log("👋 Greeting detected, skipping AI.");
-                await sendWhatsApp(phoneToSend, "Olá! 👋 Sou o assistente do Saldin. \nComo posso ajudar? Você pode registrar um gasto (ex: 'Almoço 35.00'), uma receita ou pedir seu 'saldo' ou 'extrato'.");
-                if (logId) await supabaseAdmin.from("whatsapp_logs").update({ processed: true }).eq("id", logId);
-                return new Response("Greeting", { status: 200 });
+                return new Response("Edit Step OK", { status: 200 });
             }
 
             // 3. Normal Commands (Delete, Saldo, Extrato)
