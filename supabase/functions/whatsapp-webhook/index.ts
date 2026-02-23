@@ -216,7 +216,9 @@ Deno.serve(async (req: Request) => {
         }
 
         const userId = userLink.user_id;
-        const phoneToSend = remoteJid;
+        const phoneToSend = userLink.phone_number; // USAR O NÚMERO VERIFICADO NO CADASTRO (com o 9, se houver)
+
+        console.log(`🎯 Target phone for reply: ${phoneToSend}`);
 
         // 3. Content Extraction
         let textToAnalyze = "";
@@ -259,7 +261,7 @@ Deno.serve(async (req: Request) => {
         // 4. Command & Edit Flow
         if (textToAnalyze) {
             const cleanText = textToAnalyze.trim();
-            const normalizedCmd = cleanText.toLowerCase().replace(/[^\w\s]/gi, ''); // Remove emojis/punctuation for check
+            const normalizedCmd = cleanText.toLowerCase().replace(/[^\w\s]/gi, ''); // Remove emojis/pontuação
 
             // 1. Check Edit/Conversation State First
             const editResult = await processEditStep(userId, cleanText);
@@ -269,8 +271,8 @@ Deno.serve(async (req: Request) => {
                 return new Response("Edit Step", { status: 200 });
             }
 
-            // 2. Robust Greeting check (Strict equals or starts with)
-            const greetings = ['oi', 'ola', 'olá', 'teste', 'bom dia', 'boa tarde', 'boa noite', 'hey', 'hello'];
+            // 2. Greeting check (Robusto)
+            const greetings = ['oi', 'ola', 'olá', 'teste', 'bom dia', 'boa tarde', 'boa noite', 'hey', 'hello', 'oie'];
             if (greetings.includes(normalizedCmd) || greetings.some(g => normalizedCmd.startsWith(g + " "))) {
                 console.log("👋 Greeting detected, skipping AI.");
                 await sendWhatsApp(phoneToSend, "Olá! 👋 Sou o assistente do Saldin. \nComo posso ajudar? Você pode registrar um gasto (ex: 'Almoço 35.00'), uma receita ou pedir seu 'saldo' ou 'extrato'.");

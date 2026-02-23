@@ -30,20 +30,21 @@ export function formatPremiumMessage(transaction: Transaction, balanceData: any,
     const formattedAmount = new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(Number(amount));
     const dateFormatted = new Date(date).toLocaleDateString('pt-BR');
 
-    // Layout Blocks
-    const sep = "━━━━━━━━━━━━━━━━━━";
+    // Layout Blocks - Using simpler separators for higher delivery success
+    const sep = "--------------------------------";
 
     let header = "";
     if (isDelete) {
-        header = `🗑️ TRANSAÇÃO REMOVIDA`;
+        header = `*🗑️ TRANSAÇÃO REMOVIDA*`;
     } else {
-        header = type === 'income' ? `✔️ RECEITA REGISTRADA` : `✔️ TRANSAÇÃO CONFIRMADA`;
+        header = type === 'income' ? `*✅ RECEITA REGISTRADA*` : `*✅ TRANSAÇÃO CONFIRMADA*`;
     }
 
     const detailsBlock = `
-🧾 ID: ${transaction_code}
+*🧾 DETALHES*
+ID: \`${transaction_code}\`
 Tipo: ${type === 'income' ? 'Receita' : 'Gasto'}
-Valor: ${formattedAmount}
+Valor: *${formattedAmount}*
 Categoria: ${category || 'Não definida'}
 Descrição: ${description}
 Origem: ${account || 'Padrão'}
@@ -51,21 +52,19 @@ Data: ${dateFormatted}
 `.trim();
 
     const impactBlock = `
-💰 Impacto Financeiro
+*💰 IMPACTO FINANCEIRO*
 ${sep}
-
 Saldo anterior: R$ ${formatCurrency(balanceData.previous_balance)}
-Novo saldo: R$ ${formatCurrency(balanceData.new_balance)}
-
-${balanceData.invoice ? `Fatura atual: R$ ${formatCurrency(balanceData.invoice)}\n` : ''}Saldo disponível nas contas: R$ ${formatCurrency(balanceData.available_balance)}
+Novo saldo: *R$ ${formatCurrency(balanceData.new_balance)}*
+${balanceData.invoice ? `Fatura atual: R$ ${formatCurrency(balanceData.invoice)}\n` : ''}
+Saldo disponível: R$ ${formatCurrency(balanceData.available_balance)}
 `.trim();
 
     const actionsBlock = `
-⚙️ Ações
+*⚙️ AÇÕES*
 ${sep}
-
-EXCLUIR ${transaction_code}
-EDITAR ${transaction_code}
+Para excluir: \`excluir ${transaction_code}\`
+Para editar: \`editar ${transaction_code}\`
 `.trim();
 
     return `
@@ -82,7 +81,7 @@ ${sep}
 ${actionsBlock}
 
 ${sep}
-Saldin • Seu controle financeiro
+_Saldin • Seu controle financeiro_
 `.trim();
 }
 
