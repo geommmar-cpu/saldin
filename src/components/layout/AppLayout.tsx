@@ -206,20 +206,23 @@ export const AppLayout = ({ children, className }: AppLayoutProps) => {
 
     return (
         <div
-            className="min-h-screen bg-background flex relative overflow-hidden"
+            className="min-h-screen bg-[#EEF1F4] flex relative overflow-hidden"
             onTouchStart={handleTouchStart}
             onTouchMove={handleTouchMove}
             onTouchEnd={handleTouchEnd}
         >
-            {/* Premium Background Blurs for Desktop Experience */}
+            {/* Ultra-Premium Mesh Background */}
             <div className="fixed inset-0 pointer-events-none overflow-hidden -z-10 hidden lg:block">
-                <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-primary/10 rounded-full blur-[120px] animate-pulse" />
-                <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-essential/10 rounded-full blur-[120px] animate-pulse" style={{ animationDelay: '2s' }} />
-                <div className="absolute top-[20%] right-[10%] w-[20%] h-[20%] bg-obligation/5 rounded-full blur-[80px]" />
+                <div className="absolute top-[-20%] left-[-10%] w-[60%] h-[60%] bg-primary/15 rounded-full blur-[150px] animate-pulse" />
+                <div className="absolute bottom-[-20%] right-[-10%] w-[60%] h-[60%] bg-essential/10 rounded-full blur-[150px] animate-pulse" style={{ animationDelay: '3s' }} />
+                <div className="absolute top-[20%] right-[-5%] w-[30%] h-[30%] bg-obligation/10 rounded-full blur-[100px]" />
+
+                {/* Tactical Texture Overlay */}
+                <div className="absolute inset-0 opacity-[0.015] mix-blend-overlay pointer-events-none bg-[url('https://www.transparenttextures.com/patterns/carbon-fibre.png')]" />
             </div>
 
             {/* Desktop Sidebar (Elite Glass Version) */}
-            <aside className="hidden lg:block w-72 border-r border-white/10 bg-card/40 backdrop-blur-xl fixed h-full z-30 shadow-2xl">
+            <aside className="hidden lg:block w-72 border-r border-white/20 bg-white/40 backdrop-blur-2xl fixed h-full z-30 shadow-2xl">
                 <SidebarContent />
             </aside>
 

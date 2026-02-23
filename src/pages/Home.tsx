@@ -175,9 +175,9 @@ export default function Home() {
           {hasData ? (
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:items-start">
               {/* Left Column (Main Stats & Transactions) */}
-              <div className="lg:col-span-7 xl:col-span-8 space-y-8">
-                {/* 1. Hero Balance */}
-                <FadeIn>
+              <div className="lg:col-span-12 xl:col-span-8 space-y-8">
+                {/* 1. Hero Balance - Ultra Glass Effect Container */}
+                <FadeIn className="glass-premium p-2 rounded-[3.5rem] overflow-hidden group">
                   <BalanceHero
                     balance={balanceBreakdown}
                     cryptoTotal={preferences.cryptoEnabled ? cryptoTotal : 0}
@@ -185,8 +185,12 @@ export default function Home() {
                   />
                 </FadeIn>
 
-                {/* 2. Monthly Summary */}
-                <FadeIn delay={0.05}>
+                {/* 2. Monthly Summary - Glass Container */}
+                <FadeIn delay={0.05} className="glass-premium p-10 rounded-[3rem]">
+                  <div className="flex items-center gap-3 mb-8">
+                    <div className="w-1.5 h-8 bg-primary rounded-full" />
+                    <h3 className="text-sm font-black text-foreground uppercase tracking-[0.2em]">Desempenho de Fluxo</h3>
+                  </div>
                   <MonthlyResult
                     totalIncome={totalIncome}
                     totalSpent={totalSpent + totalCCInstallments}
@@ -196,7 +200,13 @@ export default function Home() {
                 </FadeIn>
 
                 {/* 7. Recent Transactions - High priority on web */}
-                <FadeIn delay={0.3}>
+                <FadeIn delay={0.3} className="glass-premium p-10 rounded-[3rem]">
+                  <div className="flex items-center justify-between mb-8">
+                    <div className="flex items-center gap-3">
+                      <div className="w-1.5 h-8 bg-essential rounded-full" />
+                      <h3 className="text-sm font-black text-foreground uppercase tracking-[0.2em]">Movimentações Recentes</h3>
+                    </div>
+                  </div>
                   <TransactionsSection
                     expenses={filteredExpenses}
                     incomes={filteredIncomes}
@@ -222,40 +232,51 @@ export default function Home() {
                   />
                 </FadeIn>
 
-                {/* 4. Credit Cards Carousel */}
+                {/* 4. Credit Cards Carousel - Glass Box */}
                 {creditCards.length > 0 && (
-                  <FadeIn delay={0.15} className="bg-gradient-to-br from-secondary/30 to-background p-4 sm:rounded-3xl border border-border/50">
-                    <div className="flex items-center justify-between px-1 mb-3">
-                      <div className="flex items-center gap-2">
-                        <div className="w-8 h-8 rounded-full bg-obligation/10 flex items-center justify-center">
-                          <Wallet className="w-4 h-4 text-obligation" />
+                  <FadeIn delay={0.15} className="glass-premium p-8 rounded-[3rem]">
+                    <div className="flex items-center justify-between px-1 mb-8">
+                      <div className="flex items-center gap-3">
+                        <div className="w-12 h-12 rounded-2xl bg-obligation/10 flex items-center justify-center border border-obligation/10 shadow-inner">
+                          <Wallet className="w-6 h-6 text-obligation" />
                         </div>
-                        <h3 className="text-sm font-semibold text-foreground uppercase tracking-wider">Meus Cartões</h3>
+                        <div>
+                          <h3 className="text-sm font-black text-foreground uppercase tracking-[0.2em]">Meus Cartões</h3>
+                          <p className="text-[10px] text-muted-foreground font-medium uppercase tracking-wider">Gestão de Crédito</p>
+                        </div>
                       </div>
-                      <button onClick={() => navigate("/cards")} className="text-xs text-primary font-medium hover:underline">Gerenciar</button>
+                      <button onClick={() => navigate("/cards")} className="text-xs text-primary font-black uppercase tracking-widest hover:underline transition-all bg-primary/5 px-4 py-2 rounded-full border border-primary/10">Gerenciar</button>
                     </div>
-                    <CreditCardsCarousel
-                      cards={creditCards}
-                      installments={ccInstallments}
-                      selectedMonth={selectedMonth}
-                    />
+                    <div className="flex justify-center xl:justify-start">
+                      <CreditCardsCarousel
+                        cards={creditCards}
+                        installments={ccInstallments}
+                        selectedMonth={selectedMonth}
+                      />
+                    </div>
                   </FadeIn>
                 )}
 
-                {/* 5. Bank Accounts */}
-                <FadeIn delay={0.2}>
+                {/* 5. Bank Accounts - Glass Box */}
+                <FadeIn delay={0.2} className="glass-premium p-8 rounded-[3rem]">
+                  <div className="flex items-center gap-3 mb-8">
+                    <h3 className="text-sm font-black text-foreground uppercase tracking-[0.2em]">Cofre e Bancos</h3>
+                  </div>
                   <BankAccountsSummary />
                 </FadeIn>
 
-                {/* 5.1 Crypto */}
+                {/* 5.1 Crypto - Glass Box */}
                 {preferences.cryptoEnabled && (
-                  <FadeIn delay={0.22}>
+                  <FadeIn delay={0.22} className="glass-premium p-8 rounded-[3rem]">
                     <CryptoSummary />
                   </FadeIn>
                 )}
 
-                {/* 6. Goals */}
-                <FadeIn delay={0.25}>
+                {/* 6. Goals - Glass Box */}
+                <FadeIn delay={0.25} className="glass-premium p-8 rounded-[3rem]">
+                  <div className="flex items-center gap-3 mb-8">
+                    <h3 className="text-sm font-black text-foreground uppercase tracking-[0.2em]">Metas de Futuro</h3>
+                  </div>
                   <GoalsSummary
                     goals={goals}
                     totalSaved={goalStats?.totalSaved || 0}
