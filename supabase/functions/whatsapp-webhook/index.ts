@@ -16,13 +16,7 @@ const supabaseAdmin = createClient(SUPABASE_URL, SERVICE_ROLE_KEY);
 // ─── META API HELPERS ───
 
 async function sendWhatsApp(to: string, text: string): Promise<void> {
-    if (!META_ACCESS_TOKEN || !META_PHONE_NUMBER_ID) {
-        console.error("❌ Meta Token or Phone ID not set.");
-        return;
-    }
-
-    // No modo Sandbox, enviar para o número exato que a Meta nos forneceu via Webhook.
-    // Isso evita o erro 131030 e garante que a mensagem chegue no chat correto.
+    if (!META_ACCESS_TOKEN || !META_PHONE_NUMBER_ID) return;
     console.log(`📤 Sending Meta API to ${to}...`);
     try {
         const url = `https://graph.facebook.com/v19.0/${META_PHONE_NUMBER_ID}/messages`;
@@ -40,16 +34,36 @@ async function sendWhatsApp(to: string, text: string): Promise<void> {
                 text: { body: text }
             })
         });
-
         const data = await resp.json();
-        if (!resp.ok) {
-            console.error(`❌ Meta API Error for ${to} (${resp.status}):`, JSON.stringify(data));
-        } else {
-            console.log(`✅ WhatsApp sent to ${to}:`, JSON.stringify(data));
-        }
-    } catch (e) {
-        console.error(`❌ Failed to send to ${to}:`, e);
-    }
+        console.log(`✅ WhatsApp Response:`, JSON.stringify(data));
+    } catch (e) { console.error(`❌ Failed to send:`, e); }
+}
+
+async function sendWhatsAppTemplate(to: string, templateName: string = "hello_world"): Promise<void> {
+    if (!META_ACCESS_TOKEN || !META_PHONE_NUMBER_ID) return;
+    console.log(`📤 Sending Meta TEMPLATE (${templateName}) to ${to}...`);
+    try {
+        const url = `https://graph.facebook.com/v19.0/${META_PHONE_NUMBER_ID}/messages`;
+        const resp = await fetch(url, {
+            method: "POST",
+            headers: {
+                "Authorization": `Bearer ${META_ACCESS_TOKEN}`,
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+                messaging_product: "whatsapp",
+                recipient_type: "individual",
+                to: to,
+                type: "template",
+                template: {
+                    name: templateName,
+                    language: { code: "en_US" }
+                }
+            })
+        });
+        const data = await resp.json();
+        console.log(`✅ Template Response:`, JSON.stringify(data));
+    } catch (e) { console.error(`❌ Template Failed:`, e); }
 }
 
 async function markMessageAsRead(messageId: string): Promise<void> {
@@ -271,8 +285,15 @@ Deno.serve(async (req: Request) => {
                 return new Response("Edit Step", { status: 200 });
             }
 
-            // 2. Greeting check (Robusto)
+            // 2. Greeting & Template check (Robusto)
             const greetings = ['oi', 'ola', 'olá', 'teste', 'bom dia', 'boa tarde', 'boa noite', 'hey', 'hello', 'oie'];
+            if (normalizedCmd === 'template' || normalizedCmd === 'teste template') {
+                console.log("🧪 Template test triggered.");
+                await sendWhatsAppTemplate(phoneToSend);
+                if (logId) await supabaseAdmin.from("whatsapp_logs").update({ processed: true }).eq("id", logId);
+                return new Response("Template Test", { status: 200 });
+            }
+
             if (greetings.includes(normalizedCmd) || greetings.some(g => normalizedCmd.startsWith(g + " "))) {
                 console.log("👋 Greeting detected, skipping AI.");
                 await sendWhatsApp(phoneToSend, "Olá! 👋 Sou o assistente do Saldin. \nComo posso ajudar? Você pode registrar um gasto (ex: 'Almoço 35.00'), uma receita ou pedir seu 'saldo' ou 'extrato'.");
