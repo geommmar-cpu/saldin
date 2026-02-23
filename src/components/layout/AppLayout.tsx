@@ -118,14 +118,14 @@ export const AppLayout = ({ children, className }: AppLayoutProps) => {
                 </div>
             </div>
 
-            {/* User Info (Optional - consistent with sidebar design) */}
+            {/* User Info (Premium Glass Card) */}
             <div className="px-6 mb-4">
-                <div className="flex items-center gap-3 p-3 rounded-xl bg-secondary/50">
-                    <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center text-primary overflow-hidden">
+                <div className="flex items-center gap-3 p-3 rounded-xl bg-white/5 border border-white/5 backdrop-blur-sm shadow-sm ring-1 ring-white/10">
+                    <div className="w-10 h-10 rounded-full bg-primary/20 flex items-center justify-center text-primary overflow-hidden shadow-inner border border-white/20">
                         {profile?.avatar_url ? (
                             <img src={profile.avatar_url} alt="Avatar" className="w-full h-full object-cover" />
                         ) : (
-                            <span className="font-bold text-sm">
+                            <span className="font-bold text-sm text-white drop-shadow-sm">
                                 {profile?.full_name
                                     ? profile.full_name.split(" ").map(n => n[0]).join("").substring(0, 2).toUpperCase()
                                     : <User className="w-5 h-5" />}
@@ -133,8 +133,8 @@ export const AppLayout = ({ children, className }: AppLayoutProps) => {
                         )}
                     </div>
                     <div className="flex-1 min-w-0">
-                        <p className="font-semibold text-sm truncate">{profile?.full_name || "Usuário"}</p>
-                        <p className="text-xs text-muted-foreground truncate">{user?.email || ""}</p>
+                        <p className="font-bold text-sm truncate text-white leading-tight">{profile?.full_name || "Usuário"}</p>
+                        <p className="text-[10px] text-white/50 truncate tracking-wide">{user?.email || ""}</p>
                     </div>
                 </div>
             </div>
@@ -151,14 +151,14 @@ export const AppLayout = ({ children, className }: AppLayoutProps) => {
                             key={item.path}
                             to={item.path}
                             className={cn(
-                                "flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-colors",
+                                "flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-semibold transition-all duration-300",
                                 isActive
-                                    ? "bg-primary/10 text-primary"
-                                    : "text-muted-foreground hover:bg-muted hover:text-foreground"
+                                    ? "bg-white/10 text-white border border-white/10 shadow-lg backdrop-blur-md"
+                                    : "text-white/60 hover:bg-white/5 hover:text-white"
                             )}
                             onClick={() => setOpen(false)}
                         >
-                            <item.icon className={cn("w-5 h-5", isActive ? "text-primary" : "text-muted-foreground")} />
+                            <item.icon className={cn("w-5 h-5 transition-transform group-hover:scale-110", isActive ? "text-primary shadow-sm" : "text-white/40")} />
                             {item.label}
                         </Link>
                     );
@@ -175,26 +175,26 @@ export const AppLayout = ({ children, className }: AppLayoutProps) => {
                                 key={item.path}
                                 to={item.path}
                                 className={cn(
-                                    "flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-colors",
+                                    "flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-semibold transition-all duration-300",
                                     isActive
-                                        ? "bg-primary/10 text-primary"
-                                        : "text-muted-foreground hover:bg-muted hover:text-foreground"
+                                        ? "bg-white/10 text-white border border-white/10 shadow-lg"
+                                        : "text-white/60 hover:bg-white/5 hover:text-white"
                                 )}
                                 onClick={() => setOpen(false)}
                             >
-                                <item.icon className={cn("w-5 h-5", isActive ? "text-primary" : "text-muted-foreground")} />
+                                <item.icon className={cn("w-5 h-5", isActive ? "text-primary" : "text-white/40")} />
                                 {item.label}
                             </Link>
                         );
                     })}
 
-                    {/* Botão Sair - Agora parte do fluxo normal, não fixo no rodapé para evitar sumir */}
+                    {/* Botão Sair - Premium Style */}
                     <button
                         onClick={() => {
                             setOpen(false);
                             signOut();
                         }}
-                        className="flex items-center gap-3 px-4 py-3 w-full rounded-xl text-sm font-medium text-destructive hover:bg-destructive/10 transition-colors mt-2"
+                        className="flex items-center gap-3 px-4 py-3 w-full rounded-xl text-sm font-semibold text-impulse hover:bg-impulse/10 transition-all mt-4 border border-transparent hover:border-impulse/20"
                     >
                         <LogOut className="w-5 h-5" />
                         Sair
@@ -206,18 +206,25 @@ export const AppLayout = ({ children, className }: AppLayoutProps) => {
 
     return (
         <div
-            className="min-h-screen bg-background flex"
+            className="min-h-screen bg-background flex relative overflow-hidden"
             onTouchStart={handleTouchStart}
             onTouchMove={handleTouchMove}
             onTouchEnd={handleTouchEnd}
         >
-            {/* Desktop Sidebar (hidden on mobile) */}
-            <aside className="hidden lg:block w-64 border-r border-border bg-card fixed h-full z-30">
+            {/* Premium Background Blurs for Desktop Experience */}
+            <div className="fixed inset-0 pointer-events-none overflow-hidden -z-10 hidden lg:block">
+                <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-primary/10 rounded-full blur-[120px] animate-pulse" />
+                <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-essential/10 rounded-full blur-[120px] animate-pulse" style={{ animationDelay: '2s' }} />
+                <div className="absolute top-[20%] right-[10%] w-[20%] h-[20%] bg-obligation/5 rounded-full blur-[80px]" />
+            </div>
+
+            {/* Desktop Sidebar (Elite Glass Version) */}
+            <aside className="hidden lg:block w-72 border-r border-white/10 bg-card/40 backdrop-blur-xl fixed h-full z-30 shadow-2xl">
                 <SidebarContent />
             </aside>
 
             {/* Main Content Area */}
-            <div className="flex-1 lg:pl-64 flex flex-col min-h-screen relative w-full overflow-hidden">
+            <div className="flex-1 lg:pl-72 flex flex-col min-h-screen relative w-full overflow-hidden">
                 {/* Mobile Header (Sidebar Trigger) */}
                 <header className="lg:hidden px-4 pt-safe-top sticky top-0 bg-background/80 backdrop-blur-xl z-20 grid grid-cols-3 items-center h-16 border-b border-border/50 transition-all shadow-sm">
                     {/* Left: Menu Trigger */}
