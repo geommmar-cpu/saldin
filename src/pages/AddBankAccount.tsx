@@ -111,7 +111,7 @@ export const AddBankAccount = () => {
                   setBankKey(bank.key);
                   setCustomBankName("");
                 }}
-                className="flex flex-col items-center gap-2 min-w-[72px] snap-center"
+                className="flex flex-col items-center gap-2 min-w-[72px] snap-center shrink-0"
               >
                 <div className={cn(
                   "w-14 h-14 rounded-full flex items-center justify-center transition-all border-2 shadow-sm",
@@ -141,7 +141,7 @@ export const AddBankAccount = () => {
             <motion.button
               whileTap={{ scale: 0.95 }}
               onClick={() => setBankKey("outros")}
-              className="flex flex-col items-center gap-2 min-w-[72px] snap-center"
+              className="flex flex-col items-center gap-2 min-w-[72px] snap-center shrink-0"
             >
               <div className={cn(
                 "w-14 h-14 rounded-full flex items-center justify-center transition-all border-2 shadow-sm bg-muted",

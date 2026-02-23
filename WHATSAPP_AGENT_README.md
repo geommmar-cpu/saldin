@@ -37,18 +37,14 @@
 
 **Nome:** `whatsapp-webhook`  
 **URL:** `https://vmkhqtuqgvtcapwmxtov.supabase.co/functions/v1/whatsapp-webhook`  
-**verify_jwt:** `false` (webhook público para Evolution API)
+**verify_jwt:** `false` (webhook público para Meta API)
 
 #### Arquivos:
-4. **`index.ts`** - Orquestrador principal
-   - **Deduplicação Robusta:**
-     - **Hardware ID:** Bloqueio via `message_id` único do WhatsApp no banco.
-     - **Janela de Tempo:** Bloqueio via `dedup_key` (Telefone + Hash do Conteúdo + Minuto).
-   - **Extrato Blindado:** Consultas diretas ao banco (sem dependência de helpers frágeis).
-   - Recebe webhooks da Evolution API
-   - Valida e autentica usuário pelo telefone
-   - Processa texto/áudio/imagem
-   - Envia resposta formatada via WhatsApp
+1. **`index.ts`** - Orquestrador principal (Focado em Meta Cloud API)
+   - Recebe webhooks da Meta API
+   - Valida e autentica usuário pelo telefone (E.164)
+   - Processa texto/áudio/imagem via OpenAI (GPT-4o & Whisper)
+   - Envia resposta formatada e premium via WhatsApp
 
 2. **`ai-service.ts`** - Análise de IA (Claude)
    - Extrai intenção financeira (receita/gasto)
@@ -98,32 +94,20 @@ supabase secrets set EVOLUTION_API_KEY=your_key
 
 ## 📲 PRÓXIMOS PASSOS
 
-### **1. Configurar a Evolution API**
+### **1. Configurar a Meta Cloud API**
 
-#### a) Criar uma instância do WhatsApp
-```bash
-POST https://sua-evolution-api.com/instance/create
-{
-  "instanceName": "saldin-bot",
-  "qrcode": true
-}
-```
+#### a) No Painel Meta for Developers:
+- Crie um App do tipo "Business"
+- Adicione o produto "WhatsApp"
+- Em "Configurações de Webhook", aponte para a URL da sua Edge Function:
+  `https://vmkhqtuqgvtcapwmxtov.supabase.co/functions/v1/whatsapp-webhook`
+- Configure o **Verify Token** (Padrão: `saldin123` ou sua secret `META_VERIFY_TOKEN`)
+- Ative os campos de Webhook: `messages`
 
-#### b) Conectar o WhatsApp
-- Escanear o QR Code gerado
-- Vincular o número do bot
-
-#### c) Configurar o Webhook
-```bash
-POST https://sua-evolution-api.com/webhook/set/saldin-bot
-{
-  "url": "https://vmkhqtuqgvtcapwmxtov.supabase.co/functions/v1/whatsapp-webhook",
-  "webhook_by_events": false,
-  "events": [
-    "MESSAGES_UPSERT"
-  ]
-}
-```
+#### b) Variáveis de Ambiente no Supabase:
+- `META_ACCESS_TOKEN`: Token de acesso permanente
+- `META_PHONE_NUMBER_ID`: ID do número de telefone no painel Meta
+- `META_VERIFY_TOKEN`: Token de verificação (precisa bater com o painel)
 
 ---
 

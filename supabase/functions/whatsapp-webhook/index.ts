@@ -21,45 +21,34 @@ async function sendWhatsApp(to: string, text: string): Promise<void> {
         return;
     }
 
-    // 🇧🇷 Estratégia de "Tiro Duplo" para o Brasil em modo Sandbox
-    let targets = [to];
-    if (to.startsWith("55")) {
-        const clean = to.replace(/\D/g, "");
-        if (clean.length === 12) { // Sem o 9
-            targets.push("55" + clean.substring(2, 4) + "9" + clean.substring(4));
-        } else if (clean.length === 13) { // Com o 9
-            targets.push("55" + clean.substring(2, 4) + clean.substring(5));
-        }
-    }
+    // No modo Sandbox, enviar para o número exato que a Meta nos forneceu via Webhook.
+    // Isso evita o erro 131030 e garante que a mensagem chegue no chat correto.
+    console.log(`📤 Sending Meta API to ${to}...`);
+    try {
+        const url = `https://graph.facebook.com/v19.0/${META_PHONE_NUMBER_ID}/messages`;
+        const resp = await fetch(url, {
+            method: "POST",
+            headers: {
+                "Authorization": `Bearer ${META_ACCESS_TOKEN}`,
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+                messaging_product: "whatsapp",
+                recipient_type: "individual",
+                to: to,
+                type: "text",
+                text: { body: text }
+            })
+        });
 
-    for (const target of [...new Set(targets)]) {
-        console.log(`📤 Sending Meta API to ${target}...`);
-        try {
-            const url = `https://graph.facebook.com/v19.0/${META_PHONE_NUMBER_ID}/messages`;
-            const resp = await fetch(url, {
-                method: "POST",
-                headers: {
-                    "Authorization": `Bearer ${META_ACCESS_TOKEN}`,
-                    "Content-Type": "application/json"
-                },
-                body: JSON.stringify({
-                    messaging_product: "whatsapp",
-                    recipient_type: "individual",
-                    to: target,
-                    type: "text",
-                    text: { body: text.replace(/[*_~`]/g, "") }
-                })
-            });
-
-            const data = await resp.json();
-            if (!resp.ok) {
-                console.error(`❌ Meta API Error for ${target} (${resp.status}):`, JSON.stringify(data));
-            } else {
-                console.log(`✅ WhatsApp sent to ${target}:`, JSON.stringify(data));
-            }
-        } catch (e) {
-            console.error(`❌ Failed to send to ${target}:`, e);
+        const data = await resp.json();
+        if (!resp.ok) {
+            console.error(`❌ Meta API Error for ${to} (${resp.status}):`, JSON.stringify(data));
+        } else {
+            console.log(`✅ WhatsApp sent to ${to}:`, JSON.stringify(data));
         }
+    } catch (e) {
+        console.error(`❌ Failed to send to ${to}:`, e);
     }
 }
 
@@ -159,18 +148,21 @@ Deno.serve(async (req: Request) => {
 
         const payload = await req.json();
 
-        // Check if valid Meta payload
+        // 1. Meta API Extraction (Strict)
         const entry = payload.entry?.[0];
         const changes = entry?.changes?.[0];
         const value = changes?.value;
         const message = value?.messages?.[0];
 
         if (!message) {
-            return new Response("No message to process", { status: 200 }); // Ack status updates
+            // Check for statuses (sent, delivered, read) to avoid unnecessary processing
+            if (value?.statuses?.[0]) {
+                return new Response("Status update acknowledged", { status: 200 });
+            }
+            return new Response("No message to process", { status: 200 });
         }
 
-        // Extract basic data
-        const remoteJid = message.from; // Phone number (no @s.whatsapp.net suffix usually)
+        const remoteJid = message.from;
         const messageId = message.id;
         const messageType = message.type;
         const contactName = value?.contacts?.[0]?.profile?.name || "Usuário";
@@ -180,65 +172,53 @@ Deno.serve(async (req: Request) => {
         // Mark as read immediately (UX)
         await markMessageAsRead(messageId);
 
-        // Log to DB
-        const { data: logData, error: logError } = await supabaseAdmin
-            .from("whatsapp_logs")
-            .insert({
-                phone_number: remoteJid,
-                message_content: JSON.stringify(message),
-                message_type: messageType,
-                processed: false,
-                message_id: messageId,
-                dedup_key: null
-            })
-            .select()
-            .single();
-
-        if (logError && logError.code === "23505") {
-            console.log("🔁 Duplicate message blocked:", messageId);
-            return new Response("Duplicate", { status: 200 }); // Ack to stop retries
-        }
-        if (logData) logId = logData.id;
-
-        // 3. User Lookup
-        // Meta sends "554799..." (raw number). We need to match with our DB.
-        // We will try exact match first, then variations (9 digit).
-
-        let userId = "";
-        let phoneToSend = remoteJid;
-
-        // Construct variations for lookup
+        // 2. User Lookup (Handling Brazil 9th digit variations)
         let variations = [remoteJid];
-        // If BR number (55)
         if (remoteJid.startsWith("55") && remoteJid.length >= 10) {
             const ddd = remoteJid.substring(2, 4);
             const body = remoteJid.substring(4);
-
-            if (body.length === 9) { // Has 9th digit
-                variations.push("55" + ddd + body.substring(1)); // Remove 9
-            } else if (body.length === 8) { // No 9th digit
-                variations.push("55" + ddd + "9" + body); // Add 9
-            }
+            if (body.length === 9) variations.push("55" + ddd + body.substring(1));
+            else if (body.length === 8) variations.push("55" + ddd + "9" + body);
         }
 
         const { data: userLink, error: userError } = await supabaseAdmin
             .from("whatsapp_users")
-            .select("user_id, is_verified, phone_number")
+            .select("user_id, is_verified, phone_number, id")
             .in("phone_number", variations)
             .eq("is_verified", true)
             .limit(1)
             .maybeSingle();
 
+        // Log incoming message with associated user_id if possible
+        const { data: logData, error: logError } = await supabaseAdmin
+            .from("whatsapp_logs")
+            .insert({
+                phone_number: remoteJid,
+                whatsapp_user_id: userLink?.id || null,
+                message_content: JSON.stringify(message),
+                message_type: messageType,
+                processed: false,
+                message_id: messageId
+            })
+            .select()
+            .single();
+
+        if (logError && logError.code === "23505") {
+            return new Response("Duplicate", { status: 200 });
+        }
+        if (logData) logId = logData.id;
+
         if (userError || !userLink) {
             console.warn("❌ Unverified user:", remoteJid);
             if (logId) await supabaseAdmin.from("whatsapp_logs").update({ processed: true, error_message: "Unverified" }).eq("id", logId);
-            await sendWhatsApp(phoneToSend, "❌ Olá! Parece que seu número não está identificado. Vincule seu WhatsApp no app Saldin (Configurações > WhatsApp).");
+            await sendWhatsApp(remoteJid, "❌ Olá! Este número não está vinculado a uma conta Saldin. Ative o WhatsApp Agent nas configurações do aplicativo.");
             return new Response("Unauthorized", { status: 200 });
         }
 
-        userId = userLink.user_id;
+        const userId = userLink.user_id;
+        const phoneToSend = remoteJid;
 
-        // 4. Content Extraction
+        // 3. Content Extraction
         let textToAnalyze = "";
         let intent: any = null;
 
@@ -247,7 +227,6 @@ Deno.serve(async (req: Request) => {
         }
         else if (messageType === "audio") {
             const mediaId = message.audio?.id;
-            console.log("🎤 Audio ID:", mediaId);
             if (mediaId) {
                 const buffer = await downloadMedia(mediaId);
                 if (buffer) {
@@ -255,7 +234,7 @@ Deno.serve(async (req: Request) => {
                         textToAnalyze = await transcribeAudio(buffer, message.audio?.mime_type);
                     } catch (err) {
                         console.error("Transcription error:", err);
-                        await sendWhatsApp(phoneToSend, "❌ Erro ao transcrever seu áudio. Tente falar mais claro ou enviar por texto.");
+                        await sendWhatsApp(phoneToSend, "❌ Erro ao processar o áudio.");
                         return new Response("Audio Error", { status: 200 });
                     }
                 }
@@ -263,63 +242,65 @@ Deno.serve(async (req: Request) => {
         }
         else if (messageType === "image") {
             const mediaId = message.image?.id;
-            console.log("📸 Image ID:", mediaId);
             if (mediaId) {
                 const buffer = await downloadMedia(mediaId);
                 if (buffer) {
                     try {
                         intent = await processImage(buffer);
-                        console.log("📸 Vision Intent:", intent);
                     } catch (err) {
                         console.error("Vision error:", err);
-                        await sendWhatsApp(phoneToSend, "❌ Erro ao analisar a imagem. Tente enviar uma foto mais nítida do comprovante.");
+                        await sendWhatsApp(phoneToSend, "❌ Erro ao ler a imagem do comprovante.");
                         return new Response("Vision Error", { status: 200 });
                     }
                 }
             }
         }
 
-
-        // 5. Command & Edit Flow
+        // 4. Command & Edit Flow
         if (textToAnalyze) {
-            textToAnalyze = textToAnalyze.trim();
+            const cleanText = textToAnalyze.trim();
+            const normalizedCmd = cleanText.toLowerCase().replace(/[^\w\s]/gi, ''); // Remove emojis/punctuation for check
 
-            // Check Edit Flow State
-            const editResult = await processEditStep(userId, textToAnalyze);
+            // 1. Check Edit/Conversation State First
+            const editResult = await processEditStep(userId, cleanText);
             if (editResult.success) {
                 await sendWhatsApp(phoneToSend, editResult.message);
                 if (logId) await supabaseAdmin.from("whatsapp_logs").update({ processed: true }).eq("id", logId);
                 return new Response("Edit Step", { status: 200 });
             }
 
-            // Normalize Commands
-            const normalizedCmd = textToAnalyze.toLowerCase().replace(/[*_~`]/g, "");
+            // 2. Robust Greeting check (Strict equals or starts with)
+            const greetings = ['oi', 'ola', 'olá', 'teste', 'bom dia', 'boa tarde', 'boa noite', 'hey', 'hello'];
+            if (greetings.includes(normalizedCmd) || greetings.some(g => normalizedCmd.startsWith(g + " "))) {
+                console.log("👋 Greeting detected, skipping AI.");
+                await sendWhatsApp(phoneToSend, "Olá! 👋 Sou o assistente do Saldin. \nComo posso ajudar? Você pode registrar um gasto (ex: 'Almoço 35.00'), uma receita ou pedir seu 'saldo' ou 'extrato'.");
+                if (logId) await supabaseAdmin.from("whatsapp_logs").update({ processed: true }).eq("id", logId);
+                return new Response("Greeting", { status: 200 });
+            }
 
-            // Excluir
-            const deleteMatch = normalizedCmd.match(/excluir.*?(txn-\d{8}-[a-z0-9]{6})/i);
+            // 3. Normal Commands (Delete, Saldo, Extrato)
+            const deleteMatch = cleanText.match(/excluir.*?(txn-\d{8}-[a-z0-9]{6})/i);
             if (deleteMatch) {
                 const res = await handleExcluirCommand(userId, deleteMatch[1].toUpperCase().trim());
                 await sendWhatsApp(phoneToSend, res.message);
                 return new Response("Delete", { status: 200 });
             }
 
-            // Saldo
-            if (normalizedCmd.match(/^\/?saldo$/)) {
+            if (normalizedCmd === 'saldo' || normalizedCmd === '/saldo') {
                 const balance = await getBalance(userId);
                 const formatted = new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(balance);
                 await sendWhatsApp(phoneToSend, `💰 Seu saldo atual é: *${formatted}*`);
                 return new Response("Saldo", { status: 200 });
             }
 
-            // Extrato
-            if (normalizedCmd.match(/^\/?extrato$/)) {
+            if (normalizedCmd === 'extrato' || normalizedCmd === '/extrato') {
                 await sendExtrato(userId, phoneToSend);
                 return new Response("Extrato", { status: 200 });
             }
         }
 
-        // 6. AI Analysis
-        if (textToAnalyze) {
+        // 5. AI Analysis
+        if (textToAnalyze && !intent) {
             console.log("🤖 Analyzing:", textToAnalyze);
             intent = await analyzeText(textToAnalyze);
             console.log("📊 Result:", intent);
@@ -329,11 +310,16 @@ Deno.serve(async (req: Request) => {
             await supabaseAdmin.from("whatsapp_logs").update({ processing_result: intent, processed: intent.status === "ok" }).eq("id", logId);
         }
 
-        if (!intent) return new Response("Ok", { status: 200 });
+        if (!intent || intent.tipo === 'duvida') {
+            if (textToAnalyze) {
+                await sendWhatsApp(phoneToSend, "🤔 Não consegui identificar a operação. Se for um registro, use o formato: 'Valor Descrição' (ex: '50 cafezinho').");
+            }
+            return new Response("Ok", { status: 200 });
+        }
 
-        // 7. Execute Intent
+        // 6. Execute Intent
         if (intent.status === "incompleto") {
-            await sendWhatsApp(phoneToSend, "🤔 Não entendi. Pode detalhar? (Ex: 'Gastei 50 no almoço')");
+            await sendWhatsApp(phoneToSend, "🤔 Pode me dar mais detalhes? Preciso do valor e uma breve descrição.");
             return new Response("Incomplete", { status: 200 });
         }
 
@@ -349,7 +335,7 @@ Deno.serve(async (req: Request) => {
             return new Response("OK", { status: 200 });
         }
 
-        // Transaction
+        // Transaction Registration
         const categoryId = await getCategoryId(userId, intent.categoria_sugerida, intent.tipo === "receita" ? "income" : "expense");
         const targetAccountId = await getPreferredAccount(userId, intent.metodo_pagamento);
         const tCode = generateTransactionCode();
@@ -364,6 +350,7 @@ Deno.serve(async (req: Request) => {
             transactionCode: tCode
         });
 
+        // Use the formatted record message
         const msg = formatPremiumMessage({
             id: result.id,
             description: result.description,
@@ -373,7 +360,12 @@ Deno.serve(async (req: Request) => {
             account: result.is_credit_card ? "Cartão de Crédito" : (result.dest_name || "Conta"),
             type: intent.tipo === 'receita' ? 'income' : 'expense',
             transaction_code: tCode
-        }, { previous_balance: 0, new_balance: result.new_balance, invoice: 0, available_balance: result.new_balance });
+        }, {
+            previous_balance: result.new_balance - (intent.tipo === 'receita' ? intent.valor : -intent.valor),
+            new_balance: result.new_balance,
+            invoice: 0,
+            available_balance: result.new_balance
+        });
 
         await sendWhatsApp(phoneToSend, msg);
 

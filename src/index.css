@@ -295,8 +295,8 @@
   /* Fix for horizontal scrolling on mobile */
   .overflow-x-auto {
     -webkit-overflow-scrolling: touch;
-    touch-action: pan-y;
-    /* Allow vertical page scroll, but let component handle horizontal */
+    touch-action: pan-x;
+    /* Corrected to allow horizontal scroll */
   }
 
   .no-scrollbar::-webkit-scrollbar {
