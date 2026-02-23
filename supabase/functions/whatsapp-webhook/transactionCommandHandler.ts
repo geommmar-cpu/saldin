@@ -30,58 +30,41 @@ export function formatPremiumMessage(transaction: Transaction, balanceData: any,
     const formattedAmount = new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(Number(amount));
     const dateFormatted = new Date(date).toLocaleDateString('pt-BR');
 
-    // Layout Blocks - Using simpler separators for higher delivery success
-    const sep = "--------------------------------";
+    let header = isDelete ? "TRANSAÇÃO REMOVIDA" : (type === 'income' ? "RECEITA REGISTRADA" : "TRANSAÇÃO CONFIRMADA");
 
-    let header = "";
-    if (isDelete) {
-        header = `*🗑️ TRANSAÇÃO REMOVIDA*`;
-    } else {
-        header = type === 'income' ? `*✅ RECEITA REGISTRADA*` : `*✅ TRANSAÇÃO CONFIRMADA*`;
-    }
-
-    const detailsBlock = `
-*🧾 DETALHES*
-ID: \`${transaction_code}\`
+    const details = `
+ID: ${transaction_code}
 Tipo: ${type === 'income' ? 'Receita' : 'Gasto'}
-Valor: *${formattedAmount}*
+Valor: ${formattedAmount}
 Categoria: ${category || 'Não definida'}
 Descrição: ${description}
 Origem: ${account || 'Padrão'}
 Data: ${dateFormatted}
 `.trim();
 
-    const impactBlock = `
-*💰 IMPACTO FINANCEIRO*
-${sep}
+    const impact = `
 Saldo anterior: R$ ${formatCurrency(balanceData.previous_balance)}
-Novo saldo: *R$ ${formatCurrency(balanceData.new_balance)}*
-${balanceData.invoice ? `Fatura atual: R$ ${formatCurrency(balanceData.invoice)}\n` : ''}
-Saldo disponível: R$ ${formatCurrency(balanceData.available_balance)}
+Novo saldo: R$ ${formatCurrency(balanceData.new_balance)}
+Balance total: R$ ${formatCurrency(balanceData.available_balance)}
 `.trim();
 
-    const actionsBlock = `
-*⚙️ AÇÕES*
-${sep}
-Para excluir: \`excluir ${transaction_code}\`
-Para editar: \`editar ${transaction_code}\`
+    const actions = `
+Para excluir: excluir ${transaction_code}
+Para editar: editar ${transaction_code}
 `.trim();
 
     return `
-${sep}
-${header}
-${sep}
+*${header}*
 
-${detailsBlock}
+${details}
 
-${sep}
-${impactBlock}
+*RESUMO FINANCEIRO*
+${impact}
 
-${sep}
-${actionsBlock}
+*AÇÕES*
+${actions}
 
-${sep}
-_Saldin • Seu controle financeiro_
+Saldin - Seu controle financeiro
 `.trim();
 }
 
