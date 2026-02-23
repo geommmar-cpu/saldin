@@ -50,99 +50,109 @@ export const CreditCardsCarousel = ({ cards, installments, selectedMonth }: Cred
                     <motion.div
                         key={card.id}
                         onClick={() => navigate(`/cards/${card.id}`)}
-                        className="snap-center shrink-0 w-[280px] sm:w-[320px] h-[180px] rounded-[1.5rem] p-5 relative overflow-hidden shadow-lg first:ml-0 last:mr-4 group border-0 animate-in fade-in slide-in-from-right-4 duration-500 fill-mode-backwards cursor-pointer transition-transform hover:scale-[1.02] active:scale-95"
+                        className="snap-center shrink-0 w-[280px] sm:w-[320px] h-[190px] rounded-[1.8rem] p-6 relative overflow-hidden shadow-large group cursor-pointer transition-all duration-500 border border-white/10"
                         style={{
                             animationDelay: `${index * 100}ms`,
                         }}
-
                     >
-                        {/* Card Dynamic Background */}
+                        {/* Card Dynamic Background with Texture */}
                         <div className={cn(
-                            "absolute inset-0 bg-gradient-to-br opacity-100 transition-all duration-300",
+                            "absolute inset-0 bg-gradient-to-br transition-all duration-700 group-hover:scale-110",
                             card.bankTheme.gradient || "from-slate-700 to-slate-900"
                         )} />
 
-                        {/* Overlay for texture/readability */}
-                        <div className="absolute inset-0 bg-black/10" />
-                        <div className="absolute -right-10 -top-10 w-40 h-40 bg-white/10 rounded-full blur-3xl pointer-events-none" />
+                        {/* Subtle Noise/Texture Overlay */}
+                        <div className="absolute inset-0 opacity-[0.03] pointer-events-none bg-[url('https://www.transparenttextures.com/patterns/carbon-fibre.png')]" />
 
-                        {/* Content */}
+                        {/* Premium Gloss Reflection */}
+                        <div className="absolute -inset-full bg-gradient-to-tr from-transparent via-white/5 to-transparent rotate-45 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-1000 ease-in-out" />
+
+                        {/* Inner Shadow for Depth */}
+                        <div className="absolute inset-0 shadow-[inset_0_0_40px_rgba(0,0,0,0.2)]" />
+
+                        {/* Content Container */}
                         <div className="relative z-10 flex flex-col h-full justify-between text-white">
-                            {/* Header */}
+                            {/* Top row: Bank Logo & Wireless Icon */}
                             <div className="flex justify-between items-start">
                                 <div className="flex items-center gap-3">
-                                    <BankLogo
-                                        bankName={card.card_name}
-                                        className="w-10 h-10 border-white/20 bg-white/20 backdrop-blur-md"
-                                        iconClassName="text-white"
-                                        size="md"
-                                    />
-
-                                    <div>
-                                        <p className="text-sm font-bold tracking-wide drop-shadow-sm">
-                                            {card.card_name}
-                                        </p>
-                                        <div className="flex items-center gap-1.5 opacity-80">
-                                            <CreditCard className="w-3 h-3" />
-                                            <span className="text-[10px] font-mono tracking-wider">•••• {card.last_four_digits || "0000"}</span>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                {/* Brand Flag Placeholder */}
-                                <div className="opacity-90">
-                                    {card.card_brand && (
-                                        <span className="font-bold text-xs italic tracking-wider uppercase opacity-80">{card.card_brand}</span>
-                                    )}
-                                    {card.id === defaultCardId && (
-                                        <div className="flex items-center gap-1 bg-white/20 backdrop-blur-md rounded-full px-2 py-0.5 border border-white/10 ml-2">
-                                            <PhoneIcon className="w-2.5 h-2.5 text-white" />
-                                            <span className="text-[7px] font-bold uppercase tracking-widest text-white">Principal</span>
-                                        </div>
-                                    )}
-                                </div>
-                            </div>
-
-                            {/* Invoice Amount */}
-                            <div className="mt-2">
-                                <p className="text-[10px] uppercase tracking-wider opacity-70 mb-0.5">Fatura Atual</p>
-                                <div className="flex items-baseline gap-1">
-                                    <span className="text-sm font-medium opacity-80">R$</span>
-                                    <p className="font-sans text-3xl font-bold tracking-tight drop-shadow-md">
-                                        {formatCurrency(card.currentInvoice).replace("R$", "").trim()}
-                                    </p>
-                                </div>
-                            </div>
-
-                            {/* Footer: Due Date & Limit */}
-                            <div className="flex justify-between items-end mt-auto pt-2 border-t border-white/10">
-                                <div>
-                                    <p className="text-[10px] opacity-70 mb-1 flex items-center gap-1">
-                                        <Calendar className="w-3 h-3" />
-                                        Vence dia {card.due_day}
-                                    </p>
-                                </div>
-
-                                {/* Enhanced Limit Display */}
-                                <div className="text-right">
-                                    <div className="flex flex-col items-end">
-                                        <p className="text-[10px] opacity-70 mb-1">Limite Usado</p>
-                                        <p className="text-xs font-medium tracking-tight">
-                                            <span className="font-bold">{formatCurrency(card.currentInvoice)}</span>
-                                            <span className="opacity-60 mx-1">de</span>
-                                            <span>{formatCurrency(card.limit)}</span>
-                                        </p>
-                                    </div>
-                                    {/* Visual Progress Bar */}
-                                    <div className="h-1.5 w-24 bg-white/20 rounded-full overflow-hidden mt-1 ml-auto backdrop-blur-sm">
-                                        <div
-                                            className={cn(
-                                                "h-full rounded-full transition-all duration-500",
-                                                card.usage > 90 ? "bg-red-400" : "bg-white"
-                                            )}
-                                            style={{ width: `${Math.min(card.usage, 100)}%` }}
+                                    <div className="p-2 rounded-xl bg-white/20 backdrop-blur-md border border-white/30 shadow-soft">
+                                        <BankLogo
+                                            bankName={card.card_name}
+                                            className="w-8 h-8"
+                                            iconClassName="text-white"
+                                            size="md"
                                         />
                                     </div>
+                                    <div>
+                                        <p className="text-sm font-bold tracking-tight drop-shadow-md">
+                                            {card.card_name}
+                                        </p>
+                                        <p className="text-[9px] uppercase font-bold tracking-[0.1em] opacity-60">
+                                            {card.card_brand || "Crédito"}
+                                        </p>
+                                    </div>
+                                </div>
+
+                                <div className="flex flex-col items-end gap-2">
+                                    {/* Wireless Icon */}
+                                    <div className="opacity-40 rotate-90">
+                                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                                            <path d="M5 8a10 10 0 0 1 14 0" /><path d="M8.5 11.5a5 5 0 0 1 7 0" /><path d="M12 15a1 1 0 0 1 0 0" />
+                                        </svg>
+                                    </div>
+                                    {card.id === defaultCardId && (
+                                        <div className="flex items-center gap-1 bg-white/20 backdrop-blur-md rounded-full px-2 py-0.5 border border-white/10">
+                                            <PhoneIcon className="w-2.5 h-2.5 text-white" />
+                                            <span className="text-[7px] font-black uppercase tracking-widest">Main</span>
+                                        </div>
+                                    )}
+                                </div>
+                            </div>
+
+                            {/* Middle row: The metallic Chip */}
+                            <div className="mt-2 flex items-center justify-between">
+                                <div className="w-10 h-8 rounded-md bg-gradient-to-br from-yellow-200 via-yellow-400 to-yellow-600 relative overflow-hidden shadow-inner border border-yellow-700/30">
+                                    {/* Chip details lines */}
+                                    <div className="absolute inset-x-0 top-1/2 h-[1px] bg-black/20" />
+                                    <div className="absolute inset-y-0 left-1/3 w-[1px] bg-black/20" />
+                                    <div className="absolute inset-y-0 right-1/3 w-[1px] bg-black/20" />
+                                </div>
+
+                                {/* Last 4 digits in monospace premium style */}
+                                <div className="text-right">
+                                    <span className="text-[10px] font-mono tracking-[0.3em] opacity-60 mr-1">••••</span>
+                                    <span className="text-sm font-mono font-bold tracking-widest drop-shadow-lg">{card.last_four_digits || "0000"}</span>
+                                </div>
+                            </div>
+
+                            {/* Bottom row: Balance & Usage Bar */}
+                            <div className="mt-auto pt-3">
+                                <div className="flex justify-between items-end mb-2">
+                                    <div className="flex flex-col">
+                                        <p className="text-[8px] uppercase font-black tracking-widest opacity-60 mb-1">Fatura Atual</p>
+                                        <p className="text-2xl font-bold tracking-tight drop-shadow-md text-white">
+                                            {formatCurrency(card.currentInvoice)}
+                                        </p>
+                                    </div>
+                                    <div className="text-right pb-1">
+                                        <p className="text-[9px] font-bold opacity-80 mb-0.5">Vence {card.due_day}</p>
+                                        <p className="text-[8px] opacity-50 uppercase tracking-tighter">Limite: {formatCurrency(card.limit).split(',')[0]}</p>
+                                    </div>
+                                </div>
+
+                                {/* Visual Usage Bar with Glow */}
+                                <div className="h-1.5 w-full bg-black/20 rounded-full overflow-hidden backdrop-blur-sm border border-white/5">
+                                    <motion.div
+                                        initial={{ width: 0 }}
+                                        animate={{ width: `${Math.min(card.usage, 100)}%` }}
+                                        transition={{ duration: 1.2, ease: "easeOut" }}
+                                        className={cn(
+                                            "h-full rounded-full relative",
+                                            card.usage > 90 ? "bg-destructive shadow-[0_0_8px_rgba(239,68,68,0.5)]" : "bg-white/80 shadow-[0_0_8px_rgba(255,255,255,0.3)]"
+                                        )}
+                                    >
+                                        <div className="absolute inset-0 bg-gradient-to-r from-transparent to-white/20" />
+                                    </motion.div>
                                 </div>
                             </div>
                         </div>

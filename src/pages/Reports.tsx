@@ -1,5 +1,6 @@
 import { useState, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
+import { motion, AnimatePresence } from "framer-motion";
 import {
     BarChart,
     Bar,
@@ -185,127 +186,183 @@ export default function Reports() {
                 </div>
             </header>
 
-            <main className="p-5 space-y-6">
-                {/* Month Selector */}
-                <div className="flex items-center justify-between bg-card p-3 rounded-2xl border border-border/50 shadow-sm">
-                    <Button variant="ghost" size="icon" onClick={prevMonth}>
+            <main className="p-5 space-y-8 pt-4">
+                {/* Month Selector Premium */}
+                <div className="flex items-center justify-between glass p-2 rounded-2xl border border-white/20 shadow-medium">
+                    <Button variant="ghost" size="icon" onClick={prevMonth} className="rounded-xl hover:bg-white/10">
                         <ChevronLeft className="w-5 h-5" />
                     </Button>
                     <div className="flex flex-col items-center">
-                        <span className="text-sm font-medium uppercase tracking-wider text-muted-foreground">
-                            {format(selectedMonth, "MMMM", { locale: ptBR })}
+                        <span className="text-[10px] font-black uppercase tracking-[0.2em] text-primary mb-0.5">
+                            Referente a
                         </span>
-                        <span className="text-xs text-muted-foreground">{format(selectedMonth, "yyyy")}</span>
+                        <h3 className="text-sm font-bold capitalize">
+                            {format(selectedMonth, "MMMM", { locale: ptBR })} {format(selectedMonth, "yyyy")}
+                        </h3>
                     </div>
-                    <Button variant="ghost" size="icon" onClick={nextMonth}>
+                    <Button variant="ghost" size="icon" onClick={nextMonth} className="rounded-xl hover:bg-white/10">
                         <ChevronRight className="w-5 h-5" />
                     </Button>
                 </div>
 
-                {/* Total & Comparison */}
+                {/* Total & Comparison Premium */}
                 <FadeIn>
-                    <div className="grid grid-cols-1 gap-4">
-                        <div className="p-5 rounded-2xl bg-gradient-to-br from-primary/10 via-background to-background border border-primary/20 shadow-sm">
-                            <p className="text-xs font-medium text-muted-foreground uppercase tracking-widest mb-1">Gasto Total no Mês</p>
-                            <div className="flex items-end justify-between">
-                                <h2 className="text-3xl font-bold tracking-tighter">
+                    <div className="relative overflow-hidden p-8 rounded-[2.5rem] glass shadow-large border border-white/20 group">
+                        {/* Static Blurs (Matching BalanceHero) */}
+                        <div className="absolute -top-12 -right-12 w-48 h-48 bg-primary/10 rounded-full blur-[60px]" />
+
+                        <div className="relative">
+                            <p className="text-[10px] font-black text-muted-foreground/60 uppercase tracking-[0.2em] mb-2">Desembolso Mensal</p>
+                            <div className="flex items-baseline justify-between gap-4">
+                                <h2 className="text-4xl font-serif font-bold tracking-tight text-foreground truncate">
                                     {formatCurrency(reportData.reduce((acc, curr) => acc + curr.total, 0))}
                                 </h2>
+
                                 {comparison.totalPrev > 0 && (
                                     <div className={cn(
-                                        "flex items-center gap-1 px-2 py-1 rounded-full text-xs font-bold",
-                                        comparison.trend === "up" ? "text-impulse bg-impulse/10" : "text-essential bg-essential/10"
+                                        "shrink-0 flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-[10px] font-black uppercase tracking-tight shadow-sm border",
+                                        comparison.trend === "up"
+                                            ? "text-destructive bg-destructive/10 border-destructive/20"
+                                            : "text-essential bg-essential/10 border-essential/20"
                                     )}>
                                         {comparison.trend === "up" ? <TrendingUp className="w-3 h-3" /> : <TrendingDown className="w-3 h-3" />}
-                                        {Math.abs(comparison.diffPercent).toFixed(1)}% vs mês ant.
+                                        {Math.abs(comparison.diffPercent).toFixed(0)}%
                                     </div>
                                 )}
                             </div>
+
+                            {/* Visual Progress Bar - Relative to prev month */}
+                            {comparison.totalPrev > 0 && (
+                                <div className="mt-6">
+                                    <div className="h-1.5 w-full bg-white/10 rounded-full overflow-hidden">
+                                        <motion.div
+                                            initial={{ width: 0 }}
+                                            animate={{ width: `${Math.min((reportData.reduce((acc, curr) => acc + curr.total, 0) / (comparison.totalPrev || 1)) * 100, 100)}%` }}
+                                            className={cn(
+                                                "h-full rounded-full",
+                                                comparison.trend === "up" ? "bg-destructive" : "bg-essential"
+                                            )}
+                                        />
+                                    </div>
+                                    <p className="text-[9px] text-muted-foreground mt-2 font-medium">
+                                        Comparado a {formatCurrency(comparison.totalPrev)} do mês anterior
+                                    </p>
+                                </div>
+                            )}
                         </div>
                     </div>
                 </FadeIn>
 
-                {/* Pie Chart */}
+                {/* Pie Chart Premium */}
                 <FadeIn delay={0.1}>
-                    <div className="p-5 rounded-2xl bg-card border border-border shadow-sm">
-                        <div className="flex items-center gap-2 mb-6">
-                            <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center text-primary">
-                                <PieIcon className="w-4 h-4" />
+                    <div className="p-6 rounded-[2.5rem] bg-card/40 backdrop-blur-md border border-border/50 shadow-soft">
+                        <div className="flex items-center justify-between mb-8 px-1">
+                            <div className="flex items-center gap-3">
+                                <div className="w-10 h-10 rounded-2xl bg-primary/10 flex items-center justify-center text-primary border border-primary/20">
+                                    <PieIcon className="w-5 h-5" />
+                                </div>
+                                <h3 className="font-serif text-lg font-bold">Onde você gastou?</h3>
                             </div>
-                            <h3 className="font-serif text-lg font-semibold">Distribuição de Gastos</h3>
                         </div>
 
-                        <div className="h-[250px] w-full">
+                        <div className="h-[280px] w-full relative">
+                            {/* Center Summary for Donut */}
+                            <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none translate-y-[-10px]">
+                                <span className="text-[9px] font-black text-muted-foreground/60 uppercase tracking-widest">Total</span>
+                                <span className="text-xl font-serif font-bold tracking-tight">
+                                    {formatCurrency(reportData.reduce((acc, curr) => acc + curr.total, 0)).split(',')[0]}
+                                </span>
+                            </div>
+
                             <ResponsiveContainer width="100%" height="100%">
                                 <PieChart>
                                     <Pie
                                         data={reportData}
                                         cx="50%"
                                         cy="50%"
-                                        innerRadius={60}
-                                        outerRadius={80}
-                                        paddingAngle={5}
+                                        innerRadius={75}
+                                        outerRadius={95}
+                                        paddingAngle={8}
                                         dataKey="total"
+                                        stroke="none"
                                     >
                                         {reportData.map((entry, index) => (
-                                            <Cell key={`cell-${index}`} fill={entry.color || COLORS[index % COLORS.length]} />
+                                            <Cell
+                                                key={`cell-${index}`}
+                                                fill={entry.color || COLORS[index % COLORS.length]}
+                                                className="hover:opacity-80 transition-opacity cursor-pointer shadow-large"
+                                            />
                                         ))}
                                     </Pie>
                                     <Tooltip
                                         formatter={(value: number) => formatCurrency(value)}
-                                        contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 4px 12px rgba(0,0,0,0.1)' }}
+                                        contentStyle={{
+                                            backgroundColor: 'rgba(255,255,255,0.8)',
+                                            backdropFilter: 'blur(12px)',
+                                            borderRadius: '16px',
+                                            border: '1px solid rgba(255,255,255,0.2)',
+                                            boxShadow: '0 10px 30px rgba(0,0,0,0.1)',
+                                            padding: '12px'
+                                        }}
+                                        itemStyle={{ fontSize: '12px', fontWeight: 'bold' }}
                                     />
                                 </PieChart>
                             </ResponsiveContainer>
                         </div>
 
-                        <div className="grid grid-cols-2 gap-3 mt-4">
+                        {/* Top 4 Legend - Grid Style */}
+                        <div className="grid grid-cols-2 gap-4 mt-4 bg-muted/20 p-4 rounded-[1.5rem] border border-border/30">
                             {reportData.slice(0, 4).map((item, index) => (
-                                <div key={item.id} className="flex items-center gap-2">
-                                    <div className="w-2 h-2 rounded-full" style={{ backgroundColor: item.color || COLORS[index % COLORS.length] }} />
-                                    <span className="text-xs text-muted-foreground truncate flex-1">{item.name}</span>
-                                    <span className="text-xs font-bold">{item.percentage.toFixed(0)}%</span>
+                                <div key={item.id} className="flex items-center gap-2.5">
+                                    <div className="w-2.5 h-2.5 rounded-full shadow-sm" style={{ backgroundColor: item.color || COLORS[index % COLORS.length] }} />
+                                    <div className="min-w-0">
+                                        <p className="text-[10px] font-bold truncate leading-none mb-0.5">{item.name}</p>
+                                        <p className="text-[9px] text-muted-foreground font-medium">{item.percentage.toFixed(0)}% do mês</p>
+                                    </div>
                                 </div>
                             ))}
                         </div>
                     </div>
                 </FadeIn>
 
-                {/* Bar Chart */}
+                {/* Bar Chart Premium */}
                 <FadeIn delay={0.2}>
-                    <div className="p-5 rounded-2xl bg-card border border-border shadow-sm">
-                        <div className="flex items-center gap-2 mb-6">
-                            <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center text-primary">
-                                <BarChart3 className="w-4 h-4" />
+                    <div className="p-6 rounded-[2.5rem] bg-card/40 backdrop-blur-md border border-border/50 shadow-soft">
+                        <div className="flex items-center gap-3 mb-8 px-1">
+                            <div className="w-10 h-10 rounded-2xl bg-primary/10 flex items-center justify-center text-primary border border-primary/20">
+                                <BarChart3 className="w-5 h-5" />
                             </div>
-                            <h3 className="font-serif text-lg font-semibold">Maiores Gastos</h3>
+                            <h3 className="font-serif text-lg font-bold">Concentração de Despesas</h3>
                         </div>
 
-                        <div className="h-[300px] w-full">
+                        <div className="h-[280px] w-full">
                             <ResponsiveContainer width="100%" height="100%">
-                                <BarChart data={reportData.slice(0, 6)} layout="vertical" margin={{ left: -20, right: 30 }}>
-                                    <CartesianGrid strokeDasharray="3 3" horizontal={false} stroke="#E2E8F0" />
+                                <BarChart data={reportData.slice(0, 6)} layout="vertical" margin={{ left: -10, right: 20 }}>
                                     <XAxis type="number" hide />
                                     <YAxis
                                         dataKey="name"
                                         type="category"
                                         axisLine={false}
                                         tickLine={false}
-                                        tick={{ fontSize: 12, fontWeight: 500 }}
-                                        width={100}
+                                        tick={{ fontSize: 11, fontWeight: 700, fill: 'hsl(var(--muted-foreground))' }}
+                                        width={90}
                                     />
                                     <Tooltip
                                         formatter={(value: number) => formatCurrency(value)}
-                                        cursor={{ fill: 'transparent' }}
+                                        cursor={{ fill: 'rgba(0,0,0,0.03)' }}
+                                        contentStyle={{ borderRadius: '16px', border: 'none', boxShadow: '0 10px 30px rgba(0,0,0,0.1)' }}
                                     />
                                     <Bar
                                         dataKey="total"
-                                        radius={[0, 4, 4, 0]}
-                                        fill="#3B82F6"
-                                        barSize={20}
+                                        radius={[0, 8, 8, 0]}
+                                        barSize={16}
                                     >
                                         {reportData.map((entry, index) => (
-                                            <Cell key={`bar-${index}`} fill={entry.color || COLORS[index % COLORS.length]} />
+                                            <Cell
+                                                key={`bar-${index}`}
+                                                fill={entry.color || COLORS[index % COLORS.length]}
+                                                className="shadow-inner"
+                                            />
                                         ))}
                                     </Bar>
                                 </BarChart>
@@ -314,24 +371,38 @@ export default function Reports() {
                     </div>
                 </FadeIn>
 
-                {/* List Details */}
+                {/* List Details Premium */}
                 <FadeIn delay={0.3}>
-                    <div className="space-y-3">
-                        <h3 className="px-1 text-sm font-semibold text-muted-foreground uppercase tracking-wider">Detalhamento</h3>
-                        <div className="space-y-2">
+                    <div className="space-y-4">
+                        <h3 className="px-2 text-[10px] font-black text-muted-foreground/60 uppercase tracking-[0.2em]">Raio-X Mensal</h3>
+                        <div className="space-y-3 pb-8">
                             {reportData.map((item) => (
-                                <div key={item.id} className="p-4 rounded-xl bg-card border border-border/50 flex items-center justify-between">
-                                    <div className="flex items-center gap-3">
-                                        <div className="w-2 h-8 rounded-full" style={{ backgroundColor: item.color }} />
+                                <motion.div
+                                    key={item.id}
+                                    whileTap={{ scale: 0.98 }}
+                                    className="group p-4 rounded-2xl bg-card border border-border/40 flex items-center justify-between shadow-soft hover:shadow-medium transition-all"
+                                >
+                                    <div className="flex items-center gap-4">
+                                        <div className="w-1.5 h-10 rounded-full" style={{ backgroundColor: item.color }} />
                                         <div>
-                                            <p className="text-sm font-bold">{item.name}</p>
-                                            <p className="text-[10px] text-muted-foreground uppercase tracking-tighter">
-                                                {item.percentage.toFixed(1)}% do total
-                                            </p>
+                                            <p className="text-sm font-bold group-hover:text-primary transition-colors">{item.name}</p>
+                                            <div className="flex items-center gap-2">
+                                                <span className="text-[10px] font-bold text-muted-foreground bg-muted/50 px-1.5 rounded uppercase tracking-tighter">
+                                                    {item.percentage.toFixed(0)}% do mês
+                                                </span>
+                                            </div>
                                         </div>
                                     </div>
-                                    <p className="font-bold">{formatCurrency(item.total)}</p>
-                                </div>
+                                    <div className="text-right">
+                                        <p className="font-bold text-sm tracking-tight">{formatCurrency(item.total)}</p>
+                                        <div className="h-0.5 w-full bg-muted rounded-full mt-1 overflow-hidden">
+                                            <div
+                                                className="h-full bg-current opacity-20"
+                                                style={{ width: `${item.percentage}%`, color: item.color }}
+                                            />
+                                        </div>
+                                    </div>
+                                </motion.div>
                             ))}
                         </div>
                     </div>

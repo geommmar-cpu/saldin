@@ -17,42 +17,36 @@ const supabaseAdmin = createClient(SUPABASE_URL, SERVICE_ROLE_KEY);
 
 async function sendWhatsApp(to: string, text: string): Promise<void> {
     if (!META_ACCESS_TOKEN || !META_PHONE_NUMBER_ID) return;
-    console.log(`📤 Sending Meta API to ${to}...`);
+
+    console.log(`📤 [v25.0-simple] Sending Text to ${to}...`);
     try {
-        const url = `https://graph.facebook.com/v19.0/${META_PHONE_NUMBER_ID}/messages`;
+        const url = `https://graph.facebook.com/v25.0/${META_PHONE_NUMBER_ID}/messages`;
         const resp = await fetch(url, {
             method: "POST",
-            headers: {
-                "Authorization": `Bearer ${META_ACCESS_TOKEN}`,
-                "Content-Type": "application/json"
-            },
+            headers: { "Authorization": `Bearer ${META_ACCESS_TOKEN}`, "Content-Type": "application/json" },
             body: JSON.stringify({
                 messaging_product: "whatsapp",
-                recipient_type: "individual",
                 to: to,
                 type: "text",
                 text: { body: text }
             })
         });
         const data = await resp.json();
-        console.log(`✅ WhatsApp Response:`, JSON.stringify(data));
-    } catch (e) { console.error(`❌ Failed to send:`, e); }
+        console.log(`✅ Response for ${to}:`, JSON.stringify(data));
+    } catch (e) { console.error(`❌ Failed:`, e); }
 }
 
 async function sendWhatsAppTemplate(to: string, templateName: string = "hello_world"): Promise<void> {
     if (!META_ACCESS_TOKEN || !META_PHONE_NUMBER_ID) return;
-    console.log(`📤 Sending Meta TEMPLATE (${templateName}) to ${to}...`);
+
+    console.log(`📤 [v25.0-simple] Sending Template to ${to}...`);
     try {
-        const url = `https://graph.facebook.com/v19.0/${META_PHONE_NUMBER_ID}/messages`;
+        const url = `https://graph.facebook.com/v25.0/${META_PHONE_NUMBER_ID}/messages`;
         const resp = await fetch(url, {
             method: "POST",
-            headers: {
-                "Authorization": `Bearer ${META_ACCESS_TOKEN}`,
-                "Content-Type": "application/json"
-            },
+            headers: { "Authorization": `Bearer ${META_ACCESS_TOKEN}`, "Content-Type": "application/json" },
             body: JSON.stringify({
                 messaging_product: "whatsapp",
-                recipient_type: "individual",
                 to: to,
                 type: "template",
                 template: {
@@ -62,8 +56,8 @@ async function sendWhatsAppTemplate(to: string, templateName: string = "hello_wo
             })
         });
         const data = await resp.json();
-        console.log(`✅ Template Response:`, JSON.stringify(data));
-    } catch (e) { console.error(`❌ Template Failed:`, e); }
+        console.log(`✅ Template Response for ${to}:`, JSON.stringify(data));
+    } catch (e) { console.error(`❌ Failed:`, e); }
 }
 
 async function markMessageAsRead(messageId: string): Promise<void> {
@@ -161,6 +155,7 @@ Deno.serve(async (req: Request) => {
         if (req.method !== "POST") return new Response("Method Not Allowed", { status: 405 });
 
         const payload = await req.json();
+        console.log("📥 New Payload Received:", JSON.stringify(payload));
 
         // 1. Meta API Extraction (Strict)
         const entry = payload.entry?.[0];
@@ -169,8 +164,13 @@ Deno.serve(async (req: Request) => {
         const message = value?.messages?.[0];
 
         if (!message) {
-            // Check for statuses (sent, delivered, read) to avoid unnecessary processing
             if (value?.statuses?.[0]) {
+                const status = value.statuses[0];
+                if (status.status === "failed") {
+                    console.error(`❌ Meta Delivery FAILED for ${status.recipient_id}:`, JSON.stringify(status.errors || status));
+                } else {
+                    console.log(`ℹ️ Status Update: ${status.status} for ${status.recipient_id}`);
+                }
                 return new Response("Status update acknowledged", { status: 200 });
             }
             return new Response("No message to process", { status: 200 });
@@ -183,8 +183,8 @@ Deno.serve(async (req: Request) => {
 
         console.log(`🚀 [META] Msg from ${remoteJid} (${contactName}) - Type: ${messageType}`);
 
-        // Mark as read immediately (UX)
-        await markMessageAsRead(messageId);
+        // Mark as read (Non-blocking to avoid timeouts)
+        markMessageAsRead(messageId).catch(e => console.error("Read Mark Error:", e));
 
         // 2. User Lookup (Handling Brazil 9th digit variations)
         let variations = [remoteJid];
@@ -195,6 +195,8 @@ Deno.serve(async (req: Request) => {
             else if (body.length === 8) variations.push("55" + ddd + "9" + body);
         }
 
+        console.log("🔍 Looking for user variations:", variations);
+
         const { data: userLink, error: userError } = await supabaseAdmin
             .from("whatsapp_users")
             .select("user_id, is_verified, phone_number, id")
@@ -203,7 +205,9 @@ Deno.serve(async (req: Request) => {
             .limit(1)
             .maybeSingle();
 
-        // Log incoming message with associated user_id if possible
+        if (userError) console.error("❌ DB User Lookup Error:", userError);
+
+        // 3. Log incoming message
         const { data: logData, error: logError } = await supabaseAdmin
             .from("whatsapp_logs")
             .insert({
@@ -230,7 +234,7 @@ Deno.serve(async (req: Request) => {
         }
 
         const userId = userLink.user_id;
-        const phoneToSend = userLink.phone_number; // USAR O NÚMERO VERIFICADO NO CADASTRO (com o 9, se houver)
+        const phoneToSend = remoteJid; // IMPORTANTE: Responder EXATAMENTE para o número de onde veio (remoteJid), não variações.
 
         console.log(`🎯 Target phone for reply: ${phoneToSend}`);
 

@@ -124,9 +124,10 @@ export const GoalsSummary = ({ goals, totalSaved, totalTarget }: GoalsSummaryPro
 
       <div className="relative w-full">
         <div
-          className="flex gap-4 overflow-x-auto pb-6 px-4 -mx-4 snap-x snap-mandatory no-scrollbar touch-pan-x"
+          className="flex gap-4 overflow-x-auto pb-6 pt-2 px-4 -mx-4 snap-x snap-mandatory scroll-smooth"
           style={{
             WebkitOverflowScrolling: 'touch',
+            scrollbarWidth: 'auto',
           }}
         >
           {activeGoals.map((goal) => {
@@ -139,63 +140,77 @@ export const GoalsSummary = ({ goals, totalSaved, totalTarget }: GoalsSummaryPro
               <motion.div
                 key={goal.id}
                 onClick={() => navigate(`/goals/${goal.id}`)}
-                className="snap-center shrink-0 w-[160px] h-[200px] rounded-[1.5rem] p-4 relative overflow-hidden shadow-lg group cursor-pointer border-0 active:scale-95 transition-transform"
+                className="snap-center shrink-0 w-[170px] h-[220px] rounded-[2rem] p-5 relative overflow-hidden shadow-large group cursor-pointer border border-white/10 active:scale-95 transition-transform"
               >
-
-                {/* Real Image Background */}
+                {/* Image background with zoom effect on hover */}
                 <div
-                  className="absolute inset-0 bg-cover bg-center transition-transform duration-700 group-hover:scale-110"
+                  className="absolute inset-0 bg-cover bg-center transition-transform duration-1000 group-hover:scale-125"
                   style={{ backgroundImage: `url(${theme.image})` }}
                 />
 
-                {/* Color Overlay for Readability */}
+                {/* Layered Overlays for depth */}
                 <div className={cn(
-                  "absolute inset-0 transition-opacity duration-300",
+                  "absolute inset-0 opacity-40 transition-opacity duration-500 group-hover:opacity-20",
                   theme.overlay
                 )} />
+                <div className="absolute inset-0 bg-gradient-to-t from-black via-black/20 to-transparent opacity-80" />
 
-                {/* Gradient Bottom Overlay for Text Legibility */}
-                <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent" />
+                {/* Glow highlight on top */}
+                <div className="absolute top-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-white/40 to-transparent" />
 
                 {/* Content */}
-                <div className="relative z-10 flex flex-col h-full justify-between text-white">
-
-                  {/* Header Icon */}
-                  <div className="w-8 h-8 rounded-full bg-white/20 backdrop-blur-md flex items-center justify-center border border-white/10 shadow-sm">
-                    <Icon className="w-4 h-4 text-white" />
+                <div className="relative z-10 flex flex-col h-full justify-between">
+                  {/* Category/Icon Badge */}
+                  <div className="flex items-center justify-between">
+                    <div className="w-9 h-9 rounded-xl bg-white/15 backdrop-blur-xl flex items-center justify-center border border-white/20 shadow-soft group-hover:rotate-12 transition-transform duration-500">
+                      <Icon className="w-4 h-4 text-white" />
+                    </div>
+                    {isCompleted && (
+                      <div className="bg-essential px-2 py-0.5 rounded-full text-[8px] font-black uppercase tracking-tighter shadow-medium">
+                        Concluída
+                      </div>
+                    )}
                   </div>
 
-                  {/* Main Info */}
-                  <div className="mt-2">
-                    <p className="font-bold text-lg leading-tight line-clamp-2 drop-shadow-md mb-1 text-white">
+                  {/* Goal Name */}
+                  <div className="mt-4">
+                    <p className="font-bold text-lg leading-tight text-white drop-shadow-lg group-hover:translate-x-1 transition-transform">
                       {goal.name}
                     </p>
-                    {/* Optional: Days left or Status */}
                   </div>
 
-                  {/* Footer: Progress */}
-                  <div className="mt-auto pt-3">
-                    <div className="flex justify-between items-end mb-1">
-                      <span className="text-[10px] text-white/90 font-medium">
+                  {/* Footer with Glowing Progress */}
+                  <div className="mt-auto">
+                    <div className="flex justify-between items-end mb-2 px-0.5">
+                      <span className="text-[10px] text-white font-bold opacity-100">
                         {Math.round(progress)}%
                       </span>
-                      <span className="text-[10px] text-white/90 font-medium">
+                      <span className="text-[10px] text-white/70 font-medium">
                         {formatCurrency(goal.target_amount)}
                       </span>
                     </div>
 
-                    {/* Progress Bar */}
-                    <div className="h-1.5 w-full bg-white/20 rounded-full overflow-hidden backdrop-blur-md">
-                      <div
-                        className="h-full bg-primary rounded-full transition-all duration-500 shadow-[0_0_10px_rgba(255,255,255,0.5)]"
-                        style={{ width: `${Math.min(progress, 100)}%` }}
-                      />
+                    {/* Progress Bar Container */}
+                    <div className="h-2 w-full bg-white/15 rounded-full overflow-hidden backdrop-blur-md border border-white/5">
+                      <motion.div
+                        initial={{ width: 0 }}
+                        animate={{ width: `${Math.min(progress, 100)}%` }}
+                        transition={{ duration: 1.5, ease: "easeOut" }}
+                        className="relative h-full bg-primary rounded-full"
+                      >
+                        {/* Glowing tip */}
+                        <div className="absolute top-0 right-0 bottom-0 w-2 bg-white blur-[4px] opacity-60" />
+                        <div className="absolute inset-0 bg-gradient-to-r from-transparent to-white/30" />
+                      </motion.div>
                     </div>
-                    <p className="text-[10px] mt-1 text-white/80 truncate font-medium">
-                      Guardado: {formatCurrency(goal.current_amount)}
-                    </p>
-                  </div>
 
+                    <div className="mt-2 flex items-center gap-1.5 overflow-hidden">
+                      <PiggyBank className="w-3 h-3 text-white/50 shrink-0" />
+                      <p className="text-[9px] text-white/60 truncate font-semibold">
+                        {formatCurrency(goal.current_amount)} salvos
+                      </p>
+                    </div>
+                  </div>
                 </div>
               </motion.div>
             );

@@ -257,37 +257,56 @@ export const Onboarding = () => {
 
             {step.id === "concept" && (
               <div className="flex-1 flex flex-col">
-                <div className="text-center mb-6">
-                  <h1 className="font-serif text-3xl font-semibold mb-2">Como funciona</h1>
-                  <p className="text-muted-foreground">Dois ambientes, um propósito</p>
+                <div className="text-center mb-10">
+                  <motion.h1
+                    initial={{ opacity: 0, y: -10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    className="font-serif text-4xl font-semibold mb-3"
+                  >
+                    Como funciona
+                  </motion.h1>
+                  <p className="text-muted-foreground/80">Dois ambientes, um único propósito</p>
                 </div>
-                <div className="space-y-4 mb-6">
+                <div className="space-y-6 mb-8">
                   {conceptCards.map((card, index) => (
                     <motion.div
                       key={card.title}
-                      initial={{ opacity: 0, y: 20 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      transition={{ delay: index * 0.15 }}
-                      className="p-5 rounded-xl bg-card border border-border shadow-soft"
+                      initial={{ opacity: 0, x: index % 2 === 0 ? -20 : 20 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      transition={{ delay: index * 0.2, type: "spring", damping: 20 }}
+                      className="glass p-6 rounded-[2rem] shadow-medium relative overflow-hidden group"
                     >
-                      <div className="flex items-start gap-4">
+                      {/* Subthe glow behind icon */}
+                      <div
+                        className="absolute -top-4 -left-4 w-24 h-24 blur-3xl opacity-20 transition-opacity group-hover:opacity-40"
+                        style={{ backgroundColor: `hsl(var(--${card.color}))` }}
+                      />
+
+                      <div className="flex items-start gap-5 relative z-10">
                         <div
-                          className="w-12 h-12 rounded-full flex items-center justify-center flex-shrink-0"
-                          style={{ backgroundColor: `hsl(var(--${card.color}) / 0.15)` }}
+                          className="w-14 h-14 rounded-2xl flex items-center justify-center flex-shrink-0 shadow-soft border border-white/20"
+                          style={{
+                            background: `linear-gradient(135deg, hsl(var(--${card.color}) / 0.2), hsl(var(--${card.color}) / 0.05))`
+                          }}
                         >
-                          <card.icon className="w-6 h-6" style={{ color: `hsl(var(--${card.color}))` }} />
+                          <card.icon className="w-7 h-7" style={{ color: `hsl(var(--${card.color}))` }} />
                         </div>
                         <div>
-                          <h3 className="font-semibold text-lg mb-1">{card.title}</h3>
-                          <p className="text-muted-foreground text-sm leading-relaxed">{card.description}</p>
+                          <h3 className="font-bold text-xl mb-1.5 tracking-tight">{card.title}</h3>
+                          <p className="text-muted-foreground/90 text-sm leading-relaxed">{card.description}</p>
                         </div>
                       </div>
                     </motion.div>
                   ))}
                 </div>
-                <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.4 }} className="text-center">
-                  <p className="text-lg font-medium text-primary italic">
-                    "Você fala com o Saldin. Você encara a verdade no app."
+                <motion.div
+                  initial={{ opacity: 0, scale: 0.9 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  transition={{ delay: 0.6 }}
+                  className="text-center p-6 rounded-2xl bg-primary/5 border border-primary/10"
+                >
+                  <p className="text-lg font-medium text-primary italic leading-tight">
+                    "Fale com o Saldin no WhatsApp.<br />Encare a verdade no app."
                   </p>
                 </motion.div>
               </div>
@@ -295,20 +314,18 @@ export const Onboarding = () => {
 
             {step.id === "bank-account" && (
               <div className="flex-1 flex flex-col">
-                <div className="text-center mb-6">
+                <div className="text-center mb-8">
                   <motion.div
-                    initial={{ scale: 0.8, opacity: 0 }}
-                    animate={{ scale: 1, opacity: 1 }}
-                    className="w-20 h-20 rounded-full bg-primary/10 flex items-center justify-center mb-6 mx-auto"
+                    initial={{ scale: 0.8, opacity: 0, rotate: -10 }}
+                    animate={{ scale: 1, opacity: 1, rotate: 0 }}
+                    transition={{ type: "spring", damping: 15 }}
+                    className="w-24 h-24 rounded-[2rem] bg-gradient-to-br from-primary/20 to-accent/10 flex items-center justify-center mb-6 mx-auto border border-primary/20 shadow-soft"
                   >
-                    <Landmark className="w-10 h-10 text-primary" />
+                    <Landmark className="w-12 h-12 text-primary" />
                   </motion.div>
-                  <h1 className="font-serif text-3xl font-semibold mb-2">Suas contas bancárias</h1>
-                  <p className="text-muted-foreground max-w-xs mx-auto">
-                    Cadastre suas contas para acompanhar seu saldo real. O saldo começa com o valor que você informar.
-                  </p>
-                  <p className="text-xs text-muted-foreground mt-2 max-w-xs mx-auto">
-                    Você pode adicionar sua renda e outras informações depois.
+                  <h1 className="font-serif text-3xl font-bold mb-3">Onde está seu dinheiro?</h1>
+                  <p className="text-muted-foreground max-w-xs mx-auto text-sm leading-relaxed">
+                    Cadastre suas contas para começarmos a organizar sua liberdade financeira.
                   </p>
                 </div>
 
@@ -318,72 +335,78 @@ export const Onboarding = () => {
                       {bankAccounts.map((acc, accIndex) => (
                         <motion.div
                           key={acc.id}
-                          initial={{ opacity: 0, y: 10 }}
+                          initial={{ opacity: 0, y: 15 }}
                           animate={{ opacity: 1, y: 0 }}
-                          className="p-4 rounded-xl border border-border bg-card"
+                          className="p-5 rounded-[2rem] border border-border/50 bg-card/40 backdrop-blur-sm shadow-soft overflow-hidden"
                         >
                           {/* Account header */}
-                          <div className="flex items-center justify-between mb-3">
-                            <p className="text-sm font-medium text-muted-foreground">
-                              Conta {accIndex + 1}
-                            </p>
+                          <div className="flex items-center justify-between mb-5">
+                            <div className="flex items-center gap-2">
+                              <span className="w-6 h-6 rounded-full bg-primary/10 flex items-center justify-center text-[10px] font-bold text-primary">
+                                {accIndex + 1}
+                              </span>
+                              <p className="text-xs font-bold uppercase tracking-widest text-muted-foreground">
+                                Conta Bancária
+                              </p>
+                            </div>
                             {bankAccounts.length > 1 && (
                               <Button
                                 variant="ghost"
                                 size="icon"
-                                className="h-7 w-7"
+                                className="h-8 w-8 rounded-full hover:bg-destructive/10"
                                 onClick={() => removeBankAccount(acc.id)}
                               >
-                                <Trash2 className="w-3.5 h-3.5 text-destructive" />
+                                <Trash2 className="w-4 h-4 text-destructive" />
                               </Button>
                             )}
                           </div>
 
                           {/* Bank selector */}
-                          <div className="mb-4">
-                            <label className="text-xs text-muted-foreground mb-2 block">Banco</label>
-                            <div className="grid grid-cols-4 gap-1.5">
+                          <div className="mb-6">
+                            <label className="text-[10px] uppercase font-bold tracking-widest text-muted-foreground mb-3 block">Selecione o Banco</label>
+                            <div className="grid grid-cols-4 gap-2">
                               {BANK_LIST.filter((b) => b.key !== "outros").map((bank) => (
                                 <motion.button
                                   key={bank.key}
-                                  whileTap={{ scale: 0.95 }}
+                                  whileTap={{ scale: 0.9 }}
                                   onClick={() => updateBankAccount(acc.id, { bankKey: bank.key, customBankName: "" })}
                                   className={cn(
-                                    "flex flex-col items-center gap-2 p-1 rounded-xl border-2 transition-all",
+                                    "group flex flex-col items-center gap-2 p-2 rounded-2xl border-2 transition-all duration-300",
                                     acc.bankKey === bank.key
-                                      ? "border-primary bg-primary/5 shadow-inner"
-                                      : "border-transparent bg-secondary/30 hover:bg-secondary"
+                                      ? "border-primary bg-primary/10 shadow-[0_0_15px_rgba(var(--primary),0.2)]"
+                                      : "border-transparent bg-secondary/20 hover:bg-secondary/40"
                                   )}
+                                  style={acc.bankKey === bank.key ? { borderColor: bank.color, backgroundColor: bank.color + '10' } : {}}
                                 >
                                   <BankLogo
                                     bankName={bank.name}
                                     color={bank.color}
                                     size="md"
-                                    className={cn("transition-transform", acc.bankKey === bank.key && "scale-110")}
+                                    className={cn("transition-transform duration-500", acc.bankKey === bank.key && "scale-110 rotate-3")}
                                   />
                                   <span className={cn(
-                                    "text-[10px] font-bold truncate w-full text-center tracking-tight",
-                                    acc.bankKey === bank.key ? "text-primary" : "text-muted-foreground"
+                                    "text-[9px] font-bold truncate w-full text-center tracking-tight transition-colors",
+                                    acc.bankKey === bank.key ? "text-foreground" : "text-muted-foreground"
                                   )}>
                                     {bank.name}
                                   </span>
                                 </motion.button>
                               ))}
                               <motion.button
-                                whileTap={{ scale: 0.95 }}
+                                whileTap={{ scale: 0.9 }}
                                 onClick={() => updateBankAccount(acc.id, { bankKey: "outros" })}
                                 className={cn(
-                                  "flex flex-col items-center gap-2 p-1 rounded-xl border-2 transition-all",
+                                  "flex flex-col items-center gap-2 p-2 rounded-2xl border-2 transition-all",
                                   acc.bankKey === "outros"
-                                    ? "border-primary bg-primary/5 shadow-inner"
-                                    : "border-transparent bg-secondary/30 hover:bg-secondary"
+                                    ? "border-primary bg-primary/10 shadow-inner"
+                                    : "border-transparent bg-secondary/20 hover:bg-secondary/40"
                                 )}
                               >
-                                <div className="w-10 h-10 rounded-full flex items-center justify-center bg-muted/50 border border-muted-foreground/10">
+                                <div className="w-10 h-10 rounded-full flex items-center justify-center bg-muted/50 border border-muted-foreground/10 group-hover:rotate-12 transition-transform">
                                   <Plus className="w-5 h-5 text-muted-foreground" />
                                 </div>
                                 <span className={cn(
-                                  "text-[10px] font-bold text-center tracking-tight",
+                                  "text-[9px] font-bold text-center tracking-tight",
                                   acc.bankKey === "outros" ? "text-primary" : "text-muted-foreground"
                                 )}>
                                   Outro
@@ -400,15 +423,15 @@ export const Onboarding = () => {
                                 initial={{ height: 0, opacity: 0 }}
                                 animate={{ height: "auto", opacity: 1 }}
                                 exit={{ height: 0, opacity: 0 }}
-                                className="mb-4 overflow-hidden"
+                                className="mb-6 overflow-hidden"
                               >
-                                <label className="text-xs text-muted-foreground mb-1.5 block">Nome do banco</label>
+                                <label className="text-xs font-bold text-muted-foreground mb-2 block">Nome da Instituição</label>
                                 <Input
-                                  placeholder="Ex: Banco Safra, BTG..."
+                                  placeholder="Digite o nome do banco..."
                                   value={acc.customBankName}
                                   onChange={(e) => updateBankAccount(acc.id, { customBankName: e.target.value })}
                                   maxLength={40}
-                                  className="h-10"
+                                  className="h-12 rounded-xl bg-background/50"
                                 />
                               </motion.div>
                             )}
@@ -417,42 +440,46 @@ export const Onboarding = () => {
                           {/* Account type + balance */}
                           {acc.bankKey && (
                             <motion.div
-                              initial={{ opacity: 0 }}
-                              animate={{ opacity: 1 }}
-                              className="space-y-3"
+                              initial={{ opacity: 0, y: 10 }}
+                              animate={{ opacity: 1, y: 0 }}
+                              className="space-y-5"
                             >
                               <div>
-                                <label className="text-xs text-muted-foreground mb-2 block">Tipo de conta</label>
-                                <div className="grid grid-cols-3 gap-1.5">
+                                <label className="text-[10px] uppercase font-bold tracking-widest text-muted-foreground mb-3 block">Tipo de conta</label>
+                                <div className="grid grid-cols-3 gap-2">
                                   {accountTypeOptions.map((opt) => (
                                     <motion.button
                                       key={opt.value}
                                       whileTap={{ scale: 0.95 }}
                                       onClick={() => updateBankAccount(acc.id, { accountType: opt.value })}
                                       className={cn(
-                                        "p-2 rounded-lg border-2 text-center transition-all",
+                                        "p-2.5 rounded-xl border-2 text-[11px] font-bold uppercase tracking-tight transition-all",
                                         acc.accountType === opt.value
-                                          ? "border-primary bg-primary/10 text-primary font-medium"
-                                          : "border-border bg-card hover:bg-secondary"
+                                          ? "border-primary bg-primary/10 text-primary"
+                                          : "border-border/40 bg-background/30 hover:bg-secondary/50 text-muted-foreground"
                                       )}
                                     >
-                                      <span className="text-xs">{opt.label}</span>
+                                      {opt.label}
                                     </motion.button>
                                   ))}
                                 </div>
                               </div>
 
                               <div>
-                                <label className="text-xs text-muted-foreground mb-1.5 block">
-                                  Saldo inicial (opcional)
+                                <label className="text-[10px] uppercase font-bold tracking-widest text-muted-foreground mb-3 block">
+                                  Qual seu saldo atual? (R$)
                                 </label>
                                 <CurrencyInput
                                   value={acc.initialBalance}
                                   onChange={(val) => updateBankAccount(acc.id, { initialBalance: val })}
+                                  className="text-lg font-bold h-14 rounded-2xl bg-background/50 border-border/50 focus:border-primary shadow-inner"
                                 />
-                                <p className="text-[10px] text-muted-foreground mt-1">
-                                  Você pode informar o saldo agora ou adicionar depois.
-                                </p>
+                                <div className="flex items-center gap-2 mt-2 px-1">
+                                  <div className="w-1 h-1 rounded-full bg-primary" />
+                                  <p className="text-[10px] text-muted-foreground">
+                                    Este valor será o ponto de partida do seu saldo real.
+                                  </p>
+                                </div>
                               </div>
                             </motion.div>
                           )}

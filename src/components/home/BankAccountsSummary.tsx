@@ -155,11 +155,18 @@ export const BankAccountsSummary = () => {
 
       <div className="relative w-full">
         <div
-          className="flex gap-4 overflow-x-auto pb-6 px-4 -mx-4 snap-x snap-mandatory no-scrollbar touch-pan-x"
-          style={{ WebkitOverflowScrolling: 'touch' }}
+          className="flex gap-4 overflow-x-auto pb-6 pt-2 px-4 -mx-4 snap-x snap-mandatory scroll-smooth"
+          style={{
+            WebkitOverflowScrolling: 'touch',
+            scrollbarWidth: 'auto', // Ensure scrollbar is visible if system/browser allows
+          }}
         >
           {displayAccounts.map((account) => (
-            <div key={account.id} onClick={() => handleAccountClick(account)}>
+            <div
+              key={account.id}
+              onClick={() => handleAccountClick(account)}
+              className="snap-center shrink-0"
+            >
               <AccountCard
                 account={account}
                 isDefault={account.id === defaultIncomeId || account.id === defaultExpenseId}

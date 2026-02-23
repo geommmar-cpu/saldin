@@ -68,77 +68,118 @@ export const BalanceHero = ({ balance, cryptoTotal = 0, cryptoEnabled = false }:
 
   return (
     <motion.div
-      className="relative overflow-hidden p-7 rounded-[2.5rem] bg-card/60 backdrop-blur-xl border border-white/10 shadow-large"
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
+      className="relative overflow-hidden p-8 rounded-[3rem] glass shadow-large border border-white/20 group"
+      initial={{ opacity: 0, scale: 0.95 }}
+      animate={{ opacity: 1, scale: 1 }}
+      transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
     >
-      {/* Decorative background blurs - Premium touch */}
-      <div className="absolute -top-16 -right-16 w-40 h-40 bg-primary/10 rounded-full blur-[60px]" />
-      <div className="absolute -bottom-16 -left-16 w-32 h-32 bg-accent/10 rounded-full blur-[50px]" />
+      {/* Dynamic Animated Background Blurs */}
+      <motion.div
+        animate={{
+          scale: [1, 1.2, 1],
+          x: [0, 20, 0],
+          y: [0, -20, 0]
+        }}
+        transition={{ duration: 8, repeat: Infinity, ease: "easeInOut" }}
+        className={cn(
+          "absolute -top-20 -right-20 w-64 h-64 rounded-full blur-[80px] opacity-30",
+          balance.saldoLivre >= 0 ? "bg-essential" : "bg-destructive"
+        )}
+      />
+      <motion.div
+        animate={{
+          scale: [1, 1.3, 1],
+          x: [0, -30, 0],
+          y: [0, 30, 0]
+        }}
+        transition={{ duration: 10, repeat: Infinity, ease: "easeInOut", delay: 1 }}
+        className="absolute -bottom-24 -left-20 w-56 h-56 bg-accent/20 rounded-full blur-[70px] opacity-20"
+      />
 
-      {/* Top label */}
-      <div className="relative flex items-center justify-between mb-6">
-        <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-2xl bg-primary/10 flex items-center justify-center border border-primary/20">
-            <Coins className="w-5 h-5 text-primary" />
+      {/* Top Section: Label & Badge */}
+      <div className="relative flex items-center justify-between mb-8">
+        <div className="flex items-center gap-4">
+          <div className="w-12 h-12 rounded-2xl bg-white/10 backdrop-blur-md flex items-center justify-center border border-white/20 shadow-soft group-hover:scale-110 transition-transform duration-500">
+            <Coins className="w-6 h-6 text-primary" />
           </div>
           <div>
-            <span className="text-xs font-bold uppercase tracking-widest text-muted-foreground/80 block">Total Geral</span>
-            <div className="flex items-center gap-1">
-              <span className="text-sm font-medium text-foreground">Disponível em Bancos</span>
+            <span className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground/60 block mb-0.5">Saldo Disponível</span>
+            <div className="flex items-center gap-1.5">
+              <h4 className="text-sm font-bold text-foreground/80 tracking-tight">Recursos em conta</h4>
               <Tooltip>
                 <TooltipTrigger>
-                  <Info className="w-3.5 h-3.5 text-muted-foreground/40" />
+                  <div className="w-4 h-4 rounded-full bg-muted/50 flex items-center justify-center hover:bg-muted transition-colors">
+                    <Info className="w-2.5 h-2.5 text-muted-foreground" />
+                  </div>
                 </TooltipTrigger>
-                <TooltipContent className="max-w-[240px] border-primary/10 shadow-medium p-3">
-                  <p className="text-xs font-medium mb-1">Saldo Acumulado</p>
-                  <p className="text-[10px] text-muted-foreground leading-relaxed">
-                    Este valor representa todo o dinheiro que você tem hoje em suas contas, somando economias de meses anteriores.<br /><br />
-                    Ele desconta os compromissos deste mês, mas não deve ser confundido com o "Resultado do Mês" (que considera apenas entradas e saídas do mês atual).
+                <TooltipContent className="max-w-[260px] glass p-4 rounded-2xl shadow-large border-primary/20">
+                  <p className="text-xs font-bold text-primary mb-2 uppercase tracking-wider">Como calculamos?</p>
+                  <p className="text-[11px] text-muted-foreground leading-relaxed">
+                    Este é o seu **Saldo Livre**. Somamos tudo o que você tem e subtraímos o que já está comprometido com contas e dívidas este mês.
                   </p>
                 </TooltipContent>
               </Tooltip>
             </div>
           </div>
         </div>
-      </div>
 
-      {/* Main value with AnimatedAmount and Playfair Display */}
-      <div className="relative mb-6">
-        <AnimatedAmount
-          value={balance.saldoLivre}
+        {/* Status indicator pill */}
+        <motion.div
+          initial={{ opacity: 0, x: 20 }}
+          animate={{ opacity: 1, x: 0 }}
           className={cn(
-            "text-4xl sm:text-5xl font-serif font-bold tracking-tight block tabular-nums",
-            balance.saldoLivre >= 0 ? "text-foreground" : "text-impulse"
+            "px-4 py-1.5 rounded-full text-[9px] font-black uppercase tracking-widest border transition-colors duration-500 shadow-sm",
+            balance.saldoLivre >= 0
+              ? "bg-essential/10 text-essential border-essential/20"
+              : "bg-destructive/10 text-destructive border-destructive/20"
           )}
-        />
+        >
+          {balance.saldoLivre >= 0 ? "Consistente" : "Alerta de Fluxo"}
+        </motion.div>
+      </div>
 
-        {/* Status Badge - Refined */}
-        <div className={cn(
-          "inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-[10px] font-bold uppercase tracking-wider mt-4 border",
-          balance.saldoLivre >= 0
-            ? "bg-essential/5 text-essential border-essential/20"
-            : "bg-impulse/5 text-impulse border-impulse/20"
-        )}>
-          {balance.saldoLivre >= 0 ? <TrendingUp className="w-3 h-3" /> : <AlertTriangle className="w-3 h-3" />}
-          {balance.saldoLivre >= 0 ? "Saúde Financeira OK" : "Atenção Crítica"}
+      {/* Main Balance Display */}
+      <div className="relative mb-8 text-center sm:text-left">
+        <div className="relative inline-block">
+          <AnimatedAmount
+            value={balance.saldoLivre}
+            className={cn(
+              "text-5xl sm:text-7xl font-serif font-bold tracking-tight block tabular-nums leading-none",
+              balance.saldoLivre >= 0 ? "text-foreground" : "text-destructive"
+            )}
+          />
+          {/* Subtle underline gradient */}
+          <div className={cn(
+            "h-1.5 w-1/2 rounded-full mt-3 opacity-30 blur-sm mx-auto sm:mx-0",
+            balance.saldoLivre >= 0 ? "bg-essential" : "bg-destructive"
+          )} />
         </div>
       </div>
 
-      {/* Expand toggle */}
-      <button
-        onClick={() => setExpanded(!expanded)}
-        className="group flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-all active:scale-95"
-      >
-        <span className="font-bold uppercase tracking-widest text-[10px]">Ver detalhes</span>
-        <div className={cn(
-          "p-1 rounded-full bg-secondary transition-transform duration-500",
-          expanded ? "rotate-180" : ""
-        )}>
-          <ChevronDown className="w-3.5 h-3.5" />
+      {/* Action Footer */}
+      <div className="flex items-center justify-between pt-2">
+        <button
+          onClick={() => setExpanded(!expanded)}
+          className="group/btn flex items-center gap-3 px-5 py-2.5 rounded-2xl bg-secondary/40 hover:bg-secondary/60 border border-border/40 transition-all active:scale-95"
+        >
+          <span className="font-bold uppercase tracking-[0.15em] text-[10px] text-muted-foreground group-hover/btn:text-foreground transition-colors">
+            {expanded ? "Ocultar Composição" : "Análise de Saldo"}
+          </span>
+          <div className={cn(
+            "p-1 rounded-full bg-background/50 shadow-soft transition-transform duration-500",
+            expanded ? "rotate-180" : ""
+          )}>
+            <ChevronDown className="w-3.5 h-3.5" />
+          </div>
+        </button>
+
+        {/* Quick stat icon */}
+        <div className="flex gap-2">
+          <div className="w-9 h-9 rounded-xl bg-essential/5 border border-essential/10 flex items-center justify-center">
+            <TrendingUp className={cn("w-4 h-4", balance.saldoLivre >= 0 ? "text-essential" : "text-muted-foreground/30")} />
+          </div>
         </div>
-      </button>
+      </div>
 
       {/* Expandable details */}
       <AnimatePresence>
