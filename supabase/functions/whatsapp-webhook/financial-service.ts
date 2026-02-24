@@ -163,46 +163,76 @@ export async function processTransaction(data: TransactionData) {
 
 
 export async function getBalance(userId: string): Promise<number> {
-    // 1. Get Sum of all active bank accounts (Saldo Bruto)
-    const { data: banks } = await supabaseAdmin
-        .from('bank_accounts')
-        .select('current_balance')
-        .eq('user_id', userId)
-        .eq('active', true);
-
-    const bankTotal = banks?.reduce((acc: number, b: any) => acc + Number(b.current_balance), 0) || 0;
-
-    // 2. Get Pending Commitments for the current month (Saldo Comprometido)
     const now = new Date();
     const monthStart = new Date(now.getFullYear(), now.getMonth(), 1).toISOString();
     const monthEnd = new Date(now.getFullYear(), now.getMonth() + 1, 0, 23, 59, 59).toISOString();
+    const refMonthStr = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-01`;
 
+    // 1. Bank Total
+    const { data: banks } = await supabaseAdmin.from('bank_accounts').select('current_balance').eq('user_id', userId).eq('active', true);
+    const bankTotal = banks?.reduce((acc: number, b: any) => acc + Number(b.current_balance), 0) || 0;
+
+    // 2. Unlinked Transactions (Confirmed but not in a bank account yet)
+    // Incomes
+    const { data: unlinkedIncomes } = await supabaseAdmin.from('incomes')
+        .select('amount')
+        .eq('user_id', userId)
+        .is('bank_account_id', null)
+        .or('status.eq.received,status.eq.confirmed')
+        .gte('date', monthStart)
+        .lte('date', monthEnd);
+    const confirmedUnlinkedIncome = unlinkedIncomes?.reduce((acc: number, i: any) => acc + Number(i.amount), 0) || 0;
+
+    // Expenses
+    const { data: unlinkedExpenses } = await supabaseAdmin.from('expenses')
+        .select('amount')
+        .eq('user_id', userId)
+        .is('bank_account_id', null)
+        .eq('status', 'confirmed')
+        .gte('date', monthStart)
+        .lte('date', monthEnd);
+    const confirmedUnlinkedExpenses = unlinkedExpenses?.reduce((acc: number, e: any) => acc + Number(e.amount), 0) || 0;
+
+    const saldoBruto = bankTotal + confirmedUnlinkedIncome - confirmedUnlinkedExpenses;
+
+    // 3. Commitments (Saldo Comprometido)
     // Pending essential/pilar expenses
-    const { data: pendingExpenses } = await supabaseAdmin
-        .from('expenses')
+    const { data: pendingExpenses } = await supabaseAdmin.from('expenses')
         .select('amount')
         .eq('user_id', userId)
         .eq('status', 'pending')
         .or('emotion.eq.essencial,emotion.eq.pilar')
         .gte('date', monthStart)
         .lte('date', monthEnd);
-
     const pendingTotal = pendingExpenses?.reduce((acc: number, e: any) => acc + Number(e.amount), 0) || 0;
 
-    // Active debts for the month (Active installments)
-    const { data: debts } = await supabaseAdmin
-        .from('debts')
-        .select('total_amount, installment_amount, is_installment, total_installments, current_installment')
+    // Active debts
+    const { data: debts } = await supabaseAdmin.from('debts')
+        .select('total_amount, installment_amount, is_installment')
         .eq('user_id', userId)
         .eq('status', 'active');
+    const debtTotal = debts?.reduce((acc: number, d: any) => acc + Number(d.is_installment ? (d.installment_amount || 0) : d.total_amount), 0) || 0;
 
-    const debtTotal = debts?.reduce((acc: number, d: any) => {
-        if (d.is_installment) return acc + Number(d.installment_amount || 0);
-        return acc + Number(d.total_amount || 0);
-    }, 0) || 0;
+    // CC Installments for the month
+    const { data: ccInstallments } = await supabaseAdmin.from('credit_card_installments')
+        .select('amount')
+        .eq('user_id', userId)
+        .eq('reference_month', refMonthStr)
+        .eq('status', 'open');
+    const ccTotal = ccInstallments?.reduce((acc: number, inst: any) => acc + Number(inst.amount), 0) || 0;
 
-    // 3. Saldo Livre = Saldo Bruto - (Pendências + Dívidas)
-    return bankTotal - (pendingTotal + debtTotal);
+    const saldoComprometido = pendingTotal + debtTotal + ccTotal;
+
+    // 4. Goals Saved (Saldo Guardado)
+    const { data: goals } = await supabaseAdmin.from('goals')
+        .select('current_amount')
+        .eq('user_id', userId)
+        .neq('is_personal', false)
+        .eq('status', 'in_progress');
+    const saldoGuardado = goals?.reduce((acc: number, g: any) => acc + Number(g.current_amount), 0) || 0;
+
+    // 5. Saldo Livre = Saldo Bruto - Comprometido - Guardado
+    return saldoBruto - saldoComprometido - saldoGuardado;
 }
 
 export async function getLastTransactions(userId: string, limit = 5) {
