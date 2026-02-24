@@ -384,10 +384,12 @@ Deno.serve(async (req: Request) => {
 
         // 7. MULTIPLE TRANSACTIONS PROCESSING
         if (intent.tipo === 'transacao' || (intent.items && intent.items.length > 0)) {
+            console.log(`🔄 Processing ${intent.items.length} items...`);
             let summaryMsg = "✅ *TRANSAÇÕES REGISTRADAS*\n\n";
             let totalProcessed = 0;
 
             for (const item of intent.items) {
+                console.log(`👉 Item: ${item.descricao} (${item.tipo}) - ${item.valor}`);
                 try {
                     const categoryId = await getCategoryId(userId, item.categoria_sugerida, item.tipo === "receita" ? "income" : "expense");
                     const { id: targetAccountId, isCreditCard } = await getPreferredAccount(userId, item.metodo_pagamento);
@@ -404,12 +406,13 @@ Deno.serve(async (req: Request) => {
                         isCreditCard: isCreditCard
                     });
 
+                    console.log(`✅ Item Processed: ${item.descricao}`);
                     const valStr = new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(item.valor);
                     const icon = item.tipo === 'receita' ? '🟢' : '🔴';
                     summaryMsg += `${icon} *${item.descricao}*\n   ${valStr} (${item.categoria_sugerida})\n   ID: ${tCode}\n\n`;
                     totalProcessed++;
                 } catch (err) {
-                    console.error("Error processing item:", err);
+                    console.error(`❌ Item Failed: ${item.descricao}`, err);
                 }
             }
 

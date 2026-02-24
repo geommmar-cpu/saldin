@@ -74,7 +74,7 @@ export async function processTransaction(data: TransactionData) {
                 user_id: userId,
                 amount,
                 description,
-                date: finalDate, // Explicitly set date
+                date: finalDate,
                 source: 'whatsapp',
                 status: 'confirmed',
                 confirmed_at: finalDate,
@@ -84,6 +84,7 @@ export async function processTransaction(data: TransactionData) {
             if (categoryId) payload.category_id = categoryId;
             if (bankAccountId) payload.bank_account_id = bankAccountId;
 
+            console.log("📤 Inserting EXPENSE:", JSON.stringify(payload));
             const { data: exp, error: err } = await supabaseAdmin
                 .from('expenses')
                 .insert(payload)
@@ -92,7 +93,6 @@ export async function processTransaction(data: TransactionData) {
             result = exp;
             error = err;
         } else {
-            // Map common income types or default to 'other'
             let incomeType = 'other';
             const descLower = description.toLowerCase();
             if (descLower.includes('salário') || descLower.includes('salario')) incomeType = 'salary';
@@ -104,17 +104,18 @@ export async function processTransaction(data: TransactionData) {
                 user_id: userId,
                 amount,
                 description,
-                date: finalDate, // Explicitly set date
+                date: finalDate,
                 type: incomeType,
                 is_recurring: false,
                 source: 'whatsapp',
                 transaction_code: transactionCode,
                 created_at: finalDate,
-                status: 'active' // Match dashboard status
+                status: 'active'
             };
             if (categoryId) payload.category_id = categoryId;
             if (bankAccountId) payload.bank_account_id = bankAccountId;
 
+            console.log("📤 Inserting INCOME:", JSON.stringify(payload));
             const { data: inc, error: err } = await supabaseAdmin
                 .from('incomes')
                 .insert(payload)
@@ -125,9 +126,11 @@ export async function processTransaction(data: TransactionData) {
         }
 
         if (error) {
-            console.error("DB Insert Error:", error);
+            console.error("❌ DB Insert Error:", JSON.stringify(error));
             throw error;
         }
+
+        console.log("✅ DB Insert Success:", type);
 
         // Update Bank Account Balance if linked
         if (bankAccountId && !isCreditCard) {
