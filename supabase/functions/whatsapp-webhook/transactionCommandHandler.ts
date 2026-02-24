@@ -101,9 +101,32 @@ export async function handleExcluirCommand(userId: string, code: string): Promis
         return { success: true, message: "⚠️ Esta transação já foi excluída anteriormente." };
     }
 
-    // 3. Soft Delete
+    // 3. Revert Bank Account Balance if linked
+    if (target.bank_account_id) {
+        const { data: acc } = await supabaseAdmin
+            .from('bank_accounts')
+            .select('current_balance')
+            .eq('id', target.bank_account_id)
+            .single();
+
+        if (acc) {
+            const currentBal = Number(acc.current_balance) || 0;
+            const amount = Number(target.amount);
+            // If it was an expense, we ADD back. If it was income, we SUBTRACT.
+            const newBal = type === 'expense' ? (currentBal + amount) : (currentBal - amount);
+
+            await supabaseAdmin
+                .from('bank_accounts')
+                .update({ current_balance: newBal })
+                .eq('id', target.bank_account_id);
+
+            console.log(`🏦 Balance reverted for account ${target.bank_account_id}: ${currentBal} -> ${newBal}`);
+        }
+    }
+
+    // 4. Soft Delete
     const updatePayload = { deleted_at: new Date().toISOString(), status: 'deleted' };
-    const tableName = type === 'expense' ? 'expenses' : 'incomes'; // Ensure correct table name
+    const tableName = type === 'expense' ? 'expenses' : 'incomes';
 
     const { error: updateErr } = await supabaseAdmin
         .from(tableName)
@@ -115,16 +138,16 @@ export async function handleExcluirCommand(userId: string, code: string): Promis
         return { success: false, message: "❌ Erro ao excluir transação." };
     }
 
-    // 4. Log Audit
+    // 5. Log Audit
     await supabaseAdmin.from('transaction_audit_logs').insert({
         transaction_id: target.id,
-        transaction_type: type, // 'expense' or 'income'
+        transaction_type: type,
         action: 'delete',
         user_id: userId,
         changed_fields: updatePayload
     });
 
-    // 5. Get Updated Balance (Sum active bank accounts)
+    // 6. Get Updated Total Balance
     const { data: banks } = await supabaseAdmin
         .from('bank_accounts')
         .select('current_balance')
@@ -132,9 +155,7 @@ export async function handleExcluirCommand(userId: string, code: string): Promis
         .eq('active', true);
 
     const newBalance = banks?.reduce((acc: number, b: any) => acc + Number(b.current_balance), 0) || 0;
-
-    const balanceVal = newBalance ?? 0;
-    const formattedBalance = new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(balanceVal);
+    const formattedBalance = new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(newBalance);
 
     return {
         success: true,
