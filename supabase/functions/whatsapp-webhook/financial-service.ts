@@ -14,19 +14,60 @@ interface TransactionData {
     bankAccountId?: string;
     date?: string; // YYYY-MM-DD
     transactionCode: string;
+    isCreditCard?: boolean;
 }
 
 export async function processTransaction(data: TransactionData) {
-    const { userId, type, amount, description, categoryId, bankAccountId, date, transactionCode } = data;
+    const { userId, type, amount, description, categoryId, bankAccountId, date, transactionCode, isCreditCard } = data;
     const finalDate = date ? new Date(date).toISOString() : new Date().toISOString();
 
     try {
         let result;
         let error;
 
-        // Note: Direct inserts to support transaction_code without altering existing RPC immediately.
-        // We assume 'category_id' and 'bank_account_id' exist on tables based on usage in previous code,
-        // even if initial migration file didn't show them (likely added in subsequent migrations).
+        if (isCreditCard && type === 'expense') {
+            // Register as Credit Card Purchase
+            const payload: any = {
+                user_id: userId,
+                card_id: bankAccountId, // bankAccountId acts as cardId here
+                total_amount: amount,
+                description,
+                purchase_date: finalDate,
+                total_installments: 1, // Default to 1 for WhatsApp unless otherwise specified
+                created_at: finalDate
+            };
+            if (categoryId) payload.category_id = categoryId;
+
+            const { data: purchase, error: err } = await supabaseAdmin
+                .from('credit_card_purchases')
+                .insert(payload)
+                .select('*, card:credit_cards(card_name)')
+                .single();
+
+            result = purchase;
+            error = err;
+
+            // Generate first installment
+            if (purchase && !error) {
+                await supabaseAdmin
+                    .from('credit_card_installments')
+                    .insert({
+                        user_id: userId,
+                        purchase_id: purchase.id,
+                        amount: amount,
+                        installment_number: 1,
+                        reference_month: finalDate, // approximate
+                        status: 'open'
+                    });
+            }
+
+            return {
+                ...result,
+                new_balance: await getBalance(userId),
+                dest_name: result?.card?.card_name || "Cartão",
+                is_credit_card: true
+            };
+        }
 
         if (type === 'expense') {
             const payload: any = {
@@ -34,8 +75,8 @@ export async function processTransaction(data: TransactionData) {
                 amount,
                 description,
                 source: 'whatsapp',
-                status: 'confirmed', // Auto-confirm for WhatsApp
-                confirmed_at: finalDate, // approximate
+                status: 'confirmed',
+                confirmed_at: finalDate,
                 transaction_code: transactionCode,
                 created_at: finalDate
             };
@@ -45,7 +86,7 @@ export async function processTransaction(data: TransactionData) {
             const { data: exp, error: err } = await supabaseAdmin
                 .from('expenses')
                 .insert(payload)
-                .select()
+                .select('*, bank_account:bank_accounts(bank_name)')
                 .single();
             result = exp;
             error = err;
@@ -54,11 +95,11 @@ export async function processTransaction(data: TransactionData) {
                 user_id: userId,
                 amount,
                 description,
-                type: 'variable', // Default to variable for WhatsApp
+                type: 'variable',
                 source: 'whatsapp',
                 transaction_code: transactionCode,
                 created_at: finalDate,
-                status: 'received' // Incomes are received
+                status: 'received'
             };
             if (categoryId) payload.category_id = categoryId;
             if (bankAccountId) payload.bank_account_id = bankAccountId;
@@ -66,7 +107,7 @@ export async function processTransaction(data: TransactionData) {
             const { data: inc, error: err } = await supabaseAdmin
                 .from('incomes')
                 .insert(payload)
-                .select()
+                .select('*, bank_account:bank_accounts(bank_name)')
                 .single();
             result = inc;
             error = err;
@@ -78,7 +119,7 @@ export async function processTransaction(data: TransactionData) {
         }
 
         // Update Bank Account Balance if linked
-        if (bankAccountId) {
+        if (bankAccountId && !isCreditCard) {
             const { data: acc } = await supabaseAdmin
                 .from('bank_accounts')
                 .select('current_balance')
@@ -96,13 +137,12 @@ export async function processTransaction(data: TransactionData) {
             }
         }
 
-        // Calculate new balance
         const newBalance = await getBalance(userId);
 
         return {
             ...result,
             new_balance: newBalance,
-            dest_name: "Conta",
+            dest_name: result?.bank_account?.bank_name || "Conta",
             is_credit_card: false
         };
 
@@ -111,6 +151,7 @@ export async function processTransaction(data: TransactionData) {
         throw new Error("Erro ao registrar transação no banco.");
     }
 }
+
 
 export async function getBalance(userId: string): Promise<number> {
     // Updated Logic: Mirror Frontend "Total Balance"
@@ -162,34 +203,45 @@ export async function getLastTransactions(userId: string, limit = 5) {
     return all.slice(0, limit);
 }
 
-export async function getPreferredAccount(userId: string, method?: string): Promise<string | null> {
-    // If method implies a bank transaction (Pix, Debit, Transfer), find a Checking Account
-    if (method && ['pix', 'debito', 'transferencia', 'dinheiro', 'boleto'].includes(method.toLowerCase())) {
+export async function getPreferredAccount(userId: string, method?: string): Promise<{ id: string | null; isCreditCard: boolean }> {
+    const { data: profile } = await supabaseAdmin
+        .from('profiles')
+        .select('wa_default_income_account_id, wa_default_expense_account_id, wa_default_expense_card_id')
+        .eq('user_id', userId)
+        .single();
 
-        // 1. Try to get the default income account (often used as main checking) from profile
-        const { data: profile } = await supabaseAdmin
-            .from('profiles')
-            .select('wa_default_income_account_id, wa_default_expense_account_id')
-            .eq('user_id', userId)
-            .single();
+    // If method implies credit card
+    if (method && ['credito', 'cartão', 'cartao', 'visa', 'master', 'elo', 'amex'].includes(method.toLowerCase())) {
+        if (profile?.wa_default_expense_card_id) {
+            return { id: profile.wa_default_expense_card_id, isCreditCard: true };
+        }
 
-        if (profile?.wa_default_expense_account_id) return profile.wa_default_expense_account_id;
-        if (profile?.wa_default_income_account_id) return profile.wa_default_income_account_id;
-
-        // 2. Fallback: Any active checking account
-        const { data: acc } = await supabaseAdmin
-            .from('bank_accounts')
+        // Fallback: Any active credit card
+        const { data: card } = await supabaseAdmin
+            .from('credit_cards')
             .select('id')
             .eq('user_id', userId)
             .eq('active', true)
-            // Prioritize checking, then wallet/others
-            .order('account_type', { ascending: true })
             .limit(1)
             .maybeSingle();
 
-        return acc?.id || null;
+        return { id: card?.id || null, isCreditCard: !!card };
     }
 
-    // For Credit, we return null so the RPC can pick the default card
-    return null;
+    // Default: Check for default accounts (Pix, Debit, etc.)
+    if (profile?.wa_default_expense_account_id) return { id: profile.wa_default_expense_account_id, isCreditCard: false };
+    if (profile?.wa_default_income_account_id) return { id: profile.wa_default_income_account_id, isCreditCard: false };
+
+    // Fallback: Any active bank account
+    const { data: acc } = await supabaseAdmin
+        .from('bank_accounts')
+        .select('id')
+        .eq('user_id', userId)
+        .eq('active', true)
+        .order('account_type', { ascending: true })
+        .limit(1)
+        .maybeSingle();
+
+    return { id: acc?.id || null, isCreditCard: false };
 }
+

@@ -120,6 +120,23 @@ export const BankAccountsSummary = () => {
       ? [cashCard, ...accounts]
       : accounts;
 
+  // Sort displayAccounts: Principal first, then Cash, then others
+  const sortedAccounts = [...displayAccounts].sort((a, b) => {
+    const isAPrincipal = a.id === defaultIncomeId || a.id === defaultExpenseId;
+    const isBPrincipal = b.id === defaultIncomeId || b.id === defaultExpenseId;
+
+    if (isAPrincipal && !isBPrincipal) return -1;
+    if (!isAPrincipal && isBPrincipal) return 1;
+
+    // Secondary sort: Cash always comes next
+    const isACash = isCashAccount(a);
+    const isBCash = isCashAccount(b);
+    if (isACash && !isBCash) return -1;
+    if (!isACash && isBCash) return 1;
+
+    return 0;
+  });
+
   const handleAccountClick = async (account: BankAccount) => {
     if (account.id === "virtual-cash") {
       const newId = await ensureCashAccount();
@@ -129,13 +146,14 @@ export const BankAccountsSummary = () => {
     }
   };
 
-  if (displayAccounts.length === 0) return null;
+  if (sortedAccounts.length === 0) return null;
+
 
   return (
     <div className="space-y-4">
       {/* Header */}
       <div className="px-1">
-        <div className="flex items-center justify-between mb-3 px-1">
+        <div className="flex items-center justify-between px-1">
           <div className="flex items-center gap-2">
             <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center">
               <Landmark className="w-4 h-4 text-primary" />
@@ -151,6 +169,9 @@ export const BankAccountsSummary = () => {
             Ver todas
           </Button>
         </div>
+        <p className="text-[10px] text-muted-foreground mt-1 ml-10">
+          Contas marcadas como <span className="text-primary font-bold">Principal</span> recebem faturas e entradas do WhatsApp.
+        </p>
       </div>
 
       <div
@@ -161,7 +182,7 @@ export const BankAccountsSummary = () => {
         }}
       >
         <div className="flex gap-4 snap-x snap-mandatory min-w-full w-max px-4">
-          {displayAccounts.map((account) => (
+          {sortedAccounts.map((account) => (
             <div
               key={account.id}
               onClick={() => handleAccountClick(account)}
@@ -173,6 +194,7 @@ export const BankAccountsSummary = () => {
               />
             </div>
           ))}
+
 
           {/* Add New Account */}
           <div

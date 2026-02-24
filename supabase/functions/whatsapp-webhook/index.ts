@@ -365,7 +365,7 @@ Deno.serve(async (req: Request) => {
 
         // Transaction Registration
         const categoryId = await getCategoryId(userId, intent.categoria_sugerida, intent.tipo === "receita" ? "income" : "expense");
-        const targetAccountId = await getPreferredAccount(userId, intent.metodo_pagamento);
+        const { id: targetAccountId, isCreditCard } = await getPreferredAccount(userId, intent.metodo_pagamento);
         const tCode = generateTransactionCode();
 
         const result = await processTransaction({
@@ -375,8 +375,10 @@ Deno.serve(async (req: Request) => {
             description: intent.descricao,
             categoryId: categoryId || undefined,
             bankAccountId: targetAccountId || undefined,
-            transactionCode: tCode
+            transactionCode: tCode,
+            isCreditCard: isCreditCard
         });
+
 
         // Use the formatted record message
         const msg = formatPremiumMessage({
