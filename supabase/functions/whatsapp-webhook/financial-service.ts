@@ -107,7 +107,6 @@ export async function processTransaction(data: TransactionData) {
                 date: finalDate,
                 type: incomeType,
                 is_recurring: false,
-                source: 'whatsapp',
                 transaction_code: transactionCode,
                 created_at: finalDate,
                 status: 'active'
