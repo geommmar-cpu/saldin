@@ -366,7 +366,7 @@ Deno.serve(async (req: Request) => {
 
         // 6. Execute Intent
         if (intent.status === "incompleto") {
-            await sendWhatsApp(phoneToSend, "🤔 Pode me dar mais detalhes? Preciso do valor e uma breve descrição.");
+            await sendWhatsApp(phoneToSend, "🤔 Pode me dar mais detalhes? Preciso de valores e descrições.");
             return new Response("Incomplete", { status: 200 });
         }
 
@@ -382,43 +382,50 @@ Deno.serve(async (req: Request) => {
             return new Response("OK", { status: 200 });
         }
 
-        // Transaction Registration
-        const categoryId = await getCategoryId(userId, intent.categoria_sugerida, intent.tipo === "receita" ? "income" : "expense");
-        const { id: targetAccountId, isCreditCard } = await getPreferredAccount(userId, intent.metodo_pagamento);
-        const tCode = generateTransactionCode();
+        // 7. MULTIPLE TRANSACTIONS PROCESSING
+        if (intent.tipo === 'transacao' || (intent.items && intent.items.length > 0)) {
+            let summaryMsg = "✅ *TRANSAÇÕES REGISTRADAS*\n\n";
+            let totalProcessed = 0;
 
-        const result = await processTransaction({
-            userId,
-            type: intent.tipo === "receita" ? "income" : "expense",
-            amount: intent.valor,
-            description: intent.descricao,
-            categoryId: categoryId || undefined,
-            bankAccountId: targetAccountId || undefined,
-            transactionCode: tCode,
-            isCreditCard: isCreditCard
-        });
+            for (const item of intent.items) {
+                try {
+                    const categoryId = await getCategoryId(userId, item.categoria_sugerida, item.tipo === "receita" ? "income" : "expense");
+                    const { id: targetAccountId, isCreditCard } = await getPreferredAccount(userId, item.metodo_pagamento);
+                    const tCode = generateTransactionCode();
 
+                    const result = await processTransaction({
+                        userId,
+                        type: item.tipo === "receita" ? "income" : "expense",
+                        amount: item.valor,
+                        description: item.descricao,
+                        categoryId: categoryId || undefined,
+                        bankAccountId: targetAccountId || undefined,
+                        transactionCode: tCode,
+                        isCreditCard: isCreditCard
+                    });
 
-        // Use the formatted record message
-        const msg = formatPremiumMessage({
-            id: result.id,
-            description: result.description,
-            amount: result.amount,
-            date: result.created_at || new Date().toISOString(),
-            category: intent.categoria_sugerida,
-            account: result.is_credit_card ? "Cartão de Crédito" : (result.dest_name || "Conta"),
-            type: intent.tipo === 'receita' ? 'income' : 'expense',
-            transaction_code: tCode
-        }, {
-            previous_balance: result.new_balance - (intent.tipo === 'receita' ? intent.valor : -intent.valor),
-            new_balance: result.new_balance,
-            invoice: 0,
-            available_balance: result.new_balance
-        });
+                    const valStr = new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(item.valor);
+                    const icon = item.tipo === 'receita' ? '🟢' : '🔴';
+                    summaryMsg += `${icon} *${item.descricao}*\n   ${valStr} (${item.categoria_sugerida})\n   ID: ${tCode}\n\n`;
+                    totalProcessed++;
+                } catch (err) {
+                    console.error("Error processing item:", err);
+                }
+            }
 
-        await sendWhatsApp(phoneToSend, msg);
+            if (totalProcessed > 0) {
+                const balance = await getBalance(userId);
+                const balStr = new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(balance);
+                summaryMsg += `💰 *Saldo Atual:* ${balStr}\n\n_Para excluir use: excluir [ID]_`;
+                await sendWhatsApp(phoneToSend, summaryMsg);
+            } else {
+                await sendWhatsApp(phoneToSend, "❌ Não consegui processar nenhuma transação. Tente novamente com outro formato.");
+            }
 
-        return new Response("Success", { status: 200 });
+            return new Response("Multi-Success", { status: 200 });
+        }
+
+        return new Response("No Action", { status: 200 });
 
     } catch (e) {
         console.error("Fatal Error:", e);
