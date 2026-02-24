@@ -8,32 +8,51 @@ export const useAuth = () => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Set up auth state listener FIRST
+    let mounted = true;
+
+    // 1. Set up auth state listener
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       (event, session) => {
+        if (!mounted) return;
         setSession(session);
         setUser(session?.user ?? null);
+
+        // Only set loading to false after we've had at least one event
+        // or if we've already done the initial check
         setLoading(false);
       }
     );
 
-    // THEN check for existing session with timeout
-    const sessionPromise = supabase.auth.getSession().then(({ data: { session } }) => {
-      setSession(session);
-      setUser(session?.user ?? null);
-      return true;
-    });
+    // 2. Initial manual check - this ensures we don't wait for the first "change" event
+    // if a session already exists and is stable.
+    const checkInitialSession = async () => {
+      try {
+        const { data: { session } } = await supabase.auth.getSession();
+        if (mounted) {
+          if (session) {
+            setSession(session);
+            setUser(session.user);
+          }
+          setLoading(false);
+        }
+      } catch (error) {
+        console.error("Session check error:", error);
+        if (mounted) setLoading(false);
+      }
+    };
 
-    // Timeout after 5 seconds
-    const timeoutPromise = new Promise((resolve) => {
-      setTimeout(() => resolve(false), 5000);
-    });
+    checkInitialSession();
 
-    Promise.race([sessionPromise, timeoutPromise]).then(() => {
-      setLoading(false);
-    });
+    // 3. Safety timeout
+    const timer = setTimeout(() => {
+      if (mounted) setLoading(false);
+    }, 5000);
 
-    return () => subscription.unsubscribe();
+    return () => {
+      mounted = false;
+      subscription.unsubscribe();
+      clearTimeout(timer);
+    };
   }, []);
 
   const signUp = async (email: string, password: string, name?: string) => {

@@ -120,7 +120,7 @@ export const Auth = () => {
     const userEmail = data?.user?.email;
 
     if (userId && userEmail && isBiometricSupported && !isEnabledForUser(userId)) {
-      // Check if user dismissed the prompt before
+      // Check if user dismissed the prompt before - unify to localStorage
       const dismissed = localStorage.getItem("biometric_prompt_dismissed");
       if (!dismissed) {
         setPendingBiometricUser({ userId, userEmail });
@@ -260,6 +260,17 @@ export const Auth = () => {
 
     // Check if session was created immediately (Email Confirmation Disabled)
     if (data?.session) {
+      // Check if we should offer biometric setup for new user
+      const userId = data?.user?.id;
+      const userEmail = data?.user?.email;
+
+      if (userId && userEmail && isBiometricSupported && !isEnabledForUser(userId)) {
+        setPendingBiometricUser({ userId, userEmail });
+        setShowBiometricSetup(true);
+        // Toast is shown inside Dialog or after it
+        return;
+      }
+
       toast({
         title: "Conta criada",
         description: "Bem-vindo ao Saldin!",
@@ -396,8 +407,8 @@ export const Auth = () => {
             setShowBiometricSetup(open);
             if (!open) {
               toast({
-                title: "Login realizado",
-                description: "Bem-vindo de volta!",
+                title: view === "signup" ? "Conta criada" : "Login realizado",
+                description: view === "signup" ? "Bem-vindo ao Saldin!" : "Bem-vindo de volta!",
               });
               setPendingBiometricUser(null);
             }
@@ -406,8 +417,8 @@ export const Auth = () => {
           userEmail={pendingBiometricUser.userEmail}
           onSuccess={() => {
             toast({
-              title: "Login realizado",
-              description: "Bem-vindo de volta!",
+              title: view === "signup" ? "Conta criada" : "Login realizado",
+              description: view === "signup" ? "Bem-vindo ao Saldin!" : "Bem-vindo de volta!",
             });
             setPendingBiometricUser(null);
           }}

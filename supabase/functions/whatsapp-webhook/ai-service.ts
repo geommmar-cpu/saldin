@@ -10,7 +10,7 @@ export interface FinancialItem {
     valor: number;
     descricao: string;
     categoria_sugerida: string;
-    metodo_pagamento: "pix" | "debito" | "credito" | "dinheiro" | "boleto" | "indefinido";
+    metodo_pagamento: string; // "pix", "debito", "credito", "dinheiro", "boleto" or specific name like "inter", "nubank"
 }
 
 export interface FinancialIntent {
@@ -28,7 +28,9 @@ REGRAS:
 3. Para cada item em "items":
    - Extraia o VALOR numérico puro (ex: 120.50).
    - Identifique CATEGORIA e MÉTODO DE PAGAMENTO.
+   - 🚨 CRÍTICO: Se o usuário mencionar um BANCO ou CARTÃO específico (ex: "no Inter", "no Nubank", "no Itaú"), você DEVE usar o NOME DO BANCO como metodo_pagamento. NÃO use termos genéricos como "credito" ou "debito" se o nome do banco estiver presente.
    - Crie uma DESCRIÇÃO objetiva.
+4. O MÉTODO DE PAGAMENTO É OBRIGATÓRIO (ex: pix, debito, credito, dinheiro, boleto, inter, nubank, itau). Se o usuário não informar nada, defina o "status" como "incompleto".
 
 RETORNO OBRIGATÓRIO (JSON):
 {
@@ -39,7 +41,7 @@ RETORNO OBRIGATÓRIO (JSON):
       "valor": number,
       "descricao": string,
       "categoria_sugerida": string,
-      "metodo_pagamento": "pix" | "debito" | "credito" | "dinheiro" | "boleto" | "indefinido"
+      "metodo_pagamento": string
     }
   ],
   "status": "ok" | "incompleto"

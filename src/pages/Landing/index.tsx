@@ -425,27 +425,68 @@ const SaleNotification = () => {
     );
 };
 
-// ─── VSL Placeholder ───
+// ─── Lite Video Component (Zero Weight Initial Load) ───
+const LiteVideo = ({
+    videoId,
+    thumbnail,
+    title,
+    className = ""
+}: {
+    videoId: string;
+    thumbnail: string;
+    title?: string;
+    className?: string;
+}) => {
+    const [isPlaying, setIsPlaying] = useState(false);
+
+    return (
+        <div
+            onClick={() => setIsPlaying(true)}
+            className={`relative w-full aspect-video bg-black/10 rounded-2xl overflow-hidden shadow-xl border border-gray-100 group cursor-pointer ${className}`}
+        >
+            {!isPlaying ? (
+                <>
+                    <div className="absolute inset-0 flex items-center justify-center z-10">
+                        <div className="w-16 h-16 sm:w-20 sm:h-20 bg-white/20 backdrop-blur-sm rounded-full flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
+                            <div className="w-12 h-12 sm:w-16 sm:h-16 bg-orange-500 rounded-full flex items-center justify-center shadow-lg relative pl-1">
+                                <Play className="w-5 h-5 sm:w-6 sm:h-6 text-white fill-current" />
+                            </div>
+                        </div>
+                    </div>
+                    {title && (
+                        <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent flex items-end p-4 sm:p-6 z-[5]">
+                            <p className="text-white font-bold text-base sm:text-xl md:text-2xl drop-shadow-md">
+                                {title}
+                            </p>
+                        </div>
+                    )}
+                    <img
+                        src={thumbnail}
+                        alt="Video Thumbnail"
+                        className="w-full h-full object-cover opacity-90 group-hover:opacity-100 transition-opacity duration-500"
+                    />
+                </>
+            ) : (
+                <iframe
+                    src={`https://www.youtube.com/embed/${videoId}?autoplay=1&rel=0&modestbranding=1`}
+                    title="YouTube video player"
+                    frameBorder="0"
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                    allowFullScreen
+                    className="w-full h-full"
+                ></iframe>
+            )}
+        </div>
+    );
+};
+
+// ─── VSL (Video Sales Letter) ───
 const VSL = () => (
-    <div className="relative w-full aspect-video bg-black/5 rounded-2xl overflow-hidden shadow-2xl border border-gray-200 group cursor-pointer">
-        <div className="absolute inset-0 flex items-center justify-center z-10">
-            <div className="w-20 h-20 bg-white/20 backdrop-blur-sm rounded-full flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
-                <div className="w-16 h-16 bg-orange-500 rounded-full flex items-center justify-center shadow-lg relative pl-1">
-                    <Play className="w-6 h-6 text-white fill-current" />
-                </div>
-            </div>
-        </div>
-        <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent flex items-end p-6">
-            <div>
-                <p className="text-white font-bold text-lg sm:text-xl md:text-2xl shadow-black/50 drop-shadow-md">
-                    Descubra como sobrar dinheiro todo mês <span className="text-orange-400">(sem planilhas)</span>
-                </p>
-                <p className="text-white/80 text-sm mt-1">Veja em 2 minutos</p>
-            </div>
-        </div>
-        {/* Fake Thumbnail */}
-        <img src="https://images.unsplash.com/photo-1554224155-8d04cb21cd6c?auto=format&fit=crop&q=80&w=1000" alt="VSL Thumbnail" className="w-full h-full object-cover opacity-90 group-hover:opacity-100 transition-opacity duration-500" />
-    </div>
+    <LiteVideo
+        videoId="dQw4w9WgXcQ" // TODO: Trocar pelo link real do VSL
+        thumbnail="https://images.unsplash.com/photo-1554224155-8d04cb21cd6c?auto=format&fit=crop&q=80&w=1000"
+        title="Descubra como sobrar dinheiro todo mês (sem planilhas)"
+    />
 );
 
 // ─── Main Headline ───
@@ -886,18 +927,31 @@ const Landing = () => {
                         {/* Feature 1: WhatsApp (Large) */}
                         <motion.div
                             whileHover={{ y: -5 }}
-                            className="md:col-span-2 row-span-1 rounded-3xl bg-[#f0fdf4] border border-green-100 p-6 sm:p-8 relative overflow-hidden flex flex-col justify-between group min-h-[280px]"
+                            className="md:col-span-2 row-span-1 rounded-3xl bg-[#f0fdf4] border border-green-100 p-6 sm:p-8 relative overflow-hidden flex flex-col md:flex-row justify-between group min-h-[320px]"
                         >
                             <div className="absolute top-0 right-0 w-64 h-64 bg-green-200/30 rounded-full blur-[80px] -translate-y-1/2 translate-x-1/2" />
-                            <div className="relative z-10">
-                                <div className="w-12 h-12 bg-white rounded-2xl flex items-center justify-center mb-4 shadow-sm border border-green-100">
-                                    <MessageCircle className="w-6 h-6 text-green-600" />
+
+                            <div className="relative z-10 flex-1 flex flex-col justify-between pr-0 md:pr-12">
+                                <div>
+                                    <div className="w-12 h-12 bg-white rounded-2xl flex items-center justify-center mb-4 shadow-sm border border-green-100">
+                                        <MessageCircle className="w-6 h-6 text-green-600" />
+                                    </div>
+                                    <h3 className="text-2xl font-bold mb-2 text-green-900">WhatsApp Inteligente</h3>
+                                    <p className="text-green-800/80 max-w-sm text-sm sm:text-base mb-6">Envie áudio, foto de notas fiscais ou texto. Nossa IA processa e atualiza seu saldo em segundos.</p>
                                 </div>
-                                <h3 className="text-2xl font-bold mb-2 text-green-900">WhatsApp Inteligente</h3>
-                                <p className="text-green-800/80 max-w-md text-sm sm:text-base">Envie áudio, foto de notas fiscais ou texto. Nossa IA processa, categoriza e atualiza seu saldo em segundos.</p>
+                                <div className="mt-auto">
+                                    <div className="inline-flex items-center gap-2 text-xs font-bold text-green-600 bg-white/50 px-3 py-1.5 rounded-full border border-green-100">
+                                        <Play className="w-3 h-3 fill-current" /> VÍDEO DEMONSTRAÇÃO
+                                    </div>
+                                </div>
                             </div>
-                            <div className="absolute -bottom-16 -right-16 md:right-0 md:bottom-0 transform scale-[0.45] md:scale-[0.6] origin-bottom-right rotate-6 group-hover:rotate-0 transition-transform duration-500 opacity-60 group-hover:opacity-100">
-                                <PhoneMockup />
+
+                            <div className="relative z-10 w-full md:w-[320px] shrink-0 mt-6 md:mt-0">
+                                <LiteVideo
+                                    videoId="dQw4w9WgXcQ" // TODO: Trocar pelo vídeo do WhatsApp
+                                    thumbnail="https://images.unsplash.com/photo-1577563908411-5077b6dc7624?auto=format&fit=crop&q=80&w=600"
+                                    className="!aspect-[4/3] rounded-2xl"
+                                />
                             </div>
                         </motion.div>
 

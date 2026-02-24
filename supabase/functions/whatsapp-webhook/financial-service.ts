@@ -15,6 +15,7 @@ interface TransactionData {
     date?: string; // YYYY-MM-DD
     transactionCode: string;
     isCreditCard?: boolean;
+    metodo?: string; // Add method for logging/debugging
 }
 
 export async function processTransaction(data: TransactionData) {
@@ -26,6 +27,10 @@ export async function processTransaction(data: TransactionData) {
         let error;
 
         if (isCreditCard && type === 'expense') {
+            if (!bankAccountId) {
+                throw new Error("Não encontrei um cartão cadastrado para vincular este gasto.");
+            }
+
             // Register as Credit Card Purchase
             const payload: any = {
                 user_id: userId,
@@ -34,6 +39,7 @@ export async function processTransaction(data: TransactionData) {
                 description,
                 purchase_date: finalDate,
                 total_installments: 1, // Default to 1 for WhatsApp unless otherwise specified
+                transaction_code: transactionCode, // Ensure we store the code here too
                 created_at: finalDate
             };
             if (categoryId) payload.category_id = categoryId;
@@ -49,6 +55,10 @@ export async function processTransaction(data: TransactionData) {
 
             // Generate first installment
             if (purchase && !error) {
+                // Ensure reference_month is the 1st of the month
+                const d = new Date(finalDate);
+                const refMonth = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-01`;
+
                 await supabaseAdmin
                     .from('credit_card_installments')
                     .insert({
@@ -56,7 +66,7 @@ export async function processTransaction(data: TransactionData) {
                         purchase_id: purchase.id,
                         amount: amount,
                         installment_number: 1,
-                        reference_month: finalDate, // approximate
+                        reference_month: refMonth,
                         status: 'open'
                     });
             }
@@ -276,13 +286,40 @@ export async function getPreferredAccount(userId: string, method?: string): Prom
         .eq('user_id', userId)
         .single();
 
-    // If method implies credit card
-    if (method && ['credito', 'cartão', 'cartao', 'visa', 'master', 'elo', 'amex'].includes(method.toLowerCase())) {
+    const cleanMethod = method?.toLowerCase().trim();
+
+    // 1. Try to find a matching Credit Card by name (e.g., "Inter", "Nubank")
+    if (cleanMethod && !['credito', 'cartão', 'cartao'].includes(cleanMethod)) {
+        const { data: matchedCard } = await supabaseAdmin
+            .from('credit_cards')
+            .select('id')
+            .eq('user_id', userId)
+            .eq('active', true)
+            .ilike('card_name', `%${cleanMethod}%`)
+            .maybeSingle();
+
+        if (matchedCard) return { id: matchedCard.id, isCreditCard: true };
+    }
+
+    // 2. Try to find a matching Bank Account by name (e.g., "Itaú", "Cofre")
+    if (cleanMethod && !['pix', 'debito', 'dinheiro', 'boleto'].includes(cleanMethod)) {
+        const { data: matchedAcc } = await supabaseAdmin
+            .from('bank_accounts')
+            .select('id')
+            .eq('user_id', userId)
+            .eq('active', true)
+            .ilike('bank_name', `%${cleanMethod}%`)
+            .maybeSingle();
+
+        if (matchedAcc) return { id: matchedAcc.id, isCreditCard: false };
+    }
+
+    // 3. Fallback to default Credit Card logic
+    if (cleanMethod && ['credito', 'cartão', 'cartao', 'visa', 'master', 'elo', 'amex'].some(m => cleanMethod.includes(m))) {
         if (profile?.wa_default_expense_card_id) {
             return { id: profile.wa_default_expense_card_id, isCreditCard: true };
         }
 
-        // Fallback: Any active credit card
         const { data: card } = await supabaseAdmin
             .from('credit_cards')
             .select('id')
@@ -294,7 +331,7 @@ export async function getPreferredAccount(userId: string, method?: string): Prom
         return { id: card?.id || null, isCreditCard: !!card };
     }
 
-    // Default: Check for default accounts (Pix, Debit, etc.)
+    // 4. Default: Check for default accounts (Pix, Debit, etc.)
     if (profile?.wa_default_expense_account_id) return { id: profile.wa_default_expense_account_id, isCreditCard: false };
     if (profile?.wa_default_income_account_id) return { id: profile.wa_default_income_account_id, isCreditCard: false };
 

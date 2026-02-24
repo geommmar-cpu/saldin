@@ -338,6 +338,14 @@ Deno.serve(async (req: Request) => {
             const cleanText = textToAnalyze.trim();
             const normalizedCmd = cleanText.toLowerCase().replace(/[^\w\s]/gi, ''); // Remove emojis/pontuação
 
+            // C. FLOW DE EDIÇÃO (MÁXIMA PRIORIDADE SE JÁ EXISTIR UM ESTADO)
+            const editResult = await processEditStep(userId, cleanText);
+            if (editResult.success) {
+                await sendWhatsApp(phoneToSend, editResult.message);
+                if (logId) await supabaseAdmin.from("whatsapp_logs").update({ processed: true }).eq("id", logId);
+                return new Response("Edit Step OK", { status: 200 });
+            }
+
             // A. TESTE DE TEMPLATE (Prioridade Máxima)
             if (normalizedCmd === 'template' || normalizedCmd === 'teste template') {
                 console.log("🧪 Template test triggered for:", phoneToSend);
@@ -346,21 +354,47 @@ Deno.serve(async (req: Request) => {
                 return new Response("Template Test OK", { status: 200 });
             }
 
-            // B. SAUDAÇÕES (Prioridade Alta)
+            // A.1 TESTE MANUAL (Para o comando que você me pediu agora)
+            if (normalizedCmd === 'teste template agora' || normalizedCmd === 'enviar template') {
+                console.log("🧪 Manual Template Test for:", phoneToSend);
+                await sendWhatsAppTemplate(phoneToSend, "hello_world");
+                if (logId) await supabaseAdmin.from("whatsapp_logs").update({ processed: true }).eq("id", logId);
+                return new Response("Manual Template OK", { status: 200 });
+            }
+
+            // B. SAUDAÇÕES E AJUDA (Prioridade Alta)
             const greetings = ['oi', 'ola', 'olá', 'teste', 'bom dia', 'boa tarde', 'boa noite', 'hey', 'hello', 'oie'];
+            const helpCommands = ['ajuda', 'ajuda', 'comando', 'comandos', 'help', '/help', 'como usar', 'o que voce faz'];
+
             if (greetings.includes(normalizedCmd) || greetings.some(g => normalizedCmd.startsWith(g + " "))) {
                 console.log("👋 Greeting detected.");
-                await sendWhatsApp(phoneToSend, "Olá! 👋 Sou o assistente do Saldin. \nComo posso ajudar? Você pode registrar um gasto (ex: 'Almoço 35.00'), ou pedir seu 'saldo' ou 'extrato'.");
+                await sendWhatsApp(phoneToSend, "Olá! 👋 Sou o assistente do Saldin. \nComo posso ajudar? Você pode registrar um gasto (ex: 'Almoço 35.00'), ou pedir seu 'saldo' ou 'extrato'. \n\nPara ver a lista completa de comandos, digite *AJUDA*.");
                 if (logId) await supabaseAdmin.from("whatsapp_logs").update({ processed: true }).eq("id", logId);
                 return new Response("Greeting OK", { status: 200 });
             }
 
-            // C. FLOW DE EDIÇÃO
-            const editResult = await processEditStep(userId, cleanText);
-            if (editResult.success) {
-                await sendWhatsApp(phoneToSend, editResult.message);
+            if (helpCommands.includes(normalizedCmd)) {
+                console.log("❓ Help command detected.");
+                const helpMsg = `🤖 *SALDIN - GUIA RÁPIDO*\n\n` +
+                    `✍️ *COMO REGISTRAR*\n` +
+                    `Basta digitar o valor e a descrição. Exemplos:\n` +
+                    `• \`50 cafezinho\`\n` +
+                    `• \`120.50 mercado no pix\`\n` +
+                    `• \`Recebi 2000 do freela\`\n\n` +
+                    `🎙️ *ÁUDIO E FOTO*\n` +
+                    `Pode mandar áudio descrevendo o gasto ou foto de comprovante/cupom fiscal. Eu leio tudo! 📸\n\n` +
+                    `📊 *CONSULTAS*\n` +
+                    `• *Saldo*: Veja seu Saldo Livre atual.\n` +
+                    `• *Extrato*: Veja as últimas 6 movimentações.\n\n` +
+                    `⚙️ *GERENCIAR*\n` +
+                    `• *Editar [ID]*: Altera valor ou categoria.\n` +
+                    `• *Excluir [ID]*: Remove o registro.\n\n` +
+                    `━━━━━━━━━━━━━━━━━━━━\n` +
+                    `_Saldin • Controle total. Zero planilhas._ 🚀`;
+
+                await sendWhatsApp(phoneToSend, helpMsg);
                 if (logId) await supabaseAdmin.from("whatsapp_logs").update({ processed: true }).eq("id", logId);
-                return new Response("Edit Step OK", { status: 200 });
+                return new Response("Help OK", { status: 200 });
             }
 
             // 3. Normal Commands (Delete, Edit, Saldo, Extrato)
@@ -373,6 +407,7 @@ Deno.serve(async (req: Request) => {
                 }
                 const res = await handleExcluirCommand(userId, code);
                 await sendWhatsApp(phoneToSend, res.message);
+                if (logId) await supabaseAdmin.from("whatsapp_logs").update({ processed: true }).eq("id", logId);
                 return new Response("Delete", { status: 200 });
             }
 
@@ -385,6 +420,7 @@ Deno.serve(async (req: Request) => {
                 }
                 const res = await handleEditarCommand(userId, code);
                 await sendWhatsApp(phoneToSend, res.message);
+                if (logId) await supabaseAdmin.from("whatsapp_logs").update({ processed: true }).eq("id", logId);
                 return new Response("Edit", { status: 200 });
             }
 
@@ -393,11 +429,13 @@ Deno.serve(async (req: Request) => {
                 const formatted = new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(balanceLivre);
                 const msg = `💰 *SEU SALDO DISPONÍVEL*\n━━━━━━━━━━━━━━━━━━━━\n*${formatted}*\n━━━━━━━━━━━━━━━━━━━━\n\n_Este é o seu *Saldo Livre*, subtraindo compromissos e contas pendentes._ ✨`;
                 await sendWhatsApp(phoneToSend, msg);
+                if (logId) await supabaseAdmin.from("whatsapp_logs").update({ processed: true }).eq("id", logId);
                 return new Response("Saldo", { status: 200 });
             }
 
             if (normalizedCmd === 'extrato' || normalizedCmd === '/extrato') {
                 await sendExtrato(userId, phoneToSend);
+                if (logId) await supabaseAdmin.from("whatsapp_logs").update({ processed: true }).eq("id", logId);
                 return new Response("Extrato", { status: 200 });
             }
         }
@@ -422,7 +460,7 @@ Deno.serve(async (req: Request) => {
 
         // 6. Execute Intent
         if (intent.status === "incompleto") {
-            await sendWhatsApp(phoneToSend, "🤔 Pode me dar mais detalhes? Preciso de valores e descrições.");
+            await sendWhatsApp(phoneToSend, "🤔 Pode me dar mais detalhes? Preciso do *valor*, da *descrição* e de *como você pagou* (ex: pix, débito, crédito ou dinheiro).");
             return new Response("Incomplete", { status: 200 });
         }
 
@@ -502,7 +540,8 @@ Deno.serve(async (req: Request) => {
                     await sendWhatsApp(phoneToSend, summaryMsg);
                 }
             } else {
-                await sendWhatsApp(phoneToSend, "❌ Não consegui processar os itens. Verifique os valores e tente novamente.");
+                // If it failed because of a specific reason, we might want to tell the user
+                await sendWhatsApp(phoneToSend, "❌ Não consegui processar seu pedido. Verifique se você possui contas/cartões cadastrados ou se o valor está correto.");
             }
 
             return new Response("Multi-Success", { status: 200 });
@@ -520,13 +559,18 @@ Deno.serve(async (req: Request) => {
 
 async function sendExtrato(userId: string, phone: string) {
     try {
-        const queryLimit = 6;
+        const queryLimit = 10;
         const { data: exps } = await supabaseAdmin.from('expenses').select('amount, description, date, created_at').eq('user_id', userId).order('created_at', { ascending: false }).limit(queryLimit);
         const { data: incs } = await supabaseAdmin.from('incomes').select('amount, description, date, type, created_at').eq('user_id', userId).order('created_at', { ascending: false }).limit(queryLimit);
+        const { data: ccs } = await supabaseAdmin.from('credit_card_purchases').select('total_amount, description, purchase_date, created_at').eq('user_id', userId).order('created_at', { ascending: false }).limit(queryLimit);
 
-        const trs = [...(exps || []).map((e: any) => ({ ...e, type: 'expense' })), ...(incs || []).map((i: any) => ({ ...i, type: 'income' }))]
+        const trs = [
+            ...(exps || []).map((e: any) => ({ ...e, type: 'expense' })),
+            ...(incs || []).map((i: any) => ({ ...i, type: 'income' })),
+            ...(ccs || []).map((c: any) => ({ amount: c.total_amount, description: c.description, created_at: c.created_at, type: 'expense', isCC: true }))
+        ]
             .sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
-            .slice(0, queryLimit);
+            .slice(0, 7); // Show last 7
 
         if (!trs.length) {
             await sendWhatsApp(phone, "📄 Nenhuma transação recente encontrada.");
@@ -537,10 +581,11 @@ async function sendExtrato(userId: string, phone: string) {
                 const val = new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(Number(t.amount));
                 const icon = t.type === 'income' ? '💰' : '💸';
                 const dateStr = new Date(t.created_at).toLocaleDateString('pt-BR');
-                msg += `${icon} *${t.description}*\n   ${val} • _${dateStr}_\n\n`;
+                const suffix = (t as any).isCC ? " 💳" : "";
+                msg += `${icon} *${t.description}*${suffix}\n   ${val} • _${dateStr}_\n\n`;
             });
             msg += "━━━━━━━━━━━━━━━━━━━━\n";
-            msg += "_Acompanhe seu fluxo no app Saldin._ ✨";
+            msg += "_Saldin • Controle Total._ ✨";
             await sendWhatsApp(phone, msg);
         }
     } catch (e) {

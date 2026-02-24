@@ -48,7 +48,8 @@ REGRAS:
 2. Identifique o NOME do estabelecimento/pessoa (para Descrição).
 3. Identifique a CATEGORIA (Alimentação, Transporte, Moradia, etc).
 4. Se for comprovante de transferência, identifique o destinatário.
-5. Identifique o MÉTODO DE PAGAMENTO se possível (Pix, Cartão, Dinheiro).
+5. Identifique o MÉTODO DE PAGAMENTO (Pix, Crédito, Débito, Dinheiro, Boleto).
+6. O MÉTODO DE PAGAMENTO É OBRIGATÓRIO. Se não for possível identificar na imagem como foi pago, defina o "status" como "incompleto".
 
 RETORNO (JSON):
 {

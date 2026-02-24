@@ -170,8 +170,8 @@ export async function handleEditarCommand(userId: string, code: string): Promise
     if (!/^[A-Z2-9]{4}$/.test(formattedCode)) return { success: false, message: "⚠️ Código inválido. Use o ID de 4 caracteres (ex: A1B2)." };
 
     // 2. Verify Existence
-    const { data: exp } = await supabaseAdmin.from('expenses').eq('transaction_code', formattedCode).eq('user_id', userId).maybeSingle();
-    const { data: inc } = await supabaseAdmin.from('incomes').eq('transaction_code', formattedCode).eq('user_id', userId).maybeSingle();
+    const { data: exp } = await supabaseAdmin.from('expenses').select('*').eq('transaction_code', formattedCode).eq('user_id', userId).maybeSingle();
+    const { data: inc } = await supabaseAdmin.from('incomes').select('*').eq('transaction_code', formattedCode).eq('user_id', userId).maybeSingle();
 
     if (!exp && !inc) return { success: false, message: "⚠️ Transação não encontrada." };
 

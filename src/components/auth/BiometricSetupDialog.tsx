@@ -42,9 +42,9 @@ export function BiometricSetupDialog({
     }
 
     setIsActivating(true);
-    
+
     const success = await registerBiometric(userId, userEmail);
-    
+
     setIsActivating(false);
 
     if (success) {
@@ -64,8 +64,8 @@ export function BiometricSetupDialog({
   };
 
   const handleSkip = () => {
-    // Save preference to not show again for this session
-    sessionStorage.setItem("biometric_prompt_dismissed", "true");
+    // Save preference to not show again - unified to localStorage
+    localStorage.setItem("biometric_prompt_dismissed", "true");
     onOpenChange(false);
   };
 
@@ -92,8 +92,8 @@ export function BiometricSetupDialog({
         </div>
 
         <DialogFooter className="flex-col gap-2 sm:flex-col">
-          <Button 
-            onClick={handleActivate} 
+          <Button
+            onClick={handleActivate}
             disabled={isActivating}
             className="w-full"
           >
@@ -106,8 +106,8 @@ export function BiometricSetupDialog({
               </>
             )}
           </Button>
-          <Button 
-            variant="ghost" 
+          <Button
+            variant="ghost"
             onClick={handleSkip}
             className="w-full"
           >
