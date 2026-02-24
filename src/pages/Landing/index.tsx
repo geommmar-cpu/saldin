@@ -185,18 +185,34 @@ const PhoneMockup = () => {
     );
 };
 
-// ─── Device Showcase Component (Phone Only) ───
+// ─── Device Showcase Component (High Fidelity Mockup) ───
 const DeviceShowcase = () => {
     return (
-        <div className="relative w-full flex items-center justify-center h-[500px] sm:h-[600px]">
-            {/* Phone - Centered */}
+        <div className="relative w-full flex items-center justify-center py-6 sm:py-10">
+            {/* Main Mockup Image */}
             <motion.div
-                initial={{ opacity: 0, y: 40 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.8, delay: 0.2 }}
-                className="z-30 transform scale-[0.85] sm:scale-100 hover:scale-[1.02] transition-transform duration-300"
+                initial={{ opacity: 0, y: 40, scale: 0.95 }}
+                animate={{ opacity: 1, y: 0, scale: 1 }}
+                transition={{ duration: 1, ease: "easeOut", delay: 0.2 }}
+                className="relative z-30"
             >
-                <PhoneMockup />
+                <img
+                    src="/mockup-showcase.png"
+                    alt="Saldin App Showcase"
+                    className="w-full h-auto drop-shadow-[0_25px_60px_rgba(0,0,0,0.15)] max-w-4xl"
+                />
+
+                {/* Floating highlight elements for depth */}
+                <motion.div
+                    animate={{ y: [0, -10, 0] }}
+                    transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
+                    className="absolute -top-10 -right-5 w-24 h-24 bg-orange-100/50 rounded-full blur-2xl -z-10"
+                />
+                <motion.div
+                    animate={{ y: [0, 10, 0] }}
+                    transition={{ duration: 5, repeat: Infinity, ease: "easeInOut", delay: 1 }}
+                    className="absolute -bottom-10 -left-5 w-32 h-32 bg-blue-100/40 rounded-full blur-2xl -z-10"
+                />
             </motion.div>
         </div>
     );
@@ -703,9 +719,9 @@ const Landing = () => {
                     </motion.div>
 
                     {/* Right: Device Showcase (Phone + Laptop + Tablet) */}
-                    <div className="flex justify-center items-center relative mt-8 lg:mt-0 w-full sm:-ml-10 scale-90 sm:scale-100">
+                    <div className="flex justify-center items-center relative mt-12 lg:mt-0 w-full">
                         {/* Decorative background glow */}
-                        <div className="absolute inset-0 bg-gradient-to-tr from-orange-200/40 to-pink-300/40 rounded-full blur-3xl transform scale-110 -z-10" />
+                        <div className="absolute inset-0 bg-gradient-to-tr from-orange-200/30 to-pink-300/30 rounded-full blur-3xl transform scale-125 -z-10" />
                         <DeviceShowcase />
                     </div>
                 </div>
@@ -888,7 +904,9 @@ const Landing = () => {
                                 <h3 className="text-2xl font-bold mb-2 text-green-900">WhatsApp Inteligente</h3>
                                 <p className="text-green-800/80 max-w-md text-sm sm:text-base">Envie áudio, foto de notas fiscais ou texto. Nossa IA processa, categoriza e atualiza seu saldo em segundos.</p>
                             </div>
-                            <img src="https://illustrations.popsy.co/amber/working-vacation.svg" className="absolute -bottom-4 -right-4 w-48 opacity-10 rotate-12 grayscale" alt="WhatsApp" />
+                            <div className="absolute -bottom-16 -right-16 md:right-0 md:bottom-0 transform scale-[0.45] md:scale-[0.6] origin-bottom-right rotate-6 group-hover:rotate-0 transition-transform duration-500 opacity-60 group-hover:opacity-100">
+                                <PhoneMockup />
+                            </div>
                         </motion.div>
 
                         {/* Feature 2: Cards */}
