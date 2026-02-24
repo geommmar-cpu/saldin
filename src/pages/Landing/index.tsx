@@ -186,15 +186,15 @@ const PhoneMockup = () => {
 };
 
 // ─── Device Showcase Component (High Fidelity Mockup) ───
-const DeviceShowcase = () => {
+const DeviceShowcase = ({ className = "" }: { className?: string }) => {
     return (
-        <div className="relative w-full flex items-center justify-center py-6 sm:py-10">
+        <div className={`relative w-full flex items-center justify-center py-6 sm:py-10 ${className}`}>
             {/* Main Mockup Image */}
             <motion.div
                 initial={{ opacity: 0, y: 40, scale: 0.95 }}
                 animate={{ opacity: 1, y: 0, scale: 1 }}
                 transition={{ duration: 1, ease: "easeOut", delay: 0.2 }}
-                className="relative z-30"
+                className="relative z-30 animate-float" /* Added floating animation class */
             >
                 <img
                     src="/mockup-showcase.png"
@@ -470,13 +470,13 @@ const faqs = [
 
 // ─── Comparison Table Component ───
 const ComparisonTable = () => (
-    <Section className="py-16 bg-white border-b border-gray-100">
+    <Section className="py-10 sm:py-16 bg-white border-b border-gray-100">
         <div className="max-w-4xl mx-auto px-4">
             <div className="text-center mb-12">
                 <h2 className="font-serif text-3xl sm:text-4xl font-bold text-gray-900 mb-4">Por que o Saldin vence?</h2>
                 <p className="text-gray-500">A evolução natural do controle financeiro.</p>
             </div>
-            <div className="overflow-x-auto pb-4">
+            <div className="overflow-x-auto pb-4 pt-6"> {/* Added pt-6 to avoid clipping the badge */}
                 <table className="w-full text-left border-collapse min-w-[600px]">
                     <thead>
                         <tr>
@@ -661,8 +661,11 @@ const Landing = () => {
                         </div>
 
                         <div className="mb-4 sm:mb-6">
-                            <h1 className="font-serif text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold leading-[1.1] tracking-tight text-gray-900">
-                                Domine seu dinheiro com o <span className="text-transparent bg-clip-text bg-gradient-to-r from-orange-600 to-pink-500">Saldo Livre de Verdade™</span>
+                            <h1 className="font-serif text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold leading-[1.1] tracking-tighter text-gray-900">
+                                Domine seu dinheiro com o <br />
+                                <span className="text-transparent bg-clip-text bg-gradient-to-r from-orange-600 via-pink-500 to-orange-400">
+                                    Saldo Livre de Verdade™
+                                </span>
                             </h1>
                         </div>
 
@@ -675,11 +678,20 @@ const Landing = () => {
                             <Button
                                 size="lg"
                                 onClick={() => navigate("/auth")}
-                                className="gradient-warm text-white border-0 h-12 sm:h-14 px-8 text-base sm:text-lg font-semibold rounded-full shadow-lg shadow-orange-500/25 hover:shadow-orange-500/40 hover:scale-105 transition-all w-full sm:w-auto"
+                                className="gradient-warm text-white border-0 h-12 sm:h-14 px-8 text-base sm:text-lg font-bold rounded-full shadow-lg shadow-orange-500/25 hover:shadow-orange-500/40 hover:scale-105 transition-all w-full sm:w-auto"
                             >
                                 Testar Grátis Agora
                                 <ArrowRight className="w-5 h-5 ml-2" />
                             </Button>
+                            <div className="flex flex-col items-center sm:items-start justify-center">
+                                <div className="flex -space-x-2 mb-1">
+                                    {[1, 2, 3, 4].map((i) => (
+                                        <img key={i} src={`https://i.pravatar.cc/100?u=${i * 10}`} className="w-6 h-6 rounded-full border-2 border-white shadow-sm" alt="user" />
+                                    ))}
+                                    <div className="w-6 h-6 rounded-full bg-orange-100 border-2 border-white flex items-center justify-center text-[10px] font-bold text-orange-600">+500</div>
+                                </div>
+                                <p className="text-[10px] sm:text-xs text-gray-400 font-medium">Junte-se a quem já tem clareza</p>
+                            </div>
                             <Button
                                 variant="outline"
                                 size="lg"
@@ -702,12 +714,12 @@ const Landing = () => {
                     <div className="flex justify-center items-center relative mt-12 lg:mt-0 w-full">
                         {/* Decorative background glow */}
                         <div className="absolute inset-0 bg-gradient-to-tr from-orange-200/30 to-pink-300/30 rounded-full blur-3xl transform scale-125 -z-10" />
-                        <DeviceShowcase />
+                        <DeviceShowcase className="animate-float" />
                     </div>
                 </div>
 
                 {/* VSL Section - Inserting right after Hero intro for maximum retention */}
-                <div className="max-w-4xl mx-auto mt-12 sm:mt-16 mb-16 px-4 relative z-20">
+                <div className="max-w-4xl mx-auto mt-8 sm:mt-10 mb-10 px-4 relative z-20">
                     <div className="text-center mb-6">
                         <span className="inline-block py-1 px-3 rounded-full bg-red-100 text-red-600 text-xs font-bold uppercase tracking-wider mb-2 animate-pulse">
                             ⚠️ Assista antes que saia do ar
@@ -818,7 +830,7 @@ const Landing = () => {
             </Section>
 
             {/* ─── SOLUTION / MECHANISM SECTION ─── */}
-            <Section id="mecanismo" className="py-16 sm:py-24 px-4 bg-gray-50/50 relative overflow-hidden">
+            <Section id="mecanismo" className="py-10 sm:py-16 px-4 bg-gray-50/50 relative overflow-hidden">
                 <div className="max-w-7xl mx-auto grid lg:grid-cols-2 gap-12 lg:gap-16 items-center relative z-10">
                     <div>
                         <span className="text-sm font-bold uppercase tracking-widest text-primary">O Mecanismo Saldin</span>
@@ -861,7 +873,7 @@ const Landing = () => {
             </Section>
 
             {/* ─── FEATURES GRID (BENTO) ─── */}
-            <Section id="funcionalidades" className="py-16 sm:py-24 px-4 bg-white">
+            <Section id="funcionalidades" className="py-10 sm:py-16 px-4 bg-white">
                 <div className="max-w-7xl mx-auto">
                     <div className="text-center mb-12 sm:mb-16">
                         <h2 className="font-serif text-3xl sm:text-4xl md:text-5xl font-bold mb-4 sm:mb-6 text-gray-900">Funcionalidades Poderosas</h2>
@@ -943,7 +955,7 @@ const Landing = () => {
             <ComparisonTable />
 
             {/* ─── TESTIMONIALS ─── */}
-            <Section id="depoimentos" className="py-16 sm:py-24 px-4 bg-gray-50">
+            <Section id="depoimentos" className="py-10 sm:py-16 px-4 bg-gray-50">
                 <div className="max-w-7xl mx-auto">
                     <div className="text-center mb-12 sm:mb-16">
                         <h2 className="font-serif text-3xl sm:text-4xl md:text-5xl font-bold mb-6 text-gray-900">Vidas transformadas</h2>
@@ -1024,7 +1036,7 @@ const Landing = () => {
             </div>
 
             {/* ─── WAITING LIST / PRICING ─── */}
-            <Section id="pricing" className="py-16 sm:py-24 px-4 bg-gray-50">
+            <Section id="pricing" className="py-10 sm:py-16 px-4 bg-gray-50">
                 <SaleNotification />
                 <div className="max-w-5xl mx-auto">
                     <div className="text-center mb-10 sm:mb-12">
@@ -1037,7 +1049,7 @@ const Landing = () => {
 
                     <div className="grid md:grid-cols-3 gap-6 sm:gap-8 items-center">
                         {/* Monthly */}
-                        <div className="p-8 rounded-3xl bg-white border border-gray-100 shadow-sm hover:shadow-md transition-shadow order-2 md:order-1">
+                        <div className="p-8 rounded-3xl bg-white/60 backdrop-blur-md border border-white/50 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all order-2 md:order-1">
                             <h3 className="text-xl font-bold mb-2 text-gray-900">Mensal</h3>
                             <div className="flex items-baseline gap-1 mb-6">
                                 <span className="text-3xl font-bold text-gray-900">R$ 19,90</span>
@@ -1051,7 +1063,7 @@ const Landing = () => {
                         </div>
 
                         {/* Semester - Highlighted */}
-                        <div className="relative p-8 rounded-3xl bg-gray-900 text-white shadow-2xl scale-100 sm:scale-105 border border-gray-800 order-1 md:order-2 ring-4 ring-orange-500/20">
+                        <div className="relative p-8 rounded-3xl bg-gray-900/90 backdrop-blur-xl text-white shadow-2xl scale-100 sm:scale-105 border border-white/10 order-1 md:order-2 ring-4 ring-orange-500/20 hover:scale-[1.07] transition-all">
                             <div className="absolute -top-4 left-1/2 -translate-x-1/2 px-4 py-1.5 rounded-full bg-gradient-to-r from-orange-500 to-pink-500 text-white text-xs font-bold uppercase tracking-wide shadow-lg border border-white/20">
                                 🔥 Oferta Limitada
                             </div>
@@ -1084,7 +1096,7 @@ const Landing = () => {
                         </div>
 
                         {/* Annual */}
-                        <div className="p-8 rounded-3xl bg-white border border-gray-100 shadow-sm hover:shadow-md transition-shadow order-3 md:order-3">
+                        <div className="p-8 rounded-3xl bg-white/60 backdrop-blur-md border border-white/50 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all order-3 md:order-3">
                             <h3 className="text-xl font-bold mb-2 text-gray-900">Anual</h3>
                             <div className="flex items-baseline gap-1 mb-2">
                                 <span className="text-3xl font-bold text-gray-900">R$ 12,49</span>
@@ -1105,7 +1117,7 @@ const Landing = () => {
             <SecuritySection />
 
             {/* ─── FAQ ─── */}
-            <Section id="faq" className="py-16 sm:py-24 px-4 bg-gray-50">
+            <Section id="faq" className="py-10 sm:py-16 px-4 bg-gray-50">
                 <div className="max-w-3xl mx-auto">
                     <h2 className="font-serif text-3xl sm:text-4xl md:text-5xl font-bold text-center mb-10 sm:mb-12 text-gray-900">Perguntas Frequentes</h2>
                     <div className="space-y-3 sm:space-y-4">
