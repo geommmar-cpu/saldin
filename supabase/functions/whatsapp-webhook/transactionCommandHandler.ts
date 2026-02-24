@@ -26,45 +26,37 @@ export function generateTransactionCode(): string {
 }
 
 export function formatPremiumMessage(transaction: Transaction, balanceData: any, isDelete = false): string {
-    const { transaction_code, amount, description, category, account, date, type } = transaction;
+    const { transaction_code, amount, description, category, account, type } = transaction;
     const formattedAmount = new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(Number(amount));
-    const dateFormatted = new Date(date).toLocaleDateString('pt-BR');
 
-    let header = isDelete ? "TRANSAÇÃO REMOVIDA" : (type === 'income' ? "RECEITA REGISTRADA" : "TRANSAÇÃO CONFIRMADA");
+    let header = isDelete ? "🗑️ *TRANSAÇÃO REMOVIDA*" : (type === 'income' ? "💰 *RECEITA REGISTRADA*" : "💸 *GASTO CONFIRMADO*");
+    const divider = "━━━━━━━━━━━━━━━━";
 
     const details = `
-ID: ${transaction_code}
-Tipo: ${type === 'income' ? 'Receita' : 'Gasto'}
-Valor: ${formattedAmount}
-Categoria: ${category || 'Não definida'}
-Descrição: ${description}
-Origem: ${account || 'Padrão'}
-Data: ${dateFormatted}
+📝 *${description}*
+💵 *${formattedAmount}*
+
+📂 Categoria: _${category || 'Geral'}_
+🏦 Origem: _${account || 'Padrão'}_
+🔑 ID: \`${transaction_code}\`
 `.trim();
 
     const impact = `
-Saldo anterior: R$ ${formatCurrency(balanceData.previous_balance)}
-Novo saldo: R$ ${formatCurrency(balanceData.new_balance)}
-Balance total: R$ ${formatCurrency(balanceData.available_balance)}
-`.trim();
-
-    const actions = `
-Para excluir: excluir ${transaction_code}
-Para editar: editar ${transaction_code}
+📊 *RESUMO FINANCEIRO*
+Saldo: R$ ${formatCurrency(balanceData.new_balance)}
+Total: R$ ${formatCurrency(balanceData.available_balance)}
 `.trim();
 
     return `
-*${header}*
+${header}
 
+${divider}
 ${details}
+${divider}
 
-*RESUMO FINANCEIRO*
 ${impact}
 
-*AÇÕES*
-${actions}
-
-Saldin - Seu controle financeiro
+_Para excluir use: excluir ${transaction_code}_
 `.trim();
 }
 

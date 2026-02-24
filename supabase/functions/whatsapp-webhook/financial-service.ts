@@ -84,7 +84,6 @@ export async function processTransaction(data: TransactionData) {
             if (categoryId) payload.category_id = categoryId;
             if (bankAccountId) payload.bank_account_id = bankAccountId;
 
-            console.log("📤 Inserting EXPENSE:", JSON.stringify(payload));
             const { data: exp, error: err } = await supabaseAdmin
                 .from('expenses')
                 .insert(payload)
@@ -114,7 +113,6 @@ export async function processTransaction(data: TransactionData) {
             if (categoryId) payload.category_id = categoryId;
             if (bankAccountId) payload.bank_account_id = bankAccountId;
 
-            console.log("📤 Inserting INCOME:", JSON.stringify(payload));
             const { data: inc, error: err } = await supabaseAdmin
                 .from('incomes')
                 .insert(payload)
@@ -128,8 +126,6 @@ export async function processTransaction(data: TransactionData) {
             console.error("❌ DB Insert Error:", JSON.stringify(error));
             throw error;
         }
-
-        console.log("✅ DB Insert Success:", type);
 
         // Update Bank Account Balance if linked
         if (bankAccountId && !isCreditCard) {

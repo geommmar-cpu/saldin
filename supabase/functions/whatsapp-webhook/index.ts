@@ -353,7 +353,8 @@ Deno.serve(async (req: Request) => {
             if (normalizedCmd === 'saldo' || normalizedCmd === '/saldo') {
                 const balance = await getBalance(userId);
                 const formatted = new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(balance);
-                await sendWhatsApp(phoneToSend, `💰 Seu saldo atual é: *${formatted}*`);
+                const msg = `💰 *SEU SALDO ATUAL*\n━━━━━━━━━━━━━━━━━━━━\n*${formatted}*\n━━━━━━━━━━━━━━━━━━━━\n\n_Continue focado nos seus objetivos!_ ✨`;
+                await sendWhatsApp(phoneToSend, msg);
                 return new Response("Saldo", { status: 200 });
             }
 
@@ -401,18 +402,17 @@ Deno.serve(async (req: Request) => {
 
         // 7. MULTIPLE TRANSACTIONS PROCESSING
         if (intent.tipo === 'transacao' || (intent.items && intent.items.length > 0)) {
-            console.log(`🔄 Processing ${intent.items.length} items...`);
-            let summaryMsg = "✅ *TRANSAÇÕES REGISTRADAS*\n\n";
+            let summaryMsg = "✅ *RESUMO DAS OPERAÇÕES*\n";
+            summaryMsg += "━━━━━━━━━━━━━━━━━━━━\n\n";
             let totalProcessed = 0;
 
             for (const item of intent.items) {
-                console.log(`👉 Item: ${item.descricao} (${item.tipo}) - ${item.valor}`);
                 try {
                     const categoryId = await getCategoryId(userId, item.categoria_sugerida, item.tipo === "receita" ? "income" : "expense");
                     const { id: targetAccountId, isCreditCard } = await getPreferredAccount(userId, item.metodo_pagamento);
                     const tCode = generateTransactionCode();
 
-                    const result = await processTransaction({
+                    await processTransaction({
                         userId,
                         type: item.tipo === "receita" ? "income" : "expense",
                         amount: item.valor,
@@ -423,7 +423,6 @@ Deno.serve(async (req: Request) => {
                         isCreditCard: isCreditCard
                     });
 
-                    console.log(`✅ Item Processed: ${item.descricao}`);
                     const valStr = new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(item.valor);
                     const icon = item.tipo === 'receita' ? '💰' : '💸';
                     summaryMsg += `${icon} *${item.descricao}*\n   Valor: *${valStr}*\n   ID: \`${tCode}\`\n\n`;
@@ -436,10 +435,12 @@ Deno.serve(async (req: Request) => {
             if (totalProcessed > 0) {
                 const balance = await getBalance(userId);
                 const balStr = new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(balance);
-                summaryMsg += `📊 *SALDO ATUAL:* ${balStr}\n\n_Para excluir use: excluir [ID]_`;
+                summaryMsg += "━━━━━━━━━━━━━━━━━━━━\n";
+                summaryMsg += `📊 *SALDO ATUAL:* ${balStr}\n\n`;
+                summaryMsg += `_Dica: Para excluir, mande "excluir ID" (ex: excluir ${intent.items[0].descricao.includes('Salário') ? 'A1B2' : 'XPTO'})_`;
                 await sendWhatsApp(phoneToSend, summaryMsg);
             } else {
-                await sendWhatsApp(phoneToSend, "❌ Não consegui processar nenhuma transação. Tente novamente com outro formato.");
+                await sendWhatsApp(phoneToSend, "❌ Não consegui processar os itens. Verifique os valores e tente novamente.");
             }
 
             return new Response("Multi-Success", { status: 200 });
@@ -457,7 +458,7 @@ Deno.serve(async (req: Request) => {
 
 async function sendExtrato(userId: string, phone: string) {
     try {
-        const queryLimit = 5;
+        const queryLimit = 6;
         const { data: exps } = await supabaseAdmin.from('expenses').select('amount, description, date, created_at').eq('user_id', userId).order('created_at', { ascending: false }).limit(queryLimit);
         const { data: incs } = await supabaseAdmin.from('incomes').select('amount, description, date, type, created_at').eq('user_id', userId).order('created_at', { ascending: false }).limit(queryLimit);
 
@@ -466,16 +467,21 @@ async function sendExtrato(userId: string, phone: string) {
             .slice(0, queryLimit);
 
         if (!trs.length) {
-            await sendWhatsApp(phone, "📄 Nenhuma transação recente.");
+            await sendWhatsApp(phone, "📄 Nenhuma transação recente encontrada.");
         } else {
-            let msg = "📄 *Extrato (Últimas 5):*\n\n";
+            let msg = "📄 *EXTRATO RECENTE*\n";
+            msg += "━━━━━━━━━━━━━━━━━━━━\n\n";
             trs.forEach((t: any) => {
                 const val = new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(Number(t.amount));
-                const icon = t.type === 'income' ? '🟢' : '🔴';
+                const icon = t.type === 'income' ? '💰' : '💸';
                 const dateStr = new Date(t.created_at).toLocaleDateString('pt-BR');
-                msg += `${icon} *${t.description}*\n   ${val} em ${dateStr}\n\n`;
+                msg += `${icon} *${t.description}*\n   ${val} • _${dateStr}_\n\n`;
             });
+            msg += "━━━━━━━━━━━━━━━━━━━━\n";
+            msg += "_Acompanhe seu fluxo no app Saldin._ ✨";
             await sendWhatsApp(phone, msg);
         }
-    } catch (e) { console.error(e); }
+    } catch (e) {
+        console.error("Extrato error:", e);
+    }
 }

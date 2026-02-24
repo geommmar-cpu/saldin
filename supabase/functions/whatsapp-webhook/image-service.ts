@@ -6,12 +6,17 @@ const openai = new OpenAI({
     apiKey: Deno.env.get("OPENAI_API_KEY")!,
 });
 
-export interface FinancialIntent {
-    tipo: "receita" | "gasto" | "duvida" | "consulta_saldo" | "consulta_extrato" | "incompleto";
+export interface FinancialItem {
+    tipo: "receita" | "gasto";
     valor: number;
     descricao: string;
     categoria_sugerida: string;
     metodo_pagamento: string;
+}
+
+export interface FinancialIntent {
+    tipo: "transacao" | "duvida" | "consulta_saldo" | "consulta_extrato";
+    items: FinancialItem[];
     status: "ok" | "incompleto";
 }
 
@@ -47,11 +52,16 @@ REGRAS:
 
 RETORNO (JSON):
 {
-  "tipo": "gasto" (ou "receita" se for recebimento), 
-  "valor": number, 
-  "descricao": string,
-  "categoria_sugerida": string,
-  "metodo_pagamento": string,
+  "tipo": "transacao",
+  "items": [
+    {
+      "tipo": "gasto" (ou "receita"), 
+      "valor": number, 
+      "descricao": string,
+      "categoria_sugerida": string,
+      "metodo_pagamento": string
+    }
+  ],
   "status": "ok" | "incompleto"
 }`;
 
