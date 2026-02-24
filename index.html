@@ -90,17 +90,24 @@
       };
 
       window.onunhandledrejection = function (event) {
+        // Ignore benign AbortErrors (common in mobile browsers/React Query)
+        if (event.reason && (event.reason.name === 'AbortError' || event.reason.message?.includes('aborted'))) {
+          console.warn('Benign AbortError suppressed from fail-safe UI');
+          return;
+        }
         showError('Unhandled Rejection', event.reason);
       };
 
       // If after 15s the root still has no content, show the fail-safe
       setTimeout(() => {
         const root = document.getElementById('root');
+        // Only show if nothing has rendered AND no fatal errors were already logged
         if (root && root.innerHTML === '' && failSafe) {
           showError('Timeout: Carregamento lento ou falha no boot (15s)');
         }
       }, 15000);
     })();
+
   </script>
 
   <script type="module" src="/src/main.tsx"></script>
