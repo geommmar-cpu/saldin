@@ -326,16 +326,26 @@ Deno.serve(async (req: Request) => {
             }
 
             // 3. Normal Commands (Delete, Edit, Saldo, Extrato)
-            const deleteMatch = cleanText.match(/(?:excluir|deletar|remover)\s+([A-Z2-9]{4})/i);
-            if (deleteMatch) {
-                const res = await handleExcluirCommand(userId, deleteMatch[1].toUpperCase().trim());
+            const deleteMatch = cleanText.match(/(?:excluir|deletar|remover)(?:\s+)?([A-Z2-9]{4})?/i);
+            if (deleteMatch && (deleteMatch[1] || cleanText.toLowerCase().trim() === 'excluir')) {
+                const code = deleteMatch[1]?.toUpperCase().trim();
+                if (!code) {
+                    await sendWhatsApp(phoneToSend, "🤔 Qual transação você deseja excluir? Por favor, use o formato: *excluir [ID]* (ex: _excluir A1B2_).");
+                    return new Response("Delete No ID", { status: 200 });
+                }
+                const res = await handleExcluirCommand(userId, code);
                 await sendWhatsApp(phoneToSend, res.message);
                 return new Response("Delete", { status: 200 });
             }
 
-            const editMatch = cleanText.match(/(?:editar|alterar|mudar)\s+([A-Z2-9]{4})/i);
-            if (editMatch) {
-                const res = await handleEditarCommand(userId, editMatch[1].toUpperCase().trim());
+            const editMatch = cleanText.match(/(?:editar|alterar|mudar)(?:\s+)?([A-Z2-9]{4})?/i);
+            if (editMatch && (editMatch[1] || cleanText.toLowerCase().trim() === 'editar')) {
+                const code = editMatch[1]?.toUpperCase().trim();
+                if (!code) {
+                    await sendWhatsApp(phoneToSend, "🤔 Qual transação você deseja editar? Por favor, use o formato: *editar [ID]* (ex: _editar A1B2_).");
+                    return new Response("Edit No ID", { status: 200 });
+                }
+                const res = await handleEditarCommand(userId, code);
                 await sendWhatsApp(phoneToSend, res.message);
                 return new Response("Edit", { status: 200 });
             }
