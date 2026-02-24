@@ -17,12 +17,12 @@ interface Transaction {
 }
 
 export function generateTransactionCode(): string {
-    const date = new Date();
-    const YYYY = date.getFullYear();
-    const MM = String(date.getMonth() + 1).padStart(2, '0');
-    const DD = String(date.getDate()).padStart(2, '0');
-    const randomChars = Math.random().toString(36).substring(2, 8).toUpperCase();
-    return `TXN-${YYYY}${MM}${DD}-${randomChars}`;
+    const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789'; // No letters/numbers that look alike (I, O, 0, 1)
+    let code = '';
+    for (let i = 0; i < 4; i++) {
+        code += chars.charAt(Math.floor(Math.random() * chars.length));
+    }
+    return code;
 }
 
 export function formatPremiumMessage(transaction: Transaction, balanceData: any, isDelete = false): string {
@@ -76,16 +76,10 @@ function formatCurrency(val: number) {
 export async function handleExcluirCommand(userId: string, code: string): Promise<{ success: boolean; message: string }> {
     console.log(`🗑️ Processing DELETE for code: ${code}, User: ${userId}`);
 
-    // 1. Validate Code Format (more lenient: handle optional 'TXN-')
-    // Ensure code has "TXN-" prefix if missing
-    let formattedCode = code.toUpperCase().trim();
-    if (!formattedCode.startsWith('TXN-')) {
-        formattedCode = `TXN-${formattedCode}`;
-    }
-
-    if (!/^TXN-\d{8}-[A-Z0-9]{6}$/.test(formattedCode)) {
+    const formattedCode = code.toUpperCase().trim();
+    if (!/^[A-Z2-9]{4}$/.test(formattedCode)) {
         console.warn(`⚠️ Invalid code format: ${formattedCode}`);
-        return { success: false, message: "⚠️ Código inválido. Formato esperado: TXN-YYYYMMDD-XXXXXX" };
+        return { success: false, message: "⚠️ Código inválido. O ID deve ter 4 caracteres (ex: A1B2)." };
     }
 
     // 2. Find Transaction
@@ -158,12 +152,13 @@ export async function handleExcluirCommand(userId: string, code: string): Promis
 
 
 export async function handleEditarCommand(userId: string, code: string): Promise<{ success: boolean; message: string }> {
+    const formattedCode = code.toUpperCase().trim();
     // 1. Validate Code
-    if (!/^TXN-\d{8}-[A-Z0-9]{6}$/.test(code)) return { success: false, message: "⚠️ Código inválido." };
+    if (!/^[A-Z2-9]{4}$/.test(formattedCode)) return { success: false, message: "⚠️ Código inválido. Use o ID de 4 caracteres (ex: A1B2)." };
 
     // 2. Verify Existence
-    const { data: exp } = await supabaseAdmin.from('expenses').eq('transaction_code', code).eq('user_id', userId).maybeSingle();
-    const { data: inc } = await supabaseAdmin.from('incomes').eq('transaction_code', code).eq('user_id', userId).maybeSingle();
+    const { data: exp } = await supabaseAdmin.from('expenses').eq('transaction_code', formattedCode).eq('user_id', userId).maybeSingle();
+    const { data: inc } = await supabaseAdmin.from('incomes').eq('transaction_code', formattedCode).eq('user_id', userId).maybeSingle();
 
     if (!exp && !inc) return { success: false, message: "⚠️ Transação não encontrada." };
 
@@ -171,13 +166,13 @@ export async function handleEditarCommand(userId: string, code: string): Promise
     await supabaseAdmin.from('conversation_states').upsert({
         user_id: userId,
         step: 'awaiting_edit_selection',
-        context: { transaction_code: code, type: exp ? 'expense' : 'income' },
+        context: { transaction_code: formattedCode, type: exp ? 'expense' : 'income' },
         updated_at: new Date().toISOString(),
     });
 
     return {
         success: true,
-        message: `O que deseja alterar na transação ${code}?\n\n1 - Valor\n2 - Categoria\n3 - Descrição\n\nResponda com o número ou nome da opção.`
+        message: `O que deseja alterar na transação ${formattedCode}?\n\n1 - Valor\n2 - Categoria\n3 - Descrição\n\nResponda com o número ou nome da opção.`
     };
 }
 

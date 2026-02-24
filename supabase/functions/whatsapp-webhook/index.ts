@@ -325,12 +325,19 @@ Deno.serve(async (req: Request) => {
                 return new Response("Edit Step OK", { status: 200 });
             }
 
-            // 3. Normal Commands (Delete, Saldo, Extrato)
-            const deleteMatch = cleanText.match(/excluir.*?(txn-\d{8}-[a-z0-9]{6})/i);
+            // 3. Normal Commands (Delete, Edit, Saldo, Extrato)
+            const deleteMatch = cleanText.match(/(?:excluir|deletar|remover)\s+([A-Z2-9]{4})/i);
             if (deleteMatch) {
                 const res = await handleExcluirCommand(userId, deleteMatch[1].toUpperCase().trim());
                 await sendWhatsApp(phoneToSend, res.message);
                 return new Response("Delete", { status: 200 });
+            }
+
+            const editMatch = cleanText.match(/(?:editar|alterar|mudar)\s+([A-Z2-9]{4})/i);
+            if (editMatch) {
+                const res = await handleEditarCommand(userId, editMatch[1].toUpperCase().trim());
+                await sendWhatsApp(phoneToSend, res.message);
+                return new Response("Edit", { status: 200 });
             }
 
             if (normalizedCmd === 'saldo' || normalizedCmd === '/saldo') {
@@ -408,8 +415,8 @@ Deno.serve(async (req: Request) => {
 
                     console.log(`✅ Item Processed: ${item.descricao}`);
                     const valStr = new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(item.valor);
-                    const icon = item.tipo === 'receita' ? '🟢' : '🔴';
-                    summaryMsg += `${icon} *${item.descricao}*\n   ${valStr} (${item.categoria_sugerida})\n   ID: ${tCode}\n\n`;
+                    const icon = item.tipo === 'receita' ? '💰' : '💸';
+                    summaryMsg += `${icon} *${item.descricao}*\n   Valor: *${valStr}*\n   ID: \`${tCode}\`\n\n`;
                     totalProcessed++;
                 } catch (err) {
                     console.error(`❌ Item Failed: ${item.descricao}`, err);
@@ -419,7 +426,7 @@ Deno.serve(async (req: Request) => {
             if (totalProcessed > 0) {
                 const balance = await getBalance(userId);
                 const balStr = new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(balance);
-                summaryMsg += `💰 *Saldo Atual:* ${balStr}\n\n_Para excluir use: excluir [ID]_`;
+                summaryMsg += `📊 *SALDO ATUAL:* ${balStr}\n\n_Para excluir use: excluir [ID]_`;
                 await sendWhatsApp(phoneToSend, summaryMsg);
             } else {
                 await sendWhatsApp(phoneToSend, "❌ Não consegui processar nenhuma transação. Tente novamente com outro formato.");
