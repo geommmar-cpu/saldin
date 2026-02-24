@@ -16,11 +16,14 @@ const supabaseAdmin = createClient(SUPABASE_URL, SERVICE_ROLE_KEY);
 // ─── META API HELPERS ───
 
 async function sendWhatsApp(to: string, text: string): Promise<void> {
-    if (!META_ACCESS_TOKEN || !META_PHONE_NUMBER_ID) return;
+    if (!META_ACCESS_TOKEN || !META_PHONE_NUMBER_ID) {
+        console.error("❌ Missing META credentials");
+        return;
+    }
 
-    console.log(`📤 [v25.0-simple] Sending Text to ${to}...`);
+    console.log(`📤 [v22.0] Sending Text to ${to}...`);
     try {
-        const url = `https://graph.facebook.com/v25.0/${META_PHONE_NUMBER_ID}/messages`;
+        const url = `https://graph.facebook.com/v22.0/${META_PHONE_NUMBER_ID}/messages`;
         const resp = await fetch(url, {
             method: "POST",
             headers: { "Authorization": `Bearer ${META_ACCESS_TOKEN}`, "Content-Type": "application/json" },
@@ -33,15 +36,19 @@ async function sendWhatsApp(to: string, text: string): Promise<void> {
         });
         const data = await resp.json();
         console.log(`✅ Response for ${to}:`, JSON.stringify(data));
+        if (data.error) console.error("❌ Meta API Error:", data.error);
     } catch (e) { console.error(`❌ Failed:`, e); }
 }
 
 async function sendWhatsAppTemplate(to: string, templateName: string = "hello_world"): Promise<void> {
-    if (!META_ACCESS_TOKEN || !META_PHONE_NUMBER_ID) return;
+    if (!META_ACCESS_TOKEN || !META_PHONE_NUMBER_ID) {
+        console.error("❌ Missing META credentials");
+        return;
+    }
 
-    console.log(`📤 [v25.0-simple] Sending Template to ${to}...`);
+    console.log(`📤 [v22.0] Sending Template to ${to}...`);
     try {
-        const url = `https://graph.facebook.com/v25.0/${META_PHONE_NUMBER_ID}/messages`;
+        const url = `https://graph.facebook.com/v22.0/${META_PHONE_NUMBER_ID}/messages`;
         const resp = await fetch(url, {
             method: "POST",
             headers: { "Authorization": `Bearer ${META_ACCESS_TOKEN}`, "Content-Type": "application/json" },
