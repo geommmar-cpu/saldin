@@ -448,12 +448,8 @@ const VSL = () => (
     </div>
 );
 
-// ─── Headlines rotation ───
-const headlines = [
-    "Pare de ser roubado pelas 'pequenas parcelas'.",
-    "O fim das planilhas chatas chegou.",
-    "Seu dinheiro está sumindo? Saiba onde.",
-];
+// ─── Main Headline ───
+const mainHeadline = "Domine seu dinheiro com o Saldo Livre de Verdade™";
 
 // ─── Testimonials ───
 const testimonials = [
@@ -575,16 +571,8 @@ const SecuritySection = () => (
 
 const Landing = () => {
     const navigate = useNavigate();
-    const [headlineIndex, setHeadlineIndex] = useState(0);
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
     const [openFaq, setOpenFaq] = useState<number | null>(null);
-
-    useEffect(() => {
-        const interval = setInterval(() => {
-            setHeadlineIndex((i) => (i + 1) % headlines.length);
-        }, 4000);
-        return () => clearInterval(interval);
-    }, []);
 
     const scrollTo = (id: string) => {
         document.getElementById(id)?.scrollIntoView({ behavior: "smooth" });
@@ -671,19 +659,10 @@ const Landing = () => {
                             A revolução no controle financeiro
                         </div>
 
-                        <div className="h-[120px] md:h-[180px] lg:h-[200px] relative mb-4 sm:mb-6">
-                            <AnimatePresence mode="wait">
-                                <motion.h1
-                                    key={headlineIndex}
-                                    initial={{ opacity: 0, y: 20 }}
-                                    animate={{ opacity: 1, y: 0 }}
-                                    exit={{ opacity: 0, y: -20 }}
-                                    transition={{ duration: 0.5 }}
-                                    className="font-serif text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold leading-[1.1] tracking-tight absolute top-0 left-0 w-full text-gray-900"
-                                >
-                                    {headlines[headlineIndex]}
-                                </motion.h1>
-                            </AnimatePresence>
+                        <div className="mb-4 sm:mb-6">
+                            <h1 className="font-serif text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold leading-[1.1] tracking-tight text-gray-900">
+                                Domine seu dinheiro com o <span className="text-transparent bg-clip-text bg-gradient-to-r from-orange-600 to-pink-500">Saldo Livre de Verdade™</span>
+                            </h1>
                         </div>
 
                         <p className="text-lg sm:text-xl text-gray-500 max-w-xl mx-auto lg:mx-0 mb-8 sm:mb-10 leading-relaxed px-4 lg:px-0">
@@ -714,7 +693,7 @@ const Landing = () => {
                         <div className="mt-8 flex items-center justify-center lg:justify-start gap-4 text-xs sm:text-sm text-gray-500">
                             <span className="flex items-center gap-1"><Shield className="w-4 h-4 text-emerald-500" /> Criptografado</span>
                             <span className="w-1 h-1 bg-gray-300 rounded-full" />
-                            <span className="flex items-center gap-1"><CheckCircle className="w-4 h-4 text-emerald-500" /> Sem Cartão</span>
+                            <span className="flex items-center gap-1"><CheckCircle className="w-4 h-4 text-emerald-500" /> Ativação Imediata</span>
                         </div>
                     </motion.div>
 
@@ -1049,7 +1028,7 @@ const Landing = () => {
                 <div className="max-w-5xl mx-auto">
                     <div className="text-center mb-10 sm:mb-12">
                         <span className="text-sm font-bold uppercase tracking-widest text-primary">Oferta de Lançamento</span>
-                        <h2 className="font-serif text-3xl sm:text-4xl md:text-5xl font-bold mt-4 mb-6 text-gray-900">Comece agora com 5 dias grátis</h2>
+                        <h2 className="font-serif text-3xl sm:text-4xl md:text-5xl font-bold mt-4 mb-6 text-gray-900">Comece agora com 4 dias grátis</h2>
                         <p className="text-gray-500 text-base sm:text-lg max-w-xl mx-auto">
                             Sem letras miúdas. Se não gostar, cancele com um clique.
                         </p>
@@ -1176,10 +1155,10 @@ const Landing = () => {
                             onClick={() => navigate("/auth")}
                             className="h-14 sm:h-16 px-10 rounded-full text-lg font-bold bg-white text-orange-600 hover:bg-gray-100 hover:scale-105 transition-all shadow-xl w-full sm:w-auto"
                         >
-                            Começar 5 Dias Grátis
+                            Começar 4 Dias Grátis
                         </Button>
                     </div>
-                    <p className="text-white/70 text-xs mt-6">Não pedimos cartão de crédito • Cancelamento fácil</p>
+                    <p className="text-white/70 text-xs mt-6">Cancele a qualquer momento • Teste de 4 dias incluso</p>
                 </div>
             </section>
 
