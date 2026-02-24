@@ -15,13 +15,24 @@ const supabaseAdmin = createClient(SUPABASE_URL, SERVICE_ROLE_KEY);
 
 // ─── META API HELPERS ───
 
+function normalizeTo(phone: string): string {
+    // Handling Brazil 9th digit for Meta Test Accounts
+    // If it's 55 + DDD (2) + 8 digits, add the '9'
+    if (phone.startsWith("55") && phone.length === 12) {
+        console.log(`🔧 Normalizing Brazil number: ${phone} -> ${phone.substring(0, 4)}9${phone.substring(4)}`);
+        return phone.substring(0, 4) + "9" + phone.substring(4);
+    }
+    return phone;
+}
+
 async function sendWhatsApp(to: string, text: string): Promise<void> {
     if (!META_ACCESS_TOKEN || !META_PHONE_NUMBER_ID) {
         console.error("❌ Missing META credentials");
         return;
     }
 
-    console.log(`📤 [v22.0] Sending Text to ${to}...`);
+    const normalizedToValue = normalizeTo(to);
+    console.log(`📤 [v22.0] Sending Text to ${normalizedToValue}...`);
     try {
         const url = `https://graph.facebook.com/v22.0/${META_PHONE_NUMBER_ID}/messages`;
         const resp = await fetch(url, {
@@ -29,13 +40,13 @@ async function sendWhatsApp(to: string, text: string): Promise<void> {
             headers: { "Authorization": `Bearer ${META_ACCESS_TOKEN}`, "Content-Type": "application/json" },
             body: JSON.stringify({
                 messaging_product: "whatsapp",
-                to: to,
+                to: normalizedToValue,
                 type: "text",
                 text: { body: text }
             })
         });
         const data = await resp.json();
-        console.log(`✅ Response for ${to}:`, JSON.stringify(data));
+        console.log(`✅ Response for ${normalizedToValue}:`, JSON.stringify(data));
         if (data.error) console.error("❌ Meta API Error:", data.error);
     } catch (e) { console.error(`❌ Failed:`, e); }
 }
@@ -46,7 +57,8 @@ async function sendWhatsAppTemplate(to: string, templateName: string = "hello_wo
         return;
     }
 
-    console.log(`📤 [v22.0] Sending Template to ${to}...`);
+    const normalizedToValue = normalizeTo(to);
+    console.log(`📤 [v22.0] Sending Template to ${normalizedToValue}...`);
     try {
         const url = `https://graph.facebook.com/v22.0/${META_PHONE_NUMBER_ID}/messages`;
         const resp = await fetch(url, {
@@ -54,7 +66,7 @@ async function sendWhatsAppTemplate(to: string, templateName: string = "hello_wo
             headers: { "Authorization": `Bearer ${META_ACCESS_TOKEN}`, "Content-Type": "application/json" },
             body: JSON.stringify({
                 messaging_product: "whatsapp",
-                to: to,
+                to: normalizedToValue,
                 type: "template",
                 template: {
                     name: templateName,
@@ -63,7 +75,7 @@ async function sendWhatsAppTemplate(to: string, templateName: string = "hello_wo
             })
         });
         const data = await resp.json();
-        console.log(`✅ Template Response for ${to}:`, JSON.stringify(data));
+        console.log(`✅ Template Response for ${normalizedToValue}:`, JSON.stringify(data));
     } catch (e) { console.error(`❌ Failed:`, e); }
 }
 
