@@ -171,120 +171,87 @@ export default function Home() {
           </div>
         </div>
 
-        <div className="px-5 pt-4">
+        <div className="px-5 space-y-8 pt-4">
           {hasData ? (
-            <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:items-start">
-              {/* Left Column (Main Stats & Transactions) */}
-              <div className="lg:col-span-12 xl:col-span-8 space-y-8">
-                {/* 1. Hero Balance - Ultra Glass Effect Container */}
-                <FadeIn className="glass-premium p-2 rounded-[3.5rem] overflow-hidden group">
-                  <BalanceHero
-                    balance={balanceBreakdown}
-                    cryptoTotal={preferences.cryptoEnabled ? cryptoTotal : 0}
-                    cryptoEnabled={preferences.cryptoEnabled}
-                  />
-                </FadeIn>
+            <>
+              {/* 1. Hero Balance */}
+              <FadeIn>
+                <BalanceHero
+                  balance={balanceBreakdown}
+                  cryptoTotal={preferences.cryptoEnabled ? cryptoTotal : 0}
+                  cryptoEnabled={preferences.cryptoEnabled}
+                />
+              </FadeIn>
 
-                {/* 2. Monthly Summary - Glass Container */}
-                <FadeIn delay={0.05} className="glass-premium p-10 rounded-[3rem]">
-                  <div className="flex items-center gap-3 mb-8">
-                    <div className="w-1.5 h-8 bg-primary rounded-full" />
-                    <h3 className="text-sm font-black text-foreground uppercase tracking-[0.2em]">Desempenho de Fluxo</h3>
-                  </div>
-                  <MonthlyResult
-                    totalIncome={totalIncome}
-                    totalSpent={totalSpent + totalCCInstallments}
-                    investedAmount={cryptoInvested}
-                    subscriptionsAmount={activeSubs.reduce((sum, s) => sum + Number(s.amount), 0)}
-                  />
-                </FadeIn>
+              {/* 2. Monthly Summary (Income vs Expense) - High Priority */}
+              <FadeIn delay={0.05}>
+                <MonthlyResult
+                  totalIncome={totalIncome}
+                  totalSpent={totalSpent + totalCCInstallments}
+                  investedAmount={cryptoInvested}
+                  subscriptionsAmount={activeSubs.reduce((sum, s) => sum + Number(s.amount), 0)}
+                />
+              </FadeIn>
 
-                {/* 7. Recent Transactions - High priority on web */}
-                <FadeIn delay={0.3} className="glass-premium p-10 rounded-[3rem]">
-                  <div className="flex items-center justify-between mb-8">
-                    <div className="flex items-center gap-3">
-                      <div className="w-1.5 h-8 bg-essential rounded-full" />
-                      <h3 className="text-sm font-black text-foreground uppercase tracking-[0.2em]">Movimentações Recentes</h3>
-                    </div>
-                  </div>
-                  <TransactionsSection
-                    expenses={filteredExpenses}
-                    incomes={filteredIncomes}
-                    debts={filteredDebts}
-                    receivables={filteredReceivables}
-                    creditCardInstallments={ccInstallments}
-                    selectedMonth={selectedMonth}
-                  />
-                </FadeIn>
-              </div>
+              {/* 3. Critical Alerts */}
+              <FadeIn delay={0.1}>
+                <AlertsSection
+                  debts={filteredDebts}
+                  goals={goals}
+                  creditCards={creditCards}
+                  installments={ccInstallments}
+                  subscriptions={activeSubs}
+                  selectedMonth={selectedMonth}
+                />
+              </FadeIn>
 
-              {/* Right Column (Cards, Goals & Accounts) */}
-              <div className="lg:col-span-5 xl:col-span-4 space-y-8">
-                {/* 3. Critical Alerts */}
-                <FadeIn delay={0.1}>
-                  <AlertsSection
-                    debts={filteredDebts}
-                    goals={goals}
-                    creditCards={creditCards}
-                    installments={ccInstallments}
-                    subscriptions={activeSubs}
-                    selectedMonth={selectedMonth}
-                  />
-                </FadeIn>
-
-                {/* 4. Credit Cards Carousel - Glass Box */}
-                {creditCards.length > 0 && (
-                  <div className="glass-premium p-6 rounded-[3rem]">
-                    <div className="flex items-center justify-between px-1 mb-6">
-                      <div className="flex items-center gap-3">
-                        <div className="w-12 h-12 rounded-2xl bg-obligation/10 flex items-center justify-center border border-obligation/10 shadow-inner">
-                          <Wallet className="w-6 h-6 text-obligation" />
-                        </div>
-                        <div>
-                          <h3 className="text-sm font-black text-foreground uppercase tracking-[0.2em]">Meus Cartões</h3>
-                          <p className="text-[10px] text-muted-foreground font-medium uppercase tracking-wider">Gestão de Crédito</p>
-                        </div>
+              {/* 4. Credit Cards Carousel (New Highlight) */}
+              {creditCards.length > 0 && (
+                <FadeIn delay={0.15} className="bg-gradient-to-br from-secondary/30 to-background p-4 -mx-4 sm:mx-0 sm:rounded-3xl border-y sm:border border-border/50">
+                  <div className="flex items-center justify-between px-1 mb-3">
+                    <div className="flex items-center gap-2">
+                      <div className="w-8 h-8 rounded-full bg-obligation/10 flex items-center justify-center">
+                        <Wallet className="w-4 h-4 text-obligation" />
                       </div>
-                      <button onClick={() => navigate("/cards")} className="text-xs text-primary font-black uppercase tracking-widest hover:underline transition-all bg-primary/5 px-4 py-2 rounded-full border border-primary/10">Gerenciar</button>
+                      <h3 className="text-sm font-semibold text-foreground uppercase tracking-wider">Meus Cartões</h3>
                     </div>
-                    <div className="flex justify-center xl:justify-start">
-                      <CreditCardsCarousel
-                        cards={creditCards}
-                        installments={ccInstallments}
-                        selectedMonth={selectedMonth}
-                      />
-                    </div>
+                    <button onClick={() => navigate("/cards")} className="text-xs text-primary font-medium hover:underline">Gerenciar</button>
                   </div>
-                )}
-
-                {/* 5. Bank Accounts - Glass Box */}
-                <div className="glass-premium p-6 rounded-[3rem]">
-                  <div className="flex items-center gap-3 mb-6">
-                    <h3 className="text-sm font-black text-foreground uppercase tracking-[0.2em]">Cofre e Bancos</h3>
-                  </div>
-                  <BankAccountsSummary />
-                </div>
-
-                {/* 5.1 Crypto - Glass Box */}
-                {preferences.cryptoEnabled && (
-                  <FadeIn delay={0.22} className="glass-premium p-8 rounded-[3rem]">
-                    <CryptoSummary />
-                  </FadeIn>
-                )}
-
-                {/* 6. Goals - Glass Box */}
-                <div className="glass-premium p-6 rounded-[3rem]">
-                  <div className="flex items-center gap-3 mb-6">
-                    <h3 className="text-sm font-black text-foreground uppercase tracking-[0.2em]">Metas de Futuro</h3>
-                  </div>
-                  <GoalsSummary
-                    goals={goals}
-                    totalSaved={goalStats?.totalSaved || 0}
-                    totalTarget={goalStats?.totalTarget || 0}
+                  <CreditCardsCarousel
+                    cards={creditCards}
+                    installments={ccInstallments}
+                    selectedMonth={selectedMonth}
                   />
-                </div>
-              </div>
-            </div>
+                </FadeIn>
+              )}
+
+              {/* 5. Bank Accounts & Crypto */}
+              <FadeIn delay={0.2} className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <BankAccountsSummary />
+                {preferences.cryptoEnabled && <CryptoSummary />}
+              </FadeIn>
+
+              {/* 6. Goals */}
+              <FadeIn delay={0.25}>
+                <GoalsSummary
+                  goals={goals}
+                  totalSaved={goalStats?.totalSaved || 0}
+                  totalTarget={goalStats?.totalTarget || 0}
+                />
+              </FadeIn>
+
+              {/* 7. Recent Transactions */}
+              <FadeIn delay={0.3}>
+                <TransactionsSection
+                  expenses={filteredExpenses}
+                  incomes={filteredIncomes}
+                  debts={filteredDebts}
+                  receivables={filteredReceivables}
+                  creditCardInstallments={ccInstallments}
+                  selectedMonth={selectedMonth}
+                />
+              </FadeIn>
+            </>
           ) : (
             <FadeIn delay={0.1} className="flex flex-col items-center justify-center py-12 px-4 text-center">
               {/* Onboarding Empty State */}
