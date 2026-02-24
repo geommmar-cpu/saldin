@@ -163,10 +163,7 @@ export async function processTransaction(data: TransactionData) {
 
 
 export async function getBalance(userId: string): Promise<number> {
-    // Updated Logic: Mirror Frontend "Total Balance"
-    // Sum of all active bank accounts only.
-    // Ignored manual/cash transactions (unlinked) to avoid discrepancies with the App Dashboard.
-
+    // 1. Get Sum of all active bank accounts (Saldo Bruto)
     const { data: banks } = await supabaseAdmin
         .from('bank_accounts')
         .select('current_balance')
@@ -175,7 +172,37 @@ export async function getBalance(userId: string): Promise<number> {
 
     const bankTotal = banks?.reduce((acc: number, b: any) => acc + Number(b.current_balance), 0) || 0;
 
-    return bankTotal;
+    // 2. Get Pending Commitments for the current month (Saldo Comprometido)
+    const now = new Date();
+    const monthStart = new Date(now.getFullYear(), now.getMonth(), 1).toISOString();
+    const monthEnd = new Date(now.getFullYear(), now.getMonth() + 1, 0, 23, 59, 59).toISOString();
+
+    // Pending essential/pilar expenses
+    const { data: pendingExpenses } = await supabaseAdmin
+        .from('expenses')
+        .select('amount')
+        .eq('user_id', userId)
+        .eq('status', 'pending')
+        .or('emotion.eq.essencial,emotion.eq.pilar')
+        .gte('date', monthStart)
+        .lte('date', monthEnd);
+
+    const pendingTotal = pendingExpenses?.reduce((acc: number, e: any) => acc + Number(e.amount), 0) || 0;
+
+    // Active debts for the month (Active installments)
+    const { data: debts } = await supabaseAdmin
+        .from('debts')
+        .select('total_amount, installment_amount, is_installment, total_installments, current_installment')
+        .eq('user_id', userId)
+        .eq('status', 'active');
+
+    const debtTotal = debts?.reduce((acc: number, d: any) => {
+        if (d.is_installment) return acc + Number(d.installment_amount || 0);
+        return acc + Number(d.total_amount || 0);
+    }, 0) || 0;
+
+    // 3. Saldo Livre = Saldo Bruto - (Pendências + Dívidas)
+    return bankTotal - (pendingTotal + debtTotal);
 }
 
 export async function getLastTransactions(userId: string, limit = 5) {

@@ -389,9 +389,9 @@ Deno.serve(async (req: Request) => {
             }
 
             if (normalizedCmd === 'saldo' || normalizedCmd === '/saldo') {
-                const balance = await getBalance(userId);
-                const formatted = new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(balance);
-                const msg = `💰 *SEU SALDO ATUAL*\n━━━━━━━━━━━━━━━━━━━━\n*${formatted}*\n━━━━━━━━━━━━━━━━━━━━\n\n_Continue focado nos seus objetivos!_ ✨`;
+                const balanceLivre = await getBalance(userId);
+                const formatted = new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(balanceLivre);
+                const msg = `💰 *SEU SALDO DISPONÍVEL*\n━━━━━━━━━━━━━━━━━━━━\n*${formatted}*\n━━━━━━━━━━━━━━━━━━━━\n\n_Este é o seu *Saldo Livre*, subtraindo compromissos e contas pendentes._ ✨`;
                 await sendWhatsApp(phoneToSend, msg);
                 return new Response("Saldo", { status: 200 });
             }
