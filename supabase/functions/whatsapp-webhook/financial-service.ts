@@ -74,6 +74,7 @@ export async function processTransaction(data: TransactionData) {
                 user_id: userId,
                 amount,
                 description,
+                date: finalDate, // Explicitly set date
                 source: 'whatsapp',
                 status: 'confirmed',
                 confirmed_at: finalDate,
@@ -91,15 +92,25 @@ export async function processTransaction(data: TransactionData) {
             result = exp;
             error = err;
         } else {
+            // Map common income types or default to 'other'
+            let incomeType = 'other';
+            const descLower = description.toLowerCase();
+            if (descLower.includes('salário') || descLower.includes('salario')) incomeType = 'salary';
+            else if (descLower.includes('freelance') || descLower.includes('freela')) incomeType = 'freelance';
+            else if (descLower.includes('investimento')) incomeType = 'investment';
+            else if (descLower.includes('presente')) incomeType = 'gift';
+
             const payload: any = {
                 user_id: userId,
                 amount,
                 description,
-                type: 'variable',
+                date: finalDate, // Explicitly set date
+                type: incomeType,
+                is_recurring: false,
                 source: 'whatsapp',
                 transaction_code: transactionCode,
                 created_at: finalDate,
-                status: 'received'
+                status: 'active' // Match dashboard status
             };
             if (categoryId) payload.category_id = categoryId;
             if (bankAccountId) payload.bank_account_id = bankAccountId;
