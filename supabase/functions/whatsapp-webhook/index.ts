@@ -51,6 +51,36 @@ async function sendWhatsApp(to: string, text: string): Promise<void> {
     } catch (e) { console.error(`❌ Failed:`, e); }
 }
 
+async function sendWhatsAppInteractive(to: string, text: string, buttons: { id: string, title: string }[]): Promise<void> {
+    if (!META_ACCESS_TOKEN || !META_PHONE_NUMBER_ID) return;
+    const normalizedToValue = normalizeTo(to);
+
+    try {
+        const url = `https://graph.facebook.com/v22.0/${META_PHONE_NUMBER_ID}/messages`;
+        const resp = await fetch(url, {
+            method: "POST",
+            headers: { "Authorization": `Bearer ${META_ACCESS_TOKEN}`, "Content-Type": "application/json" },
+            body: JSON.stringify({
+                messaging_product: "whatsapp",
+                to: normalizedToValue,
+                type: "interactive",
+                interactive: {
+                    type: "button",
+                    body: { text },
+                    action: {
+                        buttons: buttons.map(b => ({
+                            type: "reply",
+                            reply: { id: b.id, title: b.title }
+                        }))
+                    }
+                }
+            })
+        });
+        const data = await resp.json();
+        console.log(`✅ Interactive Response:`, JSON.stringify(data));
+    } catch (e) { console.error(`❌ Interactive Failed:`, e); }
+}
+
 async function sendWhatsAppTemplate(to: string, templateName: string = "hello_world"): Promise<void> {
     if (!META_ACCESS_TOKEN || !META_PHONE_NUMBER_ID) {
         console.error("❌ Missing META credentials");
@@ -294,6 +324,14 @@ Deno.serve(async (req: Request) => {
                 }
             }
         }
+        else if (messageType === "interactive") {
+            const interactive = message.interactive;
+            if (interactive?.type === "button_reply") {
+                const replyId = interactive.button_reply?.id; // Ex: "excluir_A5H2"
+                textToAnalyze = replyId.replace("_", " "); // -> "excluir A5H2"
+                console.log(`🔘 Button Clicked: ${replyId} -> ${textToAnalyze}`);
+            }
+        }
 
         // 4. Command & Edit Flow
         if (textToAnalyze) {
@@ -402,15 +440,17 @@ Deno.serve(async (req: Request) => {
 
         // 7. MULTIPLE TRANSACTIONS PROCESSING
         if (intent.tipo === 'transacao' || (intent.items && intent.items.length > 0)) {
-            let summaryMsg = "✅ *RESUMO DAS OPERAÇÕES*\n";
-            summaryMsg += "━━━━━━━━━━━━━━━━━━━━\n\n";
+            const isSingle = intent.items.length === 1;
+            let summaryMsg = isSingle ? "" : "✅ *RESUMO DAS OPERAÇÕES*\n━━━━━━━━━━━━━━━━━━━━\n\n";
             let totalProcessed = 0;
+            let lastTCode = "";
 
             for (const item of intent.items) {
                 try {
                     const categoryId = await getCategoryId(userId, item.categoria_sugerida, item.tipo === "receita" ? "income" : "expense");
                     const { id: targetAccountId, isCreditCard } = await getPreferredAccount(userId, item.metodo_pagamento);
                     const tCode = generateTransactionCode();
+                    lastTCode = tCode;
 
                     await processTransaction({
                         userId,
@@ -425,7 +465,22 @@ Deno.serve(async (req: Request) => {
 
                     const valStr = new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(item.valor);
                     const icon = item.tipo === 'receita' ? '💰' : '💸';
-                    summaryMsg += `${icon} *${item.descricao}*\n   Valor: *${valStr}*\n   ID: \`${tCode}\`\n\n`;
+
+                    if (isSingle) {
+                        const balance = await getBalance(userId);
+                        const balStr = new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(balance);
+
+                        summaryMsg = `${icon} *${item.tipo === 'receita' ? 'RECEITA REGISTRADA' : 'GASTO CONFIRMADO'}*\n` +
+                            `━━━━━━━━━━━━━━━━━━━━\n\n` +
+                            `📝 *${item.descricao}*\n` +
+                            `💵 *${valStr}*\n\n` +
+                            `📂 Categoria: _${item.categoria_sugerida || 'Geral'}_\n` +
+                            `🔑 ID: \`${tCode}\`\n\n` +
+                            `━━━━━━━━━━━━━━━━━━━━\n` +
+                            `📊 *SALDO:* ${balStr}`;
+                    } else {
+                        summaryMsg += `${icon} *${item.descricao}*\n   Valor: *${valStr}*\n   ID: \`${tCode}\`\n\n`;
+                    }
                     totalProcessed++;
                 } catch (err) {
                     console.error(`❌ Item Failed: ${item.descricao}`, err);
@@ -433,12 +488,19 @@ Deno.serve(async (req: Request) => {
             }
 
             if (totalProcessed > 0) {
-                const balance = await getBalance(userId);
-                const balStr = new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(balance);
-                summaryMsg += "━━━━━━━━━━━━━━━━━━━━\n";
-                summaryMsg += `📊 *SALDO ATUAL:* ${balStr}\n\n`;
-                summaryMsg += `_Dica: Para excluir, mande "excluir ID" (ex: excluir ${intent.items[0].descricao.includes('Salário') ? 'A1B2' : 'XPTO'})_`;
-                await sendWhatsApp(phoneToSend, summaryMsg);
+                if (isSingle) {
+                    await sendWhatsAppInteractive(phoneToSend, summaryMsg, [
+                        { id: `excluir_${lastTCode}`, title: "🗑️ Excluir" },
+                        { id: `editar_${lastTCode}`, title: "📝 Editar" }
+                    ]);
+                } else {
+                    const balance = await getBalance(userId);
+                    const balStr = new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(balance);
+                    summaryMsg += "━━━━━━━━━━━━━━━━━━━━\n";
+                    summaryMsg += `📊 *SALDO TOTAL:* ${balStr}\n\n`;
+                    summaryMsg += `_Para excluir, use: excluir ID_`;
+                    await sendWhatsApp(phoneToSend, summaryMsg);
+                }
             } else {
                 await sendWhatsApp(phoneToSend, "❌ Não consegui processar os itens. Verifique os valores e tente novamente.");
             }
