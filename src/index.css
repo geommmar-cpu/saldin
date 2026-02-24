@@ -347,6 +347,16 @@
     min-height: calc(100vh - env(safe-area-inset-top) - env(safe-area-inset-bottom));
   }
 
+  @keyframes shimmer {
+    from {
+      transform: translateX(-100%);
+    }
+
+    to {
+      transform: translateX(100%);
+    }
+  }
+
   .animate-pulse-slow {
     animation: pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite;
   }

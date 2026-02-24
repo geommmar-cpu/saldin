@@ -582,16 +582,17 @@ const Landing = () => {
     return (
         <div className="min-h-screen bg-white text-gray-900 font-sans selection:bg-orange-100 selection:text-orange-900 overflow-x-hidden">
             {/* ─── URGENCY NOTICE BAR ─── */}
-            <div className="bg-gray-900 text-white py-2.5 px-4 text-center text-xs sm:text-sm font-medium relative overflow-hidden z-[60]">
-                <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-orange-500 via-pink-500 to-orange-500 animate-gradient-x"></div>
-                <p className="flex flex-wrap items-center justify-center gap-2">
-                    <Clock className="w-3 h-3 sm:w-4 sm:h-4 text-orange-400 animate-pulse" />
-                    <span className="opacity-90">Oferta de Lançamento: Bônus Exclusivos.</span>
-                    <span className="text-orange-300 font-bold ml-1 hidden sm:inline">Restam 14 vagas.</span>
-                    <span className="hidden sm:inline-block w-1 h-1 bg-gray-600 rounded-full mx-1"></span>
-                    <span className="text-gray-400 text-[10px] uppercase tracking-wide mr-1">Expira em:</span>
+            <div className="bg-gradient-to-r from-orange-500 to-pink-600 text-white py-2.5 px-4 text-center text-xs sm:text-sm font-semibold relative overflow-hidden z-[60] shadow-md">
+                <p className="flex flex-wrap items-center justify-center gap-2 relative z-10">
+                    <Clock className="w-3 h-3 sm:w-4 sm:h-4 text-white animate-pulse" />
+                    <span className="opacity-95">Oferta de Lançamento: Bônus Exclusivos.</span>
+                    <span className="bg-white/20 px-2 py-0.5 rounded text-[10px] sm:text-xs font-bold uppercase tracking-wider ml-1">Restam 14 vagas</span>
+                    <span className="hidden sm:inline-block w-1 h-1 bg-white/40 rounded-full mx-1"></span>
+                    <span className="text-white/80 text-[10px] uppercase tracking-wide mr-1">Expira em:</span>
                     <CountdownTimer />
                 </p>
+                {/* Subtle shine effect */}
+                <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent -translate-x-full animate-[shimmer_3s_infinite]" />
             </div>
 
             {/* ─── NAVBAR ─── */}
