@@ -490,7 +490,7 @@ Deno.serve(async (req: Request) => {
                     const tCode = generateTransactionCode();
                     lastTCode = tCode;
 
-                    await processTransaction({
+                    const result = await processTransaction({
                         userId,
                         type: item.tipo === "receita" ? "income" : "expense",
                         amount: item.valor,
@@ -505,17 +505,17 @@ Deno.serve(async (req: Request) => {
                     const icon = item.tipo === 'receita' ? '💰' : '💸';
 
                     if (isSingle) {
-                        const balance = await getBalance(userId);
-                        const balStr = new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(balance);
-
-                        summaryMsg = `${icon} *${item.tipo === 'receita' ? 'RECEITA REGISTRADA' : 'GASTO CONFIRMADO'}*\n` +
-                            `━━━━━━━━━━━━━━━━━━━━\n\n` +
-                            `📝 *${item.descricao}*\n` +
-                            `💵 *${valStr}*\n\n` +
-                            `📂 Categoria: _${item.categoria_sugerida || 'Geral'}_\n` +
-                            `🔑 ID: \`${tCode}\`\n\n` +
-                            `━━━━━━━━━━━━━━━━━━━━\n` +
-                            `📊 *SALDO:* ${balStr}`;
+                        summaryMsg = formatPremiumMessage({
+                            id: result.id,
+                            description: item.descricao,
+                            amount: item.valor,
+                            date: new Date().toISOString(),
+                            category: item.categoria_sugerida,
+                            account_name: result.dest_name,
+                            type: item.tipo === "receita" ? "income" : "expense",
+                            transaction_code: tCode,
+                            account_balance: result.account_balance
+                        }, { new_balance: result.new_balance });
                     } else {
                         summaryMsg += `${icon} *${item.descricao}*\n   Valor: *${valStr}*\n   ID: \`${tCode}\`\n\n`;
                     }

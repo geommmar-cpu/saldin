@@ -138,6 +138,7 @@ export async function processTransaction(data: TransactionData) {
         }
 
         // Update Bank Account Balance if linked
+        let accountBalance: number | undefined;
         if (bankAccountId && !isCreditCard) {
             const { data: acc } = await supabaseAdmin
                 .from('bank_accounts')
@@ -147,12 +148,14 @@ export async function processTransaction(data: TransactionData) {
 
             if (acc) {
                 const currentBal = Number(acc.current_balance) || 0;
-                const newBal = type === 'income' ? (currentBal + amount) : (currentBal - amount);
+                const newAccBal = type === 'income' ? (currentBal + amount) : (currentBal - amount);
 
                 await supabaseAdmin
                     .from('bank_accounts')
-                    .update({ current_balance: newBal })
+                    .update({ current_balance: newAccBal })
                     .eq('id', bankAccountId);
+
+                accountBalance = newAccBal;
             }
         }
 
@@ -161,8 +164,9 @@ export async function processTransaction(data: TransactionData) {
         return {
             ...result,
             new_balance: newBalance,
-            dest_name: result?.bank_account?.bank_name || "Conta",
-            is_credit_card: false
+            account_balance: accountBalance,
+            dest_name: result?.bank_account?.bank_name || result?.card?.card_name || (isCreditCard ? "Cartão" : "Conta"),
+            is_credit_card: isCreditCard
         };
 
     } catch (err) {

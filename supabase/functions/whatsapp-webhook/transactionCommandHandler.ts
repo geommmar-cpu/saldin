@@ -11,9 +11,10 @@ interface Transaction {
     amount: number;
     date: string;
     category?: string;
-    account?: string;
+    account_name?: string; // Clearer name
     type: 'income' | 'expense';
     transaction_code: string;
+    account_balance?: number; // Balance of the specific account used
 }
 
 export function generateTransactionCode(): string {
@@ -26,8 +27,13 @@ export function generateTransactionCode(): string {
 }
 
 export function formatPremiumMessage(transaction: Transaction, balanceData: any, isDelete = false): string {
-    const { transaction_code, amount, description, category, account, type } = transaction;
+    const { transaction_code, amount, description, category, account_name, type, account_balance } = transaction;
     const formattedAmount = new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(Number(amount));
+
+    // Date and Time in BR format
+    const now = new Date();
+    const dateStr = now.toLocaleDateString('pt-BR');
+    const timeStr = now.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
 
     let header = isDelete ? "🗑️ *TRANSAÇÃO REMOVIDA*" : (type === 'income' ? "💰 *RECEITA REGISTRADA*" : "💸 *GASTO CONFIRMADO*");
     const divider = "━━━━━━━━━━━━━━━━";
@@ -37,14 +43,15 @@ export function formatPremiumMessage(transaction: Transaction, balanceData: any,
 💵 *${formattedAmount}*
 
 📂 Categoria: _${category || 'Geral'}_
-🏦 Origem: _${account || 'Padrão'}_
+🏦 Origem/Destino: _${account_name || 'Conta Padrão'}_
+📅 Data: _${dateStr} às ${timeStr}_
 🔑 ID: \`${transaction_code}\`
 `.trim();
 
     const impact = `
 📊 *RESUMO FINANCEIRO*
-Saldo: R$ ${formatCurrency(balanceData.new_balance)}
-Total: R$ ${formatCurrency(balanceData.available_balance)}
+Saldo Livre: R$ ${formatCurrency(balanceData.new_balance)}
+${account_balance !== undefined ? `Carteira (${account_name}): R$ ${formatCurrency(account_balance)}` : ''}
 `.trim();
 
     return `
@@ -56,7 +63,7 @@ ${divider}
 
 ${impact}
 
-_Para excluir use: excluir ${transaction_code}_
+_Dica: Se errou algo, clique em *Editar* abaixo ou digite: *excluir ${transaction_code}*_
 `.trim();
 }
 
