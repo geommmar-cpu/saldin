@@ -115,7 +115,7 @@ const App = () => (
             <Route path="/expenses/:id" element={<OnboardingRoute><ExpenseDetail /></OnboardingRoute>} />
             <Route path="/expenses/:id/edit" element={<OnboardingRoute><EditExpense /></OnboardingRoute>} />
             {/* Legacy confirm route → now handled inside QuickExpense */}
-            <Route path="/confirm/:id" element={<Navigate to="/expenses/add" replace />} />
+            <Route path="/confirm/:id" element={<OnboardingRoute><ConfirmExpense /></OnboardingRoute>} />
 
             {/* Income */}
             <Route path="/income" element={<OnboardingRoute><Income /></OnboardingRoute>} />

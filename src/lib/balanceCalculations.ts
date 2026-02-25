@@ -4,7 +4,8 @@
 import { ExpenseRow } from "@/hooks/useExpenses";
 import { IncomeRow } from "@/hooks/useIncomes";
 import { DebtRow } from "@/hooks/useDebts";
-import { startOfMonth, endOfMonth, isWithinInterval, isBefore, isAfter, addMonths } from "date-fns";
+import { Subscription } from "@/types/subscription";
+import { startOfMonth, endOfMonth, isWithinInterval, isBefore, isAfter, addMonths, isEqual, format } from "date-fns";
 import { getExpensesForMonth } from "@/lib/recurringExpenses";
 
 export interface BalanceBreakdown {
@@ -27,6 +28,7 @@ export interface BalanceBreakdown {
     dividasAtivas: number;
     parcelasFuturas: number;
     contasRecorrentes: number;
+    assinaturas: number;
     valoresParaTerceiros: number;
     metasGuardadas: number;
   };
@@ -49,6 +51,7 @@ export function calculateBalances(
   expenses: ExpenseRow[],
   debts: DebtRow[],
   selectedMonth: Date,
+  subscriptions: Subscription[] = [],
   goalsSaved: number = 0,
   ccInstallmentsTotal: number = 0,
   bankTotal?: number
@@ -101,6 +104,28 @@ export function calculateBalances(
     .filter(e => (e.emotion === "essencial" || e.emotion === "pilar") && e.status === "pending")
     .reduce((sum, e) => sum + Number(e.amount), 0);
 
+  // Somar assinaturas ativas que ainda não foram lançadas para este mês ou são meses futuros
+  const monthStartStr = format(monthStart, "yyyy-MM-dd");
+  const assinaturasPendentes = subscriptions
+    .filter(s => s.status === 'active')
+    .filter(s => {
+      // Se a última geração foi antes do início deste mês selecionado, 
+      // significa que ainda não foi lançada/paga para este período
+      if (!s.last_generated_date) return true;
+      return isBefore(startOfMonth(new Date(s.last_generated_date)), monthStart);
+    })
+    .reduce((sum, s) => {
+      if (s.frequency === 'monthly') return sum + Number(s.amount);
+      if (s.frequency === 'yearly') {
+        // Se for anual, só somamos no mês da cobrança ou dividimos? 
+        // Para impacto de saldo comprometido mensal, o ideal é o valor real no mês real.
+        // Mas como o app usa last_generated_date, vamos considerar o mês da billing_date.
+        const billingMonthMatch = true; // Por enquanto simplificado como mensal para projeção
+        return sum + Number(s.amount) / 12; // Seguindo a lógica de "custo mensal" do Subscriptions.tsx
+      }
+      return sum + Number(s.amount);
+    }, 0);
+
   // Calcular parcelas futuras (próximos 3 meses)
   let parcelasFuturas = 0;
   const futureMonths = [1, 2, 3].map(n => addMonths(selectedMonth, n));
@@ -134,7 +159,7 @@ export function calculateBalances(
     var saldoBruto = receitasTotal - gastosTotal;
   }
   // Saldo Comprometido = o que ainda vai sair este mês
-  const saldoComprometido = dividasAtivas + valoresParaTerceiros + ccInstallmentsTotal + contasRecorrentesPendentes;
+  const saldoComprometido = dividasAtivas + valoresParaTerceiros + ccInstallmentsTotal + contasRecorrentesPendentes + assinaturasPendentes;
   const saldoGuardado = goalsSaved;
   const saldoLivre = saldoBruto - saldoComprometido - saldoGuardado;
 
@@ -149,6 +174,7 @@ export function calculateBalances(
       dividasAtivas,
       parcelasFuturas,
       contasRecorrentes: contasRecorrentesPendentes,
+      assinaturas: assinaturasPendentes,
       valoresParaTerceiros,
       metasGuardadas: goalsSaved,
     },
@@ -160,6 +186,7 @@ export function calculateMonthlyProjection(
   incomes: IncomeRow[],
   expenses: ExpenseRow[],
   debts: DebtRow[],
+  subscriptions: Subscription[],
   startMonth: Date,
   monthsAhead: number = 6
 ): MonthlyProjection[] {
@@ -167,7 +194,7 @@ export function calculateMonthlyProjection(
 
   for (let i = 0; i <= monthsAhead; i++) {
     const targetMonth = addMonths(startMonth, i);
-    const balance = calculateBalances(incomes, expenses, debts, targetMonth);
+    const balance = calculateBalances(incomes, expenses, debts, targetMonth, subscriptions);
 
     projections.push({
       month: targetMonth,

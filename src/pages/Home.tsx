@@ -124,10 +124,11 @@ export default function Home() {
     filteredExpenses,
     filteredDebts,
     selectedMonth,
+    subscriptions,
     goalStats?.totalSaved || 0,
     totalCCInstallments,
     bankTotal
-  ), [filteredIncomes, filteredExpenses, filteredDebts, selectedMonth, goalStats?.totalSaved, totalCCInstallments, bankTotal]);
+  ), [filteredIncomes, filteredExpenses, filteredDebts, selectedMonth, subscriptions, goalStats?.totalSaved, totalCCInstallments, bankTotal]);
 
   const monthLabel = format(selectedMonth, "MMMM yyyy", { locale: ptBR });
   const isCurrentMonth = format(selectedMonth, "yyyy-MM") === format(new Date(), "yyyy-MM");
@@ -248,6 +249,7 @@ export default function Home() {
                   debts={filteredDebts}
                   receivables={filteredReceivables}
                   creditCardInstallments={ccInstallments}
+                  subscriptions={subscriptions}
                   selectedMonth={selectedMonth}
                 />
               </FadeIn>

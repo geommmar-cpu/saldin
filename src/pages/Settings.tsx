@@ -39,7 +39,6 @@ import {
   Moon,
   Fingerprint,
   Trash2,
-  Trash2,
   Bitcoin,
   Camera,
   Loader2
@@ -49,7 +48,8 @@ import { useAuth } from "@/hooks/useAuth";
 import { useProfile, useUpdateProfile } from "@/hooks/useProfile";
 import { useWebAuthn } from "@/hooks/useWebAuthn";
 import { useBankAccounts } from "@/hooks/useBankAccounts";
-import { useCreditCards } from "@/hooks/useCreditCards";
+import { useSubscriptions } from "@/hooks/useSubscriptions";
+import { useCreditCards, useCardInstallmentsByMonth } from "@/hooks/useCreditCards";
 import { exportToCSV } from "@/lib/exportData";
 import { useQueryClient } from "@tanstack/react-query";
 import { cn } from "@/lib/utils";
@@ -81,6 +81,7 @@ export const Settings = () => {
   const { data: allReceivables } = useReceivables("pending");
   const { data: allGoals } = useGoals("all");
   const { data: goalStats } = useGoalStats();
+  const { data: allSubscriptions = [] } = useSubscriptions();
   const { data: ccInstallments = [] } = useCardInstallmentsByMonth(new Date());
 
   // Keep localStorage in sync with DB value
@@ -224,6 +225,7 @@ export const Settings = () => {
         debts: allDebts || [],
         receivables: allReceivables || [],
         goals: allGoals || [],
+        subscriptions: allSubscriptions,
         creditCardInstallments: ccInstallments as any,
         userName: user?.user_metadata?.full_name || profile?.full_name,
         selectedMonth: new Date(),

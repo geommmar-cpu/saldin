@@ -1,12 +1,12 @@
 import { useMemo, useState } from "react";
 import { motion } from "framer-motion";
 import { useNavigate } from "react-router-dom";
-import { CreditCard, Banknote, HandCoins, Receipt, LucideIcon, Plus, Calendar } from "lucide-react";
+import { CreditCard, Banknote, HandCoins, Receipt, LucideIcon, Calendar } from "lucide-react";
 import { BankLogo } from "@/components/BankLogo";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { formatCurrency } from "@/lib/balanceCalculations";
-import { format, isToday, isThisWeek } from "date-fns";
+import { format, isToday, isThisWeek, isAfter, startOfMonth } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { parseLocalDate } from "@/lib/dateUtils";
 import type { ExpenseRow } from "@/hooks/useExpenses";
@@ -25,6 +25,8 @@ interface TransactionItem {
   icon: LucideIcon;
   color: string;
   bg?: string;
+  status?: string;
+  pending?: boolean;
 }
 
 interface TransactionsSectionProps {
@@ -33,6 +35,7 @@ interface TransactionsSectionProps {
   debts: DebtRow[];
   receivables: any[];
   creditCardInstallments: (CreditCardInstallment & { purchase: CreditCardPurchase & { card: CreditCardType } })[];
+  subscriptions?: any[];
   selectedMonth: Date;
 }
 
@@ -42,6 +45,7 @@ export const TransactionsSection = ({
   debts,
   receivables,
   creditCardInstallments,
+  subscriptions = [],
   selectedMonth,
 }: TransactionsSectionProps) => {
   const navigate = useNavigate();
@@ -64,10 +68,12 @@ export const TransactionsSection = ({
         type: isSub ? "subscription" : "expense",
         amount: Number(e.amount),
         description: `${e.description}${installmentLabel}`,
-        date: new Date(e.created_at), // Use timestamp for time, assuming backend saves correctly now
+        date: new Date(e.created_at),
         icon: isSub ? Calendar : Receipt,
         color: isSub ? "text-primary" : "text-impulse",
         bg: isSub ? "bg-primary/10" : "bg-impulse/10",
+        status: e.status,
+        pending: e.status === "pending" || !e.category_id,
       });
     });
 
@@ -81,7 +87,6 @@ export const TransactionsSection = ({
         const day = i.date ? parseLocalDate(i.date).getDate() : new Date(i.created_at).getDate();
         displayDate = new Date(selectedMonth.getFullYear(), selectedMonth.getMonth(), day);
       } else {
-        // Use created_at to show the exact time of entry
         displayDate = new Date(i.created_at);
       }
       const isFuture = i.is_recurring && paymentDay ? displayDate > new Date() : false;
@@ -148,6 +153,33 @@ export const TransactionsSection = ({
       });
     });
 
+    // Add projected subscriptions
+    subscriptions.forEach(sub => {
+      if (sub.status !== 'active') return;
+
+      // Only show if subscription was already created by this month
+      const subCreatedAt = new Date(sub.created_at);
+      if (isAfter(startOfMonth(subCreatedAt), startOfMonth(selectedMonth))) return;
+
+      const hasExecuted = items.some(item =>
+        item.type === "subscription" &&
+        item.description.includes(sub.name)
+      );
+
+      if (!hasExecuted) {
+        items.push({
+          id: `proj-${sub.id}`,
+          type: "subscription",
+          amount: Number(sub.amount),
+          description: `Assinatura: ${sub.name}`,
+          date: new Date(selectedMonth.getFullYear(), selectedMonth.getMonth(), sub.billing_date || 1),
+          icon: Calendar,
+          color: "text-primary",
+          bg: "bg-primary/10",
+        });
+      }
+    });
+
     // Filter by time period
     const filtered = items.filter(item => {
       if (period === "today") return isToday(item.date);
@@ -156,7 +188,7 @@ export const TransactionsSection = ({
     });
 
     return filtered.sort((a, b) => b.date.getTime() - a.date.getTime()).slice(0, 20);
-  }, [expenses, incomes, debts, receivables, creditCardInstallments, selectedMonth, period]);
+  }, [expenses, incomes, debts, receivables, creditCardInstallments, subscriptions, selectedMonth, period]);
 
   const handleClick = (item: TransactionItem) => {
     if (!item.id) return;
@@ -169,15 +201,20 @@ export const TransactionsSection = ({
         navigate(`/expenses/cc-${item.id}`);
         break;
       case "subscription":
-        // Subscriptions generated as expenses can go to expense details or history with filter
-        if (item.id.length > 30) { // UUID length check to guess if it's an expense or cc installment
+        if (item.id.length > 30) {
           navigate(`/expenses/${item.id}`);
         } else {
           navigate(`/expenses/cc-${item.id}`);
         }
         break;
-      default: navigate(`/expenses/${item.id}`);
+      default:
+        if (item.pending) {
+          navigate(`/confirm/${item.id}`);
+        } else {
+          navigate(`/expenses/${item.id}`);
+        }
     }
+
   };
 
   const typeIcon = (type: string) => {
@@ -228,7 +265,6 @@ export const TransactionsSection = ({
         </Button>
       </div>
 
-      {/* Tabs */}
       <div className="flex p-0.5 rounded-xl bg-muted/40 mx-1">
         {([
           { key: "today", label: "Hoje" },
@@ -250,7 +286,6 @@ export const TransactionsSection = ({
         ))}
       </div>
 
-      {/* Grouped List */}
       {Object.keys(groupedTransactions).length > 0 ? (
         <div className="space-y-6">
           {Object.entries(groupedTransactions).map(([dateLabel, items]) => (

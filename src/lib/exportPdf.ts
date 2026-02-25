@@ -8,6 +8,7 @@ import { IncomeRow } from "@/hooks/useIncomes";
 import { DebtRow } from "@/hooks/useDebts";
 import { ReceivableRow } from "@/hooks/useReceivables";
 import type { Goal } from "@/types/goal";
+import type { Subscription } from "@/types/subscription";
 import type { CreditCardInstallment, CreditCardPurchase, CreditCard } from "@/types/creditCard";
 const logoSrc = "/logo-saldin-pdf.webp";
 
@@ -55,6 +56,7 @@ interface ExportData {
   debts: DebtRow[];
   receivables: ReceivableRow[];
   goals: Goal[];
+  subscriptions?: Subscription[];
   creditCardInstallments?: CreditCardInstallmentWithPurchase[];
   userName?: string;
   selectedMonth: Date;
@@ -108,6 +110,7 @@ export async function generateFinancialReport({
   debts,
   receivables,
   goals,
+  subscriptions = [],
   creditCardInstallments = [],
   userName,
   selectedMonth,
@@ -171,7 +174,7 @@ export async function generateFinancialReport({
   // 2) FINANCIAL SUMMARY (the hero section)
   // ════════════════════════════════════════════════════════════
   const totalCCInstallments = creditCardInstallments.reduce((s, i) => s + Number(i.amount), 0);
-  const balances = calculateBalances(incomes, expenses, debts, selectedMonth, goalsSaved, totalCCInstallments);
+  const balances = calculateBalances(incomes, expenses, debts, selectedMonth, subscriptions, goalsSaved, totalCCInstallments);
   const totalReceivables = receivables
     .filter(r => r.status === "pending")
     .reduce((s, r) => s + Number(r.amount), 0);

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { supabase } from "@/lib/backendClient";
 import { toLocalDateString } from "@/lib/dateUtils";
 import { useNavigate, useLocation, useParams } from "react-router-dom";
@@ -14,12 +14,13 @@ import {
 } from "lucide-react";
 import { formatCurrency } from "@/lib/balanceCalculations";
 import { cn } from "@/lib/utils";
-import { useCreateExpense, useCreateBulkExpenses } from "@/hooks/useExpenses";
+import { useCreateExpense, useCreateBulkExpenses, useUpdateExpense, useExpenseById } from "@/hooks/useExpenses";
 import { addMonths, format } from "date-fns";
 import { useCreateCreditCardPurchase, useCreditCards } from "@/hooks/useCreditCards";
 import { useCreateReceivable } from "@/hooks/useReceivables";
 import { useBankAccounts, useUpdateBankBalance } from "@/hooks/useBankAccounts";
 import { useCashAccount } from "@/hooks/useCashAccount";
+import { useSubscriptions } from "@/hooks/useSubscriptions";
 import { useAuth } from "@/hooks/useAuth";
 import { toast } from "sonner";
 import {
@@ -95,6 +96,7 @@ export const ConfirmExpense = () => {
   const { id } = useParams();
   const { user } = useAuth();
   const createExpense = useCreateExpense();
+  const updateExpense = useUpdateExpense();
   const createBulkExpenses = useCreateBulkExpenses();
   const createCreditCardPurchase = useCreateCreditCardPurchase();
   const { data: creditCards = [] } = useCreditCards();
@@ -103,9 +105,13 @@ export const ConfirmExpense = () => {
   const createReceivable = useCreateReceivable();
   const { ensureCashAccount, cashAccountId, isCreating: isCreatingCash } = useCashAccount();
 
-  const amount = location.state?.amount || 67.50;
+  // Hooks
+  const { data: existingExpense, isLoading: isLoadingExpense } = useExpenseById(id && !id.startsWith("proj-") && id !== "new" ? id : undefined);
+  const { data: subscriptions = [] } = useSubscriptions();
   const { allCategories, customCategories } = useAllCategories();
-  const isNew = id === "new";
+  const isNew = id === "new" || (id?.startsWith("proj-"));
+
+  const [amount, setAmount] = useState(0);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [categorySheetOpen, setCategorySheetOpen] = useState(false);
   const [categorySearch, setCategorySearch] = useState("");
@@ -131,13 +137,40 @@ export const ConfirmExpense = () => {
   const [selectedEmotion, setSelectedEmotion] = useState<EmotionType | undefined>();
   const [wouldDoAgain, setWouldDoAgain] = useState<boolean | undefined>();
 
+  // Sync state when existingExpense or subscription projection loads
+  useEffect(() => {
+    if (existingExpense) {
+      setAmount(Number(existingExpense.amount));
+      setDescription(existingExpense.description || "");
+      if (existingExpense.category_id) setCategory(existingExpense.category_id);
+      if (existingExpense.bank_account_id) setSelectedBankId(existingExpense.bank_account_id);
+      if (existingExpense.payment_method) setPaymentMethod(existingExpense.payment_method as PaymentMethod);
+      if (existingExpense.emotion) setSelectedEmotion(existingExpense.emotion as EmotionType);
+    } else if (id?.startsWith("proj-")) {
+      const subId = id.replace("proj-", "");
+      const sub = subscriptions.find(s => s.id === subId);
+      if (sub) {
+        setAmount(Number(sub.amount));
+        setDescription(`Assinatura: ${sub.name}`);
+        if (sub.category_id) setCategory(sub.category_id);
+        setIsRecurring(true);
+      }
+    } else if (location.state?.amount) {
+      setAmount(location.state.amount);
+    } else if (isNew) {
+      setAmount(0);
+    }
+  }, [existingExpense, subscriptions, id, location.state, isNew]);
+
+  const isLoading = isLoadingExpense || isCreatingCash;
+
   // Insufficient funds check
   const selectedAccountBalance = (() => {
     if (paymentMethod === "credit" && selectedCardId) {
       const card = creditCards.find(c => c.id === selectedCardId);
       return card ? Number(card.credit_limit) : Infinity;
     }
-    if ((paymentMethod === "debit" || paymentMethod === "pix") && selectedBankId) {
+    if ((paymentMethod === "debit" || paymentMethod === "pix" || paymentMethod === "cash") && selectedBankId) {
       const bank = bankAccounts.find(b => b.id === selectedBankId);
       return bank ? Number(bank.current_balance) : Infinity;
     }
@@ -145,6 +178,7 @@ export const ConfirmExpense = () => {
   })();
 
   const isInsufficient = amount > selectedAccountBalance;
+
 
   // Filtered categories for search
   const filteredCategories = categorySearch.trim()
@@ -286,6 +320,12 @@ export const ConfirmExpense = () => {
           category_id: finalCategoryId || null,
           purchase_date: toLocalDateString(),
         });
+
+        // Se era um gasto existente (ex: vindo do WhatsApp), deletar o gasto original
+        // já que agora ele é uma compra no cartão.
+        if (!isNew && id) {
+          await supabase.from("expenses").delete().eq("id", id);
+        }
       } else {
         // For cash payments, ensure the cash account exists
         let bankId = selectedBankId;
@@ -293,11 +333,11 @@ export const ConfirmExpense = () => {
           bankId = await ensureCashAccount();
         }
 
-        // GASTO NORMAL: Criar expense
+        // GASTO NORMAL: Criar ou Atualizar expense
         const totalInstallments = isRecurring && installments ? parseInt(installments) : 1;
         const purchaseDate = new Date();
 
-        if (totalInstallments > 1) {
+        if (totalInstallments > 1 && isNew) {
           const installmentGroupId = crypto.randomUUID();
           const bulkExpenses = Array.from({ length: totalInstallments }, (_, i) => {
             const date = addMonths(purchaseDate, i);
@@ -307,7 +347,7 @@ export const ConfirmExpense = () => {
               emotion: selectedEmotion,
               status: "confirmed" as const,
               source: "manual" as const,
-              is_installment: false, // Important: Bulk entries are real rows, not virtual
+              is_installment: false,
               total_installments: totalInstallments,
               installment_number: i + 1,
               installment_group_id: installmentGroupId,
@@ -317,7 +357,19 @@ export const ConfirmExpense = () => {
             };
           });
           await createBulkExpenses.mutateAsync(bulkExpenses as any);
+        } else if (!isNew && id) {
+          // UPDATE EXISTING
+          await updateExpense.mutateAsync({
+            id,
+            amount,
+            description: description || selectedCategory?.name || "Gasto confirmado",
+            emotion: selectedEmotion,
+            status: "confirmed",
+            bank_account_id: bankId || undefined,
+            category_id: finalCategoryId || null,
+          });
         } else {
+          // CREATE NEW SINGLE
           await createExpense.mutateAsync({
             amount,
             description: description || selectedCategory?.name || "Gasto registrado",

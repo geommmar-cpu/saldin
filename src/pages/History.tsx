@@ -362,31 +362,32 @@ export const History = () => {
       });
     });
 
-    // Add projected subscriptions for current or future months
-    const isFuture = isAfter(monthStart, startOfMonth(new Date()));
-    if (isCurrentMonth || isFuture) {
-      subscriptions.forEach(sub => {
-        if (sub.status !== 'active') return;
+    // Add projected subscriptions
+    subscriptions.forEach(sub => {
+      if (sub.status !== 'active') return;
 
-        const hasExecuted = items.some(item =>
-          item.type === "subscription" &&
-          item.description.includes(sub.name)
-        );
+      // Only show if subscription was already created by this month
+      const subCreatedAt = new Date(sub.created_at);
+      if (isAfter(startOfMonth(subCreatedAt), monthEnd)) return;
 
-        if (!hasExecuted) {
-          items.push({
-            id: `proj-${sub.id}`,
-            type: "subscription",
-            amount: Number(sub.amount),
-            description: `Assinatura: ${sub.name}`,
-            source: "manual",
-            pending: true,
-            createdAt: new Date(selectedMonth.getFullYear(), selectedMonth.getMonth(), sub.billing_date || 1),
-            accountName: "Previsto",
-          });
-        }
-      });
-    }
+      const hasExecuted = items.some(item =>
+        (item.type === "subscription" || item.type === "expense" || item.type === "credit_card") &&
+        item.description.toLowerCase().includes(sub.name.toLowerCase())
+      );
+
+      if (!hasExecuted) {
+        items.push({
+          id: `proj-${sub.id}`,
+          type: "subscription",
+          amount: Number(sub.amount),
+          description: `Assinatura: ${sub.name}`,
+          source: "manual",
+          pending: true,
+          createdAt: new Date(selectedMonth.getFullYear(), selectedMonth.getMonth(), sub.billing_date || 1),
+          accountName: "Previsto",
+        });
+      }
+    });
 
     return items;
   }, [expenses, incomes, debts, receivables, ccInstallments, subscriptions, monthStart, monthEnd, selectedMonth, isCurrentMonth]);
