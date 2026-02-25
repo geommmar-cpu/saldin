@@ -291,9 +291,26 @@ export async function getPreferredAccount(userId: string, method?: string): Prom
         .single();
 
     const cleanMethod = method?.toLowerCase().trim();
+    const isPaymentMethodDebitLike = cleanMethod && ['pix', 'debito', 'débito', 'dinheiro', 'espécie', 'especie', 'boleto'].some(m => cleanMethod.includes(m));
 
-    // 1. Try to find a matching Credit Card by name (e.g., "Inter", "Nubank")
-    if (cleanMethod && !['credito', 'cartão', 'cartao'].includes(cleanMethod)) {
+    // 1. Try to find matching Bank Account first if it's a debit-like method
+    if (isPaymentMethodDebitLike) {
+        // Try to match the specific name if provided (e.g., "Inter" in "pix no inter")
+        // We need to extract the bank name part. GPT usually puts everything in method if it's names.
+        // Let's try to match the method name against bank accounts first.
+        const { data: matchedAcc } = await supabaseAdmin
+            .from('bank_accounts')
+            .select('id')
+            .eq('user_id', userId)
+            .eq('active', true)
+            .ilike('bank_name', `%${cleanMethod.replace('pix', '').replace('debito', '').replace('débito', '').trim()}%`)
+            .maybeSingle();
+
+        if (matchedAcc) return { id: matchedAcc.id, isCreditCard: false };
+    }
+
+    // 2. Try to find a matching Credit Card by name (e.g., "Inter", "Nubank")
+    if (cleanMethod && !['credito', 'cartão', 'cartao', 'pix', 'debito', 'débito'].includes(cleanMethod)) {
         const { data: matchedCard } = await supabaseAdmin
             .from('credit_cards')
             .select('id')
@@ -305,8 +322,8 @@ export async function getPreferredAccount(userId: string, method?: string): Prom
         if (matchedCard) return { id: matchedCard.id, isCreditCard: true };
     }
 
-    // 2. Try to find a matching Bank Account by name (e.g., "Itaú", "Cofre")
-    if (cleanMethod && !['pix', 'debito', 'dinheiro', 'boleto'].includes(cleanMethod)) {
+    // 3. Try to find a matching Bank Account by name (e.g., "Itaú", "Cofre")
+    if (cleanMethod && !isPaymentMethodDebitLike) {
         const { data: matchedAcc } = await supabaseAdmin
             .from('bank_accounts')
             .select('id')
