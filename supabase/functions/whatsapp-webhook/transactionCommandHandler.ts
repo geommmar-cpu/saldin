@@ -30,10 +30,14 @@ export function formatPremiumMessage(transaction: Transaction, balanceData: any,
     const { transaction_code, amount, description, category, account_name, type, account_balance } = transaction;
     const formattedAmount = new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(Number(amount));
 
-    // Date and Time in BR format
+    // Date and Time adjusted for Brazil (UTC-3)
     const now = new Date();
-    const dateStr = now.toLocaleDateString('pt-BR');
-    const timeStr = now.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
+    const dateStr = now.toLocaleDateString('pt-BR', { timeZone: 'America/Sao_Paulo' });
+    const timeStr = now.toLocaleTimeString('pt-BR', {
+        hour: '2-digit',
+        minute: '2-digit',
+        timeZone: 'America/Sao_Paulo'
+    });
 
     let header = isDelete ? "🗑️ *TRANSAÇÃO REMOVIDA*" : (type === 'income' ? "💰 *RECEITA REGISTRADA*" : "💸 *GASTO CONFIRMADO*");
     const divider = "━━━━━━━━━━━━━━━━";
