@@ -3,7 +3,7 @@ import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 import { analyzeText } from "./ai-service.ts";
 import { processImage } from "./image-service.ts";
 import { transcribeAudio } from "./audio-service.ts";
-import { processTransaction, getBalance, getLastTransactions, getPreferredAccount } from "./financial-service.ts";
+import { processTransaction, getBalance, getLastTransactions, getPreferredAccount, getImportantAlerts } from "./financial-service.ts";
 import { generateTransactionCode, formatPremiumMessage, handleExcluirCommand, handleEditarCommand, processEditStep } from "./transactionCommandHandler.ts";
 
 const SUPABASE_URL = Deno.env.get("SUPABASE_URL")!;
@@ -426,8 +426,15 @@ Deno.serve(async (req: Request) => {
 
             if (normalizedCmd === 'saldo' || normalizedCmd === '/saldo') {
                 const balanceLivre = await getBalance(userId);
+                const alerts = await getImportantAlerts(userId);
                 const formatted = new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(balanceLivre);
-                const msg = `💰 *SEU SALDO DISPONÍVEL*\n━━━━━━━━━━━━━━━━━━━━\n*${formatted}*\n━━━━━━━━━━━━━━━━━━━━\n\n_Este é o seu *Saldo Livre*, subtraindo compromissos e contas pendentes._ ✨`;
+
+                let msg = `💰 *SEU SALDO DISPONÍVEL*\n━━━━━━━━━━━━━━━━━━━━\n*${formatted}*\n━━━━━━━━━━━━━━━━━━━━\n\n_Este é o seu *Saldo Livre*, subtraindo compromissos e contas pendentes._ ✨`;
+
+                if (alerts.length > 0) {
+                    msg += `\n\n⚠️ *AVISOS IMPORTANTES*\n${alerts.map(a => `• ${a}`).join('\n')}`;
+                }
+
                 await sendWhatsApp(phoneToSend, msg);
                 if (logId) await supabaseAdmin.from("whatsapp_logs").update({ processed: true }).eq("id", logId);
                 return new Response("Saldo", { status: 200 });
@@ -466,8 +473,14 @@ Deno.serve(async (req: Request) => {
 
         if (intent.tipo === 'consulta_saldo') {
             const balance = await getBalance(userId);
+            const alerts = await getImportantAlerts(userId);
             const formatted = new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(balance);
-            await sendWhatsApp(phoneToSend, `💰 Seu saldo atual é: *${formatted}*`);
+
+            let msg = `💰 Seu saldo atual é: *${formatted}*`;
+            if (alerts.length > 0) {
+                msg += `\n\n⚠️ *AVISOS IMPORTANTES*\n${alerts.map(a => `• ${a}`).join('\n')}`;
+            }
+            await sendWhatsApp(phoneToSend, msg);
             return new Response("OK", { status: 200 });
         }
 
@@ -505,6 +518,7 @@ Deno.serve(async (req: Request) => {
                     const icon = item.tipo === 'receita' ? '💰' : '💸';
 
                     if (isSingle) {
+                        const alerts = await getImportantAlerts(userId);
                         summaryMsg = formatPremiumMessage({
                             id: result.id,
                             description: item.descricao,
@@ -515,7 +529,7 @@ Deno.serve(async (req: Request) => {
                             type: item.tipo === "receita" ? "income" : "expense",
                             transaction_code: tCode,
                             account_balance: result.account_balance
-                        }, { new_balance: result.new_balance });
+                        }, { new_balance: result.new_balance }, alerts);
                     } else {
                         summaryMsg += `${icon} *${item.descricao}*\n   Valor: *${valStr}*\n   ID: \`${tCode}\`\n\n`;
                     }
@@ -533,10 +547,16 @@ Deno.serve(async (req: Request) => {
                     ]);
                 } else {
                     const balance = await getBalance(userId);
+                    const alerts = await getImportantAlerts(userId);
                     const balStr = new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(balance);
                     summaryMsg += "━━━━━━━━━━━━━━━━━━━━\n";
-                    summaryMsg += `📊 *SALDO TOTAL:* ${balStr}\n\n`;
-                    summaryMsg += `_Para excluir, use: excluir ID_`;
+                    summaryMsg += `📊 *SALDO TOTAL:* ${balStr}\n`;
+
+                    if (alerts.length > 0) {
+                        summaryMsg += `\n⚠️ *AVISOS IMPORTANTES*\n${alerts.map(a => `• ${a}`).join('\n')}\n`;
+                    }
+
+                    summaryMsg += `\n_Para excluir, use: excluir ID_`;
                     await sendWhatsApp(phoneToSend, summaryMsg);
                 }
             } else {
@@ -585,6 +605,13 @@ async function sendExtrato(userId: string, phone: string) {
                 msg += `${icon} *${t.description}*${suffix}\n   ${val} • _${dateStr}_\n\n`;
             });
             msg += "━━━━━━━━━━━━━━━━━━━━\n";
+
+            // Add alerts to Extrato too
+            const alerts = await getImportantAlerts(userId);
+            if (alerts.length > 0) {
+                msg += `⚠️ *AVISOS IMPORTANTES*\n${alerts.map(a => `• ${a}`).join('\n')}\n━━━━━━━━━━━━━━━━━━━━\n`;
+            }
+
             msg += "_Saldin • Controle Total._ ✨";
             await sendWhatsApp(phone, msg);
         }

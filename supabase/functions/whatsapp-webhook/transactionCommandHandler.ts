@@ -26,7 +26,7 @@ export function generateTransactionCode(): string {
     return code;
 }
 
-export function formatPremiumMessage(transaction: Transaction, balanceData: any, isDelete = false): string {
+export function formatPremiumMessage(transaction: Transaction, balanceData: any, alerts: string[] = [], isDelete = false): string {
     const { transaction_code, amount, description, category, account_name, type, account_balance } = transaction;
     const formattedAmount = new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(Number(amount));
 
@@ -58,6 +58,11 @@ Saldo Livre: R$ ${formatCurrency(balanceData.new_balance)}
 ${account_balance !== undefined ? `Carteira (${account_name}): R$ ${formatCurrency(account_balance)}` : ''}
 `.trim();
 
+    let alertsSection = "";
+    if (alerts.length > 0) {
+        alertsSection = `\n\n⚠️ *AVISOS IMPORTANTES*\n${alerts.map(a => `• ${a}`).join('\n')}\n`;
+    }
+
     return `
 ${header}
 
@@ -65,7 +70,7 @@ ${divider}
 ${details}
 ${divider}
 
-${impact}
+${impact}${alertsSection}
 
 _Dica: Se errou algo, clique em *Editar* abaixo ou digite: *excluir ${transaction_code}*_
 `.trim();

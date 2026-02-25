@@ -369,3 +369,154 @@ export async function getPreferredAccount(userId: string, method?: string): Prom
     return { id: acc?.id || null, isCreditCard: false };
 }
 
+/**
+ * Busca avisos financeiros importantes para o usuário (saldo baixo, faturas, assinaturas próximo do vencimento)
+ * Útil para anexar em respostas do WhatsApp sem gastar novos templates.
+ */
+export async function getImportantAlerts(userId: string): Promise<string[]> {
+    const alerts: string[] = [];
+    const now = new Date();
+    const today = now.getDate();
+    const tomorrowDate = new Date();
+    tomorrowDate.setDate(now.getDate() + 1);
+    const tomorrowDay = tomorrowDate.getDate();
+
+    const currentMonthStr = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-01`;
+
+    try {
+        // 1. Alerta de Saldo Geral (Saldo Livre)
+        const balance = await getBalance(userId);
+        if (balance < 0) {
+            alerts.push(`🚨 *Saldo Livre Negativo:* Você está R$ ${formatCurrencyAlert(Math.abs(balance))} no vermelho este mês.`);
+        } else if (balance < 100 && balance > 0) {
+            alerts.push(`⚠️ *Saldo Geral Baixo:* Você tem apenas R$ ${formatCurrencyAlert(balance)} disponível.`);
+        }
+
+        // 2. Alerta de Contas Bancárias Individuais (Saldo Baixo)
+        const { data: bankAccounts } = await supabaseAdmin
+            .from('bank_accounts')
+            .select('bank_name, current_balance')
+            .eq('user_id', userId)
+            .eq('active', true);
+
+        if (bankAccounts) {
+            bankAccounts.forEach((acc: any) => {
+                const bal = Number(acc.current_balance);
+                if (bal >= 0 && bal < 50) {
+                    alerts.push(`🏦 *Saldo Baixo no ${acc.bank_name}:* Restam apenas R$ ${formatCurrencyAlert(bal)}.`);
+                } else if (bal < 0) {
+                    alerts.push(`🚨 *${acc.bank_name} Negativo:* Saldo de R$ ${formatCurrencyAlert(bal)}.`);
+                }
+            });
+        }
+
+        // 3. Faturas e Limites de Cartão
+        const { data: cards } = await supabaseAdmin
+            .from('credit_cards')
+            .select('id, card_name, due_day, credit_limit')
+            .eq('user_id', userId)
+            .eq('active', true);
+
+        if (cards) {
+            for (const card of cards) {
+                // A. Vencimento da Fatura
+                if (card.due_day === today || card.due_day === tomorrowDay) {
+                    const { data: statement } = await supabaseAdmin
+                        .from('credit_card_statements')
+                        .select('total_amount, status')
+                        .eq('card_id', card.id)
+                        .eq('reference_month', currentMonthStr)
+                        .maybeSingle();
+
+                    if (statement && statement.status !== 'paid' && Number(statement.total_amount) > 0) {
+                        const when = card.due_day === today ? "Hoje" : "Amanhã";
+                        alerts.push(`💳 *Fatura ${when}:* ${card.card_name} (R$ ${formatCurrencyAlert(statement.total_amount)})`);
+                    }
+                }
+
+                // B. Alerta de Limite Disponível
+                if (card.credit_limit && Number(card.credit_limit) > 0) {
+                    // Busca todas as parcelas abertas deste cartão para ver o limite ocupado
+                    // Nota: No Saldin, o limite ocupado é a soma de todas as parcelas 'open' vinculadas às compras deste cartão
+                    const { data: installments } = await supabaseAdmin
+                        .from('credit_card_installments')
+                        .select('amount')
+                        .innerJoin('credit_card_purchases', 'purchase_id', 'id')
+                        .eq('credit_card_purchases.card_id', card.id)
+                        .eq('status', 'open');
+
+                    // Como innerJoin não é nativo do PostgREST da mesma forma que SQL, vamos simplificar a query:
+                    const { data: purchases } = await supabaseAdmin
+                        .from('credit_card_purchases')
+                        .select('id')
+                        .eq('card_id', card.id);
+
+                    if (purchases && purchases.length > 0) {
+                        const purchaseIds = purchases.map(p => p.id);
+                        const { data: openInst } = await supabaseAdmin
+                            .from('credit_card_installments')
+                            .select('amount')
+                            .in('purchase_id', purchaseIds)
+                            .eq('status', 'open');
+
+                        const usedLimit = openInst?.reduce((sum, inst) => sum + Number(inst.amount), 0) || 0;
+                        const available = Number(card.credit_limit) - usedLimit;
+                        const pctAvailable = (available / Number(card.credit_limit)) * 100;
+
+                        if (pctAvailable < 15 && available > 0) {
+                            alerts.push(`🛡️ *Limite Baixo:* ${card.card_name} tem apenas ${pctAvailable.toFixed(0)}% disponível (R$ ${formatCurrencyAlert(available)}).`);
+                        } else if (available <= 0) {
+                            alerts.push(`🚫 *Cartão Sem Limite:* ${card.card_name} atingiu o limite máximo.`);
+                        }
+                    }
+                }
+            }
+        }
+
+        // 4. Assinaturas (Hoje e Amanhã)
+        const { data: subs } = await supabaseAdmin
+            .from('subscriptions')
+            .select('name, amount, billing_date')
+            .eq('user_id', userId)
+            .eq('status', 'active');
+
+        if (subs) {
+            subs.forEach((s: any) => {
+                if (s.billing_date === today) {
+                    alerts.push(`📅 *Assinatura Hoje:* ${s.name} (R$ ${formatCurrencyAlert(s.amount)})`);
+                } else if (s.billing_date === tomorrowDay) {
+                    alerts.push(`🕒 *Assinatura Amanhã:* ${s.name} (R$ ${formatCurrencyAlert(s.amount)})`);
+                }
+            });
+        }
+
+        // 5. Dívidas vencendo hoje
+        const { data: debts } = await supabaseAdmin
+            .from('debts')
+            .select('creditor_name, installment_amount, total_amount, is_installment, due_date')
+            .eq('user_id', userId)
+            .eq('status', 'active');
+
+        if (debts) {
+            debts.forEach((d: any) => {
+                if (d.due_date) {
+                    const due = new Date(d.due_date);
+                    if (due.getUTCDate() === today && due.getUTCMonth() === now.getMonth()) {
+                        alerts.push(`💸 *Dívida Hoje:* ${d.creditor_name} (R$ ${formatCurrencyAlert(d.is_installment ? d.installment_amount : d.total_amount)})`);
+                    }
+                }
+            });
+        }
+
+    } catch (err) {
+        console.error("Error generating alerts:", err);
+    }
+
+    return alerts;
+}
+
+function formatCurrencyAlert(val: number | string) {
+    const num = typeof val === 'string' ? parseFloat(val) : val;
+    return new Intl.NumberFormat('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(num || 0);
+}
+
