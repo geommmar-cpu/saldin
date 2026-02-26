@@ -1,15 +1,16 @@
-import { useState, useRef, useCallback } from "react";
+import { useState, useRef, useCallback, useEffect, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion, AnimatePresence, useSpring } from "framer-motion";
 import { format, addMonths } from "date-fns";
 import {
     ArrowLeft, QrCode, Banknote, Smartphone, CreditCard,
     Calendar, User, Check, Minus, Plus, Loader2,
-    RepeatIcon, ChevronDown, ChevronUp
+    RepeatIcon, ChevronDown, ChevronUp, Sparkles, Info
 } from "lucide-react";
 import { toast } from "sonner";
 
 import { cn } from "@/lib/utils";
+import { FadeIn } from "@/components/ui/motion";
 import { formatCurrency } from "@/lib/balanceCalculations";
 import { parseCurrency, formatCurrencyInput } from "@/lib/currency";
 import { toLocalDateString } from "@/lib/dateUtils";
@@ -19,10 +20,15 @@ import { defaultCategories } from "@/lib/categories";
 import { useAuth } from "@/hooks/useAuth";
 import { useAllCategories } from "@/hooks/useCategories";
 import { useBankAccounts, useUpdateBankBalance } from "@/hooks/useBankAccounts";
-import { useCreditCards, useCreateCreditCardPurchase } from "@/hooks/useCreditCards";
-import { useCreateExpense, useCreateBulkExpenses } from "@/hooks/useExpenses";
+import { useCreditCards, useCreateCreditCardPurchase, useCardInstallmentsByMonth } from "@/hooks/useCreditCards";
+import { useExpenses, useCreateExpense, useCreateBulkExpenses } from "@/hooks/useExpenses";
+import { useDebts } from "@/hooks/useDebts";
+import { useIncomes } from "@/hooks/useIncomes";
+import { useSubscriptions } from "@/hooks/useSubscriptions";
+import { useGoalStats } from "@/hooks/useGoals";
 import { useCreateReceivable } from "@/hooks/useReceivables";
 import { useCashAccount } from "@/hooks/useCashAccount";
+import { calculateBalances } from "@/lib/balanceCalculations";
 import { NumericKeypad } from "@/components/ui/numeric-keypad";
 import { BankLogo } from "@/components/BankLogo";
 
@@ -48,6 +54,29 @@ const QUICK_CAT_IDS = [
     "outros",
 ];
 
+// Animated Number Component
+const Counter = ({ value, className = "" }: { value: number; className?: string }) => {
+    const springValue = useSpring(value, {
+        stiffness: 60,
+        damping: 20,
+        restDelta: 0.01
+    });
+
+    const [display, setDisplay] = useState(value);
+
+    useEffect(() => {
+        springValue.set(value);
+    }, [value, springValue]);
+
+    useEffect(() => {
+        return springValue.on("change", (latest) => {
+            setDisplay(latest);
+        });
+    }, [springValue]);
+
+    return <span className={className}>{formatCurrency(display)}</span>;
+};
+
 function isValidUuid(s: string | null | undefined): boolean {
     if (!s) return false;
     return /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(s);
@@ -68,6 +97,18 @@ export const QuickExpense = () => {
     const createCreditCardPurchase = useCreateCreditCardPurchase();
     const updateBankBalance = useUpdateBankBalance();
     const createReceivable = useCreateReceivable();
+
+    // ── Data for Balance Preview ──
+    const now = new Date();
+    const currentMonthArg = now.getMonth();
+    const currentYearArg = now.getFullYear();
+
+    const { data: incomes = [] } = useIncomes(currentMonthArg, currentYearArg);
+    const { data: expensesRepo = [] } = useExpenses("all", currentMonthArg, currentYearArg);
+    const { data: debts = [] } = useDebts("active");
+    const { data: subscriptions = [] } = useSubscriptions();
+    const { data: goalStats } = useGoalStats();
+    const { data: ccInstallments = [] } = useCardInstallmentsByMonth(now);
 
     // ── Form state ──────────────────────────────────────────────────────────────
     const [amount, setAmount] = useState("");
@@ -110,6 +151,26 @@ export const QuickExpense = () => {
     // ── Derived values ───────────────────────────────────────────────────────────
     const numericAmount = parseCurrency(amount);
     const selectedCategory = categoryId ? allCategories.find(c => c.id === categoryId) : undefined;
+
+    // Balance Calculation
+    const totalCCInstallments = ccInstallments.reduce((sum, inst) => sum + Number(inst.amount), 0);
+    const bankTotal = bankAccounts.reduce((sum, acc) => sum + Number(acc.current_balance), 0);
+
+    const currentBalance = useMemo(() => calculateBalances(
+        incomes,
+        expensesRepo,
+        debts,
+        now,
+        subscriptions,
+        goalStats?.totalSaved || 0,
+        totalCCInstallments,
+        bankTotal
+    ), [incomes, expensesRepo, debts, subscriptions, goalStats?.totalSaved, totalCCInstallments, bankTotal]);
+
+    const newSaldoLivre = currentBalance.saldoLivre - numericAmount;
+    const impactPercentage = currentBalance.saldoLivre > 0
+        ? Math.min(100, Math.round((numericAmount / currentBalance.saldoLivre) * 100))
+        : 0;
 
     // All categories carousel: quick picks first, then the rest
     const sourceList = allCategories.length > 0 ? allCategories : defaultCategories;
@@ -267,31 +328,91 @@ export const QuickExpense = () => {
         <div className="min-h-screen bg-background flex flex-col">
 
             {/* Header */}
-            <div className="flex items-center gap-3 px-4 pt-4 pb-2 border-b border-border">
-                <button onClick={() => navigate(-1)} className="w-9 h-9 rounded-full bg-muted flex items-center justify-center">
+            <div className="flex items-center gap-3 px-4 pt-4 pb-2 border-b border-border bg-background/80 backdrop-blur-xl sticky top-0 z-40">
+                <button onClick={() => navigate(-1)} className="w-9 h-9 rounded-full bg-muted/50 flex items-center justify-center hover:bg-muted transition-colors">
                     <ArrowLeft className="w-4 h-4" />
                 </button>
                 <h1 className="font-bold text-base flex-1">Novo Gasto</h1>
+                <div className="flex items-center gap-1 px-2 py-1 rounded-full bg-primary/5 border border-primary/10">
+                    <Sparkles className="w-3 h-3 text-primary animate-pulse" />
+                    <span className="text-[10px] font-bold text-primary uppercase">Quick Mode</span>
+                </div>
             </div>
 
             {/* Scrollable form */}
-            <div className={cn("flex-1 overflow-y-auto pt-4 space-y-5", bottomOffset)}>
+            <div className={cn("flex-1 overflow-y-auto pt-4 space-y-6", bottomOffset)}>
+
+                {/* ── Balance Impact Preview ── */}
+                <FadeIn className="px-4">
+                    <div className="relative group overflow-hidden rounded-2xl bg-gradient-to-br from-card to-background border border-border p-4 shadow-sm">
+                        <div className="absolute top-0 right-0 w-32 h-32 bg-primary/5 rounded-full -translate-y-1/2 translate-x-1/2 blur-2xl" />
+
+                        <div className="flex items-center justify-between mb-3">
+                            <div className="flex items-center gap-1.5 text-muted-foreground">
+                                <Info className="w-3.5 h-3.5" />
+                                <span className="text-[10px] font-bold uppercase tracking-wider">Impacto no Saldo Livre</span>
+                            </div>
+                            <div className={cn(
+                                "px-2 py-0.5 rounded-full text-[10px] font-bold",
+                                impactPercentage > 30 ? "bg-red-100 text-red-600" : "bg-emerald-100 text-emerald-600"
+                            )}>
+                                {impactPercentage}% do disponível
+                            </div>
+                        </div>
+
+                        <div className="flex items-end justify-between">
+                            <div className="space-y-0.5">
+                                <p className="text-xs text-muted-foreground">Saldo Atual</p>
+                                <p className="font-bold text-foreground">{formatCurrency(currentBalance.saldoLivre)}</p>
+                            </div>
+
+                            <div className="h-8 w-px bg-border/50 mx-2" />
+
+                            <div className="text-right space-y-0.5">
+                                <p className="text-xs text-muted-foreground">Após este gasto</p>
+                                <Counter
+                                    value={newSaldoLivre}
+                                    className={cn(
+                                        "font-bold text-lg",
+                                        newSaldoLivre < 0 ? "text-red-500" : "text-emerald-500"
+                                    )}
+                                />
+                            </div>
+                        </div>
+
+                        {/* Visual Progress Bar of Impact */}
+                        <div className="mt-3 h-1 w-full bg-muted rounded-full overflow-hidden">
+                            <motion.div
+                                initial={{ width: 0 }}
+                                animate={{ width: `${impactPercentage}%` }}
+                                className={cn(
+                                    "h-full rounded-full",
+                                    impactPercentage > 30 ? "bg-red-500" : "bg-primary"
+                                )}
+                            />
+                        </div>
+                    </div>
+                </FadeIn>
 
                 {/* ── Amount ── */}
                 <div className="px-4">
                     <button
                         onClick={() => setShowKeypad(v => !v)}
-                        className="w-full text-center py-3 rounded-2xl bg-card border border-border"
+                        className="w-full text-center py-4 rounded-2xl bg-card border border-border shadow-soft active:scale-[0.98] transition-transform"
                     >
-                        <p className="text-[10px] uppercase tracking-widest text-muted-foreground mb-0.5">Valor do Gasto</p>
-                        <p className={cn(
-                            "text-5xl font-bold tabular-nums tracking-tight",
-                            numericAmount > 0 ? "text-foreground" : "text-muted-foreground/30"
-                        )}>
+                        <p className="text-[10px] uppercase tracking-widest text-muted-foreground mb-1">Valor do Gasto</p>
+                        <motion.p
+                            key={amount}
+                            initial={{ scale: 0.95, opacity: 0.8 }}
+                            animate={{ scale: 1, opacity: 1 }}
+                            className={cn(
+                                "text-5xl font-bold tabular-nums tracking-tight",
+                                numericAmount > 0 ? "text-foreground" : "text-muted-foreground/20"
+                            )}>
                             {amount ? formatCurrency(numericAmount) : "R$ 0,00"}
-                        </p>
-                        <p className="text-[10px] text-primary mt-1 font-medium">
-                            {showKeypad ? "▼ Fechar teclado" : "▲ Abrir teclado"}
+                        </motion.p>
+                        <p className="text-[10px] text-primary mt-2 font-bold uppercase tracking-wide">
+                            {showKeypad ? "Ocultar Teclado" : "Editar Valor"}
                         </p>
                     </button>
                 </div>

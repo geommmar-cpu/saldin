@@ -35,57 +35,46 @@ const PhoneMockup = () => {
 
     useEffect(() => {
         const sequence = [
-            { type: 'user', text: 'Gastei 23 na farmácia', delay: 1000 },
+            { type: 'user', text: 'Gastei 45 no almoço no cartão Inter em 2x', delay: 1000 },
             {
                 type: 'bot', text: (
                     <div className="flex flex-col text-left text-xs sm:text-sm leading-relaxed w-full font-sans">
                         {/* Header: Transaction Confirmed */}
                         <div className="font-bold border-b border-gray-100 pb-2 mb-2 flex items-center gap-2 text-gray-800">
                             <div className="shrink-0 w-4 h-4 rounded-full border border-gray-400 flex items-center justify-center text-[10px] text-gray-500">✓</div>
-                            <span className="text-[11px] sm:text-xs tracking-wider">TRANSAÇÃO CONFIRMADA</span>
+                            <span className="text-[11px] sm:text-xs tracking-wider">COMPRA PARCELADA REGISTRADA</span>
                         </div>
 
                         {/* Details */}
                         <div className="space-y-1 mb-3 text-gray-600 text-[11px] sm:text-xs">
-                            <p className="flex gap-1"><span className="opacity-100 font-semibold text-gray-800">🆔 ID:</span> <span className="font-mono text-gray-500 text-[10px]">TXN-20260218-J6E6PI</span></p>
-                            <p><span className="font-semibold text-gray-800">Tipo:</span> Gasto</p>
-                            <p><span className="font-semibold text-gray-800">Valor:</span> <span className="text-gray-900 font-bold bg-gray-100 px-1 rounded">R$ 23,00</span></p>
-                            <p><span className="font-semibold text-gray-800">Categoria:</span> Farmácia</p>
-                            <p><span className="font-semibold text-gray-800">Descrição:</span> Despesa Geral</p>
-                            <p><span className="font-semibold text-gray-800">Origem:</span> Conta</p>
-                            <p><span className="font-semibold text-gray-800">Data:</span> 18/02/2026</p>
+                            <p><span className="font-semibold text-gray-800">Valor Total:</span> R$ 90,00</p>
+                            <p><span className="font-semibold text-gray-800">Parcelas:</span> <span className="text-gray-900 font-bold bg-gray-100 px-1 rounded">2x de R$ 45,00</span></p>
+                            <p><span className="font-semibold text-gray-800">Cartão:</span> Inter (Final 4022)</p>
+                            <p><span className="font-semibold text-gray-800">Categoria:</span> Restaurante</p>
                         </div>
 
                         {/* Impact */}
                         <div className="font-bold border-b border-gray-100 pb-1 mb-2 text-gray-800 flex items-center gap-2 text-[11px] sm:text-xs uppercase tracking-wide mt-2">
-                            💰 Impacto Financeiro
+                            📉 Impacto no Saldo Livre
                         </div>
                         <div className="space-y-1 mb-3 text-gray-600 text-[11px] sm:text-xs">
                             <div className="flex justify-between">
-                                <span>Saldo anterior:</span>
-                                <span className="font-medium text-gray-500">R$ 2.069,00</span>
+                                <span>Saldo Livre Atual:</span>
+                                <span className="font-medium text-gray-500">R$ 1.540,00</span>
                             </div>
-                            <div className="flex justify-between text-emerald-700 font-bold bg-emerald-50 p-1.5 rounded -mx-1.5 border border-emerald-100/50">
-                                <span>Novo saldo:</span>
-                                <span>R$ 2.046,00</span>
-                            </div>
-                            <div className="flex justify-between pt-1 text-emerald-600/80 font-medium text-[10px]">
-                                <span>Disponível nas contas:</span>
-                                <span>R$ 2.046,00</span>
+                            <div className="flex justify-between text-red-600 font-bold bg-red-50 p-1.5 rounded -mx-1.5 border border-red-100/50">
+                                <span>Saldo Após Gasto:</span>
+                                <span>R$ 1.495,00</span>
                             </div>
                         </div>
 
-                        {/* Actions */}
-                        <div className="font-bold border-b border-gray-100 pb-1 mb-2 text-gray-800 flex items-center gap-2 text-[11px] sm:text-xs uppercase tracking-wide mt-2">
-                            ⚙️ Ações
-                        </div>
-                        <div className="flex flex-col gap-1 text-[10px] text-blue-500 font-medium font-mono">
-                            <button className="text-left hover:underline decoration-blue-300">EXCLUIR TXN-20260218-J6E6PI</button>
-                            <button className="text-left hover:underline decoration-blue-300">EDITAR TXN-20260218-J6E6PI</button>
+                        {/* Proactive Tip */}
+                        <div className="bg-blue-50 p-2 rounded-lg border border-blue-100 text-[10px] text-blue-800">
+                            💡 <strong>Dica do Saldin:</strong> Você já tem R$ 420,00 comprometidos em parcelas para o próximo mês. Cuidado com novas compras no crédito!
                         </div>
 
                         <div className="mt-3 pt-2 border-t border-gray-100 text-[9px] text-center text-gray-400 font-medium tracking-wide">
-                            Saldin • Seu controle financeiro
+                            Saldin • Seu controle financeiro via WhatsApp
                         </div>
                     </div>
                 ), delay: 2000
@@ -490,7 +479,7 @@ const VSL = () => (
 );
 
 // ─── Main Headline ───
-const mainHeadline = "Domine seu dinheiro com o Saldo Livre de Verdade™";
+const mainHeadline = "O jeito mais rápido de registrar gastos e o único que te tira das dívidas de verdade.";
 
 // ─── Testimonials ───
 const testimonials = [
@@ -702,17 +691,16 @@ const Landing = () => {
                         </div>
 
                         <div className="mb-4 sm:mb-6">
-                            <h1 className="font-serif text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold leading-[1.1] tracking-tighter text-gray-900">
-                                Domine seu dinheiro com o <br />
+                            <h1 className="font-serif text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold leading-[1.1] tracking-tighter text-gray-900 shadow-indigo-50">
+                                Pare de olhar o saldo do banco e veja seu <br />
                                 <span className="text-transparent bg-clip-text bg-gradient-to-r from-orange-600 via-pink-500 to-orange-400">
-                                    Saldo Livre de Verdade™
+                                    Saldo Livre de Verdade™.
                                 </span>
                             </h1>
                         </div>
 
                         <p className="text-lg sm:text-xl text-gray-500 max-w-xl mx-auto lg:mx-0 mb-8 sm:mb-10 leading-relaxed px-4 lg:px-0">
-                            O Saldin mostra seu <strong className="text-gray-900 font-semibold">Saldo Livre de Verdade™</strong>.
-                            Sem planilhas. Basta enviar um áudio ou foto no WhatsApp.
+                            O único sistema que transforma seu WhatsApp em um detector de gastos e cria seu <strong className="text-gray-900 font-semibold">Plano de Guerra</strong> para zerar dívidas sem esforço e sem planilhas.
                         </p>
 
                         <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center lg:justify-start px-8 sm:px-0">
@@ -800,15 +788,20 @@ const Landing = () => {
                             <h3 className="font-bold text-lg text-gray-900 mb-2">Freelancers & Autônomos</h3>
                             <p className="text-sm text-gray-600">Que nunca sabem exatamente quanto vai entrar e misturam contas PJ com PF.</p>
                         </div>
-                        <div className="p-6 bg-purple-50/50 rounded-2xl border border-purple-100 text-center hover:scale-105 transition-transform">
-                            <div className="w-16 h-16 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-4 text-3xl">🎓</div>
-                            <h3 className="font-bold text-lg text-gray-900 mb-2">Universitários & Estagiários</h3>
-                            <p className="text-sm text-gray-600">Que precisam fazer o dinheiro render até o fim do mês sem abrir mão do lazer.</p>
+                        <div className="p-6 bg-blue-50/50 rounded-2xl border border-blue-100 text-center hover:scale-105 transition-transform">
+                            <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4 text-3xl">🚀</div>
+                            <h3 className="font-bold text-lg text-gray-900 mb-2">Quem odeia planilhas</h3>
+                            <p className="text-sm text-gray-500">Para você que começa o mês organizado mas desiste na primeira semana por preguiça de abrir o Excel.</p>
                         </div>
-                        <div className="p-6 bg-green-50/50 rounded-2xl border border-green-100 text-center hover:scale-105 transition-transform">
-                            <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4 text-3xl">👔</div>
-                            <h3 className="font-bold text-lg text-gray-900 mb-2">CLT & Assalariados</h3>
-                            <p className="text-sm text-gray-600">Que vivem de salário em salário e são surpreendidos pela fatura do cartão.</p>
+                        <div className="p-6 bg-orange-50/50 rounded-2xl border border-orange-100 text-center hover:scale-105 transition-transform">
+                            <div className="w-16 h-16 bg-orange-100 rounded-full flex items-center justify-center mx-auto mb-4 text-3xl">🛡️</div>
+                            <h3 className="font-bold text-lg text-gray-900 mb-2">Endividados & Focados</h3>
+                            <p className="text-sm text-gray-500">Para você que quer saber a data EXATA em que estará livre das dívidas e precisa de um plano de guerra real.</p>
+                        </div>
+                        <div className="p-6 bg-emerald-50/50 rounded-2xl border border-emerald-100 text-center hover:scale-105 transition-transform">
+                            <div className="w-16 h-16 bg-emerald-100 rounded-full flex items-center justify-center mx-auto mb-4 text-3xl">💻</div>
+                            <h3 className="font-bold text-lg text-gray-900 mb-2">Autônomos & Variáveis</h3>
+                            <p className="text-sm text-gray-500">Para você que nunca sabe quanto pode gastar porque a renda muda todo mês. Tenha clareza do seu Saldo Livre.</p>
                         </div>
                     </div>
                 </div>
@@ -818,12 +811,12 @@ const Landing = () => {
             <Section id="problema" className="py-16 sm:py-24 px-4 bg-white">
                 <div className="max-w-6xl mx-auto">
                     <div className="text-center mb-12 sm:mb-16">
-                        <span className="text-sm font-bold uppercase tracking-widest text-impulse">O Inimigo Invisível</span>
+                        <span className="text-sm font-bold uppercase tracking-widest text-impulse">O Ciclo da Frustração</span>
                         <h2 className="font-serif text-3xl sm:text-4xl md:text-5xl font-bold mt-4 mb-6 text-gray-900">
-                            Por que você sente que o dinheiro some?
+                            Por que você sente que o dinheiro some antes do dia 15?
                         </h2>
                         <p className="text-lg sm:text-xl text-gray-500 max-w-2xl mx-auto leading-relaxed">
-                            O app do banco foi feito para você gastar. O Saldin foi feito para você prosperar.
+                            O app do banco foi feito para você gastar. O Saldin foi feito para você Prosperar — mostrando o que REALMENTE sobra.
                         </p>
                     </div>
 
