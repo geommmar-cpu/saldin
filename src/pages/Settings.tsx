@@ -1,4 +1,4 @@
-import { useNavigate } from "react-router-dom";
+Ôªøimport { useNavigate } from "react-router-dom";
 import { useState, useEffect, useRef, ChangeEvent } from "react";
 import { supabase } from "@/lib/backendClient";
 import { generateFinancialReport } from "@/lib/exportPdf";
@@ -99,9 +99,9 @@ export const Settings = () => {
 
   const { data: whatsappData, isLoading: isLoadingWhatsApp } = useWhatsAppStatus(user?.id);
 
-  // Formata o n+¶mero para exibi+∫+˙o: 5561993984169 -> +55 61 99398-4169
+  // Formata o n√∫mero para exibi√ß√£o: 5561993984169 -> +55 61 99398-4169
   const formatPhoneNumber = (phone: string | null) => {
-    if (!phone) return "N+˙o configurado";
+    if (!phone) return "N√£o configurado";
     const cleaned = phone.replace(/\D/g, "");
     if (cleaned.length === 13) {
       return `+${cleaned.substring(0, 2)} ${cleaned.substring(2, 4)} ${cleaned.substring(4, 9)}-${cleaned.substring(9)}`;
@@ -196,7 +196,7 @@ export const Settings = () => {
       removeAllCredentials(user.id);
       toast({
         title: "Biometria desativada",
-        description: "Voc+¨ precisar+Ì usar email e senha para entrar.",
+        description: "Voc√™ precisar√° usar email e senha para entrar.",
       });
     } else {
       // Enable biometric
@@ -207,12 +207,12 @@ export const Settings = () => {
       if (success) {
         toast({
           title: "Biometria ativada!",
-          description: "Na pr+¶xima vez, use sua biometria para entrar.",
+          description: "Na pr√≥xima vez, use sua biometria para entrar.",
         });
       } else {
         toast({
           title: "Erro ao ativar",
-          description: "N+˙o foi poss+°vel ativar a biometria.",
+          description: "N√£o foi poss√≠vel ativar a biometria.",
           variant: "destructive",
         });
       }
@@ -221,7 +221,7 @@ export const Settings = () => {
 
   const handleExportPdf = async () => {
     try {
-      toast({ title: "Gerando relat+¶rio..." });
+      toast({ title: "Gerando relat√≥rio..." });
       await generateFinancialReport({
         incomes: allIncomes || [],
         expenses: allExpenses || [],
@@ -277,7 +277,7 @@ export const Settings = () => {
           <Button variant="ghost" size="icon" onClick={() => navigate("/")} className="-ml-2">
             <ChevronLeft className="w-5 h-5" />
           </Button>
-          <h1 className="font-serif text-xl font-semibold">Configura+∫+¡es</h1>
+          <h1 className="font-serif text-xl font-semibold">Configura√ß√µes</h1>
         </div>
       </header>
 
@@ -311,7 +311,7 @@ export const Settings = () => {
             className="hidden"
             accept="image/*"
           />
-          <h2 className="mt-3 text-lg font-semibold">{profile?.full_name || "Usu+Ìrio"}</h2>
+          <h2 className="mt-3 text-lg font-semibold">{profile?.full_name || "Usu√°rio"}</h2>
           <p className="text-sm text-muted-foreground">{user?.email}</p>
         </div>
 
@@ -321,17 +321,17 @@ export const Settings = () => {
             <SettingsItem
               icon={User}
               label="Nome"
-              value={profile?.full_name || user?.user_metadata?.full_name || "Usu+Ìrio"}
+              value={profile?.full_name || user?.user_metadata?.full_name || "Usu√°rio"}
             />
             <SettingsItem
               icon={Mail}
               label="Email"
-              value={user?.email || "‘«ˆ"}
+              value={user?.email || "‚Äî"}
             />
             <SettingsItem
               icon={Crown}
               label="Plano atual"
-              value="Gr+Ìtis"
+              value="Gr√°tis"
               badge="Upgrade"
               onClick={() => { }}
             />
@@ -359,7 +359,7 @@ export const Settings = () => {
             />
             <SettingsItem
               icon={Smartphone}
-              label="N+¶mero conectado"
+              label="N√∫mero conectado"
               value={whatsappStatus.number}
             />
             <SettingsItem
@@ -383,22 +383,22 @@ export const Settings = () => {
           </SettingsSection>
         </FadeIn>
 
-        {/* Bloco: Captura Autom+Ìtica de Gastos */}
+        {/* Bloco: Captura Autom√°tica de Gastos */}
         <FadeIn delay={0.08}>
           <AutoCaptureSection phone={whatsappData?.number || ""} />
         </FadeIn>
 
-        {/* Bloco 3 - Seguran+∫a */}
+        {/* Bloco 3 - Seguran√ßa */}
         <FadeIn delay={0.1}>
-          <SettingsSection title="Seguran+∫a">
+          <SettingsSection title="Seguran√ßa">
             {isBiometricSupported && (
               <SettingsItem
                 icon={Fingerprint}
                 iconColor={hasBiometricEnabled ? "text-essential" : "text-muted-foreground"}
                 label="Login por biometria"
                 description={hasBiometricEnabled
-                  ? `Ativado ‘«Û ${userCredentials[0]?.deviceName || "Dispositivo"}`
-                  : "Use impress+˙o digital ou Face ID"
+                  ? `Ativado ‚Ä¢ ${userCredentials[0]?.deviceName || "Dispositivo"}`
+                  : "Use impress√£o digital ou Face ID"
                 }
                 action={
                   <Switch
@@ -414,15 +414,15 @@ export const Settings = () => {
                 icon={Fingerprint}
                 iconColor="text-muted-foreground"
                 label="Login por biometria"
-                description="Seu dispositivo n+˙o suporta biometria"
+                description="Seu dispositivo n√£o suporta biometria"
               />
             )}
           </SettingsSection>
         </FadeIn>
 
-        {/* Bloco 4 - Apar+¨ncia */}
+        {/* Bloco 4 - Apar√™ncia */}
         <FadeIn delay={0.12}>
-          <SettingsSection title="Apar+¨ncia">
+          <SettingsSection title="Apar√™ncia">
             <SettingsItem
               icon={preferences.darkMode ? Moon : Sun}
               iconColor={preferences.darkMode ? "text-primary" : "text-amber-500"}
@@ -484,17 +484,17 @@ export const Settings = () => {
               }
             />
             <div className="px-4 py-2 bg-muted/50 text-xs text-muted-foreground">
-              Alertas cr+°ticos n+˙o podem ser desativados
+              Alertas cr√≠ticos n√£o podem ser desativados
             </div>
           </SettingsSection>
         </FadeIn>
 
-        {/* Bloco 4 - Dados e Relat+¶rios */}
+        {/* Bloco 4 - Dados e Relat√≥rios */}
         <FadeIn delay={0.15}>
-          <SettingsSection title="Dados e Relat+¶rios">
+          <SettingsSection title="Dados e Relat√≥rios">
             <SettingsItem
               icon={FileText}
-              label="Relat+¶rio PDF"
+              label="Relat√≥rio PDF"
               description="Resumo mensal completo"
               onClick={handleExportPdf}
               showArrow
@@ -502,13 +502,13 @@ export const Settings = () => {
             <SettingsItem
               icon={FileText}
               label="Exportar CSV/Excel"
-              description="Planilha para an+Ìlise detalhada"
+              description="Planilha para an√°lise detalhada"
               onClick={handleExportData}
               showArrow
             />
             <SettingsItem
               icon={History}
-              label="Hist+¶rico completo"
+              label="Hist√≥rico completo"
               onClick={() => navigate("/history")}
               showArrow
             />
@@ -532,7 +532,7 @@ export const Settings = () => {
             />
             <SettingsItem
               icon={Shield}
-              label="Pol+°tica de privacidade"
+              label="Pol√≠tica de privacidade"
               onClick={() => navigate("/privacy")}
               showArrow
             />
@@ -550,7 +550,7 @@ export const Settings = () => {
         <FadeIn delay={0.3}>
           <div className="text-center py-4">
             <p className="text-xs text-muted-foreground italic">
-              "Voc+¨ fala com a IA. Voc+¨ encara a verdade no app."
+              "Voc√™ fala com a IA. Voc√™ encara a verdade no app."
             </p>
             <p className="text-xs text-muted-foreground mt-1">v1.0.0</p>
           </div>
@@ -562,7 +562,7 @@ export const Settings = () => {
   );
 };
 
-// --- AutoCaptureSection ---
+// ‚îÄ‚îÄ‚îÄ AutoCaptureSection ‚îÄ‚îÄ‚îÄ
 
 const INJECT_URL = "https://vmkhqtuqgvtcapwmxtov.supabase.co/functions/v1/inject-notification";
 const INJECT_SECRET = "saldin_inject_2026";
@@ -589,21 +589,37 @@ const AutoCaptureSection = ({ phone }: { phone: string }) => {
   };
 
   const handleAndroidStep2 = () => {
-    const a = document.createElement("a");
-    a.href = macrodroidDeepLink;
-    a.click();
-    toast({ title: "Abrindo MacroDroid...", description: "Aceite a importaÁ„o e ative a macro. Pronto! ??" });
+    // Deep link direto para o MacroDroid (funciona no Android nativo)
+    // Fallback: abre a Play Store para o usu√°rio navegar para o app
+    const deepLink = macrodroidDeepLink;
+    const fallback = "https://play.google.com/store/apps/details?id=com.arlosoft.macrodroid";
+
+    // Tenta o deep link; se n√£o funcionar em 1.5s, mostra instru√ß√£o manual
+    const timer = setTimeout(() => {
+      setStep(3 as any);
+    }, 1500);
+
+    try {
+      window.location.href = deepLink;
+      // Se navegou, cancela o timer
+      setTimeout(() => clearTimeout(timer), 500);
+    } catch {
+      clearTimeout(timer);
+      window.open(fallback, "_blank");
+    }
+
+    toast({ title: "Abrindo MacroDroid...", description: "Se nao abrir, siga as instrucoes abaixo." });
   };
 
   const handleIosActivate = () => {
     window.open("https://www.icloud.com/shortcuts/placeholder", "_blank");
-    toast({ title: "Abrindo Atalhos...", description: 'Toque em "Adicionar" e depois em "Ativar".' });
+    toast({ title: "Abrindo Atalhos...", description: "Toque em \"Adicionar\" e depois em \"Ativar\"." });
   };
 
   return (
     <div>
       <h2 className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-2 px-1">
-        Captura Autom·tica de Gastos
+        Captura Autom√°tica de Gastos
       </h2>
       <div className="bg-card rounded-xl border border-border shadow-soft overflow-hidden">
 
@@ -614,7 +630,7 @@ const AutoCaptureSection = ({ phone }: { phone: string }) => {
           </div>
           <p className="text-base font-bold text-foreground">Gastos registrados sozinhos</p>
           <p className="text-sm text-muted-foreground mt-1 leading-relaxed">
-            Comprou no dÈbito ou crÈdito? O Saldin detecta a notificaÁ„o do banco e j· registra ó sem vocÍ fazer nada.
+            Comprou no d√©bito ou cr√©dito? O Saldin detecta a notifica√ß√£o do banco e j√° registra ‚Äî sem voc√™ fazer nada.
           </p>
         </div>
 
@@ -631,7 +647,7 @@ const AutoCaptureSection = ({ phone }: { phone: string }) => {
                   : "text-muted-foreground hover:text-foreground"
               )}
             >
-              {tab === "android" ? "?? Android" : "?? iPhone"}
+              {tab === "android" ? "üì± Android" : "üçé iPhone"}
             </button>
           ))}
         </div>
@@ -651,15 +667,15 @@ const AutoCaptureSection = ({ phone }: { phone: string }) => {
                   <div className="w-8 h-8 rounded-full bg-primary/10 text-primary text-sm font-bold flex items-center justify-center flex-shrink-0">1</div>
                   <div>
                     <p className="text-sm font-semibold text-foreground">Instale o MacroDroid</p>
-                    <p className="text-xs text-muted-foreground mt-0.5">App gratuito que conecta as notificaÁıes do banco ao Saldin. Instala uma vez e esquece.</p>
+                    <p className="text-xs text-muted-foreground mt-0.5">App gratuito que conecta as notifica√ß√µes do banco ao Saldin. Instala uma vez e esquece.</p>
                   </div>
                 </div>
                 <Button className="w-full gap-2" onClick={handleAndroidStep1}>
                   <ExternalLink className="w-4 h-4" />
-                  Instalar MacroDroid (gr·tis)
+                  Instalar MacroDroid (gr√°tis)
                 </Button>
                 <button onClick={() => setStep(2)} className="w-full text-xs text-muted-foreground text-center hover:underline underline-offset-2">
-                  J· tenho instalado ? prÛximo passo
+                  J√° tenho instalado ‚Üí pr√≥ximo passo
                 </button>
               </div>
             )}
@@ -670,7 +686,7 @@ const AutoCaptureSection = ({ phone }: { phone: string }) => {
                   <div className="w-8 h-8 rounded-full bg-primary/10 text-primary text-sm font-bold flex items-center justify-center flex-shrink-0">2</div>
                   <div>
                     <p className="text-sm font-semibold text-foreground">Conecte ao Saldin</p>
-                    <p className="text-xs text-muted-foreground mt-0.5">O MacroDroid abre com tudo configurado. SÛ toque em <strong>"Importar"</strong> e <strong>"Ativar"</strong>.</p>
+                    <p className="text-xs text-muted-foreground mt-0.5">O MacroDroid abre com tudo configurado. S√≥ toque em <strong>"Importar"</strong> e <strong>"Ativar"</strong>.</p>
                   </div>
                 </div>
                 <Button className="w-full gap-2" onClick={handleAndroidStep2}>
@@ -678,18 +694,18 @@ const AutoCaptureSection = ({ phone }: { phone: string }) => {
                   Conectar ao MacroDroid
                 </Button>
                 <div className="bg-emerald-50 dark:bg-emerald-950/30 border border-emerald-200 dark:border-emerald-800 rounded-xl p-4 text-center">
-                  <p className="text-2xl mb-1">??</p>
-                  <p className="text-sm font-semibold text-emerald-800 dark:text-emerald-200">Pronto! AtivaÁ„o em 2 toques.</p>
-                  <p className="text-xs text-emerald-700 dark:text-emerald-300 mt-1">Cada notificaÁ„o de compra chegar· automaticamente no Saldin.</p>
+                  <p className="text-2xl mb-1">üéâ</p>
+                  <p className="text-sm font-semibold text-emerald-800 dark:text-emerald-200">Pronto! Ativa√ß√£o em 2 toques.</p>
+                  <p className="text-xs text-emerald-700 dark:text-emerald-300 mt-1">Cada notifica√ß√£o de compra chegar√° automaticamente no Saldin.</p>
                 </div>
-                <button onClick={() => setStep(1)} className="w-full text-xs text-muted-foreground text-center hover:underline underline-offset-2">? Voltar</button>
+                <button onClick={() => setStep(1)} className="w-full text-xs text-muted-foreground text-center hover:underline underline-offset-2">‚Üê Voltar</button>
               </div>
             )}
 
             <div className="border-t border-border pt-4">
               <p className="text-xs text-muted-foreground mb-2 text-center">Funciona com os principais bancos</p>
               <div className="flex flex-wrap gap-2 justify-center">
-                {["Nubank", "Inter", "C6", "Ita˙", "Bradesco", "Santander", "Caixa", "Mercado Pago"].map((b) => (
+                {["Nubank", "Inter", "C6", "Ita√∫", "Bradesco", "Santander", "Caixa", "Mercado Pago"].map((b) => (
                   <span key={b} className="text-xs bg-muted text-muted-foreground px-2 py-1 rounded-full">{b}</span>
                 ))}
               </div>
@@ -702,13 +718,13 @@ const AutoCaptureSection = ({ phone }: { phone: string }) => {
           <div className="p-5 space-y-5">
             <div className="flex items-center gap-2 bg-blue-50 dark:bg-blue-950/30 border border-blue-200 dark:border-blue-800 rounded-lg px-3 py-2">
               <CheckCircle2 className="w-4 h-4 text-blue-600 flex-shrink-0" />
-              <p className="text-xs text-blue-800 dark:text-blue-200"><strong>N„o precisa instalar nada.</strong> O app Atalhos j· vem no iPhone.</p>
+              <p className="text-xs text-blue-800 dark:text-blue-200"><strong>N√£o precisa instalar nada.</strong> O app Atalhos j√° vem no iPhone.</p>
             </div>
 
             <div className="space-y-4">
               {[
-                { n: 1, title: "Toque no bot„o abaixo", desc: 'O iPhone pede para adicionar o atalho do Saldin. Toque em "Adicionar".' },
-                { n: 2, title: "Ative a automaÁ„o", desc: 'No app Atalhos, v· em AutomaÁ„o e ative "Saldin Captura". Feito!' },
+                { n: 1, title: "Toque no bot√£o abaixo", desc: "O iPhone pede para adicionar o atalho do Saldin. Toque em \"Adicionar\"." },
+                { n: 2, title: "Ative a automa√ß√£o", desc: "No app Atalhos, v√° em Automa√ß√£o e ative \"Saldin Captura\". Feito!" },
               ].map(({ n, title, desc }) => (
                 <div key={n} className="flex items-start gap-3">
                   <div className="w-8 h-8 rounded-full bg-primary/10 text-primary text-sm font-bold flex items-center justify-center flex-shrink-0">{n}</div>
@@ -726,15 +742,15 @@ const AutoCaptureSection = ({ phone }: { phone: string }) => {
             </Button>
 
             <div className="bg-emerald-50 dark:bg-emerald-950/30 border border-emerald-200 dark:border-emerald-800 rounded-xl p-4 text-center">
-              <p className="text-2xl mb-1">??</p>
-              <p className="text-sm font-semibold text-emerald-800 dark:text-emerald-200">2 toques e est· ativo para sempre.</p>
-              <p className="text-xs text-emerald-700 dark:text-emerald-300 mt-1">Cada compra registrada pelo banco chega automaticamente no Saldin.</p>
+              <p className="text-2xl mb-1">üéâ</p>
+              <p className="text-sm font-semibold text-emerald-800 dark:text-emerald-200">2 toques e est√° ativo para sempre.</p>
+              <p className="text-xs text-emerald-700 dark:text-emerald-300 mt-1">Cada compra do banco chega automaticamente no Saldin.</p>
             </div>
 
             <div className="border-t border-border pt-4">
               <p className="text-xs text-muted-foreground mb-2 text-center">Funciona com os principais bancos</p>
               <div className="flex flex-wrap gap-2 justify-center">
-                {["Nubank", "Inter", "C6", "Ita˙", "Bradesco", "Santander"].map((b) => (
+                {["Nubank", "Inter", "C6", "Ita√∫", "Bradesco", "Santander"].map((b) => (
                   <span key={b} className="text-xs bg-muted text-muted-foreground px-2 py-1 rounded-full">{b}</span>
                 ))}
               </div>
@@ -745,7 +761,9 @@ const AutoCaptureSection = ({ phone }: { phone: string }) => {
     </div>
   );
 };
+
 // Helper Components
+
 
 interface SettingsSectionProps {
   title: string;
