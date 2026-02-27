@@ -567,6 +567,273 @@ export const Settings = () => {
 const INJECT_URL = "https://vmkhqtuqgvtcapwmxtov.supabase.co/functions/v1/inject-notification";
 const INJECT_SECRET = "saldin_inject_2026";
 
+// Detecta o sistema operacional do dispositivo
+function detectPlatform(): "android" | "ios" | "unknown" {
+  const ua = navigator.userAgent.toLowerCase();
+  if (/android/.test(ua)) return "android";
+  if (/iphone|ipad|ipod/.test(ua)) return "ios";
+  return "unknown";
+}
+
+const AutoCaptureSection = ({ phone }: { phone: string }) => {
+  const { toast } = useToast();
+  const platform = detectPlatform();
+  const [activeTab, setActiveTab] = useState<"android" | "ios">(
+    platform === "ios" ? "ios" : "android"
+  );
+  const [step, setStep] = useState<1 | 2>(1);
+
+  const normalizedPhone = phone.replace(/\D/g, "");
+
+  // Link do MacroDroid com template pré-configurado (importa a macro automaticamente)
+  const macrodroidTemplateUrl = `macrodroid://template?import=${encodeURIComponent(
+    JSON.stringify({
+      m_name: "Saldin - Captura de Gastos",
+      m_trigger: { type: "notification" },
+      m_action: {
+        type: "http_post",
+        url: INJECT_URL,
+        body: JSON.stringify({
+          secret: INJECT_SECRET,
+          phone: normalizedPhone,
+          text: "{nf_title} {nf_text}",
+          source: "macrodroid",
+        }),
+      },
+    })
+  )}`;
+
+  // Fallback: abre o MacroDroid diretamente
+  const macrodroidPlayStore = "https://play.google.com/store/apps/details?id=com.arlosoft.macrodroid";
+
+  const handleAndroidStep1 = () => {
+    window.open(macrodroidPlayStore, "_blank");
+    setTimeout(() => setStep(2), 800);
+  };
+
+  const handleAndroidStep2 = () => {
+    // Tenta abrir o deep link do MacroDroid para importar a macro
+    // Se não funcionar (app não instalado), mostra um toast explicativo
+    const link = document.createElement("a");
+    link.href = macrodroidTemplateUrl;
+    link.click();
+    toast({
+      title: "Abrindo MacroDroid...",
+      description: "Aceite a importação e ative a macro. Pronto! 🎉",
+    });
+  };
+
+  // Link do Shortcut iOS — substitua pela URL real do iCloud após criar o Shortcut
+  const iosShortcutUrl = "https://www.icloud.com/shortcuts/placeholder";
+
+  const handleIosActivate = () => {
+    window.open(iosShortcutUrl, "_blank");
+    toast({
+      title: "Abrindo Atalhos...",
+      description: "Toque em \"Adicionar\" e depois em \"Ativar\" para concluir.",
+    });
+  };
+
+  return (
+    <div>
+      <h2 className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-2 px-1">
+        Captura Automática de Gastos
+      </h2>
+
+      <div className="bg-card rounded-xl border border-border shadow-soft overflow-hidden">
+
+        {/* Header hero */}
+        <div className="p-5 bg-gradient-to-br from-emerald-50 via-teal-50 to-cyan-50 dark:from-emerald-950/40 dark:via-teal-950/30 dark:to-cyan-950/20 border-b border-border text-center">
+          <div className="w-14 h-14 rounded-2xl bg-emerald-100 dark:bg-emerald-900/60 flex items-center justify-center mx-auto mb-3">
+            <Bell className="w-7 h-7 text-emerald-600" />
+          </div>
+          <p className="text-base font-bold text-foreground">Gastos registrados sozinhos</p>
+          <p className="text-sm text-muted-foreground mt-1 leading-relaxed">
+            Comprou no débito ou crédito? O Saldin detecta a notificação do banco e já registra no seu WhatsApp — sem você fazer nada.
+          </p>
+        </div>
+
+        {/* Tabs */}
+        <div className="flex border-b border-border">
+          <button
+            onClick={() => { setActiveTab("android"); setStep(1); }}
+            className={cn(
+              "flex-1 py-3 text-sm font-medium transition-colors",
+              activeTab === "android"
+                ? "text-foreground border-b-2 border-primary bg-primary/5"
+                : "text-muted-foreground hover:text-foreground"
+            )}
+          >
+            📱 Android
+          </button>
+          <button
+            onClick={() => { setActiveTab("ios"); setStep(1); }}
+            className={cn(
+              "flex-1 py-3 text-sm font-medium transition-colors",
+              activeTab === "ios"
+                ? "text-foreground border-b-2 border-primary bg-primary/5"
+                : "text-muted-foreground hover:text-foreground"
+            )}
+          >
+            🍎 iPhone
+          </button>
+        </div>
+
+        {/* ── ANDROID ── */}
+        {activeTab === "android" && (
+          <div className="p-5 space-y-4">
+
+            {/* Barra de progresso */}
+            <div className="flex items-center gap-2">
+              <div className={cn("h-1.5 flex-1 rounded-full transition-colors", step >= 1 ? "bg-primary" : "bg-muted")} />
+              <div className={cn("h-1.5 flex-1 rounded-full transition-colors", step >= 2 ? "bg-primary" : "bg-muted")} />
+              <span className="text-xs text-muted-foreground ml-1">{step}/2</span>
+            </div>
+
+            {step === 1 && (
+              <div className="space-y-4">
+                <div className="flex items-start gap-3">
+                  <div className="w-8 h-8 rounded-full bg-primary/10 text-primary text-sm font-bold flex items-center justify-center flex-shrink-0">
+                    1
+                  </div>
+                  <div>
+                    <p className="text-sm font-semibold text-foreground">Instale o MacroDroid</p>
+                    <p className="text-xs text-muted-foreground mt-0.5">
+                      É um app gratuito que vai conectar as notificações do banco ao Saldin. Você instala uma vez e esquece.
+                    </p>
+                  </div>
+                </div>
+                <Button className="w-full gap-2" onClick={handleAndroidStep1}>
+                  <ExternalLink className="w-4 h-4" />
+                  Instalar MacroDroid (grátis)
+                </Button>
+                <button
+                  onClick={() => setStep(2)}
+                  className="w-full text-xs text-muted-foreground text-center underline-offset-2 hover:underline"
+                >
+                  Já tenho instalado → próximo passo
+                </button>
+              </div>
+            )}
+
+            {step === 2 && (
+              <div className="space-y-4">
+                <div className="flex items-start gap-3">
+                  <div className="w-8 h-8 rounded-full bg-primary/10 text-primary text-sm font-bold flex items-center justify-center flex-shrink-0">
+                    2
+                  </div>
+                  <div>
+                    <p className="text-sm font-semibold text-foreground">Conecte ao Saldin</p>
+                    <p className="text-xs text-muted-foreground mt-0.5">
+                      Toque no botão abaixo. O MacroDroid vai abrir com tudo já configurado. Só toque em <strong>"Importar"</strong> e depois em <strong>"Ativar"</strong>.
+                    </p>
+                  </div>
+                </div>
+                <Button className="w-full gap-2" onClick={handleAndroidStep2}>
+                  <Zap className="w-4 h-4" />
+                  Conectar ao MacroDroid
+                </Button>
+
+                {/* Caixinha de sucesso */}
+                <div className="bg-emerald-50 dark:bg-emerald-950/30 border border-emerald-200 dark:border-emerald-800 rounded-xl p-4 text-center">
+                  <p className="text-2xl mb-1">🎉</p>
+                  <p className="text-sm font-semibold text-emerald-800 dark:text-emerald-200">Pronto! Ativação em 2 toques.</p>
+                  <p className="text-xs text-emerald-700 dark:text-emerald-300 mt-1">
+                    Após importar, toda notificação de compra do banco chegará automaticamente no Saldin.
+                  </p>
+                </div>
+
+                <button
+                  onClick={() => setStep(1)}
+                  className="w-full text-xs text-muted-foreground text-center underline-offset-2 hover:underline"
+                >
+                  ← Voltar ao passo 1
+                </button>
+              </div>
+            )}
+
+            {/* Bancos suportados */}
+            <div className="border-t border-border pt-4">
+              <p className="text-xs text-muted-foreground mb-2 text-center">Funciona com os principais bancos</p>
+              <div className="flex flex-wrap gap-2 justify-center">
+                {["Nubank", "Inter", "C6", "Itaú", "Bradesco", "Santander", "Caixa", "Mercado Pago"].map((b) => (
+                  <span key={b} className="text-xs bg-muted text-muted-foreground px-2 py-1 rounded-full">
+                    {b}
+                  </span>
+                ))}
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* ── iOS ── */}
+        {activeTab === "ios" && (
+          <div className="p-5 space-y-4">
+
+            {/* Badge "sem instalação" */}
+            <div className="flex items-center gap-2 bg-blue-50 dark:bg-blue-950/30 border border-blue-200 dark:border-blue-800 rounded-lg px-3 py-2">
+              <CheckCircle2 className="w-4 h-4 text-blue-600 flex-shrink-0" />
+              <p className="text-xs text-blue-800 dark:text-blue-200">
+                <strong>Não precisa instalar nada.</strong> O app Atalhos já vem no iPhone.
+              </p>
+            </div>
+
+            <div className="flex items-start gap-3">
+              <div className="w-8 h-8 rounded-full bg-primary/10 text-primary text-sm font-bold flex items-center justify-center flex-shrink-0">
+                1
+              </div>
+              <div>
+                <p className="text-sm font-semibold text-foreground">Toque no botão abaixo</p>
+                <p className="text-xs text-muted-foreground mt-0.5">
+                  O iPhone vai abrir e perguntar se você quer adicionar o atalho do Saldin. Toque em <strong>"Adicionar"</strong>.
+                </p>
+              </div>
+            </div>
+
+            <Button className="w-full gap-2" onClick={handleIosActivate}>
+              <ExternalLink className="w-4 h-4" />
+              Adicionar Atalho do Saldin
+            </Button>
+
+            <div className="flex items-start gap-3">
+              <div className="w-8 h-8 rounded-full bg-primary/10 text-primary text-sm font-bold flex items-center justify-center flex-shrink-0">
+                2
+              </div>
+              <div>
+                <p className="text-sm font-semibold text-foreground">Ative a automação</p>
+                <p className="text-xs text-muted-foreground mt-0.5">
+                  No app Atalhos, vá em <strong>Automação</strong> e ative <strong>"Saldin Captura"</strong>. Feito!
+                </p>
+              </div>
+            </div>
+
+            {/* Caixinha de sucesso */}
+            <div className="bg-emerald-50 dark:bg-emerald-950/30 border border-emerald-200 dark:border-emerald-800 rounded-xl p-4 text-center">
+              <p className="text-2xl mb-1">🎉</p>
+              <p className="text-sm font-semibold text-emerald-800 dark:text-emerald-200">2 toques e está ativo para sempre.</p>
+              <p className="text-xs text-emerald-700 dark:text-emerald-300 mt-1">
+                A partir de agora, cada compra registrada pelo banco chega automaticamente no Saldin.
+              </p>
+            </div>
+
+            {/* Bancos suportados */}
+            <div className="border-t border-border pt-4">
+              <p className="text-xs text-muted-foreground mb-2 text-center">Funciona com os principais bancos</p>
+              <div className="flex flex-wrap gap-2 justify-center">
+                {["Nubank", "Inter", "C6", "Itaú", "Bradesco", "Santander"].map((b) => (
+                  <span key={b} className="text-xs bg-muted text-muted-foreground px-2 py-1 rounded-full">
+                    {b}
+                  </span>
+                ))}
+              </div>
+            </div>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+};
+
 const AutoCaptureSection = ({ phone }: { phone: string }) => {
   const { toast } = useToast();
   const [activeTab, setActiveTab] = useState<"android" | "ios">("android");
