@@ -41,7 +41,10 @@ import {
   Trash2,
   Bitcoin,
   Camera,
-  Loader2
+  Loader2,
+  Bell,
+  Copy,
+  ExternalLink
 } from "lucide-react";
 import { useUserPreferences } from "@/hooks/useUserPreferences";
 import { useAuth } from "@/hooks/useAuth";
@@ -380,6 +383,11 @@ export const Settings = () => {
           </SettingsSection>
         </FadeIn>
 
+        {/* Bloco: Captura Automática de Gastos */}
+        <FadeIn delay={0.08}>
+          <AutoCaptureSection phone={whatsappData?.number || ""} />
+        </FadeIn>
+
         {/* Bloco 3 - Segurança */}
         <FadeIn delay={0.1}>
           <SettingsSection title="Segurança">
@@ -550,6 +558,228 @@ export const Settings = () => {
       </main>
 
       <BottomNav />
+    </div>
+  );
+};
+
+// ─── AutoCaptureSection ───
+
+const INJECT_URL = "https://vmkhqtuqgvtcapwmxtov.supabase.co/functions/v1/inject-notification";
+const INJECT_SECRET = "saldin_inject_2026";
+
+const AutoCaptureSection = ({ phone }: { phone: string }) => {
+  const { toast } = useToast();
+  const [activeTab, setActiveTab] = useState<"android" | "ios">("android");
+  const isAndroid = /android/i.test(navigator.userAgent);
+  const isIOS = /iphone|ipad|ipod/i.test(navigator.userAgent);
+
+  const normalizedPhone = phone.replace(/\D/g, "");
+
+  const macrodroidBody = JSON.stringify({
+    secret: INJECT_SECRET,
+    phone: normalizedPhone || "55XXXXXXXXXXX",
+    text: "{nf_title} {nf_text}",
+    source: "macrodroid",
+  }, null, 2);
+
+  const curlTest = `curl -X POST ${INJECT_URL} \\
+  -H "Content-Type: application/json" \\
+  -d '{ "secret": "${INJECT_SECRET}", "phone": "${normalizedPhone || '55XXXXXXXXXXX'}", "text": "Nubank: Compra aprovada R$ 50,00 no IFOOD", "source": "teste" }'`;
+
+  const copyToClipboard = (text: string, label: string) => {
+    navigator.clipboard.writeText(text);
+    toast({ title: `${label} copiado!` });
+  };
+
+  return (
+    <div>
+      <h2 className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-2 px-1">
+        Captura Automática de Gastos
+      </h2>
+      <div className="bg-card rounded-xl border border-border shadow-soft overflow-hidden">
+
+        {/* Header explicativo */}
+        <div className="p-4 bg-gradient-to-r from-emerald-50 to-teal-50 dark:from-emerald-950/30 dark:to-teal-950/30 border-b border-border">
+          <div className="flex items-start gap-3">
+            <div className="w-10 h-10 rounded-full bg-emerald-100 dark:bg-emerald-900/50 flex items-center justify-center flex-shrink-0">
+              <Bell className="w-5 h-5 text-emerald-600" />
+            </div>
+            <div>
+              <p className="text-sm font-semibold text-foreground">Registro automático via notificação</p>
+              <p className="text-xs text-muted-foreground mt-0.5 leading-relaxed">
+                Quando chegar uma notificação de compra do banco, o Saldin registra e confirma no seu WhatsApp — sem você digitar nada.
+              </p>
+            </div>
+          </div>
+        </div>
+
+        {/* Tabs Android / iOS */}
+        <div className="flex border-b border-border">
+          <button
+            onClick={() => setActiveTab("android")}
+            className={cn(
+              "flex-1 py-3 text-sm font-medium transition-colors",
+              activeTab === "android"
+                ? "text-foreground border-b-2 border-primary bg-primary/5"
+                : "text-muted-foreground hover:text-foreground"
+            )}
+          >
+            📱 Android
+          </button>
+          <button
+            onClick={() => setActiveTab("ios")}
+            className={cn(
+              "flex-1 py-3 text-sm font-medium transition-colors",
+              activeTab === "ios"
+                ? "text-foreground border-b-2 border-primary bg-primary/5"
+                : "text-muted-foreground hover:text-foreground"
+            )}
+          >
+            🍎 iPhone
+          </button>
+        </div>
+
+        {/* Android Content */}
+        {activeTab === "android" && (
+          <div className="p-4 space-y-4">
+            <div className="space-y-2">
+              <p className="text-xs font-semibold text-foreground uppercase tracking-wide">Passo 1</p>
+              <p className="text-sm text-muted-foreground">Baixe o <strong className="text-foreground">MacroDroid</strong> na Play Store (gratuito).</p>
+              <Button
+                variant="outline"
+                size="sm"
+                className="w-full gap-2"
+                onClick={() => window.open("https://play.google.com/store/apps/details?id=com.arlosoft.macrodroid", "_blank")}
+              >
+                <ExternalLink className="w-4 h-4" />
+                Abrir Play Store
+              </Button>
+            </div>
+
+            <div className="space-y-2">
+              <p className="text-xs font-semibold text-foreground uppercase tracking-wide">Passo 2</p>
+              <p className="text-sm text-muted-foreground">No MacroDroid, crie uma nova Macro com:</p>
+              <div className="bg-muted/50 rounded-lg p-3 space-y-2 text-xs">
+                <div>
+                  <span className="font-semibold text-foreground">Gatilho:</span>
+                  <span className="text-muted-foreground"> Notificação Recebida → Apps: Nubank, Inter, C6, Bradesco, Itaú</span>
+                </div>
+                <div>
+                  <span className="font-semibold text-foreground">Ação:</span>
+                  <span className="text-muted-foreground"> HTTP POST com o corpo abaixo</span>
+                </div>
+              </div>
+            </div>
+
+            <div className="space-y-2">
+              <div className="flex items-center justify-between">
+                <p className="text-xs font-semibold text-foreground uppercase tracking-wide">URL do Endpoint</p>
+                <button
+                  onClick={() => copyToClipboard(INJECT_URL, "URL")}
+                  className="text-xs text-primary flex items-center gap-1"
+                >
+                  <Copy className="w-3 h-3" /> Copiar
+                </button>
+              </div>
+              <div className="bg-muted rounded-lg p-2 text-xs font-mono text-muted-foreground break-all">
+                {INJECT_URL}
+              </div>
+            </div>
+
+            <div className="space-y-2">
+              <div className="flex items-center justify-between">
+                <p className="text-xs font-semibold text-foreground uppercase tracking-wide">Corpo JSON (Body)</p>
+                <button
+                  onClick={() => copyToClipboard(macrodroidBody, "JSON")}
+                  className="text-xs text-primary flex items-center gap-1"
+                >
+                  <Copy className="w-3 h-3" /> Copiar
+                </button>
+              </div>
+              <pre className="bg-muted rounded-lg p-3 text-xs font-mono text-muted-foreground overflow-x-auto whitespace-pre-wrap break-all">
+                {macrodroidBody}
+              </pre>
+              <p className="text-xs text-muted-foreground">
+                <strong>⚠️ Substitua</strong> <code className="bg-muted px-1 rounded">phone</code> pelo seu número já incluído acima.
+              </p>
+            </div>
+          </div>
+        )}
+
+        {/* iOS Content */}
+        {activeTab === "ios" && (
+          <div className="p-4 space-y-4">
+            <div className="space-y-2">
+              <p className="text-xs font-semibold text-foreground uppercase tracking-wide">Não precisa instalar nada</p>
+              <p className="text-sm text-muted-foreground">
+                O app <strong className="text-foreground">Atalhos</strong> já vem instalado no iPhone. Siga os passos abaixo.
+              </p>
+            </div>
+
+            <div className="space-y-3">
+              {[
+                { step: "1", title: "Abra o app Atalhos", desc: "Procure por \"Atalhos\" na tela inicial do seu iPhone." },
+                { step: "2", title: "Crie uma Automação Pessoal", desc: "Vá em \"Automação\" → \"Criar Automação Pessoal\" → \"App\"." },
+                { step: "3", title: "Escolha o banco", desc: "Selecione o app do banco (Nubank, Inter, etc.) e escolha \"Ao Abrir\" + active pela notificação." },
+                { step: "4", title: "Adicione ação HTTP", desc: "Adicione \"Buscar Conteúdo de URL\" com método POST e o endpoint abaixo." },
+              ].map(({ step, title, desc }) => (
+                <div key={step} className="flex gap-3">
+                  <div className="w-6 h-6 rounded-full bg-primary/10 text-primary text-xs font-bold flex items-center justify-center flex-shrink-0 mt-0.5">
+                    {step}
+                  </div>
+                  <div>
+                    <p className="text-sm font-medium text-foreground">{title}</p>
+                    <p className="text-xs text-muted-foreground">{desc}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            <div className="space-y-2">
+              <div className="flex items-center justify-between">
+                <p className="text-xs font-semibold text-foreground uppercase tracking-wide">URL do Endpoint</p>
+                <button
+                  onClick={() => copyToClipboard(INJECT_URL, "URL")}
+                  className="text-xs text-primary flex items-center gap-1"
+                >
+                  <Copy className="w-3 h-3" /> Copiar
+                </button>
+              </div>
+              <div className="bg-muted rounded-lg p-2 text-xs font-mono text-muted-foreground break-all">
+                {INJECT_URL}
+              </div>
+            </div>
+
+            <div className="bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-800 rounded-lg p-3">
+              <p className="text-xs text-amber-800 dark:text-amber-200">
+                <strong>💡 Dica:</strong> No iOS 17+, a automação pede confirmação na primeira vez. Depois, roda automaticamente para sempre.
+              </p>
+            </div>
+          </div>
+        )}
+
+        {/* Teste Manual */}
+        <div className="border-t border-border p-4">
+          <p className="text-xs font-semibold text-foreground uppercase tracking-wide mb-2">Testar agora</p>
+          <p className="text-xs text-muted-foreground mb-3">
+            Copie o comando abaixo e rode no terminal para testar se está funcionando:
+          </p>
+          <div className="relative">
+            <pre className="bg-muted rounded-lg p-3 text-xs font-mono text-muted-foreground overflow-x-auto whitespace-pre-wrap break-all pr-10">
+              {curlTest}
+            </pre>
+            <button
+              onClick={() => copyToClipboard(curlTest, "Comando")}
+              className="absolute top-2 right-2 p-1.5 rounded bg-background border border-border hover:bg-muted transition-colors"
+            >
+              <Copy className="w-3 h-3 text-muted-foreground" />
+            </button>
+          </div>
+          <p className="text-xs text-muted-foreground mt-2">
+            Se funcionar, o Saldin vai te enviar uma confirmação no WhatsApp! ✅
+          </p>
+        </div>
+      </div>
     </div>
   );
 };
