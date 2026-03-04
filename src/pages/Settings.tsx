@@ -724,11 +724,13 @@ const AutoCaptureSection = ({ phone, captureToken }: { phone: string; captureTok
                   <div className="pt-1">
                     <p className="text-sm font-bold text-foreground">Configurar a Ação</p>
                     <p className="text-xs text-muted-foreground mt-1 leading-relaxed">
-                      Toque em <strong>"Ações"</strong> → <strong>"Abrir site / Abrir URL"</strong>.
+                      Toque em <strong>"Ações"</strong> → <strong>"Conectividade"</strong> → <strong>"Requisição HTTP"</strong>.
                     </p>
-                    <p className="text-xs text-muted-foreground mt-1 leading-relaxed">
-                      No campo de URL, <strong>cole o endereço abaixo</strong>:
-                    </p>
+                    <div className="mt-2 space-y-1.5 text-xs text-muted-foreground bg-muted/50 rounded-lg p-3">
+                      <p>• <strong>Método:</strong> selecione <strong>GET</strong></p>
+                      <p>• <strong>URL:</strong> cole o endereço abaixo</p>
+                      <p>• <strong>Corpo e Cabeçalhos:</strong> deixe em branco</p>
+                    </div>
                   </div>
                 </div>
 
@@ -752,7 +754,6 @@ const AutoCaptureSection = ({ phone, captureToken }: { phone: string; captureTok
                     </Button>
                     <p className="text-xs text-muted-foreground text-center leading-relaxed">
                       ⚠️ <strong>Não modifique nada</strong> na URL — só cole.
-                      O MacroDroid preenche os dados automaticamente.
                     </p>
                   </div>
                 )}
@@ -822,7 +823,10 @@ const AutoCaptureSection = ({ phone, captureToken }: { phone: string; captureTok
               ))}
             </div>
 
-            <Button className="w-full gap-2" onClick={handleActivate} disabled={isDisabled}>
+            <Button className="w-full gap-2" disabled={isDisabled} onClick={() => {
+              window.open("https://www.icloud.com/shortcuts/placeholder", "_blank");
+              toast({ title: "Abrindo Atalhos..." });
+            }}>
               <ExternalLink className="w-4 h-4" />
               Adicionar Atalho do Saldin
             </Button>
