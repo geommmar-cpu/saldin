@@ -385,7 +385,7 @@ export const Settings = () => {
 
         {/* Bloco: Captura Automática de Gastos */}
         <FadeIn delay={0.08}>
-          <AutoCaptureSection phone={whatsappData?.number || ""} />
+          <AutoCaptureSection phone={whatsappData?.number || ""} captureToken={whatsappData?.captureToken || null} />
         </FadeIn>
 
         {/* Bloco 3 - Segurança */}
@@ -564,57 +564,97 @@ export const Settings = () => {
 
 // ─── AutoCaptureSection ───
 
-const INJECT_URL = "https://vmkhqtuqgvtcapwmxtov.supabase.co/functions/v1/inject-notification";
-const INJECT_SECRET = "saldin_inject_2026";
+const INJECT_BASE_URL = "https://vmkhqtuqgvtcapwmxtov.supabase.co/functions/v1/inject-notification";
 
 function detectPlatform(): "android" | "ios" {
   return /iphone|ipad|ipod/i.test(navigator.userAgent) ? "ios" : "android";
 }
 
-const AutoCaptureSection = ({ phone }: { phone: string }) => {
+/**
+ * Gera o JSON da macro do MacroDroid com ação "Open URL"
+ * Muito mais simples que HTTP POST — qualquer usuário consegue importar.
+ */
+function buildMacroDroidUrl(captureToken: string): string {
+  const captureUrl = `${INJECT_BASE_URL}?t=${captureToken}&n={notif_title}%20{notif_text}`;
+
+  // MacroDroid macro JSON format
+  const macroJson = {
+    exportedMacros: [{
+      m_name: "Saldin - Captura Automática",
+      m_isEnabled: true,
+      m_triggers: [{
+        m_type: "NOTIFICATION",
+        m_triggerConfig: {
+          packageFilter: [],
+          textContent: "",
+          textContentMatchType: "ANY"
+        }
+      }],
+      m_actions: [{
+        m_type: "OPEN_URL",
+        m_actionConfig: {
+          url: captureUrl
+        }
+      }],
+      m_constraints: [],
+      m_category: "Saldin"
+    }]
+  };
+
+  return `macrodroid://importMacro?json=${encodeURIComponent(JSON.stringify(macroJson))}`;
+}
+
+const AutoCaptureSection = ({ phone, captureToken }: { phone: string; captureToken: string | null }) => {
   const { toast } = useToast();
   const [activeTab, setActiveTab] = useState<"android" | "ios">(detectPlatform());
-  const [step, setStep] = useState<1 | 2>(1);
-  const normalizedPhone = phone.replace(/\D/g, "");
+  const [status, setStatus] = useState<"idle" | "activating" | "done">("idle");
+  const [showManual, setShowManual] = useState(false);
+  const [copied, setCopied] = useState(false);
 
-  const macrodroidDeepLink = `macrodroid://template?import=${encodeURIComponent(JSON.stringify({
-    m_name: "Saldin - Captura de Gastos",
-    m_trigger: { type: "notification" },
-    m_action: { type: "http_post", url: INJECT_URL, body: JSON.stringify({ secret: INJECT_SECRET, phone: normalizedPhone, text: "{nf_title} {nf_text}", source: "macrodroid" }) },
-  }))}`;
+  const captureUrl = captureToken
+    ? `${INJECT_BASE_URL}?t=${captureToken}&n={notif_title}%20{notif_text}`
+    : null;
 
-  const handleAndroidStep1 = () => {
-    window.open("https://play.google.com/store/apps/details?id=com.arlosoft.macrodroid", "_blank");
-    setTimeout(() => setStep(2), 800);
-  };
-
-  const handleAndroidStep2 = () => {
-    // Deep link direto para o MacroDroid (funciona no Android nativo)
-    // Fallback: abre a Play Store para o usuário navegar para o app
-    const deepLink = macrodroidDeepLink;
-    const fallback = "https://play.google.com/store/apps/details?id=com.arlosoft.macrodroid";
-
-    // Tenta o deep link; se não funcionar em 1.5s, mostra instrução manual
-    const timer = setTimeout(() => {
-      setStep(3 as any);
-    }, 1500);
-
-    try {
-      window.location.href = deepLink;
-      // Se navegou, cancela o timer
-      setTimeout(() => clearTimeout(timer), 500);
-    } catch {
-      clearTimeout(timer);
-      window.open(fallback, "_blank");
+  const handleActivate = () => {
+    if (!captureToken) {
+      toast({ title: "WhatsApp não conectado", description: "Conecte seu WhatsApp primeiro nas configurações acima.", variant: "destructive" });
+      return;
     }
 
-    toast({ title: "Abrindo MacroDroid...", description: "Se nao abrir, siga as instrucoes abaixo." });
+    setStatus("activating");
+
+    if (activeTab === "android") {
+      const deepLink = buildMacroDroidUrl(captureToken);
+
+      // Tenta abrir o deep link do MacroDroid
+      window.location.href = deepLink;
+
+      // Fallback se não abrir em 2s
+      setTimeout(() => {
+        setStatus("done");
+      }, 2000);
+    } else {
+      // iOS: Atalhos (placeholder por enquanto)
+      window.open("https://www.icloud.com/shortcuts/placeholder", "_blank");
+      setStatus("done");
+    }
+
+    toast({
+      title: activeTab === "android" ? "Abrindo MacroDroid..." : "Abrindo Atalhos...",
+      description: "Toque em \"Importar\" para ativar a captura automática."
+    });
   };
 
-  const handleIosActivate = () => {
-    window.open("https://www.icloud.com/shortcuts/placeholder", "_blank");
-    toast({ title: "Abrindo Atalhos...", description: "Toque em \"Adicionar\" e depois em \"Ativar\"." });
+  const handleCopyUrl = () => {
+    if (captureUrl) {
+      navigator.clipboard.writeText(captureUrl.replace("{notif_title}%20{notif_text}", "TITULO_NOTIFICACAO TEXTO_NOTIFICACAO"));
+      setCopied(true);
+      toast({ title: "URL copiada!" });
+      setTimeout(() => setCopied(false), 2000);
+    }
   };
+
+  const isDisabled = !captureToken;
 
   return (
     <div>
@@ -639,7 +679,7 @@ const AutoCaptureSection = ({ phone }: { phone: string }) => {
           {(["android", "ios"] as const).map((tab) => (
             <button
               key={tab}
-              onClick={() => { setActiveTab(tab); setStep(1); }}
+              onClick={() => { setActiveTab(tab); setStatus("idle"); setShowManual(false); }}
               className={cn(
                 "flex-1 py-3 text-sm font-medium transition-colors",
                 activeTab === tab
@@ -652,56 +692,109 @@ const AutoCaptureSection = ({ phone }: { phone: string }) => {
           ))}
         </div>
 
-        {/* Android */}
+        {/* Conteúdo Android */}
         {activeTab === "android" && (
-          <div className="p-5 space-y-5">
-            <div className="flex items-center gap-2">
-              <div className={cn("h-1.5 flex-1 rounded-full transition-colors", step >= 1 ? "bg-primary" : "bg-muted")} />
-              <div className={cn("h-1.5 flex-1 rounded-full transition-colors", step >= 2 ? "bg-primary" : "bg-muted")} />
-              <span className="text-xs text-muted-foreground">{step}/2</span>
+          <div className="p-5 space-y-4">
+
+            {/* Status de conexão */}
+            {isDisabled && (
+              <div className="flex items-center gap-2 bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-800 rounded-lg px-3 py-2">
+                <XCircle className="w-4 h-4 text-amber-600 flex-shrink-0" />
+                <p className="text-xs text-amber-800 dark:text-amber-200">
+                  <strong>WhatsApp não conectado.</strong> Conecte primeiro na seção acima.
+                </p>
+              </div>
+            )}
+
+            {/* Passos simplificados */}
+            <div className="space-y-3">
+              <div className="flex items-start gap-3">
+                <div className="w-8 h-8 rounded-full bg-primary/10 text-primary text-sm font-bold flex items-center justify-center flex-shrink-0">1</div>
+                <div>
+                  <p className="text-sm font-semibold text-foreground">Instale o MacroDroid</p>
+                  <p className="text-xs text-muted-foreground mt-0.5">App gratuito da Play Store. Instala uma vez e esquece.</p>
+                </div>
+              </div>
+
+              <div className="flex items-start gap-3">
+                <div className="w-8 h-8 rounded-full bg-primary/10 text-primary text-sm font-bold flex items-center justify-center flex-shrink-0">2</div>
+                <div>
+                  <p className="text-sm font-semibold text-foreground">Toque em "Ativar" abaixo</p>
+                  <p className="text-xs text-muted-foreground mt-0.5">O MacroDroid abre com tudo pronto. Basta tocar em <strong>"Importar"</strong>.</p>
+                </div>
+              </div>
             </div>
 
-            {step === 1 && (
-              <div className="space-y-4">
-                <div className="flex items-start gap-3">
-                  <div className="w-8 h-8 rounded-full bg-primary/10 text-primary text-sm font-bold flex items-center justify-center flex-shrink-0">1</div>
-                  <div>
-                    <p className="text-sm font-semibold text-foreground">Instale o MacroDroid</p>
-                    <p className="text-xs text-muted-foreground mt-0.5">App gratuito que conecta as notificações do banco ao Saldin. Instala uma vez e esquece.</p>
-                  </div>
-                </div>
-                <Button className="w-full gap-2" onClick={handleAndroidStep1}>
-                  <ExternalLink className="w-4 h-4" />
-                  Instalar MacroDroid (grátis)
-                </Button>
-                <button onClick={() => setStep(2)} className="w-full text-xs text-muted-foreground text-center hover:underline underline-offset-2">
-                  Já tenho instalado → próximo passo
+            {/* Botão principal */}
+            <Button
+              className="w-full gap-2 h-12 text-base"
+              onClick={handleActivate}
+              disabled={isDisabled || status === "activating"}
+            >
+              {status === "activating" ? (
+                <><Loader2 className="w-5 h-5 animate-spin" /> Abrindo MacroDroid...</>
+              ) : status === "done" ? (
+                <><CheckCircle2 className="w-5 h-5" /> Abrindo...</>
+              ) : (
+                <><Zap className="w-5 h-5" /> Ativar Captura Automática</>
+              )}
+            </Button>
+
+            {/* Link para Play Store caso não tenha instalado */}
+            <button
+              onClick={() => {
+                window.open("https://play.google.com/store/apps/details?id=com.arlosoft.macrodroid", "_blank");
+              }}
+              className="w-full text-xs text-muted-foreground text-center hover:underline underline-offset-2"
+            >
+              Ainda não tem o MacroDroid? Instalar da Play Store →
+            </button>
+
+            {/* Sucesso / Instruções pós-ativação */}
+            {status === "done" && (
+              <div className="bg-emerald-50 dark:bg-emerald-950/30 border border-emerald-200 dark:border-emerald-800 rounded-xl p-4 text-center space-y-2">
+                <p className="text-2xl">🎉</p>
+                <p className="text-sm font-semibold text-emerald-800 dark:text-emerald-200">Quase lá!</p>
+                <p className="text-xs text-emerald-700 dark:text-emerald-300">
+                  Se o MacroDroid abriu, toque em <strong>"Importar"</strong> e depois <strong>"Ativar"</strong>.
+                </p>
+                <p className="text-xs text-emerald-700 dark:text-emerald-300">
+                  Se não abriu, toque abaixo para configurar manualmente.
+                </p>
+                <button
+                  onClick={() => setShowManual(true)}
+                  className="text-xs text-primary font-medium hover:underline underline-offset-2"
+                >
+                  Configurar manualmente →
                 </button>
               </div>
             )}
 
-            {step === 2 && (
-              <div className="space-y-4">
-                <div className="flex items-start gap-3">
-                  <div className="w-8 h-8 rounded-full bg-primary/10 text-primary text-sm font-bold flex items-center justify-center flex-shrink-0">2</div>
-                  <div>
-                    <p className="text-sm font-semibold text-foreground">Conecte ao Saldin</p>
-                    <p className="text-xs text-muted-foreground mt-0.5">O MacroDroid abre com tudo configurado. Só toque em <strong>"Importar"</strong> e <strong>"Ativar"</strong>.</p>
-                  </div>
+            {/* Instruções manuais (fallback) */}
+            {showManual && captureUrl && (
+              <div className="bg-muted/50 rounded-xl p-4 space-y-3 border border-border">
+                <p className="text-sm font-semibold text-foreground">Configuração manual</p>
+                <div className="space-y-2 text-xs text-muted-foreground">
+                  <p>1. Abra o MacroDroid → <strong>Adicionar macro</strong></p>
+                  <p>2. Gatilho → <strong>Notificação recebida</strong> → Selecione apps dos bancos</p>
+                  <p>3. Ação → <strong>Abrir site/URL</strong> → Cole a URL abaixo:</p>
                 </div>
-                <Button className="w-full gap-2" onClick={handleAndroidStep2}>
-                  <Zap className="w-4 h-4" />
-                  Conectar ao MacroDroid
+                <div className="bg-background border border-border rounded-lg p-3">
+                  <p className="text-xs font-mono text-foreground break-all leading-relaxed select-all">
+                    {captureUrl.replace("{notif_title}%20{notif_text}", "[notif_title] [notif_text]")}
+                  </p>
+                </div>
+                <Button variant="outline" size="sm" className="w-full gap-2" onClick={handleCopyUrl}>
+                  {copied ? <><CheckCircle2 className="w-4 h-4" /> Copiada!</> : <><ExternalLink className="w-4 h-4" /> Copiar URL</>}
                 </Button>
-                <div className="bg-emerald-50 dark:bg-emerald-950/30 border border-emerald-200 dark:border-emerald-800 rounded-xl p-4 text-center">
-                  <p className="text-2xl mb-1">🎉</p>
-                  <p className="text-sm font-semibold text-emerald-800 dark:text-emerald-200">Pronto! Ativação em 2 toques.</p>
-                  <p className="text-xs text-emerald-700 dark:text-emerald-300 mt-1">Cada notificação de compra chegará automaticamente no Saldin.</p>
-                </div>
-                <button onClick={() => setStep(1)} className="w-full text-xs text-muted-foreground text-center hover:underline underline-offset-2">← Voltar</button>
+                <p className="text-xs text-muted-foreground text-center italic">
+                  Em "Abrir site/URL", <strong>[notif_title]</strong> e <strong>[notif_text]</strong> são variáveis do MacroDroid.
+                  Use o ícone de variável no campo para selecioná-las.
+                </p>
               </div>
             )}
 
+            {/* Bancos suportados */}
             <div className="border-t border-border pt-4">
               <p className="text-xs text-muted-foreground mb-2 text-center">Funciona com os principais bancos</p>
               <div className="flex flex-wrap gap-2 justify-center">
@@ -715,13 +808,13 @@ const AutoCaptureSection = ({ phone }: { phone: string }) => {
 
         {/* iOS */}
         {activeTab === "ios" && (
-          <div className="p-5 space-y-5">
+          <div className="p-5 space-y-4">
             <div className="flex items-center gap-2 bg-blue-50 dark:bg-blue-950/30 border border-blue-200 dark:border-blue-800 rounded-lg px-3 py-2">
               <CheckCircle2 className="w-4 h-4 text-blue-600 flex-shrink-0" />
               <p className="text-xs text-blue-800 dark:text-blue-200"><strong>Não precisa instalar nada.</strong> O app Atalhos já vem no iPhone.</p>
             </div>
 
-            <div className="space-y-4">
+            <div className="space-y-3">
               {[
                 { n: 1, title: "Toque no botão abaixo", desc: "O iPhone pede para adicionar o atalho do Saldin. Toque em \"Adicionar\"." },
                 { n: 2, title: "Ative a automação", desc: "No app Atalhos, vá em Automação e ative \"Saldin Captura\". Feito!" },
@@ -736,7 +829,7 @@ const AutoCaptureSection = ({ phone }: { phone: string }) => {
               ))}
             </div>
 
-            <Button className="w-full gap-2" onClick={handleIosActivate}>
+            <Button className="w-full gap-2" onClick={handleActivate} disabled={isDisabled}>
               <ExternalLink className="w-4 h-4" />
               Adicionar Atalho do Saldin
             </Button>

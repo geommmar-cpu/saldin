@@ -10,7 +10,7 @@ export const useWhatsAppStatus = (userId: string | undefined) => {
 
             const { data, error } = await supabase
                 .from("whatsapp_users")
-                .select("phone_number, is_verified")
+                .select("phone_number, is_verified, capture_token")
                 .eq("user_id", userId)
                 .eq("is_verified", true)
                 .order("created_at", { ascending: false })
@@ -21,10 +21,12 @@ export const useWhatsAppStatus = (userId: string | undefined) => {
 
             return data ? {
                 connected: data.is_verified,
-                number: data.phone_number
+                number: data.phone_number,
+                captureToken: data.capture_token
             } : {
                 connected: false,
-                number: null
+                number: null,
+                captureToken: null
             };
         },
         enabled: !!userId

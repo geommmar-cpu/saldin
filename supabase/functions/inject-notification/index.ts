@@ -11,35 +11,22 @@ const META_PHONE_NUMBER_ID = Deno.env.get("META_PHONE_NUMBER_ID")!;
 const supabase = createClient(SUPABASE_URL, SERVICE_ROLE_KEY);
 
 // ─── Regex Patterns para os principais bancos brasileiros ───
-// Cada banco tem um padrão específico de notificação.
-// A ordem importa: mais específico primeiro.
 const BANK_PATTERNS: { bank: string; regex: RegExp }[] = [
-    // Nubank: "Compra aprovada de R$ 89,90 no MERCADO LIVRE"
     { bank: "Nubank", regex: /(?:compra|débito|debit).*?R\$\s*([\d.,]+).*?(?:em|no|na|at)\s+(.+?)(?:\.|$)/i },
-    // Inter: "Compra aprovada R$ 89,90 - Mercado Livre"  
     { bank: "Inter", regex: /(?:compra|débito).*?R\$\s*([\d.,]+)\s*[-–]\s*(.+?)(?:\.|$)/i },
-    // Itaú: "Compra Cartão R$ 89,90 MERCADO LIVRE"
     { bank: "Itaú", regex: /(?:compra|débito)\s+(?:cartão\s+)?R\$\s*([\d.,]+)\s+(.+?)(?:\.|$)/i },
-    // Bradesco: "Débito R$ 89,90 Mercado Livre"
     { bank: "Bradesco", regex: /débito\s+R\$\s*([\d.,]+)\s+(.+?)(?:\.|$)/i },
-    // C6: "C6 Bank: Compra de R$ 89,90 em Mercado Livre"
     { bank: "C6", regex: /C6\s*Bank.*?R\$\s*([\d.,]+)\s+(?:em\s+)?(.+?)(?:\.|$)/i },
-    // Mercado Pago: "Você pagou R$ 89,90 para Mercado Livre"
     { bank: "Mercado Pago", regex: /(?:você pagou|pagamento).*?R\$\s*([\d.,]+)\s+(?:para\s+)?(.+?)(?:\.|$)/i },
-    // Caixa via SMS: "Caixa Eco Fed: Compra R$ 89,90 MERCADO LIVRE"
     { bank: "Caixa", regex: /(?:caixa|cef).*?compra\s+R\$\s*([\d.,]+)\s+(.+?)(?:\.|$)/i },
-    // Santander: "Santander: Compra aprovada R$ 89,90 MERCADO LIVRE"
     { bank: "Santander", regex: /santander.*?R\$\s*([\d.,]+)\s+(.+?)(?:\.|$)/i },
-    // Genérico: qualquer texto com R$ (fallback)
     { bank: "Banco", regex: /R\$\s*([\d.,]+).*?(?:em|no|na|em)\s+(.+?)(?:\.|$)/i },
 ];
 
-// ─── Chaves de Autenticação ───
-// A inject-notification usa uma chave secreta para evitar abusos.
-// Configure INJECT_SECRET nos Supabase Secrets.
+// ─── Legacy: Chave secreta para POST antigo ───
 const INJECT_SECRET = Deno.env.get("INJECT_SECRET") || "saldin_inject_2026";
 
-// ─── WhatsApp Send Helper ───
+// ─── WhatsApp Send Helpers ───
 async function sendWhatsApp(to: string, text: string): Promise<void> {
     if (!META_ACCESS_TOKEN || !META_PHONE_NUMBER_ID) return;
     try {
@@ -89,16 +76,13 @@ function parseNotificationText(text: string): { valor: number; estabelecimento: 
     for (const { bank, regex } of BANK_PATTERNS) {
         const match = cleanText.match(regex);
         if (match) {
-            // Normaliza o valor: "1.234,56" → 1234.56
             const rawValue = match[1].replace(/\./g, "").replace(",", ".");
             const valor = parseFloat(rawValue);
-
             if (isNaN(valor) || valor <= 0) continue;
 
-            // Limpa o nome do estabelecimento
             const estabelecimento = match[2]
                 ?.trim()
-                .replace(/\*+/g, "") // remove asteriscos do Nubank
+                .replace(/\*+/g, "")
                 .replace(/\s+/g, " ")
                 .substring(0, 80) || "Compra";
 
@@ -111,18 +95,147 @@ function parseNotificationText(text: string): { valor: number; estabelecimento: 
 
 // ─── Normaliza número de telefone para E.164 ───
 function normalizePhone(phone: string): string {
-    // Remove tudo exceto dígitos
     const digits = phone.replace(/\D/g, "");
-    // Se começar com 55 (Brasil), mantém
     if (digits.startsWith("55")) return digits;
-    // Se tiver 10-11 dígitos, adiciona 55
     if (digits.length === 10 || digits.length === 11) return `55${digits}`;
     return digits;
 }
 
+// ─── Busca usuário por capture_token (novo fluxo GET simplificado) ───
+async function findUserByToken(token: string) {
+    const { data, error } = await supabase
+        .from("whatsapp_users")
+        .select("user_id, phone_number, is_verified, capture_token")
+        .eq("capture_token", token)
+        .eq("is_verified", true)
+        .maybeSingle();
+
+    if (error) {
+        console.error("Token lookup error:", error);
+        return null;
+    }
+    return data;
+}
+
+// ─── Busca usuário por telefone (fluxo POST legado) ───
+async function findUserByPhone(phone: string) {
+    const normalizedPhone = normalizePhone(phone);
+    const phoneVariations = [normalizedPhone];
+    if (normalizedPhone.startsWith("55") && normalizedPhone.length === 13) {
+        const ddd = normalizedPhone.substring(2, 4);
+        const num = normalizedPhone.substring(4);
+        phoneVariations.push(`55${ddd}${num.substring(1)}`);
+    } else if (normalizedPhone.startsWith("55") && normalizedPhone.length === 12) {
+        const ddd = normalizedPhone.substring(2, 4);
+        const num = normalizedPhone.substring(4);
+        phoneVariations.push(`55${ddd}9${num}`);
+    }
+
+    const { data, error } = await supabase
+        .from("whatsapp_users")
+        .select("user_id, phone_number, is_verified")
+        .in("phone_number", phoneVariations)
+        .eq("is_verified", true)
+        .limit(1)
+        .maybeSingle();
+
+    if (error) {
+        console.error("Phone lookup error:", error);
+        return null;
+    }
+    return data;
+}
+
+// ─── Processa a transação e envia no WhatsApp ───
+async function processAndNotify(userId: string, phoneToReply: string, text: string, source: string) {
+    const parsed = parseNotificationText(text);
+
+    if (!parsed) {
+        console.log("ℹ️ Notification not parseable as transaction. Ignoring silently.");
+        return { status: "ignored", reason: "not_a_transaction" };
+    }
+
+    console.log(`💸 Parsed: R$ ${parsed.valor} em "${parsed.estabelecimento}" (${parsed.banco})`);
+
+    // IA para categoria
+    const aiText = `Gastei R$ ${parsed.valor} em ${parsed.estabelecimento}`;
+    let intent: any = null;
+    try {
+        intent = await analyzeText(aiText);
+    } catch (e) {
+        console.warn("AI analysis failed, using defaults:", e);
+    }
+
+    // Conta/cartão de destino
+    const metodo = intent?.items?.[0]?.metodo_pagamento || "pix";
+    const { id: targetAccountId, isCreditCard } = await getPreferredAccount(userId, metodo);
+
+    // Registra transação
+    const tCode = generateTransactionCode();
+    const categoryId = intent?.items?.[0]?.categoria_sugerida
+        ? await getCategoryId(userId, intent.items[0].categoria_sugerida)
+        : null;
+
+    const result = await processTransaction({
+        userId,
+        type: "expense",
+        amount: parsed.valor,
+        description: parsed.estabelecimento,
+        categoryId: categoryId || undefined,
+        bankAccountId: targetAccountId || undefined,
+        transactionCode: tCode,
+        isCreditCard,
+    });
+
+    // Log de auditoria
+    await supabase.from("whatsapp_logs").insert({
+        phone_number: phoneToReply,
+        whatsapp_user_id: null,
+        message_content: JSON.stringify({ text, source, parsed }),
+        message_type: "auto_notification",
+        processed: true,
+        processing_result: { valor: parsed.valor, estabelecimento: parsed.estabelecimento, tCode },
+    });
+
+    // Monta resposta premium
+    const alerts = await getImportantAlerts(userId);
+    const premiumMsg = formatPremiumMessage(
+        {
+            id: result.id,
+            description: parsed.estabelecimento,
+            amount: parsed.valor,
+            date: new Date().toISOString(),
+            category: intent?.items?.[0]?.categoria_sugerida || "Compras",
+            account_name: result.dest_name,
+            type: "expense",
+            transaction_code: tCode,
+            account_balance: result.account_balance,
+        },
+        { new_balance: result.new_balance },
+        alerts
+    );
+
+    const finalMsg = `🔔 *Auto-Captura Ativa*\n_Detectei uma compra via ${parsed.banco}_\n\n${premiumMsg}`;
+
+    await sendInteractive(phoneToReply, finalMsg, [
+        { id: `excluir_${tCode}`, title: "🗑️ Excluir" },
+        { id: `editar_${tCode}`, title: "📝 Editar" },
+    ]);
+
+    console.log(`✅ Auto-registered: R$ ${parsed.valor} | ${parsed.estabelecimento} | Code: ${tCode}`);
+
+    return {
+        status: "success",
+        transaction_code: tCode,
+        valor: parsed.valor,
+        estabelecimento: parsed.estabelecimento,
+        banco: parsed.banco,
+    };
+}
+
 // ─── MAIN HANDLER ───
 Deno.serve(async (req: Request) => {
-    // CORS para facilitar testes locais
+    // CORS
     if (req.method === "OPTIONS") {
         return new Response("ok", {
             headers: {
@@ -132,155 +245,104 @@ Deno.serve(async (req: Request) => {
         });
     }
 
-    if (req.method !== "POST") {
-        return new Response("Method Not Allowed", { status: 405 });
-    }
+    const url = new URL(req.url);
 
     try {
-        const body = await req.json();
-        console.log("📲 [inject-notification] Received:", JSON.stringify(body));
+        // ════════════════════════════════════════════
+        // 🆕 FLUXO GET — Simplificado para MacroDroid
+        // URL: /inject-notification?t=TOKEN&n=TEXTO_DA_NOTIFICACAO
+        // O MacroDroid só precisa de "Abrir URL" com essa URL.
+        // ════════════════════════════════════════════
+        if (req.method === "GET") {
+            const token = url.searchParams.get("t");
+            const notificationText = url.searchParams.get("n");
 
-        // ─── 1. Autenticação por chave secreta ───
-        const secret = body.secret || req.headers.get("x-saldin-secret");
-        if (secret !== INJECT_SECRET) {
-            console.warn("⛔ Unauthorized inject attempt");
-            return new Response(JSON.stringify({ error: "Unauthorized" }), { status: 401 });
+            if (!token || !notificationText) {
+                return new Response(JSON.stringify({ error: "Parâmetros t e n são obrigatórios" }), {
+                    status: 400,
+                    headers: { "Content-Type": "application/json" },
+                });
+            }
+
+            console.log(`📲 [GET] Token: ${token.substring(0, 8)}... | Text: ${notificationText.substring(0, 60)}`);
+
+            // Busca usuário pelo token
+            const userLink = await findUserByToken(token);
+            if (!userLink) {
+                console.warn("❌ Invalid or unverified token:", token.substring(0, 8));
+                return new Response(JSON.stringify({ error: "Token inválido" }), {
+                    status: 401,
+                    headers: { "Content-Type": "application/json" },
+                });
+            }
+
+            const result = await processAndNotify(
+                userLink.user_id,
+                userLink.phone_number,
+                notificationText,
+                "macrodroid_get"
+            );
+
+            return new Response(JSON.stringify(result), {
+                status: 200,
+                headers: { "Content-Type": "application/json" },
+            });
         }
 
-        // ─── 2. Extrai campos obrigatórios ───
-        const { phone, text, source } = body;
-        // phone: número do usuário (para buscar no DB e responder via WhatsApp)
-        // text: texto bruto da notificação/SMS
-        // source: "macrodroid" | "shortcuts_ios" | "manual"
+        // ════════════════════════════════════════════
+        // 📮 FLUXO POST — Legado (mantido por compatibilidade)
+        // Body: { secret, phone, text, source }
+        // ════════════════════════════════════════════
+        if (req.method === "POST") {
+            const body = await req.json();
+            console.log("📲 [POST] Received:", JSON.stringify(body));
 
-        if (!phone || !text) {
-            return new Response(JSON.stringify({ error: "phone e text são obrigatórios" }), { status: 400 });
+            // Autenticação por secret ou token
+            const secret = body.secret || req.headers.get("x-saldin-secret");
+            const token = body.token;
+
+            let userId: string;
+            let phoneToReply: string;
+
+            if (token) {
+                // Novo: auth por token
+                const userLink = await findUserByToken(token);
+                if (!userLink) {
+                    return new Response(JSON.stringify({ error: "Token inválido" }), { status: 401 });
+                }
+                userId = userLink.user_id;
+                phoneToReply = userLink.phone_number;
+            } else if (secret === INJECT_SECRET) {
+                // Legacy: auth por secret + phone
+                const { phone, text } = body;
+                if (!phone || !text) {
+                    return new Response(JSON.stringify({ error: "phone e text são obrigatórios" }), { status: 400 });
+                }
+                const userLink = await findUserByPhone(phone);
+                if (!userLink) {
+                    return new Response(JSON.stringify({ error: "Usuário não encontrado" }), { status: 404 });
+                }
+                userId = userLink.user_id;
+                phoneToReply = userLink.phone_number;
+            } else {
+                return new Response(JSON.stringify({ error: "Unauthorized" }), { status: 401 });
+            }
+
+            const text = body.text;
+            if (!text) {
+                return new Response(JSON.stringify({ error: "text é obrigatório" }), { status: 400 });
+            }
+
+            const result = await processAndNotify(userId, phoneToReply, text, body.source || "api_post");
+
+            return new Response(JSON.stringify(result), {
+                status: 200,
+                headers: { "Content-Type": "application/json" },
+            });
         }
 
-        const normalizedPhone = normalizePhone(phone);
-        console.log(`📱 Phone: ${normalizedPhone} | Source: ${source || "unknown"}`);
+        return new Response("Method Not Allowed", { status: 405 });
 
-        // ─── 3. Busca usuário no banco ───
-        // Tenta variações do número (com e sem 9º dígito)
-        const phoneVariations = [normalizedPhone];
-        if (normalizedPhone.startsWith("55") && normalizedPhone.length === 13) {
-            // Tem o 9: tenta sem
-            const ddd = normalizedPhone.substring(2, 4);
-            const num = normalizedPhone.substring(4);
-            phoneVariations.push(`55${ddd}${num.substring(1)}`);
-        } else if (normalizedPhone.startsWith("55") && normalizedPhone.length === 12) {
-            // Sem o 9: tenta com
-            const ddd = normalizedPhone.substring(2, 4);
-            const num = normalizedPhone.substring(4);
-            phoneVariations.push(`55${ddd}9${num}`);
-        }
-
-        const { data: userLink, error: userError } = await supabase
-            .from("whatsapp_users")
-            .select("user_id, phone_number, is_verified")
-            .in("phone_number", phoneVariations)
-            .eq("is_verified", true)
-            .limit(1)
-            .maybeSingle();
-
-        if (userError || !userLink) {
-            console.warn("❌ User not found for phone:", normalizedPhone);
-            return new Response(JSON.stringify({ error: "Usuário não encontrado ou não verificado" }), { status: 404 });
-        }
-
-        const userId = userLink.user_id;
-        const phoneToReply = userLink.phone_number; // Responde para o número exato do cadastro
-
-        // ─── 4. Parseia o texto da notificação ───
-        const parsed = parseNotificationText(text);
-
-        if (!parsed) {
-            // Se não conseguiu parsear (ex: notificação de aprovação de limite, não de gasto),
-            // ignora silenciosamente sem responder para não poluir o WhatsApp.
-            console.log("ℹ️ Notification not parseable as transaction. Ignoring silently.");
-            return new Response(JSON.stringify({ status: "ignored", reason: "not_a_transaction" }), { status: 200 });
-        }
-
-        console.log(`💸 Parsed: R$ ${parsed.valor} em "${parsed.estabelecimento}" (${parsed.banco})`);
-
-        // ─── 5. Usa a IA para análise complementar (categoria e método) ───
-        const aiText = `Gastei R$ ${parsed.valor} em ${parsed.estabelecimento}`;
-        let intent: any = null;
-        try {
-            intent = await analyzeText(aiText);
-        } catch (e) {
-            console.warn("AI analysis failed, using defaults:", e);
-        }
-
-        // ─── 6. Determina conta/cartão de destino ───
-        const metodo = intent?.items?.[0]?.metodo_pagamento || "pix";
-        const { id: targetAccountId, isCreditCard } = await getPreferredAccount(userId, metodo);
-
-        // ─── 7. Registra a transação ───
-        const tCode = generateTransactionCode();
-        const categoryId = intent?.items?.[0]?.categoria_sugerida
-            ? await getCategoryId(userId, intent.items[0].categoria_sugerida)
-            : null;
-
-        const result = await processTransaction({
-            userId,
-            type: "expense",
-            amount: parsed.valor,
-            description: parsed.estabelecimento,
-            categoryId: categoryId || undefined,
-            bankAccountId: targetAccountId || undefined,
-            transactionCode: tCode,
-            isCreditCard,
-        });
-
-        // ─── 8. Loga no banco para auditoria ───
-        await supabase.from("whatsapp_logs").insert({
-            phone_number: normalizedPhone,
-            whatsapp_user_id: null,
-            message_content: JSON.stringify({ text, source, parsed }),
-            message_type: "auto_notification",
-            processed: true,
-            processing_result: { valor: parsed.valor, estabelecimento: parsed.estabelecimento, tCode },
-        });
-
-        // ─── 9. Monta resposta premium e envia no WhatsApp ───
-        const alerts = await getImportantAlerts(userId);
-        const premiumMsg = formatPremiumMessage(
-            {
-                id: result.id,
-                description: parsed.estabelecimento,
-                amount: parsed.valor,
-                date: new Date().toISOString(),
-                category: intent?.items?.[0]?.categoria_sugerida || "Compras",
-                account_name: result.dest_name,
-                type: "expense",
-                transaction_code: tCode,
-                account_balance: result.account_balance,
-            },
-            { new_balance: result.new_balance },
-            alerts
-        );
-
-        // Adiciona indicador de que foi auto-capturado da notificação
-        const finalMsg = `🔔 *Auto-Captura Ativa*\n_Detectei uma compra via ${parsed.banco}_\n\n${premiumMsg}`;
-
-        await sendInteractive(phoneToReply, finalMsg, [
-            { id: `excluir_${tCode}`, title: "🗑️ Excluir" },
-            { id: `editar_${tCode}`, title: "📝 Editar" },
-        ]);
-
-        console.log(`✅ Auto-registered: R$ ${parsed.valor} | ${parsed.estabelecimento} | Code: ${tCode}`);
-
-        return new Response(
-            JSON.stringify({
-                status: "success",
-                transaction_code: tCode,
-                valor: parsed.valor,
-                estabelecimento: parsed.estabelecimento,
-                banco: parsed.banco,
-            }),
-            { status: 200, headers: { "Content-Type": "application/json" } }
-        );
     } catch (e) {
         console.error("❌ inject-notification fatal error:", e);
         return new Response(JSON.stringify({ error: String(e) }), { status: 500 });
@@ -300,7 +362,6 @@ async function getCategoryId(userId: string, name: string): Promise<string | nul
 
     if (data) return data.id;
 
-    // Fallback: "Outros"
     const { data: fallback } = await supabase
         .from("categories")
         .select("id")
