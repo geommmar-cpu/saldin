@@ -11,7 +11,8 @@ const META_PHONE_NUMBER_ID = Deno.env.get("META_PHONE_NUMBER_ID")!;
 const supabase = createClient(SUPABASE_URL, SERVICE_ROLE_KEY);
 
 // ─── Regex Patterns para os principais bancos brasileiros ───
-const BANK_PATTERNS: { bank: string; regex: RegExp }[] = [
+const BANK_PATTERNS: { bank: string; regex: RegExp; swap?: boolean }[] = [
+    // Padrões de COMPRA/DÉBITO (cartão)
     { bank: "Nubank", regex: /(?:compra|débito|debit).*?R\$\s*([\d.,]+).*?(?:em|no|na|at)\s+(.+?)(?:\.|$)/i },
     { bank: "Inter", regex: /(?:compra|débito).*?R\$\s*([\d.,]+)\s*[-–]\s*(.+?)(?:\.|$)/i },
     { bank: "Itaú", regex: /(?:compra|débito)\s+(?:cartão\s+)?R\$\s*([\d.,]+)\s+(.+?)(?:\.|$)/i },
@@ -20,7 +21,16 @@ const BANK_PATTERNS: { bank: string; regex: RegExp }[] = [
     { bank: "Mercado Pago", regex: /(?:você pagou|pagamento).*?R\$\s*([\d.,]+)\s+(?:para\s+)?(.+?)(?:\.|$)/i },
     { bank: "Caixa", regex: /(?:caixa|cef).*?compra\s+R\$\s*([\d.,]+)\s+(.+?)(?:\.|$)/i },
     { bank: "Santander", regex: /santander.*?R\$\s*([\d.,]+)\s+(.+?)(?:\.|$)/i },
-    { bank: "Banco", regex: /R\$\s*([\d.,]+).*?(?:em|no|na|em)\s+(.+?)(?:\.|$)/i },
+
+    // Padrões de PIX (enviado: valor vem primeiro)
+    { bank: "Pix", regex: /pix\s+(?:enviado|realizado|feito|efetuado).*?R\$\s*([\d.,]+).*?(?:para|a)\s+(.+?)(?:\.|,\s*$|$)/i },
+    // Pix recebido: nome vem primeiro, valor depois → swap=true
+    { bank: "Pix", regex: /pix\s+(?:recebido|receber).*?(?:de|do\(a\)|do|da)\s+(.+?),?\s*(?:no\s+)?valor\s+(?:de\s+)?R\$\s*([\d.,]+)/i, swap: true },
+    // Transferências
+    { bank: "Pix", regex: /(?:transferência|transferencia)\s+(?:enviada|realizada|recebida).*?R\$\s*([\d.,]+).*?(?:para|de|do|da)\s+(.+?)(?:\.|,\s*$|$)/i },
+
+    // Padrão genérico (deve ser o último)
+    { bank: "Banco", regex: /R\$\s*([\d.,]+).*?(?:em|no|na|para|de)\s+(.+?)(?:\.|,\s*$|$)/i },
 ];
 
 // ─── Legacy: Chave secreta para POST antigo ───
@@ -73,14 +83,16 @@ async function sendInteractive(to: string, text: string, buttons: { id: string; 
 function parseNotificationText(text: string): { valor: number; estabelecimento: string; banco: string } | null {
     const cleanText = text.trim();
 
-    for (const { bank, regex } of BANK_PATTERNS) {
+    for (const { bank, regex, swap } of BANK_PATTERNS) {
         const match = cleanText.match(regex);
         if (match) {
-            const rawValue = match[1].replace(/\./g, "").replace(",", ".");
+            // swap=true: group(1)=nome, group(2)=valor (ex: Pix recebido)
+            const rawValue = (swap ? match[2] : match[1]).replace(/\./g, "").replace(",", ".");
             const valor = parseFloat(rawValue);
             if (isNaN(valor) || valor <= 0) continue;
 
-            const estabelecimento = match[2]
+            const rawEstab = swap ? match[1] : match[2];
+            const estabelecimento = rawEstab
                 ?.trim()
                 .replace(/\*+/g, "")
                 .replace(/\s+/g, " ")
