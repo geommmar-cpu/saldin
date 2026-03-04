@@ -436,16 +436,7 @@ export async function getImportantAlerts(userId: string): Promise<string[]> {
 
                 // B. Alerta de Limite Disponível
                 if (card.credit_limit && Number(card.credit_limit) > 0) {
-                    // Busca todas as parcelas abertas deste cartão para ver o limite ocupado
-                    // Nota: No Saldin, o limite ocupado é a soma de todas as parcelas 'open' vinculadas às compras deste cartão
-                    const { data: installments } = await supabaseAdmin
-                        .from('credit_card_installments')
-                        .select('amount')
-                        .innerJoin('credit_card_purchases', 'purchase_id', 'id')
-                        .eq('credit_card_purchases.card_id', card.id)
-                        .eq('status', 'open');
-
-                    // Como innerJoin não é nativo do PostgREST da mesma forma que SQL, vamos simplificar a query:
+                    // Busca limite ocupado do cartão via parcelas abertas
                     const { data: purchases } = await supabaseAdmin
                         .from('credit_card_purchases')
                         .select('id')
