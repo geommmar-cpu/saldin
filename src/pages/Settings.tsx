@@ -577,7 +577,7 @@ const AutoCaptureSection = ({ phone, captureToken }: { phone: string; captureTok
   const [currentStep, setCurrentStep] = useState(1);
 
   const captureUrl = captureToken
-    ? `${INJECT_BASE_URL}?t=${captureToken}&n={notif_title} {notif_text}`
+    ? `${INJECT_BASE_URL}?t=${captureToken}&n=`
     : null;
 
   const handleCopyUrl = () => {
@@ -726,35 +726,66 @@ const AutoCaptureSection = ({ phone, captureToken }: { phone: string; captureTok
                     <p className="text-xs text-muted-foreground mt-1 leading-relaxed">
                       Toque em <strong>"Ações"</strong> → <strong>"Conectividade"</strong> → <strong>"Requisição HTTP"</strong>.
                     </p>
-                    <div className="mt-2 space-y-1.5 text-xs text-muted-foreground bg-muted/50 rounded-lg p-3">
-                      <p>• <strong>Método:</strong> selecione <strong>GET</strong></p>
-                      <p>• <strong>URL:</strong> cole o endereço abaixo</p>
-                      <p>• <strong>Corpo e Cabeçalhos:</strong> deixe em branco</p>
-                    </div>
                   </div>
+                </div>
+
+                <div className="space-y-1.5 text-xs text-muted-foreground bg-muted/50 rounded-lg p-3">
+                  <p><strong>Método:</strong> selecione <strong>GET</strong></p>
                 </div>
 
                 {captureUrl && (
                   <div className="space-y-2">
-                    <div className="bg-background border-2 border-primary/30 rounded-lg p-3">
-                      <p className="text-xs font-mono text-foreground break-all leading-relaxed select-all">
-                        {captureUrl}
+                    <p className="text-xs font-semibold text-foreground">No campo URL, faça nesta ordem:</p>
+
+                    <div className="space-y-3">
+                      {/* Sub-step A: Cole a URL */}
+                      <div className="flex items-start gap-2">
+                        <span className="text-xs font-bold text-primary bg-primary/10 rounded-full w-5 h-5 flex items-center justify-center flex-shrink-0">a</span>
+                        <div className="flex-1">
+                          <p className="text-xs text-muted-foreground">Cole esta URL:</p>
+                          <div className="bg-background border-2 border-primary/30 rounded-lg p-2.5 mt-1">
+                            <p className="text-xs font-mono text-foreground break-all leading-relaxed select-all">
+                              {captureUrl}
+                            </p>
+                          </div>
+                          <Button
+                            className="w-full gap-2 h-10 mt-1.5"
+                            onClick={handleCopyUrl}
+                            variant={copied ? "outline" : "default"}
+                            size="sm"
+                          >
+                            {copied ? (
+                              <><CheckCircle2 className="w-4 h-4 text-emerald-600" /> Copiada!</>
+                            ) : (
+                              <><Copy className="w-4 h-4" /> Copiar URL</>
+                            )}
+                          </Button>
+                        </div>
+                      </div>
+
+                      {/* Sub-step B: Inserir Magic Text */}
+                      <div className="flex items-start gap-2">
+                        <span className="text-xs font-bold text-primary bg-primary/10 rounded-full w-5 h-5 flex items-center justify-center flex-shrink-0">b</span>
+                        <div className="flex-1">
+                          <p className="text-xs text-muted-foreground">Depois de colar, <strong>sem dar espaço</strong>, toque no ícone <strong>🏷️ (Magic Text)</strong> no canto do campo de URL</p>
+                        </div>
+                      </div>
+
+                      {/* Sub-step C: Selecionar variável */}
+                      <div className="flex items-start gap-2">
+                        <span className="text-xs font-bold text-primary bg-primary/10 rounded-full w-5 h-5 flex items-center justify-center flex-shrink-0">c</span>
+                        <div className="flex-1">
+                          <p className="text-xs text-muted-foreground">Selecione: <strong>"Gatilho"</strong> → <strong>"Texto do gatilho"</strong></p>
+                          <p className="text-xs text-muted-foreground mt-1">Vai aparecer algo como <code className="bg-muted px-1 rounded text-foreground">[trigger_text]</code> no final da URL</p>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-800 rounded-lg p-2.5">
+                      <p className="text-xs text-amber-800 dark:text-amber-200">
+                        <strong>Corpo e Cabeçalhos:</strong> deixe em branco.
                       </p>
                     </div>
-                    <Button
-                      className="w-full gap-2 h-11"
-                      onClick={handleCopyUrl}
-                      variant={copied ? "outline" : "default"}
-                    >
-                      {copied ? (
-                        <><CheckCircle2 className="w-5 h-5 text-emerald-600" /> Copiada! Cole no MacroDroid</>
-                      ) : (
-                        <><Copy className="w-5 h-5" /> Copiar URL</>
-                      )}
-                    </Button>
-                    <p className="text-xs text-muted-foreground text-center leading-relaxed">
-                      ⚠️ <strong>Não modifique nada</strong> na URL — só cole.
-                    </p>
                   </div>
                 )}
 
