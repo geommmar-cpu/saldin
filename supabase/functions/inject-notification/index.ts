@@ -37,11 +37,11 @@ const BANK_PATTERNS: { bank: string; regex: RegExp; swap?: boolean }[] = [
 const INJECT_SECRET = Deno.env.get("INJECT_SECRET") || "saldin_inject_2026";
 
 // ─── WhatsApp Send Helpers ───
-async function sendWhatsApp(to: string, text: string): Promise<void> {
-    if (!META_ACCESS_TOKEN || !META_PHONE_NUMBER_ID) return;
+async function sendWhatsApp(to: string, text: string): Promise<{ ok: boolean; errorCode?: number }> {
+    if (!META_ACCESS_TOKEN || !META_PHONE_NUMBER_ID) return { ok: false };
     try {
         const url = `https://graph.facebook.com/v22.0/${META_PHONE_NUMBER_ID}/messages`;
-        await fetch(url, {
+        const res = await fetch(url, {
             method: "POST",
             headers: { Authorization: `Bearer ${META_ACCESS_TOKEN}`, "Content-Type": "application/json" },
             body: JSON.stringify({
@@ -51,8 +51,53 @@ async function sendWhatsApp(to: string, text: string): Promise<void> {
                 text: { body: text },
             }),
         });
+        const data = await res.json();
+        if (data.error) {
+            console.error("sendWhatsApp error:", data.error.code, data.error.message);
+            return { ok: false, errorCode: data.error.code };
+        }
+        return { ok: true };
     } catch (e) {
         console.error("sendWhatsApp error:", e);
+        return { ok: false };
+    }
+}
+
+async function sendWhatsAppTemplate(
+    to: string,
+    templateName: string,
+    params: string[]
+): Promise<boolean> {
+    if (!META_ACCESS_TOKEN || !META_PHONE_NUMBER_ID) return false;
+    try {
+        const url = `https://graph.facebook.com/v22.0/${META_PHONE_NUMBER_ID}/messages`;
+        const res = await fetch(url, {
+            method: "POST",
+            headers: { Authorization: `Bearer ${META_ACCESS_TOKEN}`, "Content-Type": "application/json" },
+            body: JSON.stringify({
+                messaging_product: "whatsapp",
+                to,
+                type: "template",
+                template: {
+                    name: templateName,
+                    language: { code: "pt_BR" },
+                    components: [{
+                        type: "body",
+                        parameters: params.map(p => ({ type: "text", text: p })),
+                    }],
+                },
+            }),
+        });
+        const data = await res.json();
+        if (data.error) {
+            console.error(`Template '${templateName}' failed:`, data.error.code, data.error.message);
+            return false;
+        }
+        console.info(`✅ Template '${templateName}' sent to ${to}`);
+        return true;
+    } catch (e) {
+        console.error("sendWhatsAppTemplate error:", e);
+        return false;
     }
 }
 
@@ -229,10 +274,26 @@ async function processAndNotify(userId: string, phoneToReply: string, text: stri
 
     const finalMsg = `🔔 *Auto-Captura Ativa*\n_Detectei uma compra via ${parsed.banco}_\n\n${premiumMsg}`;
 
-    await sendInteractive(phoneToReply, finalMsg, [
-        { id: `excluir_${tCode}`, title: "🗑️ Excluir" },
-        { id: `editar_${tCode}`, title: "📝 Editar" },
-    ]);
+    // Tenta enviar mensagem interativa (com botões)
+    const msgResult = await sendWhatsApp(phoneToReply, finalMsg);
+
+    if (!msgResult.ok && msgResult.errorCode === 131047) {
+        // Janela de 24h expirada → tenta template
+        console.info("⏰ 24h window expired, trying template fallback...");
+        const categoria = intent?.items?.[0]?.categoria_sugerida || "Compras";
+        await sendWhatsAppTemplate(phoneToReply, "auto_capture_confirmation", [
+            String(parsed.valor).replace(".", ","),
+            parsed.estabelecimento,
+            categoria,
+            tCode,
+        ]);
+    } else if (msgResult.ok) {
+        // Mensagem de texto funcionou, agora envia os botões
+        await sendInteractive(phoneToReply, `Ações para ${tCode}:`, [
+            { id: `excluir_${tCode}`, title: "🗑️ Excluir" },
+            { id: `editar_${tCode}`, title: "📝 Editar" },
+        ]);
+    }
 
     console.log(`✅ Auto-registered: R$ ${parsed.valor} | ${parsed.estabelecimento} | Code: ${tCode}`);
 
