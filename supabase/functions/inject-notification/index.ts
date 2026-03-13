@@ -128,34 +128,64 @@ async function sendWhatsAppTemplate(
     params: string[]
 ): Promise<boolean> {
     if (!META_ACCESS_TOKEN || !META_PHONE_NUMBER_ID) return false;
-    try {
-        const url = `https://graph.facebook.com/v22.0/${META_PHONE_NUMBER_ID}/messages`;
+    
+    const cleanTo = normalizeTo(to);
+    const url = `https://graph.facebook.com/v22.0/${META_PHONE_NUMBER_ID}/messages`;
+
+    const sendRequest = async (recipient: string) => {
+        const payload = {
+            messaging_product: "whatsapp",
+            to: recipient,
+            type: "template",
+            template: {
+                name: templateName,
+                language: { code: "pt_BR" },
+                components: [{
+                    type: "body",
+                    parameters: params.map(p => ({ type: "text", text: p })),
+                }],
+            },
+        };
+        
         const res = await fetch(url, {
             method: "POST",
-            headers: { Authorization: `Bearer ${META_ACCESS_TOKEN}`, "Content-Type": "application/json" },
-            body: JSON.stringify({
-                messaging_product: "whatsapp",
-                to,
-                type: "template",
-                template: {
-                    name: templateName,
-                    language: { code: "pt_BR" },
-                    components: [{
-                        type: "body",
-                        parameters: params.map(p => ({ type: "text", text: p })),
-                    }],
-                },
-            }),
+            headers: { 
+                Authorization: `Bearer ${META_ACCESS_TOKEN}`, 
+                "Content-Type": "application/json" 
+            },
+            body: JSON.stringify(payload),
         });
-        const data = await res.json();
+        return await res.json();
+    };
+
+    try {
+        let data = await sendRequest(cleanTo);
+
+        // Se falhar com #100, tenta a variação do número (com/sem o 9)
+        if (data.error && data.error.code === 100) {
+            console.warn(`⚠️ Template rejected for ${cleanTo}. Trying variation...`);
+            let variation = cleanTo;
+            if (cleanTo.startsWith("55") && cleanTo.length === 12) {
+                variation = cleanTo.substring(0, 4) + "9" + cleanTo.substring(4);
+            } else if (cleanTo.startsWith("55") && cleanTo.length === 13) {
+                variation = cleanTo.substring(0, 4) + cleanTo.substring(5);
+            }
+
+            if (variation !== cleanTo) {
+                console.log(`🔄 Retrying template with variation: ${variation}`);
+                data = await sendRequest(variation);
+            }
+        }
+
         if (data.error) {
-            console.error(`Template '${templateName}' failed:`, data.error.code, data.error.message);
+            console.error(`❌ Template '${templateName}' failure:`, data.error.code, data.error.message);
             return false;
         }
-        console.info(`✅ Template '${templateName}' sent to ${to}`);
+        
+        console.info(`✅ Template '${templateName}' sent to ${cleanTo}`);
         return true;
     } catch (e) {
-        console.error("sendWhatsAppTemplate error:", e);
+        console.error("sendWhatsAppTemplate exception:", e);
         return false;
     }
 }
