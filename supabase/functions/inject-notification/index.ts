@@ -169,15 +169,21 @@ function normalizePhone(phone: string): string {
 
 // ─── Busca usuário por capture_token (novo fluxo GET simplificado) ───
 async function findUserByToken(token: string) {
+    const cleanToken = token.trim();
+    console.log(`[findUserByToken] Searching for: "${cleanToken}"`);
     const { data, error } = await supabase
         .from("whatsapp_users")
         .select("user_id, phone_number, is_verified, capture_token")
-        .eq("capture_token", token)
+        .filter("capture_token", "ilike", cleanToken)
         .eq("is_verified", true)
         .maybeSingle();
 
     if (error) {
-        console.error("Token lookup error:", error);
+        console.error("❌ Token lookup query error:", error);
+        return null;
+    }
+    if (!data) {
+        console.warn(`⚠️ No verified user found for token: "${cleanToken}"`);
         return null;
     }
     return data;
@@ -413,13 +419,24 @@ Deno.serve(async (req: Request) => {
         // ════════════════════════════════════════════
         if (req.method === "POST") {
             let body;
+            const rawBody = await req.text();
             try {
-                body = await req.json();
+                body = JSON.parse(rawBody);
             } catch (err) {
-                console.error("❌ Error parsing JSON body:", err);
+                console.error("❌ Error parsing JSON body. Raw content received:", rawBody);
+                // Log even failed attempts to help identify the source
+                await supabase.from("whatsapp_logs").insert({
+                    phone_number: "unknown",
+                    message_content: JSON.stringify({ raw_body: rawBody, error: "invalid_json", method: "POST" }),
+                    message_type: "error_log",
+                    processed: false,
+                    processing_result: { error: String(err) }
+                });
+
                 return new Response(JSON.stringify({ 
                     error: "Invalid or empty JSON body", 
-                    tip: "Make sure you are sending a valid JSON body with 'Content-Type: application/json' header." 
+                    received: rawBody,
+                    tip: "MacroDroid body must be valid JSON: {\"secret\":\"...\", \"phone\":\"...\", \"text\":\"...\"}" 
                 }), { 
                     status: 400,
                     headers: { "Content-Type": "application/json" }
