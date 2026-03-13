@@ -41,32 +41,92 @@ const BANK_PATTERNS: { bank: string; regex: RegExp; swap?: boolean; isIncome?: b
 const INJECT_SECRET = Deno.env.get("INJECT_SECRET") || "saldin_inject_2026";
 
 // ─── WhatsApp Send Helpers ───
+function normalizeTo(phone: string): string {
+    // Remove any non-digits
+    let clean = phone.replace(/\D/g, "");
+    
+    // Handling Brazil 9th digit variations for Meta API
+    // Meta historically prefers 12 digits (55DDXXXXXXXX) over 13 (55DD9XXXXXXXX) for some accounts
+    if (clean.startsWith("55") && clean.length === 13) {
+        // If it has 13 digits, the 5th digit is usually the extra '9'
+        const ddd = clean.substring(2, 4);
+        const number = clean.substring(5);
+        console.log(`🔧 Normalizing Brazil number (13->12): ${clean} -> 55${ddd}${number}`);
+        return `55${ddd}${number}`;
+    }
+    
+    if (clean.startsWith("55") && clean.length === 12) {
+        // Some Meta accounts (Test/Trial) might want the 9 added? 
+        // But usually, trial accounts require exact format as registered.
+        // The webhook does the opposite: 12 -> 13. 
+        // Let's stick to what works in most cases or try both if it fails.
+    }
+    
+    return clean;
+}
+
 async function sendWhatsApp(to: string, text: string): Promise<{ ok: boolean; errorCode?: number }> {
+    const cleanTo = normalizeTo(to);
+    
     if (!META_ACCESS_TOKEN || !META_PHONE_NUMBER_ID) {
         console.error("❌ sendWhatsApp SKIPPED: META_ACCESS_TOKEN or META_PHONE_NUMBER_ID is not configured!");
-        console.error(`   META_ACCESS_TOKEN set: ${!!META_ACCESS_TOKEN}, META_PHONE_NUMBER_ID set: ${!!META_PHONE_NUMBER_ID}`);
         return { ok: false };
     }
-    try {
+
+    const sendMessage = async (recipient: string) => {
         const url = `https://graph.facebook.com/v22.0/${META_PHONE_NUMBER_ID}/messages`;
+        const body = {
+            messaging_product: "whatsapp",
+            to: recipient,
+            type: "text",
+            text: { body: text },
+        };
+        
+        console.log(`📡 Sending to Meta: ${recipient} | Body length: ${text.length}`);
+        
         const res = await fetch(url, {
             method: "POST",
-            headers: { Authorization: `Bearer ${META_ACCESS_TOKEN}`, "Content-Type": "application/json" },
-            body: JSON.stringify({
-                messaging_product: "whatsapp",
-                to,
-                type: "text",
-                text: { body: text },
-            }),
+            headers: { 
+                Authorization: `Bearer ${META_ACCESS_TOKEN}`, 
+                "Content-Type": "application/json" 
+            },
+            body: JSON.stringify(body),
         });
-        const data = await res.json();
+        
+        return await res.json();
+    };
+
+    try {
+        let data = await sendMessage(cleanTo);
+        
+        // If it fails with #100 and it's a 12-digit number, try adding the 9
+        // OR if it's 13 digits, we already tried 12. Let's try 13 if it failed?
+        if (data.error && data.error.code === 100) {
+            console.warn(`⚠️ Meta rejected ${cleanTo}. Trying variation...`);
+            let variation = cleanTo;
+            if (cleanTo.startsWith("55") && cleanTo.length === 12) {
+                // Try 13 digits (add the 9)
+                variation = cleanTo.substring(0, 4) + "9" + cleanTo.substring(4);
+            } else if (cleanTo.startsWith("55") && cleanTo.length === 13) {
+                // Try 12 digits (remove the 9)
+                variation = cleanTo.substring(0, 4) + cleanTo.substring(5);
+            }
+            
+            if (variation !== cleanTo) {
+                console.log(`🔄 Retrying with variation: ${variation}`);
+                data = await sendMessage(variation);
+            }
+        }
+
         if (data.error) {
-            console.error("sendWhatsApp error:", data.error.code, data.error.message);
+            console.error("❌ sendWhatsApp final failure:", JSON.stringify(data.error));
             return { ok: false, errorCode: data.error.code };
         }
+        
+        console.log(`✅ WhatsApp sent to ${cleanTo}`);
         return { ok: true };
     } catch (e) {
-        console.error("sendWhatsApp error:", e);
+        console.error("sendWhatsApp exception:", e);
         return { ok: false };
     }
 }
