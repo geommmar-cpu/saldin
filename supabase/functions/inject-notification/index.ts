@@ -406,8 +406,9 @@ async function processAndNotify(userId: string, phoneToReply: string, text: stri
         // Janela de 24h expirada → tenta template
         console.info("⏰ 24h window expired, trying template fallback...");
         const categoria = intent?.items?.[0]?.categoria_sugerida || defaultCategory;
+        const formattedAmount = new Intl.NumberFormat('pt-BR', { minimumFractionDigits: 2 }).format(parsed.valor);
         const templateSent = await sendWhatsAppTemplate(phoneToReply, "auto_capture_confirmation", [
-            String(parsed.valor).replace(".", ","),
+            formattedAmount,
             parsed.estabelecimento,
             categoria,
             tCode,
