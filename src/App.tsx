@@ -179,9 +179,9 @@ const App = () => (
 
             {/* Support & Legal */}
 
-            <Route path="/help" element={<OnboardingRoute><Help /></OnboardingRoute>} />
-            <Route path="/terms" element={<OnboardingRoute><Terms /></OnboardingRoute>} />
-            <Route path="/privacy" element={<OnboardingRoute><Privacy /></OnboardingRoute>} />
+            <Route path="/help" element={<Help />} />
+            <Route path="/terms" element={<Terms />} />
+            <Route path="/privacy" element={<Privacy />} />
 
             {/* Style Guide - Public for development */}
             <Route path="/style-guide" element={<StyleGuide />} />
