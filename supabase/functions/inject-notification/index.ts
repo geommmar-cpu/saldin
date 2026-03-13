@@ -5,10 +5,12 @@ import { generateTransactionCode, formatPremiumMessage } from "../whatsapp-webho
 
 const SUPABASE_URL = Deno.env.get("SUPABASE_URL")!;
 const SERVICE_ROLE_KEY = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
-const META_ACCESS_TOKEN = Deno.env.get("META_ACCESS_TOKEN")!;
-const META_PHONE_NUMBER_ID = Deno.env.get("META_PHONE_NUMBER_ID")!;
+const META_ACCESS_TOKEN = Deno.env.get("META_ACCESS_TOKEN");
+const META_PHONE_NUMBER_ID = Deno.env.get("META_PHONE_NUMBER_ID");
 
 const supabase = createClient(SUPABASE_URL, SERVICE_ROLE_KEY);
+
+console.log(`🔑 Credential Check: ID starting with "${META_PHONE_NUMBER_ID?.substring(0, 4)}...", Token starting with "${META_ACCESS_TOKEN?.substring(0, 7)}..."`);
 
 // ─── Regex Patterns para os principais bancos brasileiros ───
 const BANK_PATTERNS: { bank: string; regex: RegExp; swap?: boolean; isIncome?: boolean }[] = [
