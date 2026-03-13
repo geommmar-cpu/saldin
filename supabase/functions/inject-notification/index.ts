@@ -13,32 +13,27 @@ const supabase = createClient(SUPABASE_URL, SERVICE_ROLE_KEY);
 // ─── Regex Patterns para os principais bancos brasileiros ───
 const BANK_PATTERNS: { bank: string; regex: RegExp; swap?: boolean; isIncome?: boolean }[] = [
     // Padrões de COMPRA/DÉBITO (cartão) — GASTOS
-    { bank: "Nubank", regex: /(?:compra|débito|debit).*?R\$\s*([\d.,]+).*?(?:em|no|na|at)\s+(.+?)(?:\.|$)/i },
-    { bank: "Inter", regex: /(?:compra|débito).*?R\$\s*([\d.,]+)\s*[-–]\s*(.+?)(?:\.|$)/i },
-    { bank: "Itaú", regex: /(?:compra|débito)\s+(?:cartão\s+)?R\$\s*([\d.,]+)\s+(.+?)(?:\.|$)/i },
-    { bank: "Bradesco", regex: /débito\s+R\$\s*([\d.,]+)\s+(.+?)(?:\.|$)/i },
+    { bank: "Nubank", regex: /nubank.*?(?:compra|débito|debit).*?R\$\s*([\d.,]+).*?(?:em|no|na|at)\s+(.+?)(?:\.|$)/i },
+    { bank: "Inter", regex: /inter.*?(?:compra|débito).*?R\$\s*([\d.,]+)\s*[-–]\s*(.+?)(?:\.|$)/i },
+    { bank: "Itaú", regex: /itaú.*?(?:compra|débito)\s+(?:cartão\s+)?R\$\s*([\d.,]+)\s+(.+?)(?:\.|$)/i },
+    { bank: "Bradesco", regex: /bradesco.*?débito\s+R\$\s*([\d.,]+)\s+(.+?)(?:\.|$)/i },
     { bank: "C6", regex: /C6\s*Bank.*?R\$\s*([\d.,]+)\s+(?:em\s+)?(.+?)(?:\.|$)/i },
-    { bank: "Mercado Pago", regex: /(?:você pagou|pagamento).*?R\$\s*([\d.,]+)\s+(?:para\s+)?(.+?)(?:\.|$)/i },
-    { bank: "Caixa", regex: /(?:caixa|cef).*?compra\s+R\$\s*([\d.,]+)\s+(.+?)(?:\.|$)/i },
+    { bank: "Mercado Pago", regex: /(?:mercado pago|você pagou|pagamento).*?R\$\s*([\d.,]+)\s+(?:para\s+)?(.+?)(?:\.|$)/i },
+    { bank: "Caixa", regex: /(?:caixa|cef).*?(?:compra|transferência|transferencia|pix|pagamento).*?R\$\s*([\d.,]+)\s+(.+?)(?:\.|$)/i },
     { bank: "Santander", regex: /santander.*?R\$\s*([\d.,]+)\s+(.+?)(?:\.|$)/i },
 
-    // Padrões de PIX ENVIADO (GASTO)
-    { bank: "Pix", regex: /pix\s+(?:enviado|realizado|feito|efetuado).*?R\$\s*([\d.,]+).*?(?:para|a)\s+(.+?)(?:\.|,\s*$|$)/i },
+    // Padrões de PIX / TRANSFERÊNCIA RECEBIDA (RECEITA)
+    { bank: "Pix", regex: /pix\s+(?:recebido|receber|recebeu).*?R\$\s*([\d.,]+).*?(?:de|do|da)\s+(.+?)(?:\.|,\s*$|$)/i, isIncome: true },
+    { bank: "Pix", regex: /pix\s+(?:recebido|receber|recebeu).*?(?:de|do|da)\s+(.+?),?\s*(?:no\s+)?valor\s+(?:de\s+)?R\$\s*([\d.,]+)/i, swap: true, isIncome: true },
+    { bank: "Transferência", regex: /(?:transferência|transferencia)\s+recebida.*?R\$\s*([\d.,]+).*?(?:de|do|da)\s+(.+?)(?:\.|,\s*$|$)/i, isIncome: true },
 
-    // Padrões de PIX RECEBIDO (RECEITA) → swap=true, isIncome=true
-    { bank: "Pix", regex: /pix\s+(?:recebido|receber).*?(?:de|do\(a\)|do|da)\s+(.+?),?\s*(?:no\s+)?valor\s+(?:de\s+)?R\$\s*([\d.,]+)/i, swap: true, isIncome: true },
-    { bank: "Pix", regex: /pix\s+(?:recebido|receber).*?R\$\s*([\d.,]+).*?(?:de|do|da)\s+(.+?)(?:\.|,\s*$|$)/i, isIncome: true },
+    // Padrões de PIX / TRANSFERÊNCIA ENVIADA (GASTO)
+    { bank: "Pix", regex: /pix\s+(?:enviado|realizado|feito|efetuado|pago).*?R\$\s*([\d.,]+).*?(?:para|a)\s+(.+?)(?:\.|,\s*$|$)/i },
+    { bank: "Transferência", regex: /(?:transferência|transferencia).*?R\$\s*([\d.,]+).*?(?:para|a)\s+(.+?)(?:\.|,\s*$|$)/i },
 
-    // Transferências RECEBIDAS (RECEITA)
-    { bank: "Pix", regex: /(?:transferência|transferencia)\s+recebida.*?R\$\s*([\d.,]+).*?(?:de|do|da)\s+(.+?)(?:\.|,\s*$|$)/i, isIncome: true },
-    // Transferências ENVIADAS (GASTO)
-    { bank: "Pix", regex: /(?:transferência|transferencia)\s+(?:enviada|realizada).*?R\$\s*([\d.,]+).*?(?:para|de|do|da)\s+(.+?)(?:\.|,\s*$|$)/i },
-
-    // Depósito / Salário / Crédito em conta (RECEITA)
+    // Padrão genérico de Banco/R$ (assume GASTO)
     { bank: "Banco", regex: /(?:depósito|deposito|salário|salario|crédito|credito)\s+(?:em\s+conta\s+)?.*?R\$\s*([\d.,]+).*?(?:de|do|da|em)\s+(.+?)(?:\.|,\s*$|$)/i, isIncome: true },
     { bank: "Banco", regex: /(?:você\s+recebeu|recebeu|recebimento).*?R\$\s*([\d.,]+).*?(?:de|do|da)\s+(.+?)(?:\.|,\s*$|$)/i, isIncome: true },
-
-    // Padrão genérico (deve ser o último — assume GASTO)
     { bank: "Banco", regex: /R\$\s*([\d.,]+).*?(?:em|no|na|para|de)\s+(.+?)(?:\.|,\s*$|$)/i },
 ];
 
@@ -219,6 +214,17 @@ async function findUserByPhone(phone: string) {
 
 // ─── Processa a transação e envia no WhatsApp ───
 async function processAndNotify(userId: string, phoneToReply: string, text: string, source: string) {
+    // Log de auditoria (Movido para antes do parse para debug)
+    const { error: logError } = await supabase.from("whatsapp_logs").insert({
+        phone_number: phoneToReply,
+        whatsapp_user_id: null,
+        message_content: JSON.stringify({ text, source, isIncoming: true }),
+        message_type: "auto_notification",
+        processed: false,
+        processing_result: { text_raw: text, source },
+    });
+    if (logError) console.error("❌ Failed to insert audit log:", logError);
+
     const parsed = parseNotificationText(text);
 
     if (!parsed) {
@@ -273,15 +279,15 @@ async function processAndNotify(userId: string, phoneToReply: string, text: stri
         isCreditCard: isIncome ? false : isCreditCard, // Receita nunca vai para cartão de crédito
     });
 
-    // Log de auditoria
-    await supabase.from("whatsapp_logs").insert({
-        phone_number: phoneToReply,
-        whatsapp_user_id: null,
-        message_content: JSON.stringify({ text, source, parsed, transactionType }),
-        message_type: "auto_notification",
-        processed: true,
-        processing_result: { valor: parsed.valor, estabelecimento: parsed.estabelecimento, tCode, type: transactionType },
-    });
+    // Atualiza o log com o resultado
+    await supabase.from("whatsapp_logs")
+        .update({
+            processed: true,
+            processing_result: { valor: parsed.valor, estabelecimento: parsed.estabelecimento, tCode, type: transactionType },
+        })
+        .match({ phone_number: phoneToReply, message_type: "auto_notification", processed: false })
+        .order("created_at", { ascending: false })
+        .limit(1);
 
     // Monta resposta premium
     const alerts = await getImportantAlerts(userId);

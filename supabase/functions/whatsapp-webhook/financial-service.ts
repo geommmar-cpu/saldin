@@ -32,6 +32,7 @@ export async function processTransaction(data: TransactionData) {
             }
 
             // Register as Credit Card Purchase
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
             const payload: any = {
                 user_id: userId,
                 card_id: bankAccountId, // bankAccountId acts as cardId here
@@ -80,6 +81,7 @@ export async function processTransaction(data: TransactionData) {
         }
 
         if (type === 'expense') {
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
             const payload: any = {
                 user_id: userId,
                 amount,
@@ -109,6 +111,7 @@ export async function processTransaction(data: TransactionData) {
             else if (descLower.includes('investimento')) incomeType = 'investment';
             else if (descLower.includes('presente')) incomeType = 'gift';
 
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
             const payload: any = {
                 user_id: userId,
                 amount,
@@ -184,6 +187,7 @@ export async function getBalance(userId: string): Promise<number> {
 
     // 1. Bank Total
     const { data: banks } = await supabaseAdmin.from('bank_accounts').select('current_balance').eq('user_id', userId).eq('active', true);
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const bankTotal = banks?.reduce((acc: number, b: any) => acc + Number(b.current_balance), 0) || 0;
 
     // 2. Unlinked Transactions (Confirmed but not in a bank account yet)
@@ -195,6 +199,7 @@ export async function getBalance(userId: string): Promise<number> {
         .or('status.eq.received,status.eq.confirmed')
         .gte('date', monthStart)
         .lte('date', monthEnd);
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const confirmedUnlinkedIncome = unlinkedIncomes?.reduce((acc: number, i: any) => acc + Number(i.amount), 0) || 0;
 
     // Expenses
@@ -205,6 +210,7 @@ export async function getBalance(userId: string): Promise<number> {
         .eq('status', 'confirmed')
         .gte('date', monthStart)
         .lte('date', monthEnd);
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const confirmedUnlinkedExpenses = unlinkedExpenses?.reduce((acc: number, e: any) => acc + Number(e.amount), 0) || 0;
 
     const saldoBruto = bankTotal + confirmedUnlinkedIncome - confirmedUnlinkedExpenses;
@@ -218,6 +224,7 @@ export async function getBalance(userId: string): Promise<number> {
         .or('emotion.eq.essencial,emotion.eq.pilar')
         .gte('date', monthStart)
         .lte('date', monthEnd);
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const pendingTotal = pendingExpenses?.reduce((acc: number, e: any) => acc + Number(e.amount), 0) || 0;
 
     // Active debts
@@ -225,6 +232,7 @@ export async function getBalance(userId: string): Promise<number> {
         .select('total_amount, installment_amount, is_installment')
         .eq('user_id', userId)
         .eq('status', 'active');
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const debtTotal = debts?.reduce((acc: number, d: any) => acc + Number(d.is_installment ? (d.installment_amount || 0) : d.total_amount), 0) || 0;
 
     // CC Installments for the month
@@ -233,6 +241,7 @@ export async function getBalance(userId: string): Promise<number> {
         .eq('user_id', userId)
         .eq('reference_month', refMonthStr)
         .eq('status', 'open');
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const ccTotal = ccInstallments?.reduce((acc: number, inst: any) => acc + Number(inst.amount), 0) || 0;
 
     const saldoComprometido = pendingTotal + debtTotal + ccTotal;
@@ -243,6 +252,7 @@ export async function getBalance(userId: string): Promise<number> {
         .eq('user_id', userId)
         .neq('is_personal', false)
         .eq('status', 'in_progress');
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const saldoGuardado = goals?.reduce((acc: number, g: any) => acc + Number(g.current_amount), 0) || 0;
 
     // 5. Saldo Livre = Saldo Bruto - Comprometido - Guardado
@@ -273,7 +283,9 @@ export async function getLastTransactions(userId: string, limit = 5) {
 
     // Merge expenses and incomes
     const all = [
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         ...(exp || []).map((e: any) => ({ ...e, type: 'expense' })),
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         ...(inc || []).map((i: any) => ({ ...i, type: 'income' }))
     ];
 
@@ -400,6 +412,7 @@ export async function getImportantAlerts(userId: string): Promise<string[]> {
             .eq('active', true);
 
         if (bankAccounts) {
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
             bankAccounts.forEach((acc: any) => {
                 const bal = Number(acc.current_balance);
                 if (bal >= 0 && bal < 50) {
@@ -472,6 +485,7 @@ export async function getImportantAlerts(userId: string): Promise<string[]> {
             .eq('status', 'active');
 
         if (subs) {
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
             subs.forEach((s: any) => {
                 if (s.billing_date === today) {
                     alerts.push(`📅 *Assinatura Hoje:* ${s.name} (R$ ${formatCurrencyAlert(s.amount)})`);
@@ -489,6 +503,7 @@ export async function getImportantAlerts(userId: string): Promise<string[]> {
             .eq('status', 'active');
 
         if (debts) {
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
             debts.forEach((d: any) => {
                 if (d.due_date) {
                     const due = new Date(d.due_date);
