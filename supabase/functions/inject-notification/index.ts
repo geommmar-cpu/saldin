@@ -412,7 +412,19 @@ Deno.serve(async (req: Request) => {
         // Body: { secret, phone, text, source }
         // ════════════════════════════════════════════
         if (req.method === "POST") {
-            const body = await req.json();
+            let body;
+            try {
+                body = await req.json();
+            } catch (err) {
+                console.error("❌ Error parsing JSON body:", err);
+                return new Response(JSON.stringify({ 
+                    error: "Invalid or empty JSON body", 
+                    tip: "Make sure you are sending a valid JSON body with 'Content-Type: application/json' header." 
+                }), { 
+                    status: 400,
+                    headers: { "Content-Type": "application/json" }
+                });
+            }
             console.log("📲 [POST] Received:", JSON.stringify(body));
 
             // Autenticação por secret ou token
