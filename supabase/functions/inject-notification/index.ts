@@ -133,6 +133,18 @@ async function sendWhatsAppTemplate(
     const url = `https://graph.facebook.com/v22.0/${META_PHONE_NUMBER_ID}/messages`;
 
     const sendRequest = async (recipient: string) => {
+        // Limpeza de parâmetros para evitar rejeição da Meta por caracteres suspeitos ou excesso de tamanho
+        const sanitizedParams = params.map(p => {
+            let clean = String(p || "")
+                .normalize("NFD").replace(/[\u0300-\u036f]/g, "") // Remove acentos
+                .replace(/[^\w\s\d,.]/g, "") // Remove tudo que não for letra, espaço, número, vírgula ou ponto
+                .substring(0, 60) // Limite de 60 caracteres por variável
+                .trim();
+            return clean;
+        });
+
+        console.info(`📤 Sending Template to ${recipient}:`, JSON.stringify(sanitizedParams));
+
         const payload = {
             messaging_product: "whatsapp",
             to: recipient,
@@ -142,7 +154,7 @@ async function sendWhatsAppTemplate(
                 language: { code: "pt_BR" },
                 components: [{
                     type: "body",
-                    parameters: params.map(p => ({ type: "text", text: p })),
+                    parameters: sanitizedParams.map(p => ({ type: "text", text: p })),
                 }],
             },
         };
@@ -178,7 +190,7 @@ async function sendWhatsAppTemplate(
         }
 
         if (data.error) {
-            console.error(`❌ Template '${templateName}' failure:`, data.error.code, data.error.message);
+            console.error(`❌ Template '${templateName}' failure:`, JSON.stringify(data.error, null, 2));
             return false;
         }
         
