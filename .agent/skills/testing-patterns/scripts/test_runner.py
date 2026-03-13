@@ -43,18 +43,19 @@ def detect_test_framework(project_path: Path) -> dict:
             deps = {**pkg.get("dependencies", {}), **pkg.get("devDependencies", {})}
             
             # Check for test script
-            if "test" in scripts:
+            if "vitest" in deps:
+                result["framework"] = "vitest"
+                result["cmd"] = ["npx", "vitest", "run"]
+                result["coverage_cmd"] = ["npx", "vitest", "run", "--coverage"]
+            elif "test" in scripts:
                 result["framework"] = "npm test"
                 result["cmd"] = ["npm", "test"]
                 
                 # Try to detect specific framework for coverage
-                if "vitest" in deps:
-                    result["framework"] = "vitest"
-                    result["coverage_cmd"] = ["npx", "vitest", "run", "--coverage"]
-                elif "jest" in deps:
+                if "jest" in deps:
                     result["framework"] = "jest"
                     result["coverage_cmd"] = ["npx", "jest", "--coverage"]
-            elif "vitest" in deps:
+            elif "jest" in deps:
                 result["framework"] = "vitest"
                 result["cmd"] = ["npx", "vitest", "run"]
                 result["coverage_cmd"] = ["npx", "vitest", "run", "--coverage"]
@@ -95,7 +96,8 @@ def run_tests(cmd: list, cwd: Path) -> dict:
             text=True,
             encoding='utf-8',
             errors='replace',
-            timeout=300  # 5 min timeout for tests
+            timeout=300,  # 5 min timeout for tests
+            shell=True
         )
         
         result["output"] = proc.stdout[:3000] if proc.stdout else ""

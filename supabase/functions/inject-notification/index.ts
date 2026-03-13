@@ -11,8 +11,8 @@ const META_PHONE_NUMBER_ID = Deno.env.get("META_PHONE_NUMBER_ID")!;
 const supabase = createClient(SUPABASE_URL, SERVICE_ROLE_KEY);
 
 // ─── Regex Patterns para os principais bancos brasileiros ───
-const BANK_PATTERNS: { bank: string; regex: RegExp; swap?: boolean }[] = [
-    // Padrões de COMPRA/DÉBITO (cartão)
+const BANK_PATTERNS: { bank: string; regex: RegExp; swap?: boolean; isIncome?: boolean }[] = [
+    // Padrões de COMPRA/DÉBITO (cartão) — GASTOS
     { bank: "Nubank", regex: /(?:compra|débito|debit).*?R\$\s*([\d.,]+).*?(?:em|no|na|at)\s+(.+?)(?:\.|$)/i },
     { bank: "Inter", regex: /(?:compra|débito).*?R\$\s*([\d.,]+)\s*[-–]\s*(.+?)(?:\.|$)/i },
     { bank: "Itaú", regex: /(?:compra|débito)\s+(?:cartão\s+)?R\$\s*([\d.,]+)\s+(.+?)(?:\.|$)/i },
@@ -22,14 +22,23 @@ const BANK_PATTERNS: { bank: string; regex: RegExp; swap?: boolean }[] = [
     { bank: "Caixa", regex: /(?:caixa|cef).*?compra\s+R\$\s*([\d.,]+)\s+(.+?)(?:\.|$)/i },
     { bank: "Santander", regex: /santander.*?R\$\s*([\d.,]+)\s+(.+?)(?:\.|$)/i },
 
-    // Padrões de PIX (enviado: valor vem primeiro)
+    // Padrões de PIX ENVIADO (GASTO)
     { bank: "Pix", regex: /pix\s+(?:enviado|realizado|feito|efetuado).*?R\$\s*([\d.,]+).*?(?:para|a)\s+(.+?)(?:\.|,\s*$|$)/i },
-    // Pix recebido: nome vem primeiro, valor depois → swap=true
-    { bank: "Pix", regex: /pix\s+(?:recebido|receber).*?(?:de|do\(a\)|do|da)\s+(.+?),?\s*(?:no\s+)?valor\s+(?:de\s+)?R\$\s*([\d.,]+)/i, swap: true },
-    // Transferências
-    { bank: "Pix", regex: /(?:transferência|transferencia)\s+(?:enviada|realizada|recebida).*?R\$\s*([\d.,]+).*?(?:para|de|do|da)\s+(.+?)(?:\.|,\s*$|$)/i },
 
-    // Padrão genérico (deve ser o último)
+    // Padrões de PIX RECEBIDO (RECEITA) → swap=true, isIncome=true
+    { bank: "Pix", regex: /pix\s+(?:recebido|receber).*?(?:de|do\(a\)|do|da)\s+(.+?),?\s*(?:no\s+)?valor\s+(?:de\s+)?R\$\s*([\d.,]+)/i, swap: true, isIncome: true },
+    { bank: "Pix", regex: /pix\s+(?:recebido|receber).*?R\$\s*([\d.,]+).*?(?:de|do|da)\s+(.+?)(?:\.|,\s*$|$)/i, isIncome: true },
+
+    // Transferências RECEBIDAS (RECEITA)
+    { bank: "Pix", regex: /(?:transferência|transferencia)\s+recebida.*?R\$\s*([\d.,]+).*?(?:de|do|da)\s+(.+?)(?:\.|,\s*$|$)/i, isIncome: true },
+    // Transferências ENVIADAS (GASTO)
+    { bank: "Pix", regex: /(?:transferência|transferencia)\s+(?:enviada|realizada).*?R\$\s*([\d.,]+).*?(?:para|de|do|da)\s+(.+?)(?:\.|,\s*$|$)/i },
+
+    // Depósito / Salário / Crédito em conta (RECEITA)
+    { bank: "Banco", regex: /(?:depósito|deposito|salário|salario|crédito|credito)\s+(?:em\s+conta\s+)?.*?R\$\s*([\d.,]+).*?(?:de|do|da|em)\s+(.+?)(?:\.|,\s*$|$)/i, isIncome: true },
+    { bank: "Banco", regex: /(?:você\s+recebeu|recebeu|recebimento).*?R\$\s*([\d.,]+).*?(?:de|do|da)\s+(.+?)(?:\.|,\s*$|$)/i, isIncome: true },
+
+    // Padrão genérico (deve ser o último — assume GASTO)
     { bank: "Banco", regex: /R\$\s*([\d.,]+).*?(?:em|no|na|para|de)\s+(.+?)(?:\.|,\s*$|$)/i },
 ];
 
@@ -38,7 +47,11 @@ const INJECT_SECRET = Deno.env.get("INJECT_SECRET") || "saldin_inject_2026";
 
 // ─── WhatsApp Send Helpers ───
 async function sendWhatsApp(to: string, text: string): Promise<{ ok: boolean; errorCode?: number }> {
-    if (!META_ACCESS_TOKEN || !META_PHONE_NUMBER_ID) return { ok: false };
+    if (!META_ACCESS_TOKEN || !META_PHONE_NUMBER_ID) {
+        console.error("❌ sendWhatsApp SKIPPED: META_ACCESS_TOKEN or META_PHONE_NUMBER_ID is not configured!");
+        console.error(`   META_ACCESS_TOKEN set: ${!!META_ACCESS_TOKEN}, META_PHONE_NUMBER_ID set: ${!!META_PHONE_NUMBER_ID}`);
+        return { ok: false };
+    }
     try {
         const url = `https://graph.facebook.com/v22.0/${META_PHONE_NUMBER_ID}/messages`;
         const res = await fetch(url, {
@@ -125,10 +138,10 @@ async function sendInteractive(to: string, text: string, buttons: { id: string; 
 }
 
 // ─── Parser de Texto de Notificação ───
-function parseNotificationText(text: string): { valor: number; estabelecimento: string; banco: string } | null {
+function parseNotificationText(text: string): { valor: number; estabelecimento: string; banco: string; isIncome: boolean } | null {
     const cleanText = text.trim();
 
-    for (const { bank, regex, swap } of BANK_PATTERNS) {
+    for (const { bank, regex, swap, isIncome } of BANK_PATTERNS) {
         const match = cleanText.match(regex);
         if (match) {
             // swap=true: group(1)=nome, group(2)=valor (ex: Pix recebido)
@@ -137,13 +150,14 @@ function parseNotificationText(text: string): { valor: number; estabelecimento: 
             if (isNaN(valor) || valor <= 0) continue;
 
             const rawEstab = swap ? match[1] : match[2];
+            const defaultLabel = isIncome ? "Recebimento" : "Compra";
             const estabelecimento = rawEstab
                 ?.trim()
                 .replace(/\*+/g, "")
                 .replace(/\s+/g, " ")
-                .substring(0, 80) || "Compra";
+                .substring(0, 80) || defaultLabel;
 
-            return { valor, estabelecimento, banco: bank };
+            return { valor, estabelecimento, banco: bank, isIncome: !!isIncome };
         }
     }
 
@@ -212,22 +226,37 @@ async function processAndNotify(userId: string, phoneToReply: string, text: stri
         return { status: "ignored", reason: "not_a_transaction" };
     }
 
-    console.log(`💸 Parsed: R$ ${parsed.valor} em "${parsed.estabelecimento}" (${parsed.banco})`);
+    // Determina se é receita ou gasto:
+    // 1) O parser regex já detecta via isIncome
+    // 2) A IA pode confirmar/override via intent.items[0].tipo
+    let isIncome = parsed.isIncome;
+
+    console.log(`${isIncome ? '💰' : '💸'} Parsed: R$ ${parsed.valor} em "${parsed.estabelecimento}" (${parsed.banco}) [${isIncome ? 'RECEITA' : 'GASTO'}]`);
 
     // IA para categoria
-    const aiText = `Gastei R$ ${parsed.valor} em ${parsed.estabelecimento}`;
+    const aiText = isIncome
+        ? `Recebi R$ ${parsed.valor} de ${parsed.estabelecimento}`
+        : `Gastei R$ ${parsed.valor} em ${parsed.estabelecimento}`;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     let intent: any = null;
     try {
         intent = await analyzeText(aiText);
+        // Se a IA retornar tipo diferente do regex, priorizar a IA
+        const aiTipo = intent?.items?.[0]?.tipo;
+        if (aiTipo === "receita") isIncome = true;
+        else if (aiTipo === "gasto") isIncome = false;
     } catch (e) {
-        console.warn("AI analysis failed, using defaults:", e);
+        console.warn("AI analysis failed, using regex detection:", e);
     }
+
+    const transactionType = isIncome ? "income" : "expense";
+    console.log(`📋 Final type: ${transactionType} (regex=${parsed.isIncome}, ai=${intent?.items?.[0]?.tipo || 'N/A'})`);
 
     // Conta/cartão de destino
     const metodo = intent?.items?.[0]?.metodo_pagamento || "pix";
     const { id: targetAccountId, isCreditCard } = await getPreferredAccount(userId, metodo);
 
-    // Registra transação
+    // Registra transação com o tipo correto (income ou expense)
     const tCode = generateTransactionCode();
     const categoryId = intent?.items?.[0]?.categoria_sugerida
         ? await getCategoryId(userId, intent.items[0].categoria_sugerida)
@@ -235,36 +264,37 @@ async function processAndNotify(userId: string, phoneToReply: string, text: stri
 
     const result = await processTransaction({
         userId,
-        type: "expense",
+        type: transactionType,
         amount: parsed.valor,
         description: parsed.estabelecimento,
         categoryId: categoryId || undefined,
         bankAccountId: targetAccountId || undefined,
         transactionCode: tCode,
-        isCreditCard,
+        isCreditCard: isIncome ? false : isCreditCard, // Receita nunca vai para cartão de crédito
     });
 
     // Log de auditoria
     await supabase.from("whatsapp_logs").insert({
         phone_number: phoneToReply,
         whatsapp_user_id: null,
-        message_content: JSON.stringify({ text, source, parsed }),
+        message_content: JSON.stringify({ text, source, parsed, transactionType }),
         message_type: "auto_notification",
         processed: true,
-        processing_result: { valor: parsed.valor, estabelecimento: parsed.estabelecimento, tCode },
+        processing_result: { valor: parsed.valor, estabelecimento: parsed.estabelecimento, tCode, type: transactionType },
     });
 
     // Monta resposta premium
     const alerts = await getImportantAlerts(userId);
+    const defaultCategory = isIncome ? "Recebimentos" : "Compras";
     const premiumMsg = formatPremiumMessage(
         {
             id: result.id,
             description: parsed.estabelecimento,
             amount: parsed.valor,
             date: new Date().toISOString(),
-            category: intent?.items?.[0]?.categoria_sugerida || "Compras",
+            category: intent?.items?.[0]?.categoria_sugerida || defaultCategory,
             account_name: result.dest_name,
-            type: "expense",
+            type: transactionType,
             transaction_code: tCode,
             account_balance: result.account_balance,
         },
@@ -272,23 +302,32 @@ async function processAndNotify(userId: string, phoneToReply: string, text: stri
         alerts
     );
 
-    const finalMsg = `🔔 *Auto-Captura Ativa*\n_Detectei uma compra via ${parsed.banco}_\n\n${premiumMsg}`;
+    const actionLabel = isIncome ? "um recebimento" : "uma compra";
+    const finalMsg = `🔔 *Auto-Captura Ativa*\n_Detectei ${actionLabel} via ${parsed.banco}_\n\n${premiumMsg}`;
 
     // Tenta enviar mensagem interativa (com botões)
+    console.log(`📤 Enviando WhatsApp para ${phoneToReply.substring(0, 6)}...`);
     const msgResult = await sendWhatsApp(phoneToReply, finalMsg);
 
     if (!msgResult.ok && msgResult.errorCode === 131047) {
         // Janela de 24h expirada → tenta template
         console.info("⏰ 24h window expired, trying template fallback...");
-        const categoria = intent?.items?.[0]?.categoria_sugerida || "Compras";
-        await sendWhatsAppTemplate(phoneToReply, "auto_capture_confirmation", [
+        const categoria = intent?.items?.[0]?.categoria_sugerida || defaultCategory;
+        const templateSent = await sendWhatsAppTemplate(phoneToReply, "auto_capture_confirmation", [
             String(parsed.valor).replace(".", ","),
             parsed.estabelecimento,
             categoria,
             tCode,
         ]);
+        if (!templateSent) {
+            console.error("❌ Template fallback also failed! Check if template 'auto_capture_confirmation' is approved in Meta.");
+        }
+    } else if (!msgResult.ok) {
+        // Outro erro — logar detalhes
+        console.error(`❌ WhatsApp send failed. ErrorCode: ${msgResult.errorCode || 'unknown'}. Check META_ACCESS_TOKEN and META_PHONE_NUMBER_ID env vars.`);
     } else if (msgResult.ok) {
         // Mensagem de texto funcionou, agora envia os botões
+        console.log(`✅ WhatsApp message sent successfully to ${phoneToReply.substring(0, 6)}...`);
         await sendInteractive(phoneToReply, `Ações para ${tCode}:`, [
             { id: `excluir_${tCode}`, title: "🗑️ Excluir" },
             { id: `editar_${tCode}`, title: "📝 Editar" },
