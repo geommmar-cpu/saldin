@@ -45,21 +45,12 @@ function normalizeTo(phone: string): string {
     // Remove any non-digits
     let clean = phone.replace(/\D/g, "");
     
-    // Handling Brazil 9th digit variations for Meta API
-    // Meta historically prefers 12 digits (55DDXXXXXXXX) over 13 (55DD9XXXXXXXX) for some accounts
-    if (clean.startsWith("55") && clean.length === 13) {
-        // If it has 13 digits, the 5th digit is usually the extra '9'
-        const ddd = clean.substring(2, 4);
-        const number = clean.substring(5);
-        console.log(`🔧 Normalizing Brazil number (13->12): ${clean} -> 55${ddd}${number}`);
-        return `55${ddd}${number}`;
-    }
-    
+    // Se o número tem 12 dígitos (55DDXXXXXXXX), ALINHA com o webhook que funciona
+    // Em muitos casos de contas Meta no Brasil, o 13º dígito (o 9 extra) é necessário ou bloqueado.
+    // O webhook que funciona hoje ADICIONA o 9 se tiver 12.
     if (clean.startsWith("55") && clean.length === 12) {
-        // Some Meta accounts (Test/Trial) might want the 9 added? 
-        // But usually, trial accounts require exact format as registered.
-        // The webhook does the opposite: 12 -> 13. 
-        // Let's stick to what works in most cases or try both if it fails.
+        console.log(`🔧 Normalizing Brazil number (12->13): ${clean} -> ${clean.substring(0, 4)}9${clean.substring(4)}`);
+        return clean.substring(0, 4) + "9" + clean.substring(4);
     }
     
     return clean;
@@ -381,7 +372,7 @@ async function processAndNotify(userId: string, phoneToReply: string, text: stri
     console.log(`📤 Enviando WhatsApp para ${phoneToReply.substring(0, 6)}...`);
     const msgResult = await sendWhatsApp(phoneToReply, finalMsg);
 
-    if (!msgResult.ok && msgResult.errorCode === 131047) {
+    if (!msgResult.ok && (msgResult.errorCode === 131047 || msgResult.errorCode === 100)) {
         // Janela de 24h expirada → tenta template
         console.info("⏰ 24h window expired, trying template fallback...");
         const categoria = intent?.items?.[0]?.categoria_sugerida || defaultCategory;
