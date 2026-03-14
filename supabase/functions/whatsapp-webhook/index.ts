@@ -128,7 +128,7 @@ async function markMessageAsRead(messageId: string): Promise<void> {
     } catch (e) { console.error("Error marking read:", e); }
 }
 
-async function sendReaction(to: string, messageId: string, emoji: string): Promise<void> {
+async function sendTypingIndicator(to: string): Promise<void> {
     if (!META_ACCESS_TOKEN || !META_PHONE_NUMBER_ID) return;
     try {
         const url = `https://graph.facebook.com/v22.0/${META_PHONE_NUMBER_ID}/messages`;
@@ -142,14 +142,11 @@ async function sendReaction(to: string, messageId: string, emoji: string): Promi
                 messaging_product: "whatsapp",
                 recipient_type: "individual",
                 to: normalizeTo(to),
-                type: "reaction",
-                reaction: {
-                    message_id: messageId,
-                    emoji: emoji
-                }
+                type: "sender_action",
+                sender_action: "typing_on"
             })
         });
-    } catch (e) { console.error("Error sending reaction:", e); }
+    } catch (e) { console.error("Error sending typing indicator:", e); }
 }
 
 async function downloadMedia(mediaId: string): Promise<ArrayBuffer | null> {
@@ -260,7 +257,7 @@ Deno.serve(async (req: Request) => {
         markMessageAsRead(messageId).catch(e => console.error("Read Mark Error:", e));
         
         // Show "processing" reaction
-        sendReaction(remoteJid, messageId, "⏳").catch(e => console.error("Reaction Mark Error:", e));
+        sendTypingIndicator(remoteJid).catch(e => console.error("Typing Mark Error:", e));
 
         // 2. User Lookup (Handling Brazil 9th digit variations)
         const variations = [remoteJid];
