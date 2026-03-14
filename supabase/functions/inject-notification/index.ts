@@ -345,6 +345,30 @@ async function findUserByPhone(phone: string) {
     return data;
 }
 
+// ─── Mostra "digitando" no WhatsApp ───
+async function sendTypingIndicator(to: string): Promise<void> {
+    if (!META_ACCESS_TOKEN || !META_PHONE_NUMBER_ID) return;
+    try {
+        const url = `https://graph.facebook.com/v22.0/${META_PHONE_NUMBER_ID}/messages`;
+        await fetch(url, {
+            method: "POST",
+            headers: {
+                "Authorization": `Bearer ${META_ACCESS_TOKEN}`,
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+                messaging_product: "whatsapp",
+                recipient_type: "individual",
+                to: normalizeTo(to),
+                type: "sender_action",
+                sender_action: "typing_on"
+            })
+        });
+    } catch (e) {
+        console.error("Error sending typing indicator:", e);
+    }
+}
+
 // ─── Processa a transação e envia no WhatsApp ───
 async function processAndNotify(userId: string, phoneToReply: string, text: string, source: string) {
     // Log de auditoria (Movido para antes do parse para debug)
@@ -371,6 +395,9 @@ async function processAndNotify(userId: string, phoneToReply: string, text: stri
     let isIncome = parsed.isIncome;
 
     console.log(`${isIncome ? '💰' : '💸'} Parsed: R$ ${parsed.valor} em "${parsed.estabelecimento}" (${parsed.banco}) [${isIncome ? 'RECEITA' : 'GASTO'}]`);
+
+    // Mostra o "Digitando..." no celular do usuário agora que sabemos que é válido e a IA vai pensar
+    sendTypingIndicator(phoneToReply).catch(e => console.error(e));
 
     // IA para categoria
     const aiText = isIncome
