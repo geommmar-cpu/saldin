@@ -27,7 +27,7 @@ export function generateTransactionCode(): string {
 }
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-export function formatPremiumMessage(transaction: Transaction, balanceData: any, alerts: string[] = [], isDelete = false): string {
+export function formatPremiumMessage(transaction: Transaction, balanceData: any, alerts: string[] = [], isDelete = false, hideUndo = false): string {
     const { transaction_code, amount, description, category, account_name, type, account_balance } = transaction;
     const formattedAmount = new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(Number(amount));
 
@@ -51,14 +51,14 @@ export function formatPremiumMessage(transaction: Transaction, balanceData: any,
         ? `R$ ${formatCurrency(account_balance)}` 
         : `R$ ${formatCurrency(balanceData?.new_balance || 0)}`;
 
+    const undoLine = hideUndo ? '' : `\n\n_Para desfazer, digite: excluir ${transaction_code}_`;
+
     return `
 ${header} *${formattedAmount}*
 📝 ${description}
 📂 ${category || 'Geral'} | 🏦 ${account_name || 'Carteira'}
 
-📊 Saldo da conta: ${balanceText}${alertsSection}
-
-_Para desfazer, digite: excluir ${transaction_code}_
+📊 Saldo da conta: ${balanceText}${alertsSection}${undoLine}
 `.trim();
 }
 

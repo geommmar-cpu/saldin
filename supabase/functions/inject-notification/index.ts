@@ -482,6 +482,10 @@ async function processAndNotify(userId: string, phoneToReply: string, text: stri
     // Mostra o "Digitando..." no celular do usuário agora que sabemos que é válido e a IA vai pensar
     sendTypingIndicator(phoneToReply).catch(e => console.error(e));
 
+    // Debug: loga texto bruto para diagnosticar detecção de banco
+    console.log(`ℹ️ [DEBUG] Raw notification text: "${text.substring(0, 200)}"`);
+    console.log(`ℹ️ [DEBUG] Banco detectado: "${parsed.banco}" | isIncome: ${parsed.isIncome} | isWithdrawal: ${parsed.isWithdrawal}`);
+
     // ─── CASO 1: SAQUE ─ Cria transferência da conta bancária para Dinheiro em Mãos ───
     if (parsed.isWithdrawal) {
         console.log(`💵 SAQUE detectado: R$ ${parsed.valor} em ${parsed.banco}`);
@@ -546,13 +550,10 @@ async function processAndNotify(userId: string, phoneToReply: string, text: stri
             type: "expense",
             transaction_code: tCode,
             account_balance: expenseResult.account_balance,
-        }, { new_balance: expenseResult.new_balance }, alerts);
+        }, { new_balance: expenseResult.new_balance }, alerts, false, true);
 
         const finalMsg = `🏧 *Auto-Captura Ativa*\n_Saque da sua conta ${sourceAcc?.bank_name || parsed.banco} → ${cashAcc?.bank_name || "Dinheiro em Mãos"}_\n\n${premiumMsg}`;
-        await sendInteractive(phoneToReply, finalMsg, [
-            { id: `excluir_${tCode}`, title: "🗑️ Excluir" },
-            { id: `editar_${tCode}`, title: "📝 Editar" },
-        ]);
+        await sendWhatsApp(phoneToReply, finalMsg);
         console.log(`✅ Saque registrado: R$ ${parsed.valor} | Code: ${tCode}`);
         return { status: "success", transaction_code: tCode };
     }
@@ -604,12 +605,10 @@ async function processAndNotify(userId: string, phoneToReply: string, text: stri
                 category: "Transferência Interna", account_name: ownAcc.bank_name,
                 type: "expense", transaction_code: tCodeOut,
                 account_balance: expResult.account_balance,
-            }, { new_balance: expResult.new_balance }, alerts);
+            }, { new_balance: expResult.new_balance }, alerts, false, true);
 
             const finalMsg = `🔄 *Auto-Captura Ativa*\n_Transferência entre suas contas_\n\n${premiumMsg}`;
-            await sendInteractive(phoneToReply, finalMsg, [
-                { id: `excluir_${tCodeOut}`, title: "🗑️ Excluir" },
-            ]);
+            await sendWhatsApp(phoneToReply, finalMsg);
             console.log(`✅ Transferência interna registrada: R$ ${parsed.valor}`);
             return { status: "success", transaction_code: tCodeOut };
         }
@@ -686,17 +685,16 @@ async function processAndNotify(userId: string, phoneToReply: string, text: stri
             account_balance: result.account_balance,
         },
         { new_balance: result.new_balance },
-        alerts
+        alerts,
+        false, // isDelete
+        true   // hideUndo
     );
 
     const actionLabel = isIncome ? "um recebimento" : "uma compra";
     const finalMsg = `🔔 *Auto-Captura Ativa*\n_Detectei ${actionLabel} via ${parsed.banco}_\n\n${premiumMsg}`;
 
     console.log(`📤 Enviando WhatsApp para ${phoneToReply.substring(0, 6)}...`);
-    const msgResult = await sendInteractive(phoneToReply, finalMsg, [
-        { id: `excluir_${tCode}`, title: "🗑️ Excluir" },
-        { id: `editar_${tCode}`, title: "📝 Editar" },
-    ]);
+    const msgResult = await sendWhatsApp(phoneToReply, finalMsg);
 
     if (!msgResult.ok && (msgResult.errorCode === 131047 || msgResult.errorCode === 100)) {
         console.info("⏰ 24h window expired or Error 100, trying template fallback...");
@@ -711,7 +709,7 @@ async function processAndNotify(userId: string, phoneToReply: string, text: stri
     } else if (!msgResult.ok) {
         console.error(`❌ WhatsApp send failed. ErrorCode: ${msgResult.errorCode || 'unknown'}.`);
     } else {
-        console.log(`✅ WhatsApp Interactive sent to ${phoneToReply.substring(0, 6)}...`);
+        console.log(`✅ WhatsApp text message sent to ${phoneToReply.substring(0, 6)}...`);
     }
 
     console.log(`✅ Auto-registered: R$ ${parsed.valor} | ${parsed.estabelecimento} | Code: ${tCode}`);
