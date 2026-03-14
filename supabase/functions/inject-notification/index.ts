@@ -12,32 +12,74 @@ const supabase = createClient(SUPABASE_URL, SERVICE_ROLE_KEY);
 
 console.log(`🔑 Credential Check: ID starting with "${META_PHONE_NUMBER_ID?.substring(0, 4)}...", Token starting with "${META_ACCESS_TOKEN?.substring(0, 7)}..."`);
 
-// ─── Regex Patterns para os principais bancos brasileiros ───
-const BANK_PATTERNS: { bank: string; regex: RegExp; swap?: boolean; isIncome?: boolean }[] = [
-    // Padrões de COMPRA/DÉBITO (cartão) — GASTOS
-    { bank: "Nubank", regex: /nubank.*?(?:compra|débito|debit).*?R\$\s*([\d.,]+).*?(?:em|no|na|at)\s+(.+?)(?:\.|$)/i },
-    { bank: "Inter", regex: /inter.*?(?:compra|débito).*?R\$\s*([\d.,]+)\s*[-–]\s*(.+?)(?:\.|$)/i },
-    { bank: "Itaú", regex: /itaú.*?(?:compra|débito)\s+(?:cartão\s+)?R\$\s*([\d.,]+)\s+(.+?)(?:\.|$)/i },
-    { bank: "Bradesco", regex: /bradesco.*?débito\s+R\$\s*([\d.,]+)\s+(.+?)(?:\.|$)/i },
-    { bank: "C6", regex: /C6\s*Bank.*?R\$\s*([\d.,]+)\s+(?:em\s+)?(.+?)(?:\.|$)/i },
-    { bank: "Mercado Pago", regex: /(?:mercado pago|você pagou|pagamento).*?R\$\s*([\d.,]+)\s+(?:para\s+)?(.+?)(?:\.|$)/i },
-    { bank: "Caixa", regex: /(?:caixa|cef).*?(?:compra|transferência|transferencia|pix|pagamento).*?R\$\s*([\d.,]+)\s+(.+?)(?:\.|$)/i },
-    { bank: "Santander", regex: /santander.*?R\$\s*([\d.,]+)\s+(.+?)(?:\.|$)/i },
+// ─── Tipos de Padrão de Notificação ───
+type ParsedPatternType = 'normal' | 'withdrawal' | 'transfer';
+type BankPattern = {
+    bank: string;           // Banco REMETENTE (quem enviou a notificação)
+    regex: RegExp;
+    swap?: boolean;         // grupo(1)=descrição, grupo(2)=valor
+    isIncome?: boolean;
+    patternType?: ParsedPatternType; // 'withdrawal' | 'transfer' | 'normal'
+};
 
-    // Padrões de PIX / TRANSFERÊNCIA RECEBIDA (RECEITA)
+// ─── Regex Patterns para os principais bancos brasileiros ───
+const BANK_PATTERNS: BankPattern[] = [
+    // ── SAQUES → vira transferência para "Dinheiro em Mãos" ──
+    { bank: "Banco", regex: /saque\s*(?:24h|eletrônico|atm|caixa)?.*?R\$\s*([\d.,]+)/i, patternType: 'withdrawal' },
+
+    // ── COMPRA/DÉBITO (Cartão) — GASTOS ──
+    { bank: "Nubank",      regex: /nubank.*?(?:compra|débito|debit).*?R\$\s*([\d.,]+).*?(?:em|no|na|at)\s+(.+?)(?:\.|$)/i },
+    { bank: "Inter",       regex: /inter.*?(?:compra|débito).*?R\$\s*([\d.,]+)\s*[-–]\s*(.+?)(?:\.|$)/i },
+    { bank: "Itaú",        regex: /itaú.*?(?:compra|débito)\s+(?:cartão\s+)?R\$\s*([\d.,]+)\s+(.+?)(?:\.|$)/i },
+    { bank: "Bradesco",    regex: /bradesco.*?débito\s+R\$\s*([\d.,]+)\s+(.+?)(?:\.|$)/i },
+    { bank: "C6",          regex: /C6\s*Bank.*?R\$\s*([\d.,]+)\s+(?:em\s+)?(.+?)(?:\.|$)/i },
+    { bank: "Mercado Pago",regex: /(?:mercado pago|você pagou).*?R\$\s*([\d.,]+)\s+(?:para\s+)?(.+?)(?:\.|$)/i },
+    { bank: "Santander",   regex: /santander.*?(?:compra|débito).*?R\$\s*([\d.,]+)\s+(.+?)(?:\.|$)/i },
+    { bank: "Caixa",       regex: /(?:caixa|cef).*?(?:compra|pagamento).*?R\$\s*([\d.,]+)\s+(.+?)(?:\.|$)/i },
+
+    // ── PIX RECEBIDO — RECEITA ──
+    // Formato Caixa: "Pix recebido Fulano te enviou um Pix de R$ X"
+    { bank: "Pix", regex: /pix\s+recebido\s+(.+?)\s+te\s+enviou.*?R\$\s*([\d.,]+)/i, swap: true, isIncome: true },
+    // Formato Inter/Nubank: "Pix recebido - R$ X de Fulano"
     { bank: "Pix", regex: /pix\s+(?:recebido|receber|recebeu).*?R\$\s*([\d.,]+).*?(?:de|do|da)\s+(.+?)(?:\.|,\s*$|$)/i, isIncome: true },
+    // Formato com valor antes: "De Nome, valor R$ X"
     { bank: "Pix", regex: /pix\s+(?:recebido|receber|recebeu).*?(?:de|do|da)\s+(.+?),?\s*(?:no\s+)?valor\s+(?:de\s+)?R\$\s*([\d.,]+)/i, swap: true, isIncome: true },
     { bank: "Transferência", regex: /(?:transferência|transferencia)\s+recebida.*?R\$\s*([\d.,]+).*?(?:de|do|da)\s+(.+?)(?:\.|,\s*$|$)/i, isIncome: true },
 
-    // Padrões de PIX / TRANSFERÊNCIA ENVIADA (GASTO)
+    // ── PIX ENVIADO ─ identifica destinatário corretamente ──
+    // Formato Caixa: "Pix realizado R$ X para Fulano na sua conta final XXXX"
+    { bank: "Caixa", regex: /pix\s+(?:realizado|enviado).*?R\$\s*([\d.,]+).*?para\s+(.+?)(?:\s+na\s+sua\s+conta|\.|,|$)/i },
+    // Formato genérico
     { bank: "Pix", regex: /pix\s+(?:enviado|realizado|feito|efetuado|pago).*?R\$\s*([\d.,]+).*?(?:para|a)\s+(.+?)(?:\.|,\s*$|$)/i },
     { bank: "Transferência", regex: /(?:transferência|transferencia).*?R\$\s*([\d.,]+).*?(?:para|a)\s+(.+?)(?:\.|,\s*$|$)/i },
 
-    // Padrão genérico de Banco/R$ (assume GASTO)
+    // ── RECEITAS GENÉRICAS ──
     { bank: "Banco", regex: /(?:depósito|deposito|salário|salario|crédito|credito)\s+(?:em\s+conta\s+)?.*?R\$\s*([\d.,]+).*?(?:de|do|da|em)\s+(.+?)(?:\.|,\s*$|$)/i, isIncome: true },
     { bank: "Banco", regex: /(?:você\s+recebeu|recebeu|recebimento).*?R\$\s*([\d.,]+).*?(?:de|do|da)\s+(.+?)(?:\.|,\s*$|$)/i, isIncome: true },
+
+    // ── PADRÃO GENÉRICO DE ÚLTIMA RESORT ──
     { bank: "Banco", regex: /R\$\s*([\d.,]+).*?(?:em|no|na|para|de)\s+(.+?)(?:\.|,\s*$|$)/i },
 ];
+
+// Detecta o banco remetente a partir do nome do app / cabeçalho da notificação
+function detectSenderBank(text: string): string {
+    const t = text.toLowerCase();
+    if (t.includes('nubank'))   return 'Nubank';
+    if (t.includes('inter'))    return 'Inter';
+    if (t.includes('caixa') || t.includes('cef')) return 'Caixa';
+    if (t.includes('itaú') || t.includes('itau')) return 'Itaú';
+    if (t.includes('bradesco')) return 'Bradesco';
+    if (t.includes('santander')) return 'Santander';
+    if (t.includes('c6 bank') || t.includes('c6bank')) return 'C6';
+    if (t.includes('mercado pago')) return 'Mercado Pago';
+    if (t.includes('picpay'))   return 'PicPay';
+    if (t.includes('neon'))     return 'Neon';
+    if (t.includes('pagbank'))  return 'PagBank';
+    if (t.includes('sicoob'))   return 'Sicoob';
+    if (t.includes('sicredi'))  return 'Sicredi';
+    if (t.includes('banco do brasil') || t.includes('bb ')) return 'BB';
+    return 'Banco';
+}
 
 // ─── Legacy: Chave secreta para POST antigo ───
 const INJECT_SECRET = Deno.env.get("INJECT_SECRET") || "saldin_inject_2026";
@@ -260,27 +302,62 @@ async function sendInteractive(to: string, text: string, buttons: { id: string; 
 }
 
 // ─── Parser de Texto de Notificação ───
-function parseNotificationText(text: string): { valor: number; estabelecimento: string; banco: string; isIncome: boolean } | null {
-    const cleanText = text.trim();
+type NotificationParsed = {
+    valor: number;
+    estabelecimento: string;
+    banco: string;          // Banco remetente (ex: Caixa, Inter)
+    isIncome: boolean;
+    isWithdrawal: boolean;  // É um saque?
+    isTransfer: boolean;    // É transferência entre contas próprias (detectado depois)?
+};
 
-    for (const { bank, regex, swap, isIncome } of BANK_PATTERNS) {
+function parseNotificationText(text: string): NotificationParsed | null {
+    const cleanText = text.trim();
+    // Detecta o banco remetente pelo conteúdo geral do texto (nome do app, etc.)
+    const senderBank = detectSenderBank(cleanText);
+
+    for (const { regex, swap, isIncome, patternType } of BANK_PATTERNS) {
         const match = cleanText.match(regex);
-        if (match) {
-            // swap=true: group(1)=nome, group(2)=valor (ex: Pix recebido)
-            const rawValue = (swap ? match[2] : match[1]).replace(/\./g, "").replace(",", ".");
+        if (!match) continue;
+
+        const isWithdrawal = patternType === 'withdrawal';
+
+        if (isWithdrawal) {
+            // Saque: grupo(1)=valor, sem descrição
+            const rawValue = match[1].replace(/\./g, "").replace(",", ".");
             const valor = parseFloat(rawValue);
             if (isNaN(valor) || valor <= 0) continue;
-
-            const rawEstab = swap ? match[1] : match[2];
-            const defaultLabel = isIncome ? "Recebimento" : "Compra";
-            const estabelecimento = rawEstab
-                ?.trim()
-                .replace(/\*+/g, "")
-                .replace(/\s+/g, " ")
-                .substring(0, 80) || defaultLabel;
-
-            return { valor, estabelecimento, banco: bank, isIncome: !!isIncome };
+            return {
+                valor,
+                estabelecimento: "Saque em Espécie",
+                banco: senderBank,
+                isIncome: false,
+                isWithdrawal: true,
+                isTransfer: false,
+            };
         }
+
+        // Pix/Transferência normal: 2 grupos
+        const rawValue = (swap ? match[2] : match[1]).replace(/\./g, "").replace(",", ".");
+        const valor = parseFloat(rawValue);
+        if (isNaN(valor) || valor <= 0) continue;
+
+        const rawEstab = swap ? match[1] : match[2];
+        const defaultLabel = isIncome ? "Recebimento" : "Compra";
+        const estabelecimento = rawEstab
+            ?.trim()
+            .replace(/\*+/g, "")
+            .replace(/\s+/g, " ")
+            .substring(0, 80) || defaultLabel;
+
+        return {
+            valor,
+            estabelecimento,
+            banco: senderBank, // <-- Sempre usa o banco detectado no texto, não o padrão generic
+            isIncome: !!isIncome,
+            isWithdrawal: false,
+            isTransfer: false,
+        };
     }
 
     return null;
@@ -369,6 +446,19 @@ async function sendTypingIndicator(to: string): Promise<void> {
     }
 }
 
+// ─── Verifica se o destinatário é uma conta do próprio usuário ───
+async function findOwnAccount(userId: string, recipientName: string): Promise<{ id: string; bank_name: string } | null> {
+    if (!recipientName || recipientName.length < 3) return null;
+    const { data } = await supabase
+        .from("bank_accounts")
+        .select("id, bank_name")
+        .eq("user_id", userId)
+        .eq("active", true)
+        .ilike("bank_name", `%${recipientName.substring(0, 10)}%`)
+        .maybeSingle();
+    return data || null;
+}
+
 // ─── Processa a transação e envia no WhatsApp ───
 async function processAndNotify(userId: string, phoneToReply: string, text: string, source: string) {
     // Log de auditoria (Movido para antes do parse para debug)
@@ -389,15 +479,146 @@ async function processAndNotify(userId: string, phoneToReply: string, text: stri
         return { status: "ignored", reason: "not_a_transaction" };
     }
 
-    // Determina se é receita ou gasto:
-    // 1) O parser regex já detecta via isIncome
-    // 2) A IA pode confirmar/override via intent.items[0].tipo
+    // Mostra o "Digitando..." no celular do usuário agora que sabemos que é válido e a IA vai pensar
+    sendTypingIndicator(phoneToReply).catch(e => console.error(e));
+
+    // ─── CASO 1: SAQUE ─ Cria transferência da conta bancária para Dinheiro em Mãos ───
+    if (parsed.isWithdrawal) {
+        console.log(`💵 SAQUE detectado: R$ ${parsed.valor} em ${parsed.banco}`);
+
+        // Acha a conta de origem (banco que gerou o saque)
+        const { data: sourceAcc } = await supabase
+            .from("bank_accounts")
+            .select("id, bank_name")
+            .eq("user_id", userId)
+            .eq("active", true)
+            .ilike("bank_name", `%${parsed.banco}%`)
+            .maybeSingle();
+
+        // Acha a conta "Dinheiro em Mãos" (ou similar)
+        const { data: cashAcc } = await supabase
+            .from("bank_accounts")
+            .select("id, bank_name")
+            .eq("user_id", userId)
+            .eq("active", true)
+            .or("bank_name.ilike.%dinheiro%,bank_name.ilike.%mãos%,bank_name.ilike.%maos%,bank_name.ilike.%especie%,bank_name.ilike.%espécie%,bank_name.ilike.%cash%")
+            .maybeSingle();
+
+        const tCode = generateTransactionCode();
+        const categoryId = await getCategoryId(userId, "Saques", "expense");
+
+        // Saída do banco
+        const expenseResult = await processTransaction({
+            userId,
+            type: "expense",
+            amount: parsed.valor,
+            description: `Saque - ${parsed.banco}`,
+            categoryId: categoryId || undefined,
+            bankAccountId: sourceAcc?.id || undefined,
+            transactionCode: tCode,
+            isCreditCard: false,
+        });
+
+        // Entrada no Dinheiro em Mãos
+        if (cashAcc) {
+            const tCode2 = generateTransactionCode();
+            const cashCatId = await getCategoryId(userId, "Saques", "income");
+            await processTransaction({
+                userId,
+                type: "income",
+                amount: parsed.valor,
+                description: `Saque recebido - ${parsed.banco}`,
+                categoryId: cashCatId || undefined,
+                bankAccountId: cashAcc.id,
+                transactionCode: tCode2,
+                isCreditCard: false,
+            });
+        }
+
+        const alerts = await getImportantAlerts(userId);
+        const premiumMsg = formatPremiumMessage({
+            id: expenseResult.id,
+            description: parsed.estabelecimento,
+            amount: parsed.valor,
+            date: new Date().toISOString(),
+            category: "Saque",
+            account_name: sourceAcc?.bank_name || parsed.banco,
+            type: "expense",
+            transaction_code: tCode,
+            account_balance: expenseResult.account_balance,
+        }, { new_balance: expenseResult.new_balance }, alerts);
+
+        const finalMsg = `🏧 *Auto-Captura Ativa*\n_Saque da sua conta ${sourceAcc?.bank_name || parsed.banco} → ${cashAcc?.bank_name || "Dinheiro em Mãos"}_\n\n${premiumMsg}`;
+        await sendInteractive(phoneToReply, finalMsg, [
+            { id: `excluir_${tCode}`, title: "🗑️ Excluir" },
+            { id: `editar_${tCode}`, title: "📝 Editar" },
+        ]);
+        console.log(`✅ Saque registrado: R$ ${parsed.valor} | Code: ${tCode}`);
+        return { status: "success", transaction_code: tCode };
+    }
+
+    // ─── CASO 2: Detecta se é transferência entre contas próprias ───
+    if (!parsed.isIncome) {
+        const ownAcc = await findOwnAccount(userId, parsed.estabelecimento);
+        if (ownAcc) {
+            console.log(`🔄 TRANSFERÊNCIA PRÓPRIA detectada: R$ ${parsed.valor} → ${ownAcc.bank_name}`);
+            parsed.isTransfer = true;
+
+            // Acha a conta de origem pelo banco remetente
+            const { data: sourceAcc } = await supabase
+                .from("bank_accounts")
+                .select("id, bank_name")
+                .eq("user_id", userId)
+                .eq("active", true)
+                .ilike("bank_name", `%${parsed.banco}%`)
+                .maybeSingle();
+
+            const tCodeOut = generateTransactionCode();
+            const tCodeIn = generateTransactionCode();
+            const catTransfId = await getCategoryId(userId, "Transferências", "expense");
+            const catTransfIncId = await getCategoryId(userId, "Transferências", "income");
+
+            // Saída da conta de origem
+            const expResult = await processTransaction({
+                userId, type: "expense", amount: parsed.valor,
+                description: `Transferência para ${ownAcc.bank_name}`,
+                categoryId: catTransfId || undefined,
+                bankAccountId: sourceAcc?.id || undefined,
+                transactionCode: tCodeOut, isCreditCard: false,
+            });
+
+            // Entrada na conta destino
+            await processTransaction({
+                userId, type: "income", amount: parsed.valor,
+                description: `Transferência de ${sourceAcc?.bank_name || parsed.banco}`,
+                categoryId: catTransfIncId || undefined,
+                bankAccountId: ownAcc.id,
+                transactionCode: tCodeIn, isCreditCard: false,
+            });
+
+            const alerts = await getImportantAlerts(userId);
+            const premiumMsg = formatPremiumMessage({
+                id: expResult.id,
+                description: `${sourceAcc?.bank_name || parsed.banco} → ${ownAcc.bank_name}`,
+                amount: parsed.valor, date: new Date().toISOString(),
+                category: "Transferência Interna", account_name: ownAcc.bank_name,
+                type: "expense", transaction_code: tCodeOut,
+                account_balance: expResult.account_balance,
+            }, { new_balance: expResult.new_balance }, alerts);
+
+            const finalMsg = `🔄 *Auto-Captura Ativa*\n_Transferência entre suas contas_\n\n${premiumMsg}`;
+            await sendInteractive(phoneToReply, finalMsg, [
+                { id: `excluir_${tCodeOut}`, title: "🗑️ Excluir" },
+            ]);
+            console.log(`✅ Transferência interna registrada: R$ ${parsed.valor}`);
+            return { status: "success", transaction_code: tCodeOut };
+        }
+    }
+
+    // ─── CASO 3: Transação Normal (Receita ou Gasto) ───
     let isIncome = parsed.isIncome;
 
     console.log(`${isIncome ? '💰' : '💸'} Parsed: R$ ${parsed.valor} em "${parsed.estabelecimento}" (${parsed.banco}) [${isIncome ? 'RECEITA' : 'GASTO'}]`);
-
-    // Mostra o "Digitando..." no celular do usuário agora que sabemos que é válido e a IA vai pensar
-    sendTypingIndicator(phoneToReply).catch(e => console.error(e));
 
     // IA para categoria
     const aiText = isIncome
@@ -418,8 +639,8 @@ async function processAndNotify(userId: string, phoneToReply: string, text: stri
     const transactionType = isIncome ? "income" : "expense";
     console.log(`📋 Final type: ${transactionType} (regex=${parsed.isIncome}, ai=${intent?.items?.[0]?.tipo || 'N/A'})`);
 
-    // Conta/cartão de destino
-    const metodo = intent?.items?.[0]?.metodo_pagamento || "pix";
+    // Conta/cartão de destino — tenta identificar pelo banco remetente
+    const metodo = intent?.items?.[0]?.metodo_pagamento || parsed.banco.toLowerCase();
     const { id: targetAccountId, isCreditCard } = await getPreferredAccount(userId, metodo);
 
     // Registra transação com o tipo correto (income ou expense)
@@ -436,7 +657,7 @@ async function processAndNotify(userId: string, phoneToReply: string, text: stri
         categoryId: categoryId || undefined,
         bankAccountId: targetAccountId || undefined,
         transactionCode: tCode,
-        isCreditCard: isIncome ? false : isCreditCard, // Receita nunca vai para cartão de crédito
+        isCreditCard: isIncome ? false : isCreditCard,
     });
 
     // Atualiza o log com o resultado
@@ -471,8 +692,6 @@ async function processAndNotify(userId: string, phoneToReply: string, text: stri
     const actionLabel = isIncome ? "um recebimento" : "uma compra";
     const finalMsg = `🔔 *Auto-Captura Ativa*\n_Detectei ${actionLabel} via ${parsed.banco}_\n\n${premiumMsg}`;
 
-    // Tenta enviar mensagem interativa (com botões)
-    // Tenta enviar mensagem interativa (com botões na própria mensagem)
     console.log(`📤 Enviando WhatsApp para ${phoneToReply.substring(0, 6)}...`);
     const msgResult = await sendInteractive(phoneToReply, finalMsg, [
         { id: `excluir_${tCode}`, title: "🗑️ Excluir" },
@@ -480,24 +699,19 @@ async function processAndNotify(userId: string, phoneToReply: string, text: stri
     ]);
 
     if (!msgResult.ok && (msgResult.errorCode === 131047 || msgResult.errorCode === 100)) {
-        // Janela de 24h expirada ou erro 100 → tenta template
         console.info("⏰ 24h window expired or Error 100, trying template fallback...");
         const categoria = intent?.items?.[0]?.categoria_sugerida || defaultCategory;
         const formattedAmount = new Intl.NumberFormat('pt-BR', { minimumFractionDigits: 2 }).format(parsed.valor);
         const templateSent = await sendWhatsAppTemplate(phoneToReply, "registro_despesa", [
-            formattedAmount,
-            parsed.estabelecimento,
-            categoria,
-            tCode,
+            formattedAmount, parsed.estabelecimento, categoria, tCode,
         ]);
         if (!templateSent) {
             console.error("❌ Template fallback also failed! Check if template 'registro_despesa' is approved in Meta.");
         }
     } else if (!msgResult.ok) {
-        // Outro erro — logar detalhes
-        console.error(`❌ WhatsApp send failed. ErrorCode: ${msgResult.errorCode || 'unknown'}. Check META_ACCESS_TOKEN and META_PHONE_NUMBER_ID env vars.`);
-    } else if (msgResult.ok) {
-        console.log(`✅ WhatsApp Interactive (Text + Buttons) sent successfully to ${phoneToReply.substring(0, 6)}...`);
+        console.error(`❌ WhatsApp send failed. ErrorCode: ${msgResult.errorCode || 'unknown'}.`);
+    } else {
+        console.log(`✅ WhatsApp Interactive sent to ${phoneToReply.substring(0, 6)}...`);
     }
 
     console.log(`✅ Auto-registered: R$ ${parsed.valor} | ${parsed.estabelecimento} | Code: ${tCode}`);
@@ -654,13 +868,13 @@ Deno.serve(async (req: Request) => {
 });
 
 // ─── Helper: busca category_id por nome ───
-async function getCategoryId(userId: string, name: string): Promise<string | null> {
+async function getCategoryId(userId: string, name: string, type: "income" | "expense" = "expense"): Promise<string | null> {
     const { data } = await supabase
         .from("categories")
         .select("id")
         .eq("user_id", userId)
         .ilike("name", `%${name}%`)
-        .eq("type", "expense")
+        .eq("type", type)
         .limit(1)
         .maybeSingle();
 
@@ -671,7 +885,7 @@ async function getCategoryId(userId: string, name: string): Promise<string | nul
         .select("id")
         .eq("user_id", userId)
         .ilike("name", "%outros%")
-        .eq("type", "expense")
+        .eq("type", type)
         .limit(1)
         .maybeSingle();
 
