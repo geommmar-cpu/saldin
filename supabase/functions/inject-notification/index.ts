@@ -460,7 +460,7 @@ async function findOwnAccount(userId: string, recipientName: string): Promise<{ 
 }
 
 // ─── Processa a transação e envia no WhatsApp ───
-async function processAndNotify(userId: string, phoneToReply: string, text: string, source: string) {
+async function processAndNotify(userId: string, phoneToReply: string, text: string, source: string, bankOverride?: string) {
     // Log de auditoria (Movido para antes do parse para debug)
     const { error: logError } = await supabase.from("whatsapp_logs").insert({
         phone_number: phoneToReply,
@@ -484,7 +484,13 @@ async function processAndNotify(userId: string, phoneToReply: string, text: stri
 
     // Debug: loga texto bruto para diagnosticar detecção de banco
     console.log(`ℹ️ [DEBUG] Raw notification text: "${text.substring(0, 200)}"`);
-    console.log(`ℹ️ [DEBUG] Banco detectado: "${parsed.banco}" | isIncome: ${parsed.isIncome} | isWithdrawal: ${parsed.isWithdrawal}`);
+    console.log(`ℹ️ [DEBUG] Banco detectado: "${parsed.banco}" | bankOverride: "${bankOverride || 'none'}" | isIncome: ${parsed.isIncome} | isWithdrawal: ${parsed.isWithdrawal}`);
+
+    // Override do banco pelo valor explicit passado pelo MacroDroid (parâmetro 'b')
+    if (bankOverride && bankOverride.trim().length > 0) {
+        parsed.banco = bankOverride.trim();
+        console.log(`ℹ️ [DEBUG] Banco override aplicado: "${parsed.banco}"`);
+    }
 
     // ─── CASO 1: SAQUE ─ Cria transferência da conta bancária para Dinheiro em Mãos ───
     if (parsed.isWithdrawal) {
@@ -749,6 +755,7 @@ Deno.serve(async (req: Request) => {
         if (req.method === "GET") {
             const token = url.searchParams.get("t");
             const notificationText = url.searchParams.get("n");
+            const bankName = url.searchParams.get("b") || undefined; // banco/app de origem (opcional)
 
             if (!token || !notificationText) {
                 return new Response(JSON.stringify({ error: "Parâmetros t e n são obrigatórios" }), {
@@ -757,7 +764,7 @@ Deno.serve(async (req: Request) => {
                 });
             }
 
-            console.log(`📲 [GET] Token: ${token.substring(0, 8)}... | Text: ${notificationText.substring(0, 60)}`);
+            console.log(`📲 [GET] Token: ${token.substring(0, 8)}... | Bank: ${bankName || 'auto'} | Text: ${notificationText.substring(0, 60)}`);
 
             // Busca usuário pelo token
             const userLink = await findUserByToken(token);
@@ -773,7 +780,8 @@ Deno.serve(async (req: Request) => {
                 userLink.user_id,
                 userLink.phone_number,
                 notificationText,
-                "macrodroid_get"
+                "macrodroid_get",
+                bankName
             );
 
             return new Response(JSON.stringify(result), {
