@@ -26,6 +26,7 @@ export function generateTransactionCode(): string {
     return code;
 }
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export function formatPremiumMessage(transaction: Transaction, balanceData: any, alerts: string[] = [], isDelete = false): string {
     const { transaction_code, amount, description, category, account_name, type, account_balance } = transaction;
     const formattedAmount = new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(Number(amount));
@@ -39,40 +40,25 @@ export function formatPremiumMessage(transaction: Transaction, balanceData: any,
         timeZone: 'America/Sao_Paulo'
     });
 
-    let header = isDelete ? "🗑️ *TRANSAÇÃO REMOVIDA*" : (type === 'income' ? "💰 *RECEITA REGISTRADA*" : "💸 *GASTO CONFIRMADO*");
-    const divider = "━━━━━━━━━━━━━━━━";
-
-    const details = `
-📝 *${description}*
-💵 *${formattedAmount}*
-
-📂 Categoria: _${category || 'Geral'}_
-🏦 Origem/Destino: _${account_name || 'Conta Padrão'}_
-📅 Data: _${dateStr} às ${timeStr}_
-🔑 ID: \`${transaction_code}\`
-`.trim();
-
-    const impact = `
-📊 *RESUMO FINANCEIRO*
-Saldo Livre: R$ ${formatCurrency(balanceData.new_balance)}
-${account_balance !== undefined ? `Carteira (${account_name}): R$ ${formatCurrency(account_balance)}` : ''}
-`.trim();
-
+    const header = isDelete ? "🗑️ Removido:" : (type === 'income' ? "✅ Receita:" : "💸 Gasto:");
+    
     let alertsSection = "";
     if (alerts.length > 0) {
-        alertsSection = `\n\n⚠️ *AVISOS IMPORTANTES*\n${alerts.map(a => `• ${a}`).join('\n')}\n`;
+        alertsSection = `\n\n⚠️ ${alerts.length} Aviso(s):\n${alerts.map(a => `- ${a}`).join('\n')}`;
     }
 
+    const balanceText = account_balance !== undefined 
+        ? `R$ ${formatCurrency(account_balance)}` 
+        : `R$ ${formatCurrency(balanceData?.new_balance || 0)}`;
+
     return `
-${header}
+${header} *${formattedAmount}*
+📝 ${description}
+📂 ${category || 'Geral'} | 🏦 ${account_name || 'Carteira'}
 
-${divider}
-${details}
-${divider}
+📊 Saldo da conta: ${balanceText}${alertsSection}
 
-${impact}${alertsSection}
-
-_Dica: Se errou algo, clique em *Editar* abaixo ou digite: *excluir ${transaction_code}*_
+_Para desfazer, digite: excluir ${transaction_code}_
 `.trim();
 }
 
@@ -170,6 +156,7 @@ export async function handleExcluirCommand(userId: string, code: string): Promis
         .eq('user_id', userId)
         .eq('active', true);
 
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const newBalance = banks?.reduce((acc: number, b: any) => acc + Number(b.current_balance), 0) || 0;
     const formattedBalance = new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(newBalance);
 
@@ -236,7 +223,8 @@ export async function processEditStep(userId: string, input: string): Promise<{ 
 
     if (step.startsWith('awaiting_new_value_')) {
         const field = step.replace('awaiting_new_value_', '');
-        let updateData: any = {};
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const updateData: any = {};
 
         if (field === 'amount') {
             const val = parseFloat(input.replace(',', '.').replace('R$', '').trim());
