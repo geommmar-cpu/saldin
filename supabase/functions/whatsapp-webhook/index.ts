@@ -128,6 +128,30 @@ async function markMessageAsRead(messageId: string): Promise<void> {
     } catch (e) { console.error("Error marking read:", e); }
 }
 
+async function sendReaction(to: string, messageId: string, emoji: string): Promise<void> {
+    if (!META_ACCESS_TOKEN || !META_PHONE_NUMBER_ID) return;
+    try {
+        const url = `https://graph.facebook.com/v22.0/${META_PHONE_NUMBER_ID}/messages`;
+        await fetch(url, {
+            method: "POST",
+            headers: {
+                "Authorization": `Bearer ${META_ACCESS_TOKEN}`,
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+                messaging_product: "whatsapp",
+                recipient_type: "individual",
+                to: normalizeTo(to),
+                type: "reaction",
+                reaction: {
+                    message_id: messageId,
+                    emoji: emoji
+                }
+            })
+        });
+    } catch (e) { console.error("Error sending reaction:", e); }
+}
+
 async function downloadMedia(mediaId: string): Promise<ArrayBuffer | null> {
     try {
         // 1. Get Media URL
@@ -234,9 +258,12 @@ Deno.serve(async (req: Request) => {
 
         // Mark as read (Non-blocking to avoid timeouts)
         markMessageAsRead(messageId).catch(e => console.error("Read Mark Error:", e));
+        
+        // Show "processing" reaction
+        sendReaction(remoteJid, messageId, "⏳").catch(e => console.error("Reaction Mark Error:", e));
 
         // 2. User Lookup (Handling Brazil 9th digit variations)
-        let variations = [remoteJid];
+        const variations = [remoteJid];
         if (remoteJid.startsWith("55") && remoteJid.length >= 10) {
             const ddd = remoteJid.substring(2, 4);
             const body = remoteJid.substring(4);
@@ -289,6 +316,7 @@ Deno.serve(async (req: Request) => {
 
         // 3. Content Extraction
         let textToAnalyze = "";
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         let intent: any = null;
 
         if (messageType === "text") {
@@ -585,8 +613,11 @@ async function sendExtrato(userId: string, phone: string) {
         const { data: ccs } = await supabaseAdmin.from('credit_card_purchases').select('total_amount, description, purchase_date, created_at').eq('user_id', userId).order('created_at', { ascending: false }).limit(queryLimit);
 
         const trs = [
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
             ...(exps || []).map((e: any) => ({ ...e, type: 'expense' })),
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
             ...(incs || []).map((i: any) => ({ ...i, type: 'income' })),
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
             ...(ccs || []).map((c: any) => ({ amount: c.total_amount, description: c.description, created_at: c.created_at, type: 'expense', isCC: true }))
         ]
             .sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
@@ -597,10 +628,12 @@ async function sendExtrato(userId: string, phone: string) {
         } else {
             let msg = "📄 *EXTRATO RECENTE*\n";
             msg += "━━━━━━━━━━━━━━━━━━━━\n\n";
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
             trs.forEach((t: any) => {
                 const val = new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(Number(t.amount));
                 const icon = t.type === 'income' ? '💰' : '💸';
                 const dateStr = new Date(t.created_at).toLocaleDateString('pt-BR');
+                // eslint-disable-next-line @typescript-eslint/no-explicit-any
                 const suffix = (t as any).isCC ? " 💳" : "";
                 msg += `${icon} *${t.description}*${suffix}\n   ${val} • _${dateStr}_\n\n`;
             });

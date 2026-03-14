@@ -35,6 +35,7 @@ export async function transcribeAudio(
             response_format: "text",
         });
 
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const text = typeof response === "string" ? response : (response as any).text;
         console.log("✅ Transcription complete:", text);
 

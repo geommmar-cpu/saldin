@@ -29,7 +29,7 @@ serve(async (req) => {
       { email: "mateus@gmail.com", name: "Mateus" },
     ];
 
-    const password = "Admin123@";
+    const password = Deno.env.get("TEST_USER_PASSWORD") || "local_test_pwd";
     const results = [];
 
     for (const user of testUsers) {

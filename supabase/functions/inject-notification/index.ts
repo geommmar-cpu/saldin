@@ -204,16 +204,17 @@ async function sendWhatsAppTemplate(
     }
 }
 
-async function sendInteractive(to: string, text: string, buttons: { id: string; title: string }[]) {
-    if (!META_ACCESS_TOKEN || !META_PHONE_NUMBER_ID) return;
+async function sendInteractive(to: string, text: string, buttons: { id: string; title: string }[]): Promise<{ ok: boolean; errorCode?: number }> {
+    if (!META_ACCESS_TOKEN || !META_PHONE_NUMBER_ID) return { ok: false };
+    const cleanTo = normalizeTo(to);
     try {
         const url = `https://graph.facebook.com/v22.0/${META_PHONE_NUMBER_ID}/messages`;
-        await fetch(url, {
+        const res = await fetch(url, {
             method: "POST",
             headers: { Authorization: `Bearer ${META_ACCESS_TOKEN}`, "Content-Type": "application/json" },
             body: JSON.stringify({
                 messaging_product: "whatsapp",
-                to,
+                to: cleanTo,
                 type: "interactive",
                 interactive: {
                     type: "button",
@@ -222,8 +223,39 @@ async function sendInteractive(to: string, text: string, buttons: { id: string; 
                 },
             }),
         });
+        const data = await res.json();
+        
+        if (data.error && data.error.code === 100) {
+            console.warn(`⚠️ Meta rejected ${cleanTo}. Trying variation...`);
+            let variation = cleanTo;
+            if (cleanTo.startsWith("55") && cleanTo.length === 12) {
+                variation = cleanTo.substring(0, 4) + "9" + cleanTo.substring(4);
+            } else if (cleanTo.startsWith("55") && cleanTo.length === 13) {
+                variation = cleanTo.substring(0, 4) + cleanTo.substring(5);
+            }
+
+            if (variation !== cleanTo) {
+                const res2 = await fetch(url, {
+                    method: "POST",
+                    headers: { Authorization: `Bearer ${META_ACCESS_TOKEN}`, "Content-Type": "application/json" },
+                    body: JSON.stringify({
+                         messaging_product: "whatsapp",
+                         to: variation,
+                         type: "interactive",
+                         interactive: { type: "button", body: { text }, action: { buttons: buttons.map((b) => ({ type: "reply", reply: { id: b.id, title: b.title } })) } }
+                    })
+                });
+                const data2 = await res2.json();
+                if (data2.error) return { ok: false, errorCode: data2.error.code };
+                return { ok: true };
+            }
+        }
+
+        if (data.error) return { ok: false, errorCode: data.error.code };
+        return { ok: true };
     } catch (e) {
         console.error("sendInteractive error:", e);
+        return { ok: false };
     }
 }
 
@@ -413,33 +445,32 @@ async function processAndNotify(userId: string, phoneToReply: string, text: stri
     const finalMsg = `🔔 *Auto-Captura Ativa*\n_Detectei ${actionLabel} via ${parsed.banco}_\n\n${premiumMsg}`;
 
     // Tenta enviar mensagem interativa (com botões)
+    // Tenta enviar mensagem interativa (com botões na própria mensagem)
     console.log(`📤 Enviando WhatsApp para ${phoneToReply.substring(0, 6)}...`);
-    const msgResult = await sendWhatsApp(phoneToReply, finalMsg);
+    const msgResult = await sendInteractive(phoneToReply, finalMsg, [
+        { id: `excluir_${tCode}`, title: "🗑️ Excluir" },
+        { id: `editar_${tCode}`, title: "📝 Editar" },
+    ]);
 
     if (!msgResult.ok && (msgResult.errorCode === 131047 || msgResult.errorCode === 100)) {
-        // Janela de 24h expirada → tenta template
-        console.info("⏰ 24h window expired, trying template fallback...");
+        // Janela de 24h expirada ou erro 100 → tenta template
+        console.info("⏰ 24h window expired or Error 100, trying template fallback...");
         const categoria = intent?.items?.[0]?.categoria_sugerida || defaultCategory;
         const formattedAmount = new Intl.NumberFormat('pt-BR', { minimumFractionDigits: 2 }).format(parsed.valor);
-        const templateSent = await sendWhatsAppTemplate(phoneToReply, "auto_capture_confirmation", [
+        const templateSent = await sendWhatsAppTemplate(phoneToReply, "registro_despesa", [
             formattedAmount,
             parsed.estabelecimento,
             categoria,
             tCode,
         ]);
         if (!templateSent) {
-            console.error("❌ Template fallback also failed! Check if template 'auto_capture_confirmation' is approved in Meta.");
+            console.error("❌ Template fallback also failed! Check if template 'registro_despesa' is approved in Meta.");
         }
     } else if (!msgResult.ok) {
         // Outro erro — logar detalhes
         console.error(`❌ WhatsApp send failed. ErrorCode: ${msgResult.errorCode || 'unknown'}. Check META_ACCESS_TOKEN and META_PHONE_NUMBER_ID env vars.`);
     } else if (msgResult.ok) {
-        // Mensagem de texto funcionou, agora envia os botões
-        console.log(`✅ WhatsApp message sent successfully to ${phoneToReply.substring(0, 6)}...`);
-        await sendInteractive(phoneToReply, `Ações para ${tCode}:`, [
-            { id: `excluir_${tCode}`, title: "🗑️ Excluir" },
-            { id: `editar_${tCode}`, title: "📝 Editar" },
-        ]);
+        console.log(`✅ WhatsApp Interactive (Text + Buttons) sent successfully to ${phoneToReply.substring(0, 6)}...`);
     }
 
     console.log(`✅ Auto-registered: R$ ${parsed.valor} | ${parsed.estabelecimento} | Code: ${tCode}`);
@@ -466,6 +497,9 @@ Deno.serve(async (req: Request) => {
     }
 
     const url = new URL(req.url);
+    
+    // Log de conferência para bater com o painel da Meta
+    console.log(`🔑 Using META_PHONE_NUMBER_ID: ${META_PHONE_NUMBER_ID?.substring(0, 5)}... | Token starts with: ${META_ACCESS_TOKEN?.substring(0, 7)}...`);
 
     try {
         // ════════════════════════════════════════════
