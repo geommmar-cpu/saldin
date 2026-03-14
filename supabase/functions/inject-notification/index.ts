@@ -644,9 +644,31 @@ async function processAndNotify(userId: string, phoneToReply: string, text: stri
     const transactionType = isIncome ? "income" : "expense";
     console.log(`📋 Final type: ${transactionType} (regex=${parsed.isIncome}, ai=${intent?.items?.[0]?.tipo || 'N/A'})`);
 
-    // Conta/cartão de destino — tenta identificar pelo banco remetente
-    const metodo = intent?.items?.[0]?.metodo_pagamento || parsed.banco.toLowerCase();
-    const { id: targetAccountId, isCreditCard } = await getPreferredAccount(userId, metodo);
+    // ─── Seleção da conta: primeiro tenta pelo banco remetente (parsed.banco) ───
+    // Isso garante que um Pix recebido no Inter é registrado no Inter, não no Nubank
+    let targetAccountId: string | null = null;
+    let isCreditCard = false;
+
+    // 1. Busca direta pelo nome do banco remetente nas contas ativas
+    const { data: directAcc } = await supabase
+        .from("bank_accounts")
+        .select("id, bank_name")
+        .eq("user_id", userId)
+        .eq("active", true)
+        .ilike("bank_name", `%${parsed.banco}%`)
+        .maybeSingle();
+
+    if (directAcc) {
+        targetAccountId = directAcc.id;
+        console.log(`🏦 Conta encontrada diretamente pelo banco "${parsed.banco}": ${directAcc.bank_name}`);
+    } else {
+        // 2. Fallback: usa a lógica padrão (IA + defaults)
+        const metodo = intent?.items?.[0]?.metodo_pagamento || parsed.banco.toLowerCase();
+        const preferred = await getPreferredAccount(userId, metodo);
+        targetAccountId = preferred.id;
+        isCreditCard = preferred.isCreditCard;
+        console.log(`🏦 Conta via fallback para "${metodo}": ${targetAccountId}`);
+    }
 
     // Registra transação com o tipo correto (income ou expense)
     const tCode = generateTransactionCode();
