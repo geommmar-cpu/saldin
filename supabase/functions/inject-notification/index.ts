@@ -61,8 +61,36 @@ const BANK_PATTERNS: BankPattern[] = [
     { bank: "Banco", regex: /R\$\s*([\d.,]+).*?(?:em|no|na|para|de)\s+(.+?)(?:\.|,\s*$|$)/i },
 ];
 
+// Mapeia package names de apps para nomes de bancos (para uso com {not_package} do MacroDroid)
+const APP_PACKAGE_MAP: Record<string, string> = {
+    "br.com.intermedium": "Inter",
+    "com.nu.production": "Nubank",
+    "com.nu.mobilemicrosoft": "Nubank",
+    "br.gov.caixa.tem": "Caixa",
+    "br.com.bb.android": "BB",
+    "com.bradesco": "Bradesco",
+    "com.isban.mobile.android.main.c2b.pictetsantander": "Santander",
+    "br.com.c6bank.open": "C6",
+    "com.mercadopago.wallet": "Mercado Pago",
+    "br.com.picpay": "PicPay",
+    "br.com.neon": "Neon",
+    "br.com.pagseguro.issuer": "PagBank",
+    "br.com.sicoob": "Sicoob",
+    "br.com.sicredi": "Sicredi",
+};
+
 // Detecta o banco remetente a partir do nome do app / cabeçalho da notificação
-function detectSenderBank(text: string): string {
+function detectSenderBank(text: string, packageName?: string): string {
+    // 1. Resolução via package name (mais confiável — {not_package} do MacroDroid)
+    if (packageName) {
+        const cleanPkg = packageName.toLowerCase().trim();
+        // Busca exata no mapa
+        for (const [pkg, bank] of Object.entries(APP_PACKAGE_MAP)) {
+            if (cleanPkg.includes(pkg) || pkg.includes(cleanPkg)) return bank;
+        }
+    }
+
+    // 2. Resolução via texto da notificação
     const t = text.toLowerCase();
     if (t.includes('nubank'))   return 'Nubank';
     if (t.includes('inter'))    return 'Inter';
@@ -311,10 +339,10 @@ type NotificationParsed = {
     isTransfer: boolean;    // É transferência entre contas próprias (detectado depois)?
 };
 
-function parseNotificationText(text: string): NotificationParsed | null {
+function parseNotificationText(text: string, packageName?: string): NotificationParsed | null {
     const cleanText = text.trim();
     // Detecta o banco remetente pelo conteúdo geral do texto (nome do app, etc.)
-    const senderBank = detectSenderBank(cleanText);
+    const senderBank = detectSenderBank(cleanText, packageName);
 
     for (const { regex, swap, isIncome, patternType } of BANK_PATTERNS) {
         const match = cleanText.match(regex);
@@ -472,7 +500,7 @@ async function processAndNotify(userId: string, phoneToReply: string, text: stri
     });
     if (logError) console.error("❌ Failed to insert audit log:", logError);
 
-    const parsed = parseNotificationText(text);
+    const parsed = parseNotificationText(text, bankOverride);
 
     if (!parsed) {
         console.log("ℹ️ Notification not parseable as transaction. Ignoring silently.");
@@ -486,8 +514,8 @@ async function processAndNotify(userId: string, phoneToReply: string, text: stri
     console.log(`ℹ️ [DEBUG] Raw notification text: "${text.substring(0, 200)}"`);
     console.log(`ℹ️ [DEBUG] Banco detectado: "${parsed.banco}" | bankOverride: "${bankOverride || 'none'}" | isIncome: ${parsed.isIncome} | isWithdrawal: ${parsed.isWithdrawal}`);
 
-    // Override do banco pelo valor explicit passado pelo MacroDroid (parâmetro 'b')
-    if (bankOverride && bankOverride.trim().length > 0) {
+    // Override do banco pelo valor explicit passado pelo MacroDroid (parâmetro 'b') — apenas se ainda não resolvido via package
+    if (bankOverride && bankOverride.trim().length > 0 && parsed.banco === 'Banco') {
         parsed.banco = bankOverride.trim();
         console.log(`ℹ️ [DEBUG] Banco override aplicado: "${parsed.banco}"`);
     }
@@ -645,29 +673,45 @@ async function processAndNotify(userId: string, phoneToReply: string, text: stri
     console.log(`📋 Final type: ${transactionType} (regex=${parsed.isIncome}, ai=${intent?.items?.[0]?.tipo || 'N/A'})`);
 
     // ─── Seleção da conta: primeiro tenta pelo banco remetente (parsed.banco) ───
-    // Isso garante que um Pix recebido no Inter é registrado no Inter, não no Nubank
+    // Garante que Pix do Inter vai para conta Inter, não Nubank (padrão)
     let targetAccountId: string | null = null;
     let isCreditCard = false;
 
-    // 1. Busca direta pelo nome do banco remetente nas contas ativas
-    const { data: directAcc } = await supabase
+    const bankSearch = parsed.banco.toLowerCase().trim();
+    console.log(`🔍 Buscando conta para banco: "${parsed.banco}" (key: "${bankSearch}")`);
+
+    // 1. Busca por bank_key exato (mais confiável: "inter", "nubank", "caixa", etc.)
+    const { data: byKey } = await supabase
         .from("bank_accounts")
         .select("id, bank_name")
         .eq("user_id", userId)
-        .eq("active", true)
-        .ilike("bank_name", `%${parsed.banco}%`)
+        .eq("bank_key", bankSearch)
         .maybeSingle();
 
-    if (directAcc) {
-        targetAccountId = directAcc.id;
-        console.log(`🏦 Conta encontrada diretamente pelo banco "${parsed.banco}": ${directAcc.bank_name}`);
+    if (byKey) {
+        targetAccountId = byKey.id;
+        console.log(`🏦 Conta por bank_key "${bankSearch}": ${byKey.bank_name} (${byKey.id})`);
     } else {
-        // 2. Fallback: usa a lógica padrão (IA + defaults)
-        const metodo = intent?.items?.[0]?.metodo_pagamento || parsed.banco.toLowerCase();
-        const preferred = await getPreferredAccount(userId, metodo);
-        targetAccountId = preferred.id;
-        isCreditCard = preferred.isCreditCard;
-        console.log(`🏦 Conta via fallback para "${metodo}": ${targetAccountId}`);
+        // 2. Busca por bank_name ILIKE (fallback)
+        const { data: byName } = await supabase
+            .from("bank_accounts")
+            .select("id, bank_name")
+            .eq("user_id", userId)
+            .ilike("bank_name", `%${parsed.banco}%`)
+            .limit(1)
+            .maybeSingle();
+
+        if (byName) {
+            targetAccountId = byName.id;
+            console.log(`🏦 Conta por bank_name "%${parsed.banco}%": ${byName.bank_name} (${byName.id})`);
+        } else {
+            // 3. Fallback: usa lógica padrão (IA + conta padrão do usuário)
+            const metodo = intent?.items?.[0]?.metodo_pagamento || bankSearch;
+            const preferred = await getPreferredAccount(userId, metodo);
+            targetAccountId = preferred.id;
+            isCreditCard = preferred.isCreditCard;
+            console.log(`🏦 Conta via fallback (default) para "${metodo}": ${targetAccountId}`);
+        }
     }
 
     // Registra transação com o tipo correto (income ou expense)
