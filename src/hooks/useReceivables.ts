@@ -13,7 +13,7 @@ export type ReceivableUpdate = TablesUpdate<"receivables">;
  
 const db = supabase as any;
 
-export const useReceivables = (status?: "pending" | "received" | "cancelled" | "all") => {
+export function useReceivables(status?: "pending" | "received" | "cancelled" | "all") {
   const { user } = useAuth();
 
   return useQuery({
@@ -43,7 +43,7 @@ export const useReceivables = (status?: "pending" | "received" | "cancelled" | "
   });
 };
 
-export const useReceivableStats = (month?: number, year?: number) => {
+export function useReceivableStats(month?: number, year?: number) {
   const { user } = useAuth();
   const now = new Date();
   const targetMonth = month ?? now.getMonth();
@@ -111,7 +111,7 @@ export const useReceivableStats = (month?: number, year?: number) => {
   });
 };
 
-export const useCreateReceivable = () => {
+export function useCreateReceivable() {
   const queryClient = useQueryClient();
   const { user } = useAuth();
 
@@ -256,7 +256,7 @@ export const useCreateReceivable = () => {
   });
 };
 
-export const useUpdateReceivable = () => {
+export function useUpdateReceivable() {
   const queryClient = useQueryClient();
   const { user } = useAuth();
 
@@ -345,7 +345,7 @@ export const useUpdateReceivable = () => {
   });
 };
 
-export const useDeleteReceivable = () => {
+export function useDeleteReceivable() {
   const queryClient = useQueryClient();
 
   return useMutation({
@@ -376,7 +376,7 @@ export const useDeleteReceivable = () => {
   });
 };
 
-export const useReceivableById = (id: string | undefined) => {
+export function useReceivableById(id: string | undefined) {
   const { user } = useAuth();
 
   return useQuery({

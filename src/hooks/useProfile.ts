@@ -8,7 +8,7 @@ import type { Tables, TablesUpdate } from "@/integrations/supabase/types";
 export type ProfileData = Tables<"profiles">;
 export type ProfileUpdate = TablesUpdate<"profiles">;
 
-export const useProfile = () => {
+export function useProfile() {
   const { user } = useAuth();
 
   return useQuery({
@@ -32,9 +32,9 @@ export const useProfile = () => {
     enabled: !!user?.id,
     staleTime: 1000 * 60 * 5, // Cache for 5 minutes
   });
-};
+}
 
-export const useUpdateProfile = () => {
+export function useUpdateProfile() {
   const queryClient = useQueryClient();
   const { user } = useAuth();
 
@@ -61,10 +61,10 @@ export const useUpdateProfile = () => {
       toast.error("Erro ao atualizar perfil");
     },
   });
-};
+}
 
 // Check if user has completed onboarding
-export const useCheckOnboarding = () => {
+export function useCheckOnboarding() {
   const { user } = useAuth();
 
   return useQuery({
@@ -89,4 +89,4 @@ export const useCheckOnboarding = () => {
     staleTime: 1000 * 60 * 5,
     retry: 1,
   });
-};
+}

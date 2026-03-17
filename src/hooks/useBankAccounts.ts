@@ -16,7 +16,7 @@ const db = supabase as any;
 
 // ─── Bank Accounts ──────────────────────────────────────
 
-export const useBankAccounts = () => {
+export function useBankAccounts() {
   const { user } = useAuth();
   return useQuery({
     queryKey: ["bank-accounts", user?.id],
@@ -33,7 +33,7 @@ export const useBankAccounts = () => {
   });
 };
 
-export const useBankAccountById = (id: string | undefined) => {
+export function useBankAccountById(id: string | undefined) {
   const { user } = useAuth();
   return useQuery({
     queryKey: ["bank-account", id],
@@ -51,7 +51,7 @@ export const useBankAccountById = (id: string | undefined) => {
   });
 };
 
-export const useCreateBankAccount = () => {
+export function useCreateBankAccount() {
   const queryClient = useQueryClient();
   const { user } = useAuth();
   return useMutation({
@@ -77,7 +77,7 @@ export const useCreateBankAccount = () => {
   });
 };
 
-export const useUpdateBankAccount = () => {
+export function useUpdateBankAccount() {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: async ({ id, ...updates }: BankAccountUpdate & { id: string }) => {
@@ -99,7 +99,7 @@ export const useUpdateBankAccount = () => {
   });
 };
 
-export const useDeleteBankAccount = () => {
+export function useDeleteBankAccount() {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: async (id: string) => {
@@ -120,7 +120,7 @@ export const useDeleteBankAccount = () => {
 // ─── Balance Updates ────────────────────────────────────
 
 /** Update bank balance after an income/expense is created */
-export const useUpdateBankBalance = () => {
+export function useUpdateBankBalance() {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: async ({ accountId, delta }: { accountId: string; delta: number }) => {
@@ -149,7 +149,7 @@ export const useUpdateBankBalance = () => {
 
 // ─── Bank Transfers ─────────────────────────────────────
 
-export const useBankTransfers = () => {
+export function useBankTransfers() {
   const { user } = useAuth();
   return useQuery({
     queryKey: ["bank-transfers", user?.id],
@@ -165,7 +165,7 @@ export const useBankTransfers = () => {
   });
 };
 
-export const useCreateBankTransfer = () => {
+export function useCreateBankTransfer() {
   const queryClient = useQueryClient();
   const { user } = useAuth();
 

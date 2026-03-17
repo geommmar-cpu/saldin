@@ -7,75 +7,63 @@ interface PageTransitionProps extends HTMLMotionProps<"div"> {
   className?: string;
 }
 
-export const PageTransition = React.forwardRef<HTMLDivElement, PageTransitionProps>(
-  function PageTransition({ children, className, ...props }, ref) {
-    return (
-      <motion.div
-        ref={ref}
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        exit={{ opacity: 0, y: -20 }}
-        transition={{ duration: 0.2, ease: "easeOut" }}
-        className={cn("min-h-screen", className)}
-        {...props}
-      >
-        {children}
-      </motion.div>
-    );
-  }
-);
+export function PageTransition(props: PageTransitionProps) {
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      exit={{ opacity: 0, y: -20 }}
+      transition={{ duration: 0.2, ease: "easeOut" }}
+      className={cn("min-h-screen", props.className)}
+      {...props}
+    >
+      {props.children}
+    </motion.div>
+  );
+}
 
-export const FadeIn = React.forwardRef<HTMLDivElement, PageTransitionProps & { delay?: number }>(
-  function FadeIn({ children, className, delay = 0, ...props }, ref) {
-    return (
-      <motion.div
-        ref={ref}
-        initial={{ opacity: 0, y: 10 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.4, ease: "easeOut", delay }}
-        className={className}
-        {...props}
-      >
-        {children}
-      </motion.div>
-    );
-  }
-);
+export function FadeIn(props: PageTransitionProps & { delay?: number }) {
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 10 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.4, ease: "easeOut", delay: props.delay }}
+      className={props.className}
+      {...props}
+    >
+      {props.children}
+    </motion.div>
+  );
+}
 
-export const ScaleIn = React.forwardRef<HTMLDivElement, PageTransitionProps & { delay?: number }>(
-  function ScaleIn({ children, className, delay = 0, ...props }, ref) {
-    return (
-      <motion.div
-        ref={ref}
-        initial={{ opacity: 0, scale: 0.95 }}
-        animate={{ opacity: 1, scale: 1 }}
-        transition={{ duration: 0.3, ease: "easeOut", delay }}
-        className={className}
-        {...props}
-      >
-        {children}
-      </motion.div>
-    );
-  }
-);
+export function ScaleIn(props: PageTransitionProps & { delay?: number }) {
+  return (
+    <motion.div
+      initial={{ opacity: 0, scale: 0.95 }}
+      animate={{ opacity: 1, scale: 1 }}
+      transition={{ duration: 0.3, ease: "easeOut", delay: props.delay }}
+      className={props.className}
+      {...props}
+    >
+      {props.children}
+    </motion.div>
+  );
+}
 
-export const SlideUp = React.forwardRef<HTMLDivElement, PageTransitionProps & { delay?: number }>(
-  function SlideUp({ children, className, delay = 0, ...props }, ref) {
-    return (
-      <motion.div
-        ref={ref}
-        initial={{ opacity: 0, y: "100%" }}
-        animate={{ opacity: 1, y: 0 }}
-        exit={{ opacity: 0, y: "100%" }}
-        transition={{ duration: 0.4, ease: "easeOut", delay }}
-        className={className}
-        {...props}
-      >
-        {children}
-      </motion.div>
-    );
-  }
-);
+export function SlideUp(props: PageTransitionProps & { delay?: number }) {
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: "100%" }}
+      animate={{ opacity: 1, y: 0 }}
+      exit={{ opacity: 0, y: "100%" }}
+      transition={{ duration: 0.4, ease: "easeOut", delay: props.delay }}
+      className={props.className}
+      {...props}
+    >
+      {props.children}
+    </motion.div>
+  );
+}
 
 export function AnimatedAmount({
   value,

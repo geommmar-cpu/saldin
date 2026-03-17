@@ -8,7 +8,7 @@ import { startOfMonth, format, parseISO, isAfter, isBefore, addDays } from "date
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const db = supabase as any;
 
-export const useSubscriptions = () => {
+export function useSubscriptions() {
     const { user } = useAuth();
     return useQuery({
         queryKey: ["subscriptions", user?.id],
@@ -37,7 +37,7 @@ export const useSubscriptions = () => {
     });
 };
 
-export const useCreateSubscription = () => {
+export function useCreateSubscription() {
     const queryClient = useQueryClient();
     const { user } = useAuth();
     return useMutation({
@@ -59,7 +59,7 @@ export const useCreateSubscription = () => {
     });
 };
 
-export const useUpdateSubscription = () => {
+export function useUpdateSubscription() {
     const queryClient = useQueryClient();
     return useMutation({
         mutationFn: async ({ id, ...updates }: SubscriptionUpdate) => {
@@ -83,7 +83,7 @@ export const useUpdateSubscription = () => {
 /**
  * Hook para processar gerações automáticas de assinaturas
  */
-export const useSubscriptionAutoLauncher = () => {
+export function useSubscriptionAutoLauncher() {
     const { user } = useAuth();
     const queryClient = useQueryClient();
     const { data: subs } = useSubscriptions();

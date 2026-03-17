@@ -6,7 +6,7 @@ import { useCryptoWallets } from "@/hooks/useCryptoWallets";
 import { formatCryptoValue, formatCryptoQuantity } from "@/lib/cryptoPrices";
 import { CRYPTO_LIST } from "@/types/cryptoWallet";
 
-export const CryptoSummary = () => {
+export function CryptoSummary() {
   const navigate = useNavigate();
   const { data: wallets = [] } = useCryptoWallets();
 
@@ -101,4 +101,4 @@ export const CryptoSummary = () => {
       )}
     </div>
   );
-};
+}

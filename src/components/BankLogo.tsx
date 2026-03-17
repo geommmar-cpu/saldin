@@ -11,13 +11,13 @@ interface BankLogoProps {
     size?: "sm" | "md" | "lg";
 }
 
-export const BankLogo = ({
+export function BankLogo({
     bankName,
     className,
     iconClassName,
     color,
     size = "md"
-}: BankLogoProps) => {
+}: BankLogoProps) {
     const [imgError, setImgError] = useState(false);
     const logoUrl = getBankLogoUrl(bankName);
     const showImage = logoUrl && !imgError;
@@ -73,4 +73,4 @@ export const BankLogo = ({
             )}
         </div>
     );
-};
+}

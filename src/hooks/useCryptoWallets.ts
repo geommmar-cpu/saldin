@@ -15,7 +15,7 @@ const db = supabase as any;
 
 // ─── Wallets ────────────────────────────────────────────
 
-export const useCryptoWallets = () => {
+export function useCryptoWallets() {
   const { user } = useAuth();
   return useQuery({
     queryKey: ["crypto-wallets", user?.id],
@@ -83,7 +83,7 @@ export const useCryptoWallets = () => {
   });
 };
 
-export const useCryptoWalletById = (id: string | undefined) => {
+export function useCryptoWalletById(id: string | undefined) {
   const { user } = useAuth();
   return useQuery({
     queryKey: ["crypto-wallet", id],
@@ -363,7 +363,7 @@ export const useCreateCryptoTransaction = () => {
 
 // ─── Stats (total value) ────────────────────────────────
 
-export const useCryptoTotalValue = () => {
+export function useCryptoTotalValue() {
   const { data: wallets = [] } = useCryptoWallets();
 
   const totalBRL = wallets.reduce((sum, w) => {
@@ -372,7 +372,7 @@ export const useCryptoTotalValue = () => {
 
   return { totalValue: totalBRL, wallets };
 };
-export const useCryptoInvestedInMonth = (month: number, year: number) => {
+export function useCryptoInvestedInMonth(month: number, year: number) {
   const { user } = useAuth();
   return useQuery({
     queryKey: ["crypto-invested", user?.id, month, year],

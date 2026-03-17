@@ -11,7 +11,7 @@ export type IncomeUpdate = TablesUpdate<"incomes">;
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const db = supabase as any;
 
-export const useIncomes = (month?: number, year?: number) => {
+export function useIncomes(month?: number, year?: number) {
   const { user } = useAuth();
 
   return useQuery({
@@ -48,7 +48,7 @@ export const useIncomes = (month?: number, year?: number) => {
   });
 };
 
-export const useIncomeStats = (month?: number, year?: number) => {
+export function useIncomeStats(month?: number, year?: number) {
   const { user } = useAuth();
   const now = new Date();
   const targetMonth = month ?? now.getMonth();
@@ -106,7 +106,7 @@ export const useIncomeStats = (month?: number, year?: number) => {
   });
 };
 
-export const useCreateIncome = () => {
+export function useCreateIncome() {
   const queryClient = useQueryClient();
   const { user } = useAuth();
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -140,7 +140,7 @@ export const useCreateIncome = () => {
   });
 };
 
-export const useDeleteIncome = () => {
+export function useDeleteIncome() {
   const queryClient = useQueryClient();
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const db = supabase as any;
@@ -187,7 +187,7 @@ export const useDeleteIncome = () => {
   });
 };
 
-export const useUpdateIncome = () => {
+export function useUpdateIncome() {
   const queryClient = useQueryClient();
 
   return useMutation({
@@ -215,7 +215,7 @@ export const useUpdateIncome = () => {
   });
 };
 
-export const useIncomeById = (id: string | undefined) => {
+export function useIncomeById(id: string | undefined) {
   const { user } = useAuth();
 
   return useQuery({

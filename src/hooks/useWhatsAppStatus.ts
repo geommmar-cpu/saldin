@@ -2,13 +2,16 @@
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/lib/backendClient";
 
-export const useWhatsAppStatus = (userId: string | undefined) => {
+export function useWhatsAppStatus(userId: string | undefined) {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const db = supabase as any;
+
     return useQuery({
         queryKey: ["whatsapp-status", userId],
         queryFn: async () => {
             if (!userId) return null;
 
-            const { data, error } = await supabase
+            const { data, error } = await db
                 .from("whatsapp_users")
                 .select("phone_number, is_verified, capture_token")
                 .eq("user_id", userId)
@@ -31,4 +34,4 @@ export const useWhatsAppStatus = (userId: string | undefined) => {
         },
         enabled: !!userId
     });
-};
+}

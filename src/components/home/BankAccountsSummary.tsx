@@ -24,7 +24,7 @@ interface AccountCardProps {
   isDefault: boolean;
 }
 
-const AccountCard = ({ account, isDefault }: AccountCardProps) => {
+function AccountCard({ account, isDefault }: AccountCardProps) {
   const isCash = isCashAccount(account);
   // Use the emerald/teal theme for cash, otherwise detect from bank name
   const bankTheme = isCash ? BANK_THEMES.dinheiro : detectBank(account.bank_name, account.bank_key);
@@ -89,7 +89,7 @@ const AccountCard = ({ account, isDefault }: AccountCardProps) => {
   );
 };
 
-export const BankAccountsSummary = () => {
+export function BankAccountsSummary() {
   const navigate = useNavigate();
   const { data: accounts = [] } = useBankAccounts();
   const { data: profile } = useProfile();

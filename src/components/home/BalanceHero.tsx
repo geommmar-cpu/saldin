@@ -54,7 +54,7 @@ const chartConfig = {
   },
 } satisfies ChartConfig;
 
-export const BalanceHero = ({ balance, cryptoTotal = 0, cryptoEnabled = false }: BalanceHeroProps) => {
+export function BalanceHero({ balance, cryptoTotal = 0, cryptoEnabled = false }: BalanceHeroProps) {
   const [expanded, setExpanded] = useState(false);
   const patrimonioTotal = balance.saldoBruto + cryptoTotal;
 
@@ -352,4 +352,4 @@ export const BalanceHero = ({ balance, cryptoTotal = 0, cryptoEnabled = false }:
       </AnimatePresence>
     </motion.div>
   );
-};
+}

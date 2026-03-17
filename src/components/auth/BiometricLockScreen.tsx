@@ -24,19 +24,8 @@ export function BiometricLockScreen({
   const { authenticateWithBiometric } = useWebAuthn();
   const { toast } = useToast();
 
-  // Auto-trigger biometric on mount
-  useEffect(() => {
-    if (!autoTriggered) {
-      setAutoTriggered(true);
-      const timer = setTimeout(() => {
-        handleBiometricAuth();
-      }, 500);
-      return () => clearTimeout(timer);
-    }
-  }, [autoTriggered, handleBiometricAuth]);
-
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  const handleBiometricAuth = async () => {
+  async function handleBiometricAuth() {
     setIsAuthenticating(true);
 
     const result = await authenticateWithBiometric();
@@ -56,7 +45,18 @@ export function BiometricLockScreen({
     }
 
     setIsAuthenticating(false);
-  };
+  }
+
+  // Auto-trigger biometric on mount
+  useEffect(() => {
+    if (!autoTriggered) {
+      setAutoTriggered(true);
+      const timer = setTimeout(() => {
+        handleBiometricAuth();
+      }, 500);
+      return () => clearTimeout(timer);
+    }
+  }, [autoTriggered, handleBiometricAuth]);
 
   return (
     <div className="min-h-screen bg-background flex flex-col items-center justify-center p-6 animate-in fade-in duration-700">

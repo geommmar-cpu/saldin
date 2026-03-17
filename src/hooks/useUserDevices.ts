@@ -12,15 +12,18 @@ export interface UserDevice {
   last_used_at: string | null;
 }
 
-export const useUserDevices = (userId: string | undefined) => {
+export function useUserDevices(userId: string | undefined) {
   const queryClient = useQueryClient();
   const { toast } = useToast();
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const db = supabase as any;
 
   const query = useQuery({
     queryKey: ["user-devices", userId],
     queryFn: async () => {
       if (!userId) return [];
-      const { data, error } = await (supabase.from("user_devices" as any) as any)
+      const { data, error } = await db
+        .from("user_devices")
         .select("*")
         .eq("user_id", userId)
         .order("created_at", { ascending: false });
@@ -39,7 +42,8 @@ export const useUserDevices = (userId: string | undefined) => {
         ? crypto.randomUUID().replace(/-/g, "") 
         : Math.random().toString(36).substring(2) + Date.now().toString(36);
       
-      const { data, error } = await (supabase.from("user_devices" as any) as any)
+      const { data, error } = await db
+        .from("user_devices")
         .insert({
           user_id: userId,
           device_token: deviceToken,
@@ -67,7 +71,8 @@ export const useUserDevices = (userId: string | undefined) => {
 
   const deleteDevice = useMutation({
     mutationFn: async (deviceId: string) => {
-      const { error } = await (supabase.from("user_devices" as any) as any)
+      const { error } = await db
+        .from("user_devices")
         .delete()
         .eq("id", deviceId);
 
@@ -92,4 +97,4 @@ export const useUserDevices = (userId: string | undefined) => {
     createDevice,
     deleteDevice
   };
-};
+}

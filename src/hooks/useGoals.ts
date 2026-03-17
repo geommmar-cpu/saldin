@@ -8,7 +8,7 @@ import type { Goal, GoalInsert, GoalUpdate, GoalTransaction, GoalTransactionInse
 // is not yet in the auto-generated types. After running the migration,
 // regenerate types to get full type safety.
 
-export const useGoals = (status?: 'in_progress' | 'completed' | 'paused' | 'all') => {
+export function useGoals(status?: 'in_progress' | 'completed' | 'paused' | 'all') {
   const { user } = useAuth();
 
   return useQuery({
@@ -51,7 +51,7 @@ export const useGoals = (status?: 'in_progress' | 'completed' | 'paused' | 'all'
   });
 };
 
-export const useGoalById = (id: string | undefined) => {
+export function useGoalById(id: string | undefined) {
   const { user } = useAuth();
 
   return useQuery({
@@ -77,7 +77,7 @@ export const useGoalById = (id: string | undefined) => {
   });
 };
 
-export const useGoalStats = () => {
+export function useGoalStats() {
   const { user } = useAuth();
 
   return useQuery({
@@ -131,7 +131,7 @@ export const useGoalStats = () => {
   });
 };
 
-export const useCreateGoal = () => {
+export function useCreateGoal() {
   const queryClient = useQueryClient();
   const { user } = useAuth();
 
@@ -179,7 +179,7 @@ export const useCreateGoal = () => {
   });
 };
 
-export const useUpdateGoal = () => {
+export function useUpdateGoal() {
   const queryClient = useQueryClient();
 
   return useMutation({
@@ -211,7 +211,7 @@ export const useUpdateGoal = () => {
   });
 };
 
-export const useDeleteGoal = () => {
+export function useDeleteGoal() {
   const queryClient = useQueryClient();
 
   return useMutation({

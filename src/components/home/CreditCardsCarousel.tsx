@@ -16,7 +16,7 @@ interface CreditCardsCarouselProps {
     selectedMonth: Date;
 }
 
-export const CreditCardsCarousel = ({ cards, installments, selectedMonth }: CreditCardsCarouselProps) => {
+export function CreditCardsCarousel({ cards, installments, selectedMonth }: CreditCardsCarouselProps) {
     const { data: profile } = useProfile();
     const defaultCardId = (profile as { wa_default_expense_card_id?: string })?.wa_default_expense_card_id;
 
@@ -62,7 +62,7 @@ export const CreditCardsCarousel = ({ cards, installments, selectedMonth }: Cred
             </div>
         </div>
     );
-};
+}
 
 interface CreditCardItemProps {
     card: CreditCardType;
@@ -72,7 +72,7 @@ interface CreditCardItemProps {
     installments: any[];
 }
 
-const CreditCardItem = ({ card, index, isMain, installments }: CreditCardItemProps) => {
+function CreditCardItem({ card, index, isMain, installments }: CreditCardItemProps) {
     const navigate = useNavigate();
     const { data: globalUsedLimit = 0 } = useCardUsedLimit(card.id);
 
@@ -200,5 +200,5 @@ const CreditCardItem = ({ card, index, isMain, installments }: CreditCardItemPro
             </div>
         </motion.div>
     );
-};
+}
 

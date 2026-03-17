@@ -94,7 +94,7 @@ function useOnboardingStatus(userId: string | undefined) {
     gcTime: 1000 * 60 * 60 * 24,
     retry: 2,
   });
-};
+}
 
 /**
  * AuthRoute - Protects routes that require authentication only (not onboarding)
@@ -115,7 +115,7 @@ export function AuthRoute({ children }: { children: React.ReactNode }) {
 
   // User is authenticated → render children
   return <>{children}</>;
-};
+}
 
 /**
  * OnboardingRoute - Protects routes that require auth + completed onboarding

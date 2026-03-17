@@ -8,7 +8,7 @@ export type DebtRow = Tables<"debts">;
 export type DebtInsert = TablesInsert<"debts">;
 export type DebtUpdate = TablesUpdate<"debts">;
 
-export const useDebts = (status?: "active" | "paid" | "all") => {
+export function useDebts(status?: "active" | "paid" | "all") {
   const { user } = useAuth();
 
   return useQuery({
@@ -38,7 +38,7 @@ export const useDebts = (status?: "active" | "paid" | "all") => {
   });
 };
 
-export const useDebtStats = (month?: number, year?: number) => {
+export function useDebtStats(month?: number, year?: number) {
   const { user } = useAuth();
   const now = new Date();
   const targetMonth = month ?? now.getMonth();
@@ -123,7 +123,7 @@ export const useDebtStats = (month?: number, year?: number) => {
   });
 };
 
-export const useCreateDebt = () => {
+export function useCreateDebt() {
   const queryClient = useQueryClient();
   const { user } = useAuth();
 
@@ -155,7 +155,7 @@ export const useCreateDebt = () => {
   });
 };
 
-export const useUpdateDebt = () => {
+export function useUpdateDebt() {
   const queryClient = useQueryClient();
 
   return useMutation({
@@ -183,7 +183,7 @@ export const useUpdateDebt = () => {
   });
 };
 
-export const useDeleteDebt = () => {
+export function useDeleteDebt() {
   const queryClient = useQueryClient();
 
   return useMutation({
@@ -204,7 +204,7 @@ export const useDeleteDebt = () => {
   });
 };
 
-export const useDebtById = (id: string | undefined) => {
+export function useDebtById(id: string | undefined) {
   const { user } = useAuth();
 
   return useQuery({

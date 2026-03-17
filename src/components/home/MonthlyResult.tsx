@@ -9,7 +9,7 @@ interface MonthlyResultProps {
   subscriptionsAmount?: number;
 }
 
-export const MonthlyResult = ({ totalIncome, totalSpent, investedAmount = 0, subscriptionsAmount }: MonthlyResultProps) => {
+export function MonthlyResult({ totalIncome, totalSpent, investedAmount = 0, subscriptionsAmount }: MonthlyResultProps) {
   // Resultado do mês = Entradas - (Saídas + Investimentos)
   // Investimentos saem do banco, então para o fluxo de caixa do MÊS, é uma saída de recurso disponível.
   const totalOutflow = totalSpent + investedAmount;
@@ -115,4 +115,4 @@ export const MonthlyResult = ({ totalIncome, totalSpent, investedAmount = 0, sub
       </div>
     </div>
   );
-};
+}

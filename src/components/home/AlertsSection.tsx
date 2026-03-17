@@ -27,7 +27,7 @@ interface AlertsSectionProps {
   selectedMonth: Date;
 }
 
-export const AlertsSection = ({ debts, goals, creditCards, installments, subscriptions = [], selectedMonth }: AlertsSectionProps) => {
+export function AlertsSection({ debts, goals, creditCards, installments, subscriptions = [], selectedMonth }: AlertsSectionProps) {
   const navigate = useNavigate();
   const today = new Date();
   const alerts: AlertItem[] = [];
@@ -157,4 +157,4 @@ export const AlertsSection = ({ debts, goals, creditCards, installments, subscri
       </div>
     </div>
   );
-};
+}

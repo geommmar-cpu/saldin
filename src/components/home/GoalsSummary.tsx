@@ -97,7 +97,7 @@ const getGoalTheme = (name: string) => {
   };
 };
 
-export const GoalsSummary = ({ goals, totalSaved, totalTarget }: GoalsSummaryProps) => {
+export function GoalsSummary({ goals, totalSaved, totalTarget }: GoalsSummaryProps) {
   const navigate = useNavigate();
   // Filter only active goals
   const activeGoals = goals.filter(g => g.status === "in_progress" || !g.status);

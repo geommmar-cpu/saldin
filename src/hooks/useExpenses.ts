@@ -11,7 +11,7 @@ export type ExpenseUpdate = TablesUpdate<"expenses">;
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const db = supabase as any;
 
-export const useExpenses = (status?: "pending" | "confirmed" | "all", month?: number, year?: number) => {
+export function useExpenses(status?: "pending" | "confirmed" | "all", month?: number, year?: number) {
   const { user } = useAuth();
 
   return useQuery({
@@ -54,7 +54,7 @@ export const useExpenses = (status?: "pending" | "confirmed" | "all", month?: nu
   });
 };
 
-export const useExpenseStats = (month?: number, year?: number) => {
+export function useExpenseStats(month?: number, year?: number) {
   const { user } = useAuth();
   const now = new Date();
   const targetMonth = month ?? now.getMonth();
@@ -94,7 +94,7 @@ export const useExpenseStats = (month?: number, year?: number) => {
   });
 };
 
-export const useExpensesByCategory = (month?: number, year?: number) => {
+export function useExpensesByCategory(month?: number, year?: number) {
   const { user } = useAuth();
   const now = new Date();
   const targetMonth = month ?? now.getMonth();
@@ -139,7 +139,7 @@ export const useExpensesByCategory = (month?: number, year?: number) => {
   });
 };
 
-export const usePendingExpenses = () => {
+export function usePendingExpenses() {
   const { user } = useAuth();
 
   return useQuery({
@@ -164,7 +164,7 @@ export const usePendingExpenses = () => {
   });
 };
 
-export const useCreateExpense = () => {
+export function useCreateExpense() {
   const queryClient = useQueryClient();
   const { user } = useAuth();
 
@@ -205,7 +205,7 @@ export const useCreateExpense = () => {
   });
 };
 
-export const useCreateBulkExpenses = () => {
+export function useCreateBulkExpenses() {
   const queryClient = useQueryClient();
   const { user } = useAuth();
 
@@ -237,9 +237,9 @@ export const useCreateBulkExpenses = () => {
       toast.error("Erro ao registrar gastos");
     },
   });
-};
+}
 
-export const useUpdateExpense = () => {
+export function useUpdateExpense() {
   const queryClient = useQueryClient();
 
   return useMutation({
@@ -266,9 +266,9 @@ export const useUpdateExpense = () => {
       toast.error("Erro ao atualizar gasto");
     },
   });
-};
+}
 
-export const useDeleteExpense = () => {
+export function useDeleteExpense() {
   const queryClient = useQueryClient();
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const db = supabase as any;
@@ -344,9 +344,9 @@ export const useDeleteExpense = () => {
       toast.error("Erro ao excluir gasto");
     },
   });
-};
+}
 
-export const useExpenseById = (id: string | undefined) => {
+export function useExpenseById(id: string | undefined) {
   const { user } = useAuth();
 
   return useQuery({
@@ -383,4 +383,4 @@ export const useExpenseById = (id: string | undefined) => {
     },
     enabled: !!user && !!id,
   });
-};
+}

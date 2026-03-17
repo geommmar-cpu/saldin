@@ -709,6 +709,7 @@ export type Database = {
           dark_mode: boolean
           full_name: string | null
           id: string
+          onboarding_completed: boolean
           phone: string | null
           updated_at: string
           user_id: string
@@ -721,6 +722,7 @@ export type Database = {
           dark_mode?: boolean
           full_name?: string | null
           id?: string
+          onboarding_completed?: boolean
           phone?: string | null
           updated_at?: string
           user_id: string
@@ -733,6 +735,7 @@ export type Database = {
           dark_mode?: boolean
           full_name?: string | null
           id?: string
+          onboarding_completed?: boolean
           phone?: string | null
           updated_at?: string
           user_id?: string

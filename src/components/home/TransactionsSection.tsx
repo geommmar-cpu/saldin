@@ -41,7 +41,7 @@ interface TransactionsSectionProps {
   selectedMonth: Date;
 }
 
-export const TransactionsSection = ({
+export function TransactionsSection({
   expenses,
   incomes,
   debts,
@@ -49,7 +49,7 @@ export const TransactionsSection = ({
   creditCardInstallments,
   subscriptions = [],
   selectedMonth,
-}: TransactionsSectionProps) => {
+}: TransactionsSectionProps) {
   const navigate = useNavigate();
   const [period, setPeriod] = useState<TimePeriod>("month");
 
@@ -354,4 +354,4 @@ export const TransactionsSection = ({
       )}
     </div>
   );
-};
+}

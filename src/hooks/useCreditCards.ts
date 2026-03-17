@@ -17,7 +17,7 @@ const db = supabase as any;
 
 // ─── Cartões ────────────────────────────────────────────
 
-export const useCreditCards = () => {
+export function useCreditCards() {
   const { user } = useAuth();
   return useQuery({
     queryKey: ["credit-cards", user?.id],
@@ -34,7 +34,7 @@ export const useCreditCards = () => {
   });
 };
 
-export const useCreditCardById = (id: string | undefined) => {
+export function useCreditCardById(id: string | undefined) {
   const { user } = useAuth();
   return useQuery({
     queryKey: ["credit-card", id],
@@ -52,7 +52,7 @@ export const useCreditCardById = (id: string | undefined) => {
   });
 };
 
-export const useCreateCreditCard = () => {
+export function useCreateCreditCard() {
   const queryClient = useQueryClient();
   const { user } = useAuth();
   return useMutation({
@@ -74,7 +74,7 @@ export const useCreateCreditCard = () => {
   });
 };
 
-export const useUpdateCreditCard = () => {
+export function useUpdateCreditCard() {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: async ({ id, ...updates }: Partial<CreditCard> & { id: string }) => {
@@ -96,7 +96,7 @@ export const useUpdateCreditCard = () => {
   });
 };
 
-export const useDeleteCreditCard = () => {
+export function useDeleteCreditCard() {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: async (id: string) => {
@@ -116,7 +116,7 @@ export const useDeleteCreditCard = () => {
 
 // ─── Compras + Parcelas ─────────────────────────────────
 
-export const useCreateCreditCardPurchase = () => {
+export function useCreateCreditCardPurchase() {
   const queryClient = useQueryClient();
   const { user } = useAuth();
 
@@ -222,7 +222,7 @@ export const useCreateCreditCardPurchase = () => {
 
 // ─── Parcelas do mês ────────────────────────────────────
 
-export const useCardInstallmentsByMonth = (month: Date) => {
+export function useCardInstallmentsByMonth(month: Date) {
   const { user } = useAuth();
   const refMonth = format(startOfMonth(month), "yyyy-MM-dd");
 
@@ -277,7 +277,7 @@ export const useCardInstallmentsByMonth = (month: Date) => {
 
 // ─── Compras de um cartão ───────────────────────────────
 
-export const usePurchasesByCard = (cardId: string | undefined) => {
+export function usePurchasesByCard(cardId: string | undefined) {
   const { user } = useAuth();
   return useQuery({
     queryKey: ["cc-purchases", cardId],
@@ -297,7 +297,7 @@ export const usePurchasesByCard = (cardId: string | undefined) => {
 
 // ─── Parcelas de um cartão por mês (fatura) ─────────────
 
-export const useCardStatementData = (cardId: string | undefined, month: Date) => {
+export function useCardStatementData(cardId: string | undefined, month: Date) {
   const { user } = useAuth();
   const refMonth = format(startOfMonth(month), "yyyy-MM-dd");
 
@@ -346,7 +346,7 @@ export const useCardStatementData = (cardId: string | undefined, month: Date) =>
 
 // ─── Total usado por cartão (parcelas abertas) ──────────
 
-export const useCardUsedLimit = (cardId: string | undefined) => {
+export function useCardUsedLimit(cardId: string | undefined) {
   const { user } = useAuth();
   return useQuery({
     queryKey: ["cc-used-limit", cardId],
@@ -386,7 +386,7 @@ export const useCardUsedLimit = (cardId: string | undefined) => {
   });
 };
 
-export const useCreditCardInstallmentById = (encodedId: string | undefined) => {
+export function useCreditCardInstallmentById(encodedId: string | undefined) {
   const { user } = useAuth();
   // Expect format "cc-{uuid}" or just "{uuid}"
   const id = encodedId?.replace(/^cc-/, "");
