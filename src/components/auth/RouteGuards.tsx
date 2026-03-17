@@ -11,29 +11,31 @@ import { BiometricLockScreen } from "./BiometricLockScreen";
 const BIOMETRIC_UNLOCKED_KEY = "biometric_unlocked";
 
 // Loading component to avoid repetition
-export const LoadingScreen = () => (
-  <div className="min-h-screen flex flex-col items-center justify-center bg-background p-6 text-center animate-in fade-in duration-500">
-    <div className="relative mb-8">
-      <div className="absolute inset-0 bg-primary/20 blur-2xl rounded-full animate-pulse"></div>
-      <div className="relative w-16 h-16 bg-gradient-to-tr from-primary to-accent rounded-2xl rotate-12 flex items-center justify-center shadow-lg animate-bounce-slow">
-        <span className="max-w-[100vw] leading-relaxed text-white text-2xl font-bold -rotate-12">S</span>
+export function LoadingScreen() {
+  return (
+    <div className="min-h-screen flex flex-col items-center justify-center bg-background p-6 text-center animate-in fade-in duration-500">
+      <div className="relative mb-8">
+        <div className="absolute inset-0 bg-primary/20 blur-2xl rounded-full animate-pulse"></div>
+        <div className="relative w-16 h-16 bg-gradient-to-tr from-primary to-accent rounded-2xl rotate-12 flex items-center justify-center shadow-lg animate-bounce-slow">
+          <span className="max-w-[100vw] leading-relaxed text-white text-2xl font-bold -rotate-12">S</span>
+        </div>
       </div>
+      <h2 className="max-w-[100vw] leading-relaxed text-2xl font-serif font-bold text-foreground mb-2">Saldin</h2>
+      <div className="flex items-center gap-1 justify-center">
+        <div className="w-1.5 h-1.5 bg-primary rounded-full animate-bounce [animation-delay:-0.3s]"></div>
+        <div className="w-1.5 h-1.5 bg-primary rounded-full animate-bounce [animation-delay:-0.15s]"></div>
+        <div className="w-1.5 h-1.5 bg-primary rounded-full animate-bounce"></div>
+      </div>
+      <p className="max-w-[100vw] leading-relaxed text-muted-foreground text-sm leading-relaxed mt-4 font-medium">Preparando seu ambiente financeiro...</p>
     </div>
-    <h2 className="max-w-[100vw] leading-relaxed text-2xl font-serif font-bold text-foreground mb-2">Saldin</h2>
-    <div className="flex items-center gap-1 justify-center">
-      <div className="w-1.5 h-1.5 bg-primary rounded-full animate-bounce [animation-delay:-0.3s]"></div>
-      <div className="w-1.5 h-1.5 bg-primary rounded-full animate-bounce [animation-delay:-0.15s]"></div>
-      <div className="w-1.5 h-1.5 bg-primary rounded-full animate-bounce"></div>
-    </div>
-    <p className="max-w-[100vw] leading-relaxed text-muted-foreground text-sm leading-relaxed mt-4 font-medium">Preparando seu ambiente financeiro...</p>
-  </div>
-);
+  );
+}
 
 // localStorage key for persisting onboarding status across sessions
 const getOnboardingLocalKey = (userId: string) => `onboarding_done_${userId}`;
 
 // Hook to check onboarding status - only runs when user exists
-const useOnboardingStatus = (userId: string | undefined) => {
+function useOnboardingStatus(userId: string | undefined) {
   return useQuery({
     queryKey: ["onboarding-status", userId],
     queryFn: async (): Promise<boolean> => {
@@ -98,7 +100,7 @@ const useOnboardingStatus = (userId: string | undefined) => {
  * AuthRoute - Protects routes that require authentication only (not onboarding)
  * Used for: /onboarding route
  */
-export const AuthRoute = ({ children }: { children: React.ReactNode }) => {
+export function AuthRoute({ children }: { children: React.ReactNode }) {
   const { user, loading } = useAuth();
 
   // Wait for auth to initialize
@@ -120,7 +122,7 @@ export const AuthRoute = ({ children }: { children: React.ReactNode }) => {
  * Also handles biometric lock screen for returning users
  * Used for: All main app routes (/, /history, /settings, etc.)
  */
-export const OnboardingRoute = ({ children }: { children: React.ReactNode }) => {
+export function OnboardingRoute({ children }: { children: React.ReactNode }) {
   const { user, loading: authLoading } = useAuth();
   const { isEnabled: isBiometricEnabled, isEnabledForUser, isLoading: biometricLoading } = useWebAuthn();
   const { data: profile } = useProfile();
@@ -184,7 +186,7 @@ export const OnboardingRoute = ({ children }: { children: React.ReactNode }) => 
  * PublicRoute - For public pages that should redirect authenticated users
  * Used for: /auth route
  */
-export const PublicRoute = ({ children }: { children: React.ReactNode }) => {
+export function PublicRoute({ children }: { children: React.ReactNode }) {
   const { user, loading: authLoading } = useAuth();
 
   // IMPORTANT: Only fetch onboarding status when user.id is available
