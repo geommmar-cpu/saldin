@@ -8,7 +8,7 @@ interface PageTransitionProps extends HTMLMotionProps<"div"> {
 }
 
 export const PageTransition = React.forwardRef<HTMLDivElement, PageTransitionProps>(
-  ({ children, className, ...props }, ref) => {
+  function PageTransition({ children, className, ...props }, ref) {
     return (
       <motion.div
         ref={ref}
@@ -24,10 +24,9 @@ export const PageTransition = React.forwardRef<HTMLDivElement, PageTransitionPro
     );
   }
 );
-PageTransition.displayName = "PageTransition";
 
 export const FadeIn = React.forwardRef<HTMLDivElement, PageTransitionProps & { delay?: number }>(
-  ({ children, className, delay = 0, ...props }, ref) => {
+  function FadeIn({ children, className, delay = 0, ...props }, ref) {
     return (
       <motion.div
         ref={ref}
@@ -42,10 +41,9 @@ export const FadeIn = React.forwardRef<HTMLDivElement, PageTransitionProps & { d
     );
   }
 );
-FadeIn.displayName = "FadeIn";
 
 export const ScaleIn = React.forwardRef<HTMLDivElement, PageTransitionProps & { delay?: number }>(
-  ({ children, className, delay = 0, ...props }, ref) => {
+  function ScaleIn({ children, className, delay = 0, ...props }, ref) {
     return (
       <motion.div
         ref={ref}
@@ -60,10 +58,9 @@ export const ScaleIn = React.forwardRef<HTMLDivElement, PageTransitionProps & { 
     );
   }
 );
-ScaleIn.displayName = "ScaleIn";
 
 export const SlideUp = React.forwardRef<HTMLDivElement, PageTransitionProps & { delay?: number }>(
-  ({ children, className, delay = 0, ...props }, ref) => {
+  function SlideUp({ children, className, delay = 0, ...props }, ref) {
     return (
       <motion.div
         ref={ref}
@@ -79,9 +76,8 @@ export const SlideUp = React.forwardRef<HTMLDivElement, PageTransitionProps & { 
     );
   }
 );
-SlideUp.displayName = "SlideUp";
 
-export const AnimatedAmount = ({
+export function AnimatedAmount({
   value,
   className,
   prefix = "R$ "
@@ -89,7 +85,7 @@ export const AnimatedAmount = ({
   value: number;
   className?: string;
   prefix?: string;
-}) => {
+}) {
   const [displayValue, setDisplayValue] = React.useState(0);
 
   React.useEffect(() => {
@@ -125,4 +121,4 @@ export const AnimatedAmount = ({
       })}
     </span>
   );
-};
+}

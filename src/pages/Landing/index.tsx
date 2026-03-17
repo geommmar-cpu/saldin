@@ -12,7 +12,7 @@ import {
 import logoSaldin from "@/assets/logo-saldin-final.png";
 
 // ─── Animated section wrapper ───
-const Section = ({ children, className = "", id = "" }: { children: React.ReactNode; className?: string; id?: string }) => {
+function Section({ children, className = "", id = "" }: { children: React.ReactNode; className?: string; id?: string }) {
     const ref = useRef(null);
     const isInView = useInView(ref, { once: true, margin: "-80px" });
     return (
@@ -29,13 +29,12 @@ const Section = ({ children, className = "", id = "" }: { children: React.ReactN
       <meta property="og:title" content="Saldin - index" />
       <meta property="og:description" content="Manage your index easily with Saldin." />
         
-            {children}
         </motion.section>
     );
-};
+}
 
 // ─── Phone Mockup Component (iPhone 15 Pro Style - Light Mode) ───
-const PhoneMockup = () => {
+function PhoneMockup() {
     const [messages, setMessages] = useState<{ type: 'user' | 'bot', text: string | React.ReactNode }[]>([]);
 
     useEffect(() => {
@@ -177,10 +176,10 @@ const PhoneMockup = () => {
             </div>
         </div>
     );
-};
+}
 
 // ─── Device Showcase Component (High Fidelity Mockup) ───
-const DeviceShowcase = ({ className = "" }: { className?: string }) => {
+function DeviceShowcase({ className = "" }: { className?: string }) {
     return (
         <div className={`relative w-full flex items-center justify-center py-6 sm:py-10 ${className}`}>
             {/* Main Mockup Image */}
@@ -210,10 +209,10 @@ const DeviceShowcase = ({ className = "" }: { className?: string }) => {
             </motion.div>
         </div>
     );
-};
+}
 
 // ─── Calculation Demo Component ───
-const CalculationDemo = () => {
+function CalculationDemo() {
     const [income, setIncome] = useState(5000);
     const [fixed, setFixed] = useState(2000);
     const [installments, setInstallments] = useState(800);
@@ -302,10 +301,10 @@ const CalculationDemo = () => {
             </div>
         </div>
     );
-};
+}
 
 // ─── Countdown Timer Component ───
-const CountdownTimer = () => {
+function CountdownTimer() {
     const [timeLeft, setTimeLeft] = useState(14400); // 4 hours in seconds
 
     useEffect(() => {
@@ -324,7 +323,7 @@ const CountdownTimer = () => {
             {String(hours).padStart(2, '0')}:{String(minutes).padStart(2, '0')}:{String(seconds).padStart(2, '0')}
         </span>
     );
-};
+}
 
 // ─── Marquee Component ───
 const MARQUEE_ITEMS = [
@@ -335,7 +334,7 @@ const MARQUEE_ITEMS = [
     { icon: Smartphone, text: "100% via WhatsApp", color: "text-teal-500" },
 ];
 
-const Marquee = () => {
+function Marquee() {
     return (
         <div className="bg-gray-900 overflow-hidden py-3 border-y border-border flex relative z-40">
             <motion.div
@@ -371,10 +370,10 @@ const Marquee = () => {
             </motion.div>
         </div>
     );
-};
+}
 
 // ─── Sale Notification Component ───
-const SaleNotification = () => {
+function SaleNotification() {
     const [visible, setVisible] = useState(false);
     const [data, setData] = useState({ name: "", time: "" });
 
@@ -418,10 +417,10 @@ const SaleNotification = () => {
             )}
         </AnimatePresence>
     );
-};
+}
 
 // ─── Lite Video Component (Zero Weight Initial Load) ───
-const LiteVideo = ({
+function LiteVideo({
     videoId,
     thumbnail,
     title,
@@ -431,7 +430,7 @@ const LiteVideo = ({
     thumbnail: string;
     title?: string;
     className?: string;
-}) => {
+}) {
     const [isPlaying, setIsPlaying] = useState(false);
 
     return (
@@ -473,16 +472,18 @@ const LiteVideo = ({
             )}
         </div>
     );
-};
+}
 
 // ─── VSL (Video Sales Letter) ───
-const VSL = () => (
-    <LiteVideo
-        videoId="dQw4w9WgXcQ" // TODO: Trocar pelo link real do VSL
-        thumbnail="https://images.unsplash.com/photo-1554224155-8d04cb21cd6c?auto=format&fit=crop&q=80&w=1000"
-        title="Descubra como sobrar dinheiro todo mês (sem planilhas)"
-    />
-);
+function VSL() {
+    return (
+        <LiteVideo
+            videoId="dQw4w9WgXcQ" // TODO: Trocar pelo link real do VSL
+            thumbnail="https://images.unsplash.com/photo-1554224155-8d04cb21cd6c?auto=format&fit=crop&q=80&w=1000"
+            title="Descubra como sobrar dinheiro todo mês (sem planilhas)"
+        />
+    );
+}
 
 // ─── Main Headline ───
 const mainHeadline = "O jeito mais rápido de registrar gastos e o único que te tira das dívidas de verdade.";
@@ -505,7 +506,8 @@ const faqs = [
 ];
 
 // ─── Comparison Table Component ───
-const ComparisonTable = () => (
+function ComparisonTable() {
+    return (
     <Section className="py-10 sm:py-16 bg-background border-b border-border">
         <div className="max-w-4xl mx-auto px-4">
             <div className="max-w-[100vw] leading-relaxed text-center mb-12">
@@ -555,10 +557,12 @@ const ComparisonTable = () => (
             </div>
         </div>
     </Section>
-);
+    );
+}
 
 // ─── Security Section Component ───
-const SecuritySection = () => (
+function SecuritySection() {
+    return (
     <Section className="py-16 sm:py-24 bg-background border-t border-b border-border relative overflow-hidden">
         <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-emerald-400 to-teal-500 opacity-20"></div>
         <div className="max-w-4xl mx-auto px-4 text-center relative z-10">
@@ -603,9 +607,10 @@ const SecuritySection = () => (
             </div>
         </div>
     </Section>
-);
+    );
+}
 
-const Landing = () => {
+function Landing() {
     const navigate = useNavigate();
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
     const [openFaq, setOpenFaq] = useState<number | null>(null);
@@ -1245,6 +1250,6 @@ const Landing = () => {
             </footer>
         </div>
     );
-};
+}
 
 export default Landing;

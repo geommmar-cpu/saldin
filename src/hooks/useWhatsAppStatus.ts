@@ -1,6 +1,6 @@
 
 import { useQuery } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
+import { supabase } from "@/lib/backendClient";
 
 export const useWhatsAppStatus = (userId: string | undefined) => {
     return useQuery({

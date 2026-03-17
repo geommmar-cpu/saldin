@@ -148,18 +148,17 @@ export function calculateBalances(
   const valoresParaTerceiros = 0;
 
   // Cálculos principais
+  let saldoBruto = 0;
   if (bankTotal !== undefined) {
     const confirmedUnlinkedIncome = filteredIncomes
-       
-      .filter(i => !(i as any).bank_account_id && (i.status === "received" || i.status === "confirmed" || !i.status))
+      .filter(i => !(i as any).bank_account_id)
       .reduce((sum, i) => sum + Number(i.amount), 0);
     const confirmedUnlinkedExpenses = filteredExpenses
-       
-      .filter(e => !(e as any).bank_account_id && e.status === "confirmed")
+      .filter(e => !(e as any).bank_account_id && (e as any).status === "confirmed")
       .reduce((sum, e) => sum + Number(e.amount), 0);
-    const saldoBruto = bankTotal + confirmedUnlinkedIncome - confirmedUnlinkedExpenses;
+    saldoBruto = bankTotal + confirmedUnlinkedIncome - confirmedUnlinkedExpenses;
   } else {
-    const saldoBruto = receitasTotal - gastosTotal;
+    saldoBruto = receitasTotal - gastosTotal;
   }
   // Saldo Comprometido = o que ainda vai sair este mês
   const saldoComprometido = dividasAtivas + valoresParaTerceiros + ccInstallmentsTotal + contasRecorrentesPendentes + assinaturasPendentes;

@@ -10,7 +10,7 @@ import ScrollToTop from "@/components/ScrollToTop";
 // Lazy-loaded pages
 const Home = lazy(() => import("./pages/Home"));
 const Auth = lazy(() => import("./pages/Auth"));
-const Landing = lazy(() => import("./pages/Landing"));
+const Landing = lazy(() => import("./pages/Landing/index"));
 const Settings = lazy(() => import("./pages/Settings"));
 const History = lazy(() => import("./pages/History"));
 const Alerts = lazy(() => import("./pages/Alerts"));
@@ -80,123 +80,126 @@ const queryClient = new QueryClient({
   },
 });
 
-const App = () => (
-  <QueryClientProvider client={queryClient}>
-    <TooltipProvider>
-      <Toaster />
-      <Sonner />
-      <BrowserRouter>
-        <ScrollToTop />
-        <Suspense fallback={<LoadingScreen />}>
-          <Routes>
-            {/* Public Routes */}
-            <Route path="/" element={<PublicRoute><Landing /></PublicRoute>} />
-            <Route path="/auth" element={<PublicRoute><Auth /></PublicRoute>} />
-            <Route path="/login" element={<Navigate to="/auth" replace />} />
+export function App() {
+  return (
+    <QueryClientProvider client={queryClient}>
+      <TooltipProvider>
+        <Toaster />
+        <Sonner />
+        <BrowserRouter>
+          <ScrollToTop />
+          <Suspense fallback={<LoadingScreen />}>
+            <Routes>
+              {/* Public Routes */}
+              <Route path="/" element={<PublicRoute><Landing /></PublicRoute>} />
+              <Route path="/auth" element={<PublicRoute><Auth /></PublicRoute>} />
+              <Route path="/login" element={<Navigate to="/auth" replace />} />
 
-            {/* Auth Only (before onboarding) */}
-            <Route path="/onboarding" element={<AuthRoute><Onboarding /></AuthRoute>} />
+              {/* Auth Only (before onboarding) */}
+              <Route path="/onboarding" element={<AuthRoute><Onboarding /></AuthRoute>} />
 
-            {/* Protected Routes (require auth + onboarding) */}
-            <Route path="/app" element={<OnboardingRoute><Home /></OnboardingRoute>} />
-            <Route path="/settings" element={<OnboardingRoute><Settings /></OnboardingRoute>} />
-            <Route path="/history" element={<OnboardingRoute><History /></OnboardingRoute>} />
-            <Route path="/alerts" element={<OnboardingRoute><Alerts /></OnboardingRoute>} />
-            <Route path="/insights" element={<OnboardingRoute><Insights /></OnboardingRoute>} />
-            <Route path="/reports" element={<OnboardingRoute><Reports /></OnboardingRoute>} />
-            <Route path="/overview" element={<OnboardingRoute><Overview /></OnboardingRoute>} />
-            <Route path="/pending" element={<OnboardingRoute><Pending /></OnboardingRoute>} />
-            <Route path="/account/edit" element={<OnboardingRoute><EditAccount /></OnboardingRoute>} />
+              {/* Protected Routes (require auth + onboarding) */}
+              <Route path="/app" element={<OnboardingRoute><Home /></OnboardingRoute>} />
+              <Route path="/settings" element={<OnboardingRoute><Settings /></OnboardingRoute>} />
+              <Route path="/history" element={<OnboardingRoute><History /></OnboardingRoute>} />
+              <Route path="/alerts" element={<OnboardingRoute><Alerts /></OnboardingRoute>} />
+              <Route path="/insights" element={<OnboardingRoute><Insights /></OnboardingRoute>} />
+              <Route path="/reports" element={<OnboardingRoute><Reports /></OnboardingRoute>} />
+              <Route path="/overview" element={<OnboardingRoute><Overview /></OnboardingRoute>} />
+              <Route path="/pending" element={<OnboardingRoute><Pending /></OnboardingRoute>} />
+              <Route path="/account/edit" element={<OnboardingRoute><EditAccount /></OnboardingRoute>} />
 
-            {/* Expenses */}
-            <Route path="/expenses" element={<OnboardingRoute><Expenses /></OnboardingRoute>} />
-            <Route path="/expenses/add" element={<OnboardingRoute><QuickExpense /></OnboardingRoute>} />
-            <Route path="/expenses/quick" element={<OnboardingRoute><QuickExpense /></OnboardingRoute>} />
-            <Route path="/expenses/:id" element={<OnboardingRoute><ExpenseDetail /></OnboardingRoute>} />
-            <Route path="/expenses/:id/edit" element={<OnboardingRoute><EditExpense /></OnboardingRoute>} />
-            {/* Legacy confirm route → now handled inside QuickExpense */}
-            <Route path="/confirm/:id" element={<OnboardingRoute><ConfirmExpense /></OnboardingRoute>} />
+              {/* Expenses */}
+              <Route path="/expenses" element={<OnboardingRoute><Expenses /></OnboardingRoute>} />
+              <Route path="/expenses/add" element={<OnboardingRoute><QuickExpense /></OnboardingRoute>} />
+              <Route path="/expenses/quick" element={<OnboardingRoute><QuickExpense /></OnboardingRoute>} />
+              <Route path="/expenses/:id" element={<OnboardingRoute><ExpenseDetail /></OnboardingRoute>} />
+              <Route path="/expenses/:id/edit" element={<OnboardingRoute><EditExpense /></OnboardingRoute>} />
+              {/* Legacy confirm route \u2192 now handled inside QuickExpense */}
+              <Route path="/confirm/:id" element={<OnboardingRoute><ConfirmExpense /></OnboardingRoute>} />
 
-            {/* Income */}
-            <Route path="/income" element={<OnboardingRoute><Income /></OnboardingRoute>} />
-            <Route path="/income/add" element={<OnboardingRoute><AddIncome /></OnboardingRoute>} />
-            <Route path="/income/confirm" element={<OnboardingRoute><ConfirmIncome /></OnboardingRoute>} />
-            <Route path="/income/:id" element={<OnboardingRoute><IncomeDetail /></OnboardingRoute>} />
-            <Route path="/income/:id/edit" element={<OnboardingRoute><EditIncome /></OnboardingRoute>} />
+              {/* Income */}
+              <Route path="/income" element={<OnboardingRoute><Income /></OnboardingRoute>} />
+              <Route path="/income/add" element={<OnboardingRoute><AddIncome /></OnboardingRoute>} />
+              <Route path="/income/confirm" element={<OnboardingRoute><ConfirmIncome /></OnboardingRoute>} />
+              <Route path="/income/:id" element={<OnboardingRoute><IncomeDetail /></OnboardingRoute>} />
+              <Route path="/income/:id/edit" element={<OnboardingRoute><EditIncome /></OnboardingRoute>} />
 
-            {/* Debts */}
-            <Route path="/debts" element={<OnboardingRoute><Debts /></OnboardingRoute>} />
-            <Route path="/debts/add" element={<OnboardingRoute><AddDebt /></OnboardingRoute>} />
-            <Route path="/debts/confirm" element={<OnboardingRoute><ConfirmDebt /></OnboardingRoute>} />
-            <Route path="/debts/:id" element={<OnboardingRoute><DebtDetail /></OnboardingRoute>} />
-            <Route path="/debts/:id/edit" element={<OnboardingRoute><EditDebt /></OnboardingRoute>} />
+              {/* Debts */}
+              <Route path="/debts" element={<OnboardingRoute><Debts /></OnboardingRoute>} />
+              <Route path="/debts/add" element={<OnboardingRoute><AddDebt /></OnboardingRoute>} />
+              <Route path="/debts/confirm" element={<OnboardingRoute><ConfirmDebt /></OnboardingRoute>} />
+              <Route path="/debts/:id" element={<OnboardingRoute><DebtDetail /></OnboardingRoute>} />
+              <Route path="/debts/:id/edit" element={<OnboardingRoute><EditDebt /></OnboardingRoute>} />
 
-            {/* Receivables */}
-            <Route path="/receivables" element={<OnboardingRoute><Receivables /></OnboardingRoute>} />
-            <Route path="/receivables/add" element={<OnboardingRoute><AddReceivable /></OnboardingRoute>} />
-            <Route path="/receivables/confirm" element={<OnboardingRoute><ConfirmReceivable /></OnboardingRoute>} />
-            <Route path="/receivables/:id" element={<OnboardingRoute><ReceivableDetail /></OnboardingRoute>} />
-            <Route path="/receivables/:id/edit" element={<OnboardingRoute><EditReceivable /></OnboardingRoute>} />
+              {/* Receivables */}
+              <Route path="/receivables" element={<OnboardingRoute><Receivables /></OnboardingRoute>} />
+              <Route path="/receivables/add" element={<OnboardingRoute><AddReceivable /></OnboardingRoute>} />
+              <Route path="/receivables/confirm" element={<OnboardingRoute><ConfirmReceivable /></OnboardingRoute>} />
+              <Route path="/receivables/:id" element={<OnboardingRoute><ReceivableDetail /></OnboardingRoute>} />
+              <Route path="/receivables/:id/edit" element={<OnboardingRoute><EditReceivable /></OnboardingRoute>} />
 
-            {/* Goals */}
-            <Route path="/goals" element={<OnboardingRoute><Goals /></OnboardingRoute>} />
-            <Route path="/goals/add" element={<OnboardingRoute><AddGoal /></OnboardingRoute>} />
-            <Route path="/goals/:id" element={<OnboardingRoute><GoalDetail /></OnboardingRoute>} />
-            <Route path="/goals/:id/edit" element={<OnboardingRoute><EditGoal /></OnboardingRoute>} />
+              {/* Goals */}
+              <Route path="/goals" element={<OnboardingRoute><Goals /></OnboardingRoute>} />
+              <Route path="/goals/add" element={<OnboardingRoute><AddGoal /></OnboardingRoute>} />
+              <Route path="/goals/:id" element={<OnboardingRoute><GoalDetail /></OnboardingRoute>} />
+              <Route path="/goals/:id/edit" element={<OnboardingRoute><EditGoal /></OnboardingRoute>} />
 
-            {/* Credit Cards */}
-            <Route path="/cards" element={<OnboardingRoute><CreditCards /></OnboardingRoute>} />
-            <Route path="/cards/add" element={<OnboardingRoute><AddCreditCard /></OnboardingRoute>} />
-            <Route path="/cards/:id" element={<OnboardingRoute><CreditCardDetail /></OnboardingRoute>} />
-            <Route path="/cards/:id/edit" element={<OnboardingRoute><EditCreditCard /></OnboardingRoute>} />
-            {/* Aliases for /credit-cards */}
-            <Route path="/credit-cards" element={<OnboardingRoute><CreditCards /></OnboardingRoute>} />
-            <Route path="/credit-cards/:id" element={<OnboardingRoute><CreditCardDetail /></OnboardingRoute>} />
-            <Route path="/cards/import" element={<OnboardingRoute><ImportStatement /></OnboardingRoute>} />
+              {/* Credit Cards */}
+              <Route path="/cards" element={<OnboardingRoute><CreditCards /></OnboardingRoute>} />
+              <Route path="/cards/add" element={<OnboardingRoute><AddCreditCard /></OnboardingRoute>} />
+              <Route path="/cards/:id" element={<OnboardingRoute><CreditCardDetail /></OnboardingRoute>} />
+              <Route path="/cards/:id/edit" element={<OnboardingRoute><EditCreditCard /></OnboardingRoute>} />
+              {/* Aliases for /credit-cards */}
+              <Route path="/credit-cards" element={<OnboardingRoute><CreditCards /></OnboardingRoute>} />
+              <Route path="/credit-cards/:id" element={<OnboardingRoute><CreditCardDetail /></OnboardingRoute>} />
+              <Route path="/cards/import" element={<OnboardingRoute><ImportStatement /></OnboardingRoute>} />
 
-            {/* Bank Accounts */}
-            <Route path="/banks" element={<OnboardingRoute><BankAccounts /></OnboardingRoute>} />
-            <Route path="/banks/add" element={<OnboardingRoute><AddBankAccount /></OnboardingRoute>} />
-            <Route path="/banks/:id" element={<OnboardingRoute><BankAccountDetail /></OnboardingRoute>} />
-            <Route path="/banks/:id/edit" element={<OnboardingRoute><EditBankAccount /></OnboardingRoute>} />
-            <Route path="/banks/transfer" element={<OnboardingRoute><BankTransfer /></OnboardingRoute>} />
+              {/* Bank Accounts */}
+              <Route path="/banks" element={<OnboardingRoute><BankAccounts /></OnboardingRoute>} />
+              <Route path="/banks/add" element={<OnboardingRoute><AddBankAccount /></OnboardingRoute>} />
+              <Route path="/banks/:id" element={<OnboardingRoute><BankAccountDetail /></OnboardingRoute>} />
+              <Route path="/banks/:id/edit" element={<OnboardingRoute><EditBankAccount /></OnboardingRoute>} />
+              <Route path="/banks/transfer" element={<OnboardingRoute><BankTransfer /></OnboardingRoute>} />
 
-            {/* Crypto Wallets */}
-            <Route path="/crypto-wallet" element={<OnboardingRoute><CryptoWallets /></OnboardingRoute>} />
-            <Route path="/crypto-wallet/add" element={<OnboardingRoute><AddCryptoWallet /></OnboardingRoute>} />
-            <Route path="/crypto-wallet/:id" element={<OnboardingRoute><CryptoWalletDetail /></OnboardingRoute>} />
-            {/* Redirects for legacy routes */}
-            <Route path="/crypto" element={<Navigate to="/crypto-wallet" replace />} />
-            <Route path="/crypto/add" element={<Navigate to="/crypto-wallet/add" replace />} />
-            <Route path="/crypto/:id" element={<Navigate to="/crypto-wallet/:id" replace />} />
+              {/* Crypto Wallets */}
+              <Route path="/crypto-wallet" element={<OnboardingRoute><CryptoWallets /></OnboardingRoute>} />
+              <Route path="/crypto-wallet/add" element={<OnboardingRoute><AddCryptoWallet /></OnboardingRoute>} />
+              <Route path="/crypto-wallet/:id" element={<OnboardingRoute><CryptoWalletDetail /></OnboardingRoute>} />
+              {/* Redirects for legacy routes */}
+              <Route path="/crypto" element={<Navigate to="/crypto-wallet" replace />} />
+              <Route path="/crypto/add" element={<Navigate to="/crypto-wallet/add" replace />} />
+              <Route path="/crypto/:id" element={<Navigate to="/crypto-wallet/:id" replace />} />
 
-            {/* Categories */}
-            <Route path="/categories" element={<OnboardingRoute><Categories /></OnboardingRoute>} />
+              {/* Categories */}
+              <Route path="/categories" element={<OnboardingRoute><Categories /></OnboardingRoute>} />
 
-            {/* Subscriptions */}
-            <Route path="/subscriptions" element={<OnboardingRoute><Subscriptions /></OnboardingRoute>} />
-            <Route path="/subscriptions/add" element={<OnboardingRoute><AddSubscription /></OnboardingRoute>} />
+              {/* Subscriptions */}
+              <Route path="/subscriptions" element={<OnboardingRoute><Subscriptions /></OnboardingRoute>} />
+              <Route path="/subscriptions/add" element={<OnboardingRoute><AddSubscription /></OnboardingRoute>} />
 
-            {/* Support & Legal */}
+              {/* Support & Legal */}
 
-            <Route path="/help" element={<Help />} />
-            <Route path="/terms" element={<Terms />} />
-            <Route path="/privacy" element={<Privacy />} />
+              <Route path="/help" element={<Help />} />
+              <Route path="/terms" element={<Terms />} />
+              <Route path="/privacy" element={<Privacy />} />
 
-            {/* Style Guide - Public for development */}
-            <Route path="/style-guide" element={<StyleGuide />} />
+              {/* Style Guide - Public for development */}
+              <Route path="/style-guide" element={<StyleGuide />} />
 
-            {/* Debug & Simulation */}
-            <Route path="/debug-stress" element={<OnboardingRoute><DebugStress /></OnboardingRoute>} />
+              {/* Debug & Simulation */}
+              <Route path="/debug-stress" element={<OnboardingRoute><DebugStress /></OnboardingRoute>} />
 
-            {/* Catch-all */}
-            <Route path="*" element={<OnboardingRoute><NotFound /></OnboardingRoute>} />
-          </Routes>
-        </Suspense>
-      </BrowserRouter>
-    </TooltipProvider>
-  </QueryClientProvider>
-);
+              {/* Catch-all */}
+              <Route path="*" element={<OnboardingRoute><NotFound /></OnboardingRoute>} />
+            </Routes>
+          </Suspense>
+        </BrowserRouter>
+      </TooltipProvider>
+    </QueryClientProvider>
+  );
+}
+
 
 
 export default App;

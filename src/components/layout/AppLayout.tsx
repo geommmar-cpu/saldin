@@ -49,7 +49,7 @@ const secondaryNavItems = [
     { label: "Ajuda", icon: HelpCircle, path: "/help" },
 ];
 
-export const AppLayout = ({ children, className }: AppLayoutProps) => {
+export function AppLayout({ children, className }: AppLayoutProps) {
     const location = useLocation();
     const { signOut, user } = useAuth();
     const { data: profile } = useProfile();
@@ -96,7 +96,8 @@ export const AppLayout = ({ children, className }: AppLayoutProps) => {
         setOpen(false);
     }, [location.pathname]);
 
-    const SidebarContent = () => (
+    function SidebarContent() {
+      return (
         <div className="flex flex-col h-full py-4">
             {/* Logo */}
             <div className="px-6 mb-2 mt-4 flex justify-center">
@@ -203,6 +204,7 @@ export const AppLayout = ({ children, className }: AppLayoutProps) => {
             </nav>
         </div>
     );
+    }
 
     return (
         <div
@@ -275,4 +277,4 @@ export const AppLayout = ({ children, className }: AppLayoutProps) => {
             </div>
         </div>
     );
-};
+}

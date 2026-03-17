@@ -38,7 +38,7 @@ const navItems = [
 
 // moreItems moved inside component to be reactive to preferences
 
-export const BottomNav = React.forwardRef<HTMLDivElement>((_, ref) => {
+export function BottomNav() {
   const location = useLocation();
   const navigate = useNavigate();
   const [isSheetOpen, setIsSheetOpen] = useState(false);
@@ -327,8 +327,7 @@ export const BottomNav = React.forwardRef<HTMLDivElement>((_, ref) => {
       </nav>
     </>
   );
-});
-BottomNav.displayName = "BottomNav";
+}
 
 // ─── Register Option subcomponent ───────────────────────
 
@@ -341,7 +340,7 @@ interface RegisterOptionProps {
   large?: boolean;
 }
 
-const RegisterOption = ({ icon: Icon, label, desc, colorClass, onClick, large }: RegisterOptionProps) => {
+function RegisterOption({ icon: Icon, label, desc, colorClass, onClick, large }: RegisterOptionProps) {
   const hasColor = !!colorClass;
   return (
     <motion.button
@@ -373,4 +372,4 @@ const RegisterOption = ({ icon: Icon, label, desc, colorClass, onClick, large }:
       </div>
     </motion.button>
   );
-};
+}

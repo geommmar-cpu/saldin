@@ -17,7 +17,7 @@ import logoSaldin from "@/assets/logo-saldin-final.png";
 
 type AuthView = "login" | "signup" | "recovery";
 
-export const Auth = () => {
+export function Auth() {
   const navigate = useNavigate();
   const { toast } = useToast();
   const { user, loading: authLoading, signIn, signUp, resetPassword } = useAuth();
@@ -432,7 +432,7 @@ export const Auth = () => {
       )}
     </div>
   );
-};
+}
 
 // Login Form Component
 interface LoginFormProps {
@@ -451,7 +451,7 @@ interface LoginFormProps {
   isBiometricLoading?: boolean;
 }
 
-const LoginForm = ({
+function LoginForm({
   email,
   setEmail,
   password,
@@ -465,7 +465,8 @@ const LoginForm = ({
   showBiometricButton,
   onBiometricLogin,
   isBiometricLoading,
-}: LoginFormProps) => (
+}: LoginFormProps) {
+  return (
   <form onSubmit={onSubmit} className="space-y-6 max-w-sm mx-auto w-full">
     <div className="max-w-[100vw] leading-relaxed text-center mb-8">
       <img src={logoSaldin} alt="Saldin" className="h-20 mx-auto mb-4" />
@@ -574,7 +575,8 @@ const LoginForm = ({
       </button>
     </div>
   </form>
-);
+  );
+}
 
 // Signup Form Component
 interface SignupFormProps {
@@ -595,7 +597,7 @@ interface SignupFormProps {
   onBackToLogin: () => void;
 }
 
-const SignupForm = ({
+function SignupForm({
   name,
   setName,
   email,
@@ -611,7 +613,8 @@ const SignupForm = ({
   isLoading,
   onSubmit,
   onBackToLogin,
-}: SignupFormProps) => (
+}: SignupFormProps) {
+  return (
   <form onSubmit={onSubmit} className="space-y-6 max-w-sm mx-auto w-full">
     <div className="max-w-[100vw] leading-relaxed text-center mb-6">
       <img src={logoSaldin} alt="Saldin" className="h-20 mx-auto mb-4" />
@@ -727,7 +730,8 @@ const SignupForm = ({
       </button>
     </div>
   </form>
-);
+  );
+}
 
 // Recovery Form Component
 interface RecoveryFormProps {
@@ -738,13 +742,14 @@ interface RecoveryFormProps {
   onBackToLogin: () => void;
 }
 
-const RecoveryForm = ({
+function RecoveryForm({
   email,
   setEmail,
   isLoading,
   onSubmit,
   onBackToLogin,
-}: RecoveryFormProps) => (
+}: RecoveryFormProps) {
+  return (
   <form onSubmit={onSubmit} className="space-y-6 max-w-sm mx-auto w-full">
     <div className="max-w-[100vw] leading-relaxed text-center mb-8">
       <img src={logoSaldin} alt="Saldin" className="h-20 mx-auto mb-4" />
@@ -793,6 +798,7 @@ const RecoveryForm = ({
       </button>
     </div>
   </form>
-);
+  );
+}
 
 export default Auth;
