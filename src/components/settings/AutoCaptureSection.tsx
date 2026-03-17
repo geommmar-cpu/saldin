@@ -64,6 +64,10 @@ export const AutoCaptureSection = ({ userId }: AutoCaptureSectionProps) => {
       const newDevice = await createDevice.mutateAsync(deviceName);
       setSelectedDevice(newDevice);
       setCurrentStep(1);
+    } catch (err: any) {
+      console.error("Erro no registro rápido:", err);
+      // O erro já deve ter sido mostrado pelo toast do hook, 
+      // mas o catch impede que o erro quebre o fluxo do React
     } finally {
       setIsRegistering(false);
     }

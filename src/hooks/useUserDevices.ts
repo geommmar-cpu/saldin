@@ -20,14 +20,13 @@ export const useUserDevices = (userId: string | undefined) => {
     queryKey: ["user-devices", userId],
     queryFn: async () => {
       if (!userId) return [];
-      const { data, error } = await supabase
-        .from("user_devices")
+      const { data, error } = await (supabase.from("user_devices" as any) as any)
         .select("*")
         .eq("user_id", userId)
         .order("created_at", { ascending: false });
 
       if (error) throw error;
-      return data as UserDevice[];
+      return (data as any) as UserDevice[];
     },
     enabled: !!userId,
   });
@@ -36,10 +35,11 @@ export const useUserDevices = (userId: string | undefined) => {
     mutationFn: async (deviceName: string) => {
       if (!userId) throw new Error("User not authenticated");
       
-      const deviceToken = crypto.randomUUID().replace(/-/g, "");
+      const deviceToken = (typeof crypto !== 'undefined' && crypto.randomUUID) 
+        ? crypto.randomUUID().replace(/-/g, "") 
+        : Math.random().toString(36).substring(2) + Date.now().toString(36);
       
-      const { data, error } = await supabase
-        .from("user_devices")
+      const { data, error } = await (supabase.from("user_devices" as any) as any)
         .insert({
           user_id: userId,
           device_token: deviceToken,
@@ -49,21 +49,25 @@ export const useUserDevices = (userId: string | undefined) => {
         .single();
 
       if (error) throw error;
-      return data as UserDevice;
+      return (data as any) as UserDevice;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["user-devices", userId] });
       toast({ title: "Dispositivo registrado!", description: "Agora você pode configurar a captura automática." });
     },
     onError: (error: any) => {
-      toast({ title: "Erro ao registrar dispositivo", description: error.message, variant: "destructive" });
+      const errorMessage = error?.message || "Erro desconhecido no servidor";
+      toast({ 
+        title: "Erro ao registrar dispositivo", 
+        description: typeof errorMessage === 'string' ? errorMessage : JSON.stringify(errorMessage), 
+        variant: "destructive" 
+      });
     }
   });
 
   const deleteDevice = useMutation({
     mutationFn: async (deviceId: string) => {
-      const { error } = await supabase
-        .from("user_devices")
+      const { error } = await (supabase.from("user_devices" as any) as any)
         .delete()
         .eq("id", deviceId);
 
@@ -74,7 +78,12 @@ export const useUserDevices = (userId: string | undefined) => {
       toast({ title: "Dispositivo removido" });
     },
     onError: (error: any) => {
-      toast({ title: "Erro ao remover dispositivo", description: error.message, variant: "destructive" });
+      const errorMessage = error?.message || "Erro desconhecido ao remover";
+      toast({ 
+        title: "Erro ao remover dispositivo", 
+        description: typeof errorMessage === 'string' ? errorMessage : JSON.stringify(errorMessage), 
+        variant: "destructive" 
+      });
     }
   });
 
