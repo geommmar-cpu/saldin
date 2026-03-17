@@ -67,16 +67,18 @@ interface SettingsSectionProps {
   children: React.ReactNode;
 }
 
-const SettingsSection = ({ title, children }: SettingsSectionProps) => (
-  <div>
-    <h2 className="max-w-[100vw] leading-relaxed text-xs font-medium text-muted-foreground uppercase tracking-wide mb-2 px-1">
-      {title}
-    </h2>
-    <div className="bg-card rounded-xl border border-border shadow-soft overflow-hidden">
-      {children}
+function SettingsSection({ title, children }: SettingsSectionProps) {
+  return (
+    <div>
+      <h2 className="max-w-[100vw] leading-relaxed text-xs font-medium text-muted-foreground uppercase tracking-wide mb-2 px-1">
+        {title}
+      </h2>
+      <div className="bg-card rounded-xl border border-border shadow-soft overflow-hidden">
+        {children}
+      </div>
     </div>
-  </div>
-);
+  );
+}
 
 interface SettingsItemProps {
   icon: React.ElementType;
@@ -93,7 +95,7 @@ interface SettingsItemProps {
   locked?: boolean;
 }
 
-const SettingsItem = ({
+function SettingsItem({
   icon: Icon,
   iconColor,
   label,
@@ -106,7 +108,7 @@ const SettingsItem = ({
   onClick,
   showArrow,
   locked,
-}: SettingsItemProps) => {
+}: SettingsItemProps) {
   const Wrapper = onClick ? "button" : "div";
 
   return (
@@ -145,9 +147,9 @@ const SettingsItem = ({
       {showArrow && !locked && <ChevronRight className="w-4 h-4 text-muted-foreground" />}
     </Wrapper>
   );
-};
+}
 
-export const Settings = () => {
+export function Settings() {
   const navigate = useNavigate();
   const { toast } = useToast();
   const { preferences, updatePreference, resetPreferences } = useUserPreferences();

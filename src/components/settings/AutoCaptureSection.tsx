@@ -28,7 +28,7 @@ interface AutoCaptureSectionProps {
   userId: string | undefined;
 }
 
-export const AutoCaptureSection = ({ userId }: AutoCaptureSectionProps) => {
+export function AutoCaptureSection({ userId }: AutoCaptureSectionProps) {
   const { toast } = useToast();
   const { data: devices = [], isLoading, createDevice, deleteDevice } = useUserDevices(userId);
   const [selectedDevice, setSelectedDevice] = useState<UserDevice | null>(null);
