@@ -2,8 +2,9 @@
     "version": 2,
     "outputDirectory": "dist",
     "rewrites": [
+        { "handle": "filesystem" },
         {
-            "source": "/((?!assets/|flows/|favicon|logo|pwa|manifest.json|robots.txt).*)",
+            "source": "/(.*)",
             "destination": "/index.html"
         }
     ],
@@ -26,7 +27,7 @@
             ]
         },
         {
-            "source": "/flows/(.*).flo",
+            "source": "/(.*).flo",
             "headers": [
                 {
                     "key": "Content-Type",

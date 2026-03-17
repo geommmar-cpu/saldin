@@ -241,10 +241,12 @@ export function AutoCaptureSection({ userId }: AutoCaptureSectionProps) {
                         </div>
                       </div>
                       <a 
-                        href="/flows/saldin_v5.flo" 
+                        href="/saldin_v5.flo?v=5" 
                         download="saldin_v5.flo"
+                        target="_blank"
+                        rel="external noopener noreferrer"
                         className="w-full flex items-center justify-center gap-2 h-9 rounded-md border border-input bg-background px-3 text-sm font-medium hover:bg-accent hover:text-accent-foreground transition-colors"
-                        onClick={() => {
+                        onClick={(e) => {
                           toast({ title: "Iniciando download", description: "O arquivo .flo está sendo baixado." });
                         }}
                       >
