@@ -2,9 +2,8 @@
     "version": 2,
     "outputDirectory": "dist",
     "rewrites": [
-        { "handle": "filesystem" },
         {
-            "source": "/(.*)",
+            "source": "/(?!saldin_v5.flo).*",
             "destination": "/index.html"
         }
     ],
