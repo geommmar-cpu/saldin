@@ -3,7 +3,7 @@
     "outputDirectory": "dist",
     "rewrites": [
         {
-            "source": "/((?!assets/|saldin_v5.flo|favicon.ico|manifest.json|pwa-|sw.js|workbox-).*)",
+            "source": "/((?!assets/|favicon.ico|manifest.json|sw.js|workbox-).*)",
             "destination": "/index.html"
         }
     ],
@@ -26,7 +26,7 @@
             ]
         },
         {
-            "source": "/(.*).flo",
+            "source": "/assets/(.*).flo",
             "headers": [
                 {
                     "key": "Content-Type",
@@ -35,6 +35,10 @@
                 {
                     "key": "Content-Disposition",
                     "value": "attachment; filename=\"saldin_v5.flo\""
+                },
+                {
+                    "key": "Cache-Control",
+                    "value": "no-cache, no-store, must-revalidate"
                 }
             ]
         },

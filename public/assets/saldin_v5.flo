@@ -1,0 +1,146 @@
+{
+  "description": "Saldin - Captura notificações financeiras e envia para Webhook (Supabase)",
+  "name": "Saldin Mestre",
+  "version": 1,
+  "blocks": [
+    {
+      "id": 1,
+      "type": "block.type.flow_beginning",
+      "label": "Flow beginning",
+      "connections": {
+        "out": 2
+      },
+      "position": { "x": 300, "y": 50 }
+    },
+    {
+      "id": 2,
+      "type": "block.type.file_read",
+      "label": "File read",
+      "fields": {
+        "path": {
+          "type": "string",
+          "value": "/storage/emulated/0/Download/activation_key.txt"
+        },
+        "encoding": {
+          "type": "string",
+          "value": "UTF-8"
+        }
+      },
+      "variables": {
+        "content": "webhook_url"
+      },
+      "connections": {
+        "out": 3
+      },
+      "position": { "x": 300, "y": 170 }
+    },
+    {
+      "id": 3,
+      "type": "block.type.notification_posted",
+      "label": "Notification posted?",
+      "fields": {
+        "proceed": {
+          "type": "string",
+          "value": "when_posted"
+        },
+        "package": {
+          "type": "list",
+          "value": []
+        }
+      },
+      "variables": {
+        "message": "msg_texto",
+        "package": "app_origem"
+      },
+      "connections": {
+        "yes": 4,
+        "no": 3
+      },
+      "position": { "x": 300, "y": 290 }
+    },
+    {
+      "id": 4,
+      "type": "block.type.decision",
+      "label": "Filtro financeiro",
+      "fields": {
+        "expression": {
+          "type": "expression",
+          "value": "msg_texto matches \"(?i).*(R\\\\$|\\\\$|Pix|Compra|Recebido|Saque|Débito|Crédito|Transferência).*\""
+        }
+      },
+      "connections": {
+        "yes": 5,
+        "no": 3
+      },
+      "position": { "x": 300, "y": 420 }
+    },
+    {
+      "id": 5,
+      "type": "block.type.variables",
+      "label": "Montar URL",
+      "fields": {
+        "variables": {
+          "type": "map",
+          "value": {
+            "req_url": "{webhook_url}?n={msg_texto}&b={app_origem}"
+          }
+        }
+      },
+      "connections": {
+        "out": 6
+      },
+      "position": { "x": 300, "y": 550 }
+    },
+    {
+      "id": 6,
+      "type": "block.type.http_request",
+      "label": "HTTP Request",
+      "fields": {
+        "url": {
+          "type": "variable",
+          "value": "req_url"
+        },
+        "method": {
+          "type": "string",
+          "value": "GET"
+        },
+        "headers": {
+          "type": "map",
+          "value": {}
+        },
+        "body": {
+          "type": "string",
+          "value": ""
+        },
+        "timeout": {
+          "type": "number",
+          "value": 30
+        }
+      },
+      "connections": {
+        "ok": 7,
+        "error": 3
+      },
+      "position": { "x": 300, "y": 670 }
+    },
+    {
+      "id": 7,
+      "type": "block.type.toast",
+      "label": "Toast confirmação",
+      "fields": {
+        "message": {
+          "type": "string",
+          "value": "Saldin: enviado de {app_origem}"
+        },
+        "duration": {
+          "type": "string",
+          "value": "short"
+        }
+      },
+      "connections": {
+        "out": 3
+      },
+      "position": { "x": 300, "y": 790 }
+    }
+  ]
+}
