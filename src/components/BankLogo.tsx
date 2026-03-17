@@ -38,7 +38,7 @@ export const BankLogo = ({
         return (
             <div className={cn(
                 sizeClasses[size],
-                "rounded-full bg-white flex items-center justify-center shadow-sm overflow-hidden border border-border/10",
+                "rounded-full bg-background flex items-center justify-center shadow-sm overflow-hidden border border-border/10",
                 className
             )}>
                 <img

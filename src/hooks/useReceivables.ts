@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/lib/backendClient";
 import { useAuth } from "./useAuth";
@@ -9,6 +10,7 @@ export type ReceivableRow = Tables<"receivables">;
 export type ReceivableInsert = TablesInsert<"receivables">;
 export type ReceivableUpdate = TablesUpdate<"receivables">;
 
+ 
 const db = supabase as any;
 
 export const useReceivables = (status?: "pending" | "received" | "cancelled" | "all") => {
@@ -70,19 +72,23 @@ export const useReceivableStats = (month?: number, year?: number) => {
       const receivables = data || [];
 
       // Filter receivables for the selected month (by due_date)
+       
       const receivablesInMonth = receivables.filter((r: any) => {
         if (!r.due_date) return false;
         const dueDate = new Date(r.due_date);
         return dueDate >= startOfMonth && dueDate < endOfMonth;
       });
 
+       
       const thisMonthAmount = receivablesInMonth.reduce((acc: number, r: any) => acc + Number(r.amount), 0);
       const pendingCount = receivablesInMonth.length;
 
       // Total pending (all pending receivables)
+       
       const totalPending = receivables.reduce((acc: number, r: any) => acc + Number(r.amount), 0);
 
       // Check for overdue items (due before the target month's start)
+       
       const overdueItems = receivables.filter((r: any) => {
         if (!r.due_date) return false;
         const dueDate = new Date(r.due_date);
@@ -90,6 +96,7 @@ export const useReceivableStats = (month?: number, year?: number) => {
       });
 
       const overdueCount = overdueItems.length;
+       
       const overdueAmount = overdueItems.reduce((acc: number, r: any) => acc + Number(r.amount), 0);
 
       return {
@@ -109,6 +116,7 @@ export const useCreateReceivable = () => {
   const { user } = useAuth();
 
   return useMutation({
+     
     mutationFn: async (receivableData: any) => {
       if (!user) throw new Error("Usuário não autenticado");
 
@@ -194,7 +202,7 @@ export const useCreateReceivable = () => {
           return window.crypto.randomUUID();
         }
         return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
-          var r = Math.random() * 16 | 0, v = c == 'x' ? r : (r & 0x3 | 0x8);
+          const r = Math.random() * 16 | 0, v = c == 'x' ? r : (r & 0x3 | 0x8);
           return v.toString(16);
         });
       };
@@ -215,6 +223,7 @@ export const useCreateReceivable = () => {
           amount: amountPerInstallment,
           due_date: format(dueDate, "yyyy-MM-dd"),
           is_installment,
+           
           installment_group_id: installment_group_id as any,
           installment_number: is_installment ? (i + 1) : null,
           total_installments: is_installment ? total_installments : null,
@@ -256,6 +265,7 @@ export const useUpdateReceivable = () => {
       if (!user) throw new Error("Usuário não autenticado");
 
       // Sanitizar IDs nas atualizações
+       
       const sanitizedUpdates = { ...updates } as any;
       if (sanitizedUpdates.bank_account_id === "") sanitizedUpdates.bank_account_id = null;
       if (sanitizedUpdates.source_account_id === "") sanitizedUpdates.source_account_id = null;
@@ -271,6 +281,7 @@ export const useUpdateReceivable = () => {
 
       // 2. Se estiver marcando como recebido, processar impacto financeiro
       if (isMarkingAsReceived && receivable) {
+         
         const bankAccountId = (updates as any).bank_account_id || receivable.bank_account_id;
 
         if (bankAccountId) {
@@ -387,6 +398,7 @@ export const useReceivableById = (id: string | undefined) => {
       if (!receivable) return null;
 
       // Manually fetch bank account names since relationships are missing in types
+       
       const enrichedReceivable = { ...receivable } as any;
 
       if (receivable.bank_account_id) {

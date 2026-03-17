@@ -35,7 +35,7 @@ const vibrate = () => {
 const colorOptions = [
   { id: 'green', label: 'Verde', class: 'bg-essential' },
   { id: 'blue', label: 'Azul', class: 'bg-calm' },
-  { id: 'purple', label: 'Roxo', class: 'bg-pleasure' },
+  { id: 'teal', label: 'Roxo', class: 'bg-pleasure' },
   { id: 'orange', label: 'Laranja', class: 'bg-obligation' },
   { id: 'red', label: 'Vermelho', class: 'bg-impulse' },
   { id: 'pink', label: 'Rosa', class: 'bg-pink-500' },
@@ -113,6 +113,11 @@ export default function AddGoal() {
   if (step === 'amount') {
     return (
       <div className="min-h-screen bg-background flex flex-col pb-24">
+      <title>Saldin | AddGoal</title>
+      <meta name="description" content="Manage your addgoal easily with Saldin." />
+      <meta property="og:title" content="Saldin - AddGoal" />
+      <meta property="og:description" content="Manage your addgoal easily with Saldin." />
+        
         {/* Header */}
         <header className="px-5 pt-safe-top">
           <div className="pt-4 pb-2 flex items-center gap-4">
@@ -126,9 +131,9 @@ export default function AddGoal() {
         <main className="flex-1 flex flex-col px-5">
           {/* Amount Display */}
           <FadeIn className="flex-1 flex flex-col items-center justify-center">
-            <p className="text-muted-foreground mb-2">Quanto você quer guardar?</p>
+            <p className="max-w-[100vw] leading-relaxed text-muted-foreground mb-2">Quanto você quer guardar?</p>
             <div className="flex items-baseline gap-1">
-              <span className="text-2xl text-muted-foreground">R$</span>
+              <span className="max-w-[100vw] leading-relaxed text-2xl text-muted-foreground">R$</span>
               <motion.span
                 key={amount}
                 initial={{ scale: 1.1 }}
@@ -138,7 +143,7 @@ export default function AddGoal() {
                 {amount || "0,00"}
               </motion.span>
             </div>
-            <p className="text-sm text-muted-foreground mt-4 text-center max-w-xs">
+            <p className="max-w-[100vw] leading-relaxed text-sm leading-relaxed text-muted-foreground mt-4 text-center max-w-xs">
               Defina o valor objetivo da sua meta financeira
             </p>
           </FadeIn>
@@ -202,8 +207,8 @@ export default function AddGoal() {
             <ArrowLeft className="w-5 h-5" />
           </Button>
           <div className="flex-1">
-            <h1 className="font-serif text-xl font-semibold">Detalhes da Meta</h1>
-            <p className="text-sm text-muted-foreground">
+            <h2 className="font-serif text-xl font-semibold">Detalhes da Meta</h2>
+            <p className="max-w-[100vw] leading-relaxed text-sm leading-relaxed text-muted-foreground">
               Objetivo: {formatCurrency(targetAmount)}
             </p>
           </div>
@@ -214,7 +219,7 @@ export default function AddGoal() {
         {/* Nome */}
         <FadeIn>
           <div className="space-y-2">
-            <label className="text-sm font-medium">Nome da meta *</label>
+            <label className="max-w-[100vw] leading-relaxed text-sm leading-relaxed font-medium">Nome da meta *</label>
             <Input
               placeholder="Ex: Viagem, Reserva de emergência..."
               value={name}
@@ -227,8 +232,8 @@ export default function AddGoal() {
         {/* Valor inicial */}
         <FadeIn delay={0.05}>
           <div className="space-y-2">
-            <label className="text-sm font-medium">Valor inicial (opcional)</label>
-            <p className="text-xs text-muted-foreground">
+            <label className="max-w-[100vw] leading-relaxed text-sm leading-relaxed font-medium">Valor inicial (opcional)</label>
+            <p className="max-w-[100vw] leading-relaxed text-xs text-muted-foreground">
               Já tem algum dinheiro guardado para esta meta?
             </p>
             <div className="relative">
@@ -243,7 +248,7 @@ export default function AddGoal() {
         {/* Data objetivo */}
         <FadeIn delay={0.1}>
           <div className="space-y-2">
-            <label className="text-sm font-medium">Data objetivo (opcional)</label>
+            <label className="max-w-[100vw] leading-relaxed text-sm leading-relaxed font-medium">Data objetivo (opcional)</label>
             <div className="relative">
               <Calendar className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
               <Input
@@ -260,7 +265,7 @@ export default function AddGoal() {
         {/* Observação */}
         <FadeIn delay={0.15}>
           <div className="space-y-2">
-            <label className="text-sm font-medium">Observação (opcional)</label>
+            <label className="max-w-[100vw] leading-relaxed text-sm leading-relaxed font-medium">Observação (opcional)</label>
             <Textarea
               placeholder="Adicione uma nota..."
               value={notes}
@@ -275,8 +280,8 @@ export default function AddGoal() {
           <Card className="p-4">
             <div className="flex items-center justify-between gap-3">
               <div>
-                <p className="font-medium text-sm">Esta meta afeta meu saldo?</p>
-                <p className="text-xs text-muted-foreground">
+                <p className="font-medium text-sm leading-relaxed">Esta meta afeta meu saldo?</p>
+                <p className="max-w-[100vw] leading-relaxed text-xs text-muted-foreground">
                   {isPersonal ? "Sim, o valor guardado será subtraído do saldo livre." : "Não, é apenas para controle (ex: meta conjunta ou para terceiros)"}
                 </p>
               </div>

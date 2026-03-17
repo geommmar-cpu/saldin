@@ -26,6 +26,7 @@ import {
 export default function AddCreditCard() {
   const navigate = useNavigate();
   const location = useLocation();
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const fromOnboarding = (location.state as any)?.fromOnboarding === true;
   const createCard = useCreateCreditCard();
 
@@ -44,6 +45,7 @@ export default function AddCreditCard() {
   const updateProfile = useUpdateProfile();
 
   // Find existing main card names for the confirmation message
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const existingCardId = (profile as any)?.wa_default_expense_card_id;
   const existingCard = cards.find(c => c.id === existingCardId);
 
@@ -51,7 +53,7 @@ export default function AddCreditCard() {
     ? BANK_LIST.find(b => b.key === selectedBank)
     : detectBank(cardName);
 
-  const cardColor = bankTheme?.color || "#8B5CF6";
+  const cardColor = bankTheme?.color || "#14b8a6";
 
   const canSubmit = cardName.trim() && closingDay && dueDay;
 
@@ -102,6 +104,11 @@ export default function AddCreditCard() {
 
   return (
     <div className="min-h-screen bg-background flex flex-col">
+      <title>Saldin | AddCreditCard</title>
+      <meta name="description" content="Manage your addcreditcard easily with Saldin." />
+      <meta property="og:title" content="Saldin - AddCreditCard" />
+      <meta property="og:description" content="Manage your addcreditcard easily with Saldin." />
+        
       <header className="px-5 pt-safe-top">
         <div className="pt-4 pb-2 flex items-center gap-4">
           <Button variant="ghost" size="icon" onClick={handleCancel}>
@@ -122,28 +129,28 @@ export default function AddCreditCard() {
               <CreditCardIcon className="w-16 h-16" />
             </div>
             <div className="relative z-10">
-              <div className="w-10 h-10 rounded-full bg-white/20 flex items-center justify-center shadow-inner overflow-hidden border border-white/10 backdrop-blur-sm">
+              <div className="w-10 h-10 rounded-full bg-background/20 flex items-center justify-center shadow-inner overflow-hidden border border-white/10 backdrop-blur-sm">
                 <BankLogo
                   bankName={bankTheme?.name || "Cartão"}
                   className="w-full h-full border-0 bg-transparent"
                   iconClassName="text-white"
                 />
               </div>
-              <p className="text-sm opacity-80 font-semibold tracking-tight uppercase">
+              <p className="max-w-[100vw] leading-relaxed text-sm leading-relaxed opacity-80 font-semibold tracking-tight uppercase">
                 {cardBrand || bankTheme?.name || "Cartão"}
               </p>
 
-              <h3 className="text-xl font-bold mt-1">{cardName || "Nome do cartão"}</h3>
+              <h3 className="max-w-[100vw] leading-relaxed text-xl font-bold mt-1">{cardName || "Nome do cartão"}</h3>
               {lastFour && (
-                <p className="text-sm opacity-70 font-mono mt-3">•••• •••• •••• {lastFour}</p>
+                <p className="max-w-[100vw] leading-relaxed text-sm leading-relaxed opacity-70 font-mono mt-3">•••• •••• •••• {lastFour}</p>
               )}
-              <div className="mt-4 flex justify-between text-sm">
+              <div className="mt-4 flex justify-between text-sm leading-relaxed">
                 <div>
-                  <p className="text-xs opacity-60">Limite</p>
+                  <p className="max-w-[100vw] leading-relaxed text-xs opacity-60">Limite</p>
                   <p className="font-semibold">{limit ? `R$ ${limit}` : "—"}</p>
                 </div>
-                <div className="text-right">
-                  <p className="text-xs opacity-60">Vencimento</p>
+                <div className="max-w-[100vw] leading-relaxed text-right">
+                  <p className="max-w-[100vw] leading-relaxed text-xs opacity-60">Vencimento</p>
                   <p className="font-medium">{dueDay ? `Dia ${dueDay}` : "—"}</p>
                 </div>
               </div>
@@ -152,7 +159,7 @@ export default function AddCreditCard() {
 
           {/* Bank Selector */}
           <div className="space-y-3">
-            <label className="text-sm text-muted-foreground">Banco emissor</label>
+            <label className="max-w-[100vw] leading-relaxed text-sm leading-relaxed text-muted-foreground">Banco emissor</label>
             <div
               className="flex gap-4 overflow-x-auto pb-4 snap-x snap-mandatory no-scrollbar"
               style={{ WebkitOverflowScrolling: 'touch' }}
@@ -169,7 +176,7 @@ export default function AddCreditCard() {
                       ? "border-primary ring-2 ring-primary/20 ring-offset-2 scale-110"
                       : "border-border bg-card group-hover:border-primary/50"
                   )}
-                    style={{ backgroundColor: selectedBank === bank.key ? bank.color : "#ffffff" }}
+                    style={{ backgroundColor: selectedBank === bank.key ? bank.color : "var(--background)fff" }}
                   >
                     {selectedBank === bank.key ? (
                       <Check className="w-6 h-6 text-white" />
@@ -199,7 +206,7 @@ export default function AddCreditCard() {
                   {selectedBank === "outros" ? (
                     <Check className="w-5 h-5 text-primary" />
                   ) : (
-                    <span className="text-[10px] font-bold text-muted-foreground">...</span>
+                    <span className="max-w-[100vw] leading-relaxed text-[10px] font-bold text-muted-foreground">...</span>
                   )}
                 </div>
                 <span className={cn(
@@ -214,7 +221,7 @@ export default function AddCreditCard() {
 
           {/* Name */}
           <div className="space-y-2">
-            <label className="text-sm text-muted-foreground">Nome do cartão *</label>
+            <label className="max-w-[100vw] leading-relaxed text-sm leading-relaxed text-muted-foreground">Nome do cartão *</label>
             <Input
               placeholder="Ex: Nubank – Compras, Itaú – Viagens"
               value={cardName}
@@ -225,7 +232,7 @@ export default function AddCreditCard() {
 
           {/* Brand - Horizontal Scroll */}
           <div className="space-y-3">
-            <label className="text-sm text-muted-foreground">Bandeira</label>
+            <label className="max-w-[100vw] leading-relaxed text-sm leading-relaxed text-muted-foreground">Bandeira</label>
             <div
               className="flex gap-4 overflow-x-auto pb-4 snap-x snap-mandatory no-scrollbar"
               style={{ WebkitOverflowScrolling: 'touch' }}
@@ -247,7 +254,7 @@ export default function AddCreditCard() {
                     {cardBrand === brand.name ? (
                       <Check className="w-5 h-5 text-white" />
                     ) : (
-                      <span className="text-xs">{brand.abbr}</span>
+                      <span className="max-w-[100vw] leading-relaxed text-xs">{brand.abbr}</span>
                     )}
                   </div>
                   <span className={cn(
@@ -273,7 +280,7 @@ export default function AddCreditCard() {
                   {cardBrand === "Outra" ? (
                     <Check className="w-5 h-5 text-primary" />
                   ) : (
-                    <span className="text-xs text-muted-foreground">...</span>
+                    <span className="max-w-[100vw] leading-relaxed text-xs text-muted-foreground">...</span>
                   )}
                 </div>
                 <span className={cn(
@@ -288,7 +295,7 @@ export default function AddCreditCard() {
 
           {/* Last 4 digits */}
           <div className="space-y-2">
-            <label className="text-sm text-muted-foreground">Últimos 4 dígitos</label>
+            <label className="max-w-[100vw] leading-relaxed text-sm leading-relaxed text-muted-foreground">Últimos 4 dígitos</label>
             <Input
               placeholder="1234"
               value={lastFour}
@@ -303,7 +310,7 @@ export default function AddCreditCard() {
 
           {/* Limit */}
           <div className="space-y-2">
-            <label className="text-sm text-muted-foreground">Limite total</label>
+            <label className="max-w-[100vw] leading-relaxed text-sm leading-relaxed text-muted-foreground">Limite total</label>
             <Input
               placeholder="5.000,00"
               value={limit}
@@ -318,7 +325,7 @@ export default function AddCreditCard() {
           {/* Closing & Due days */}
           <div className="grid grid-cols-2 gap-3">
             <div className="space-y-2">
-              <label className="text-sm text-muted-foreground">Dia de fechamento *</label>
+              <label className="max-w-[100vw] leading-relaxed text-sm leading-relaxed text-muted-foreground">Dia de fechamento *</label>
               <Input
                 placeholder="Ex: 15"
                 value={closingDay}
@@ -331,7 +338,7 @@ export default function AddCreditCard() {
               />
             </div>
             <div className="space-y-2">
-              <label className="text-sm text-muted-foreground">Dia de vencimento *</label>
+              <label className="max-w-[100vw] leading-relaxed text-sm leading-relaxed text-muted-foreground">Dia de vencimento *</label>
               <Input
                 placeholder="Ex: 25"
                 value={dueDay}
@@ -348,8 +355,8 @@ export default function AddCreditCard() {
           {/* Main card toggle */}
           <div className="flex items-center justify-between p-4 rounded-xl bg-card border border-border shadow-soft">
             <div>
-              <p className="text-sm font-medium">Definir como cartão principal</p>
-              <p className="text-xs text-muted-foreground">Usar para gastos automáticos via WhatsApp</p>
+              <p className="max-w-[100vw] leading-relaxed text-sm leading-relaxed font-medium">Definir como cartão principal</p>
+              <p className="max-w-[100vw] leading-relaxed text-xs text-muted-foreground">Usar para gastos automáticos via WhatsApp</p>
             </div>
             <Switch
               checked={isMainCard}

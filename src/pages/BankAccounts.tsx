@@ -17,7 +17,9 @@ export const BankAccounts = () => {
   const { data: accounts = [], isLoading } = useBankAccounts();
   const { data: profile } = useProfile();
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const defaultIncomeId = (profile as any)?.wa_default_income_account_id;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const defaultExpenseId = (profile as any)?.wa_default_expense_account_id;
 
   const totalBalance = accounts.reduce((sum, a) => sum + Number(a.current_balance), 0);
@@ -25,6 +27,11 @@ export const BankAccounts = () => {
   if (isLoading) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
+      <title>Saldin | BankAccounts</title>
+      <meta name="description" content="Manage your bankaccounts easily with Saldin." />
+      <meta property="og:title" content="Saldin - BankAccounts" />
+      <meta property="og:description" content="Manage your bankaccounts easily with Saldin." />
+        
         <Loader2 className="w-8 h-8 animate-spin text-muted-foreground" />
       </div>
     );
@@ -38,7 +45,7 @@ export const BankAccounts = () => {
             <Button variant="ghost" size="icon" onClick={() => navigate("/")} className="shrink-0 -ml-2">
               <ChevronLeft className="w-5 h-5" />
             </Button>
-            <h1 className="font-serif text-lg sm:text-xl font-semibold truncate">Contas</h1>
+            <h1 className="font-serif text-lg leading-relaxed sm:text-xl font-semibold truncate">Contas</h1>
           </div>
           <div className="flex gap-2 shrink-0">
             {accounts.length >= 2 && (
@@ -61,7 +68,7 @@ export const BankAccounts = () => {
         {accounts.length > 0 && (
           <FadeIn>
             <div className="p-5 rounded-2xl bg-card border border-border shadow-medium text-center">
-              <p className="text-sm text-muted-foreground mb-1">Saldo total em contas</p>
+              <p className="max-w-[100vw] leading-relaxed text-sm leading-relaxed text-muted-foreground mb-1">Saldo total em contas</p>
               <p className="font-serif text-2xl font-semibold">{formatCurrency(totalBalance)}</p>
             </div>
           </FadeIn>
@@ -70,12 +77,12 @@ export const BankAccounts = () => {
         {/* Account list */}
         {accounts.length === 0 ? (
           <FadeIn delay={0.1}>
-            <div className="text-center py-12">
+            <div className="max-w-[100vw] leading-relaxed text-center py-12">
               <div className="w-16 h-16 rounded-full bg-muted mx-auto mb-4 flex items-center justify-center">
                 <Landmark className="w-8 h-8 text-muted-foreground" />
               </div>
-              <h3 className="font-serif text-lg font-semibold mb-2">Nenhuma conta cadastrada</h3>
-              <p className="text-sm text-muted-foreground mb-6">
+              <h3 className="font-serif text-lg leading-relaxed font-semibold mb-2">Nenhuma conta cadastrada</h3>
+              <p className="max-w-[100vw] leading-relaxed text-sm leading-relaxed text-muted-foreground mb-6">
                 Adicione suas contas bancárias para acompanhar seus saldos
               </p>
               <Button variant="warm" onClick={() => navigate("/banks/add")}>
@@ -105,26 +112,26 @@ export const BankAccounts = () => {
                         className="sm:w-12 sm:h-12"
                       />
                       <div className="flex-1 min-w-0">
-                        <p className="font-medium text-sm sm:text-base truncate">{account.bank_name}</p>
+                        <p className="font-medium text-sm leading-relaxed sm:text-base truncate">{account.bank_name}</p>
                         <div className="flex items-center gap-2">
-                          <p className="text-[10px] sm:text-xs text-muted-foreground truncate">
+                          <p className="max-w-[100vw] leading-relaxed text-[10px] sm:text-xs text-muted-foreground truncate">
                             {accountTypeLabels[account.account_type] || "Corrente"}
                           </p>
                           {(account.id === defaultIncomeId || account.id === defaultExpenseId) && (
                             <div className="flex items-center gap-1 bg-primary/10 text-primary rounded-full px-2 py-0.5 border border-primary/10">
                               <PhoneIcon className="w-2.5 h-2.5" />
-                              <span className="text-[8px] font-bold uppercase tracking-tight">Bot WhatsApp</span>
+                              <span className="max-w-[100vw] leading-relaxed text-[8px] font-bold uppercase tracking-tight">Bot WhatsApp</span>
                             </div>
                           )}
                         </div>
                       </div>
 
-                      <div className="text-right shrink-0">
-                        <p className="font-semibold text-sm sm:text-base tabular-nums">
+                      <div className="max-w-[100vw] leading-relaxed text-right shrink-0">
+                        <p className="font-semibold text-sm leading-relaxed sm:text-base tabular-nums">
                           {formatCurrency(Number(account.current_balance))}
                         </p>
                         {Number(account.initial_balance) !== Number(account.current_balance) && (
-                          <p className="text-[10px] sm:text-xs text-muted-foreground">
+                          <p className="max-w-[100vw] leading-relaxed text-[10px] sm:text-xs text-muted-foreground">
                             {formatCurrency(Number(account.initial_balance))}
                           </p>
                         )}

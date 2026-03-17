@@ -31,7 +31,7 @@ const generateUUID = () => {
     return crypto.randomUUID();
   }
   return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
-    var r = Math.random() * 16 | 0, v = c == 'x' ? r : (r & 0x3 | 0x8);
+    const r = Math.random() * 16 | 0, v = c == 'x' ? r : (r & 0x3 | 0x8);
     return v.toString(16);
   });
 };
@@ -110,6 +110,7 @@ export const Onboarding = () => {
           const balance = parseCurrency(acc.initialBalance);
 
           if (bankName.trim()) {
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
             await (supabase as any).from("bank_accounts").insert({
               user_id: user.id,
               bank_name: bankName.trim(),
@@ -207,6 +208,11 @@ export const Onboarding = () => {
 
   return (
     <div className="min-h-screen flex flex-col bg-background">
+      <title>Saldin | Onboarding</title>
+      <meta name="description" content="Manage your onboarding easily with Saldin." />
+      <meta property="og:title" content="Saldin - Onboarding" />
+      <meta property="og:description" content="Manage your onboarding easily with Saldin." />
+        
       {/* Progress */}
       <div className="px-6 pt-safe-top">
         <div className="flex gap-2 pt-4">
@@ -237,7 +243,7 @@ export const Onboarding = () => {
                   initial={{ scale: 0.8, opacity: 0 }}
                   animate={{ scale: 1, opacity: 1 }}
                   transition={{ delay: 0.2, duration: 0.5, ease: "easeOut" }}
-                  className="mb-10"
+                  className="leading-relaxed mb-10"
                 >
                   <img
                     src={logoSaldin}
@@ -246,10 +252,10 @@ export const Onboarding = () => {
                   />
                 </motion.div>
 
-                <p className="text-xl text-primary font-semibold mb-4 max-w-xs leading-relaxed">
+                <p className="max-w-[100vw] leading-relaxed text-xl text-primary font-semibold mb-4 max-w-xs leading-relaxed">
                   Seu assistente financeiro inteligente.
                 </p>
-                <p className="text-muted-foreground text-base max-w-[280px] leading-relaxed">
+                <p className="max-w-[100vw] leading-relaxed text-muted-foreground text-base max-w-[280px] leading-relaxed">
                   Ele te ajuda a registrar gastos, entender seus hábitos e mudar sua relação com o dinheiro.
                 </p>
               </div>
@@ -257,7 +263,7 @@ export const Onboarding = () => {
 
             {step.id === "concept" && (
               <div className="flex-1 flex flex-col">
-                <div className="text-center mb-10">
+                <div className="max-w-[100vw] leading-relaxed text-center mb-10">
                   <motion.h1
                     initial={{ opacity: 0, y: -10 }}
                     animate={{ opacity: 1, y: 0 }}
@@ -265,7 +271,7 @@ export const Onboarding = () => {
                   >
                     Como funciona
                   </motion.h1>
-                  <p className="text-muted-foreground/80">Dois ambientes, um único propósito</p>
+                  <p className="max-w-[100vw] leading-relaxed text-muted-foreground/80">Dois ambientes, um único propósito</p>
                 </div>
                 <div className="space-y-6 mb-8">
                   {conceptCards.map((card, index) => (
@@ -293,7 +299,7 @@ export const Onboarding = () => {
                         </div>
                         <div>
                           <h3 className="font-bold text-xl mb-1.5 tracking-tight">{card.title}</h3>
-                          <p className="text-muted-foreground/90 text-sm leading-relaxed">{card.description}</p>
+                          <p className="max-w-[100vw] leading-relaxed text-muted-foreground/90 text-sm leading-relaxed leading-relaxed">{card.description}</p>
                         </div>
                       </div>
                     </motion.div>
@@ -303,9 +309,9 @@ export const Onboarding = () => {
                   initial={{ opacity: 0, scale: 0.9 }}
                   animate={{ opacity: 1, scale: 1 }}
                   transition={{ delay: 0.6 }}
-                  className="text-center p-6 rounded-2xl bg-primary/5 border border-primary/10"
+                  className="max-w-[100vw] leading-relaxed text-center p-6 rounded-2xl bg-primary/5 border border-primary/10"
                 >
-                  <p className="text-lg font-medium text-primary italic leading-tight">
+                  <p className="max-w-[100vw] leading-relaxed text-lg leading-relaxed font-medium text-primary italic leading-tight">
                     "Fale com o Saldin no WhatsApp.<br />Encare a verdade no app."
                   </p>
                 </motion.div>
@@ -314,7 +320,7 @@ export const Onboarding = () => {
 
             {step.id === "bank-account" && (
               <div className="flex-1 flex flex-col">
-                <div className="text-center mb-8">
+                <div className="max-w-[100vw] leading-relaxed text-center mb-8">
                   <motion.div
                     initial={{ scale: 0.8, opacity: 0, rotate: -10 }}
                     animate={{ scale: 1, opacity: 1, rotate: 0 }}
@@ -324,7 +330,7 @@ export const Onboarding = () => {
                     <Landmark className="w-12 h-12 text-primary" />
                   </motion.div>
                   <h1 className="font-serif text-3xl font-bold mb-3">Onde está seu dinheiro?</h1>
-                  <p className="text-muted-foreground max-w-xs mx-auto text-sm leading-relaxed">
+                  <p className="max-w-[100vw] leading-relaxed text-muted-foreground max-w-xs mx-auto text-sm leading-relaxed leading-relaxed">
                     Cadastre suas contas para começarmos a organizar sua liberdade financeira.
                   </p>
                 </div>
@@ -345,7 +351,7 @@ export const Onboarding = () => {
                               <span className="w-6 h-6 rounded-full bg-primary/10 flex items-center justify-center text-[10px] font-bold text-primary">
                                 {accIndex + 1}
                               </span>
-                              <p className="text-xs font-bold uppercase tracking-widest text-muted-foreground">
+                              <p className="max-w-[100vw] leading-relaxed text-xs font-bold uppercase tracking-widest text-muted-foreground">
                                 Conta Bancária
                               </p>
                             </div>
@@ -362,8 +368,8 @@ export const Onboarding = () => {
                           </div>
 
                           {/* Bank selector */}
-                          <div className="mb-6">
-                            <label className="text-[10px] uppercase font-bold tracking-widest text-muted-foreground mb-3 block">Selecione o Banco</label>
+                          <div className="leading-relaxed mb-6">
+                            <label className="max-w-[100vw] leading-relaxed text-[10px] uppercase font-bold tracking-widest text-muted-foreground mb-3 block">Selecione o Banco</label>
                             <div className="grid grid-cols-4 gap-2">
                               {BANK_LIST.filter((b) => b.key !== "outros").map((bank) => (
                                 <motion.button
@@ -423,9 +429,9 @@ export const Onboarding = () => {
                                 initial={{ height: 0, opacity: 0 }}
                                 animate={{ height: "auto", opacity: 1 }}
                                 exit={{ height: 0, opacity: 0 }}
-                                className="mb-6 overflow-hidden"
+                                className="leading-relaxed mb-6 overflow-hidden"
                               >
-                                <label className="text-xs font-bold text-muted-foreground mb-2 block">Nome da Instituição</label>
+                                <label className="max-w-[100vw] leading-relaxed text-xs font-bold text-muted-foreground mb-2 block">Nome da Instituição</label>
                                 <Input
                                   placeholder="Digite o nome do banco..."
                                   value={acc.customBankName}
@@ -445,7 +451,7 @@ export const Onboarding = () => {
                               className="space-y-5"
                             >
                               <div>
-                                <label className="text-[10px] uppercase font-bold tracking-widest text-muted-foreground mb-3 block">Tipo de conta</label>
+                                <label className="max-w-[100vw] leading-relaxed text-[10px] uppercase font-bold tracking-widest text-muted-foreground mb-3 block">Tipo de conta</label>
                                 <div className="grid grid-cols-3 gap-2">
                                   {accountTypeOptions.map((opt) => (
                                     <motion.button
@@ -466,17 +472,17 @@ export const Onboarding = () => {
                               </div>
 
                               <div>
-                                <label className="text-[10px] uppercase font-bold tracking-widest text-muted-foreground mb-3 block">
+                                <label className="max-w-[100vw] leading-relaxed text-[10px] uppercase font-bold tracking-widest text-muted-foreground mb-3 block">
                                   Qual seu saldo atual? (R$)
                                 </label>
                                 <CurrencyInput
                                   value={acc.initialBalance}
                                   onChange={(val) => updateBankAccount(acc.id, { initialBalance: val })}
-                                  className="text-lg font-bold h-14 rounded-2xl bg-background/50 border-border/50 focus:border-primary shadow-inner"
+                                  className="max-w-[100vw] leading-relaxed text-lg leading-relaxed font-bold h-14 rounded-2xl bg-background/50 border-border/50 focus:border-primary shadow-inner"
                                 />
                                 <div className="flex items-center gap-2 mt-2 px-1">
                                   <div className="w-1 h-1 rounded-full bg-primary" />
-                                  <p className="text-[10px] text-muted-foreground">
+                                  <p className="max-w-[100vw] leading-relaxed text-[10px] text-muted-foreground">
                                     Este valor será o ponto de partida do seu saldo real.
                                   </p>
                                 </div>
@@ -512,8 +518,8 @@ export const Onboarding = () => {
                     </div>
                   </>
                 ) : (
-                  <div className="text-center py-8">
-                    <p className="text-muted-foreground mb-4">
+                  <div className="max-w-[100vw] leading-relaxed text-center py-8">
+                    <p className="max-w-[100vw] leading-relaxed text-muted-foreground mb-4">
                       Tudo bem! Você pode cadastrar suas contas a qualquer momento.
                     </p>
                     <Button
@@ -538,11 +544,11 @@ export const Onboarding = () => {
                 >
                   <CreditCard className="w-10 h-10 text-primary" />
                 </motion.div>
-                <h1 className="font-serif text-3xl font-semibold mb-3">Importar fatura do cartão?</h1>
-                <p className="text-muted-foreground max-w-xs mb-2">
+                <h2 className="font-serif text-3xl font-semibold mb-3">Importar fatura do cartão?</h2>
+                <p className="max-w-[100vw] leading-relaxed text-muted-foreground max-w-xs mb-2">
                   Importe sua fatura atual em PDF ou CSV para já começar com seus gastos registrados.
                 </p>
-                <p className="text-xs text-muted-foreground max-w-xs mb-8">
+                <p className="max-w-[100vw] leading-relaxed text-xs text-muted-foreground max-w-xs mb-8">
                   Você precisará cadastrar um cartão primeiro. Essa etapa é totalmente opcional.
                 </p>
 

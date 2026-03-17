@@ -93,7 +93,7 @@ const getGoalTheme = (name: string) => {
   return {
     icon: Target,
     image: "https://images.unsplash.com/photo-1557683316-973673baf926?q=80&w=500&auto=format&fit=crop", // Abstract gradient
-    overlay: "bg-purple-900/40"
+    overlay: "bg-teal-900/40"
   };
 };
 
@@ -110,7 +110,7 @@ export const GoalsSummary = ({ goals, totalSaved, totalTarget }: GoalsSummaryPro
           <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center">
             <Target className="w-4 h-4 text-primary" />
           </div>
-          <h3 className="text-sm font-semibold text-foreground uppercase tracking-wider">Minhas Metas</h3>
+          <h3 className="max-w-[100vw] leading-relaxed text-sm leading-relaxed font-semibold text-foreground uppercase tracking-wider">Minhas Metas</h3>
         </div>
         <Button
           variant="ghost"
@@ -162,7 +162,7 @@ export const GoalsSummary = ({ goals, totalSaved, totalTarget }: GoalsSummaryPro
                 <div className="relative z-10 flex flex-col h-full justify-between">
                   {/* Category/Icon Badge */}
                   <div className="flex items-center justify-between">
-                    <div className="w-9 h-9 rounded-xl bg-white/15 backdrop-blur-xl flex items-center justify-center border border-white/20 shadow-soft group-hover:rotate-12 transition-transform duration-500">
+                    <div className="w-9 h-9 rounded-xl bg-background/15 backdrop-blur-xl flex items-center justify-center border border-white/20 shadow-soft group-hover:rotate-12 transition-transform duration-500">
                       <Icon className="w-4 h-4 text-white" />
                     </div>
                     {isCompleted && (
@@ -174,7 +174,7 @@ export const GoalsSummary = ({ goals, totalSaved, totalTarget }: GoalsSummaryPro
 
                   {/* Goal Name */}
                   <div className="mt-4">
-                    <p className="font-bold text-lg leading-tight text-white drop-shadow-lg group-hover:translate-x-1 transition-transform">
+                    <p className="font-bold text-lg leading-relaxed leading-tight text-white drop-shadow-lg group-hover:translate-x-1 transition-transform">
                       {goal.name}
                     </p>
                   </div>
@@ -182,16 +182,16 @@ export const GoalsSummary = ({ goals, totalSaved, totalTarget }: GoalsSummaryPro
                   {/* Footer with Glowing Progress */}
                   <div className="mt-auto">
                     <div className="flex justify-between items-end mb-2 px-0.5">
-                      <span className="text-[10px] text-white font-bold opacity-100">
+                      <span className="max-w-[100vw] leading-relaxed text-[10px] text-white font-bold opacity-100">
                         {Math.round(progress)}%
                       </span>
-                      <span className="text-[10px] text-white/70 font-medium">
+                      <span className="max-w-[100vw] leading-relaxed text-[10px] text-white/70 font-medium">
                         {formatCurrency(goal.target_amount)}
                       </span>
                     </div>
 
                     {/* Progress Bar Container */}
-                    <div className="h-2 w-full bg-white/15 rounded-full overflow-hidden backdrop-blur-md border border-white/5">
+                    <div className="h-2 w-full bg-background/15 rounded-full overflow-hidden backdrop-blur-md border border-white/5">
                       <motion.div
                         initial={{ width: 0 }}
                         animate={{ width: `${Math.min(progress, 100)}%` }}
@@ -199,14 +199,14 @@ export const GoalsSummary = ({ goals, totalSaved, totalTarget }: GoalsSummaryPro
                         className="relative h-full bg-primary rounded-full"
                       >
                         {/* Glowing tip */}
-                        <div className="absolute top-0 right-0 bottom-0 w-2 bg-white blur-[4px] opacity-60" />
+                        <div className="absolute top-0 right-0 bottom-0 w-2 bg-background blur-[4px] opacity-60" />
                         <div className="absolute inset-0 bg-gradient-to-r from-transparent to-white/30" />
                       </motion.div>
                     </div>
 
                     <div className="mt-2 flex items-center gap-1.5 overflow-hidden">
                       <PiggyBank className="w-3 h-3 text-white/50 shrink-0" />
-                      <p className="text-[9px] text-white/60 truncate font-semibold">
+                      <p className="max-w-[100vw] leading-relaxed text-[9px] text-white/60 truncate font-semibold">
                         {formatCurrency(goal.current_amount)} salvos
                       </p>
                     </div>
@@ -224,7 +224,7 @@ export const GoalsSummary = ({ goals, totalSaved, totalTarget }: GoalsSummaryPro
             <div className="w-8 h-8 rounded-full bg-muted flex items-center justify-center">
               <Plus className="w-4 h-4 text-muted-foreground" />
             </div>
-            <span className="text-[10px] font-medium text-muted-foreground text-center leading-tight">
+            <span className="max-w-[100vw] leading-relaxed text-[10px] font-medium text-muted-foreground text-center leading-tight">
               Nova<br />Meta
             </span>
           </div>

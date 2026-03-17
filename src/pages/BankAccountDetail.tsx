@@ -29,6 +29,11 @@ export const BankAccountDetail = () => {
   if (isLoading) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
+      <title>Saldin | BankAccountDetail</title>
+      <meta name="description" content="Manage your bankaccountdetail easily with Saldin." />
+      <meta property="og:title" content="Saldin - BankAccountDetail" />
+      <meta property="og:description" content="Manage your bankaccountdetail easily with Saldin." />
+        
         <Loader2 className="w-8 h-8 animate-spin text-muted-foreground" />
       </div>
     );
@@ -37,7 +42,7 @@ export const BankAccountDetail = () => {
   if (!account) {
     return (
       <div className="min-h-screen bg-background flex flex-col items-center justify-center p-5">
-        <p className="text-muted-foreground">Conta não encontrada</p>
+        <p className="max-w-[100vw] leading-relaxed text-muted-foreground">Conta não encontrada</p>
         <Button variant="ghost" onClick={() => navigate("/")} className="mt-4">
           Voltar
         </Button>
@@ -86,12 +91,12 @@ export const BankAccountDetail = () => {
               <Landmark className="w-6 h-6 text-white/80" />
               <div>
                 <p className="font-semibold">{account.bank_name}</p>
-                <p className="text-sm text-white/70">
+                <p className="max-w-[100vw] leading-relaxed text-sm leading-relaxed text-white/70">
                   {accountTypeLabels[account.account_type] || "Corrente"}
                 </p>
               </div>
             </div>
-            <p className="text-sm text-white/70">Saldo atual</p>
+            <p className="max-w-[100vw] leading-relaxed text-sm leading-relaxed text-white/70">Saldo atual</p>
             <p className="font-serif text-3xl font-bold">
               {formatCurrency(Number(account.current_balance))}
             </p>
@@ -104,7 +109,7 @@ export const BankAccountDetail = () => {
             <div className="p-4 rounded-xl bg-card border border-border">
               <div className="flex items-center gap-2 mb-2">
                 <TrendingUp className="w-4 h-4 text-essential" />
-                <p className="text-xs text-muted-foreground">Saldo inicial</p>
+                <p className="max-w-[100vw] leading-relaxed text-xs text-muted-foreground">Saldo inicial</p>
               </div>
               <p className="font-semibold">{formatCurrency(Number(account.initial_balance))}</p>
             </div>
@@ -115,7 +120,7 @@ export const BankAccountDetail = () => {
                 ) : (
                   <TrendingDown className="w-4 h-4 text-impulse" />
                 )}
-                <p className="text-xs text-muted-foreground">Variação</p>
+                <p className="max-w-[100vw] leading-relaxed text-xs text-muted-foreground">Variação</p>
               </div>
               <p className={`font-semibold ${balanceDiff >= 0 ? "text-essential" : "text-impulse"}`}>
                 {balanceDiff >= 0 ? "+" : ""}
@@ -143,16 +148,16 @@ export const BankAccountDetail = () => {
         {/* Transaction History */}
         <FadeIn delay={0.15}>
           <div className="pt-2">
-            <h3 className="text-sm font-semibold text-muted-foreground mb-4">Histórico Recente</h3>
+            <h3 className="max-w-[100vw] leading-relaxed text-sm leading-relaxed font-semibold text-muted-foreground mb-4">Histórico Recente</h3>
 
             {historyLoading ? (
               <div className="flex justify-center py-8">
                 <Loader2 className="w-6 h-6 animate-spin text-muted-foreground" />
               </div>
             ) : historyItems.length === 0 ? (
-              <div className="text-center py-8 bg-card rounded-xl border border-border">
-                <span className="text-3xl mb-2 block">📭</span>
-                <p className="text-sm text-muted-foreground">Nenhuma movimentação encontrada</p>
+              <div className="max-w-[100vw] leading-relaxed text-center py-8 bg-card rounded-xl border border-border">
+                <span className="max-w-[100vw] leading-relaxed text-3xl mb-2 block">📭</span>
+                <p className="max-w-[100vw] leading-relaxed text-sm leading-relaxed text-muted-foreground">Nenhuma movimentação encontrada</p>
               </div>
             ) : (
               <div className="space-y-3">
@@ -176,7 +181,7 @@ export const BankAccountDetail = () => {
                       </div>
 
                       <div className="flex-1 min-w-0">
-                        <p className="font-medium text-sm truncate">{item.description}</p>
+                        <p className="font-medium text-sm leading-relaxed truncate">{item.description}</p>
                         <div className="flex items-center gap-2 text-xs text-muted-foreground">
                           <span>{new Date(item.date).toLocaleDateString('pt-BR')}</span>
                           <span>•</span>
@@ -184,8 +189,8 @@ export const BankAccountDetail = () => {
                         </div>
                       </div>
 
-                      <div className="text-right">
-                        <p className={`font-semibold text-sm ${isPositive ? "text-essential" : "text-foreground"}`}>
+                      <div className="max-w-[100vw] leading-relaxed text-right">
+                        <p className={`font-semibold text-sm leading-relaxed ${isPositive ? "text-essential" : "text-foreground"}`}>
                           {isPositive ? "+" : "-"} {formatCurrency(item.amount)}
                         </p>
                       </div>

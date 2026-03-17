@@ -286,6 +286,7 @@ export async function generateFinancialReport({
       alternateRowStyles: { fillColor: [248, 248, 245] },
       columnStyles: { 4: { halign: "right", fontStyle: "bold" } },
     });
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     y = (doc as any).lastAutoTable.finalY + 10;
   }
 
@@ -356,6 +357,7 @@ export async function generateFinancialReport({
           3: { halign: "right", fontStyle: "bold" },
         },
       });
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       y = (doc as any).lastAutoTable.finalY + 3;
     }
 
@@ -431,6 +433,7 @@ export async function generateFinancialReport({
         alternateRowStyles: { fillColor: [245, 248, 252] },
         columnStyles: { 4: { halign: "right", fontStyle: "bold" } },
       });
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       y = (doc as any).lastAutoTable.finalY + 5;
     }
 
@@ -486,6 +489,7 @@ export async function generateFinancialReport({
         5: { halign: "right", fontStyle: "bold" },
       },
     });
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     y = (doc as any).lastAutoTable.finalY + 5;
 
     // Total comprometido
@@ -535,6 +539,7 @@ export async function generateFinancialReport({
       alternateRowStyles: { fillColor: [245, 248, 252] },
       columnStyles: { 1: { halign: "right", fontStyle: "bold" } },
     });
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     y = (doc as any).lastAutoTable.finalY + 3;
   }
 
@@ -591,6 +596,7 @@ export async function generateFinancialReport({
         3: { halign: "center" },
       },
     });
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     y = (doc as any).lastAutoTable.finalY + 10;
   }
 

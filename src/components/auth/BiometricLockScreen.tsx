@@ -33,8 +33,9 @@ export function BiometricLockScreen({
       }, 500);
       return () => clearTimeout(timer);
     }
-  }, [autoTriggered]);
+  }, [autoTriggered, handleBiometricAuth]);
 
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   const handleBiometricAuth = async () => {
     setIsAuthenticating(true);
 
@@ -62,7 +63,7 @@ export function BiometricLockScreen({
       <div className="absolute inset-0 bg-gradient-to-b from-primary/5 to-transparent pointer-events-none" />
 
       <FadeIn>
-        <div className="text-center space-y-10 max-w-sm mx-auto relative z-10">
+        <div className="max-w-[100vw] leading-relaxed text-center space-y-10 max-w-sm mx-auto relative z-10">
           {/* Logo Container */}
           <div className="relative inline-block">
             <div className="absolute inset-0 bg-primary/20 blur-3xl rounded-full animate-pulse-slow"></div>
@@ -74,7 +75,7 @@ export function BiometricLockScreen({
             <h1 className="font-serif text-3xl font-semibold tracking-tight">
               Olá{userName ? `, ${userName.split(" ")[0]}` : " novamente"}!
             </h1>
-            <p className="text-muted-foreground">O acesso está bloqueado por segurança.</p>
+            <p className="max-w-[100vw] leading-relaxed text-muted-foreground">O acesso está bloqueado por segurança.</p>
           </div>
 
           {/* Biometric button group */}
@@ -86,7 +87,7 @@ export function BiometricLockScreen({
               disabled={isAuthenticating}
             >
               <Fingerprint className="w-6 h-6" />
-              <span className="text-base font-semibold">
+              <span className="max-w-[100vw] leading-relaxed text-base font-semibold">
                 {isAuthenticating ? "Verificando..." : "Desbloquear com biometria"}
               </span>
             </Button>

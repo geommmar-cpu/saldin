@@ -44,6 +44,7 @@ export default function EditCreditCard() {
     const { data: cards = [] } = useCreditCards();
 
     // Find existing main card for confirmation
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const existingCardId = (profile as any)?.wa_default_expense_card_id;
     const existingCard = cards.find(c => c.id === existingCardId);
     const isEditingCurrentMain = existingCardId === id;
@@ -61,6 +62,7 @@ export default function EditCreditCard() {
             if (bank) setSelectedBank(bank.key);
 
             if (profile) {
+                // eslint-disable-next-line @typescript-eslint/no-explicit-any
                 setIsMainCard((profile as any).wa_default_expense_card_id === card.id);
             }
         }
@@ -70,7 +72,7 @@ export default function EditCreditCard() {
         ? BANK_LIST.find(b => b.key === selectedBank)
         : detectBank(cardName);
 
-    const cardColor = bankTheme?.color || card?.color || "#8B5CF6";
+    const cardColor = bankTheme?.color || card?.color || "#14b8a6";
     const canSubmit = cardName.trim() && closingDay && dueDay;
 
     const handleSubmit = async () => {
@@ -90,11 +92,14 @@ export default function EditCreditCard() {
         if (isMainCard) {
             await updateProfile.mutateAsync({
                 wa_default_expense_card_id: id
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
             } as any);
         } else {
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
             if ((profile as any).wa_default_expense_card_id === id) {
                 await updateProfile.mutateAsync({
                     wa_default_expense_card_id: null
+                // eslint-disable-next-line @typescript-eslint/no-explicit-any
                 } as any);
             }
         }
@@ -105,6 +110,11 @@ export default function EditCreditCard() {
     if (isLoading) {
         return (
             <div className="min-h-screen bg-background flex items-center justify-center">
+      <title>Saldin | EditCreditCard</title>
+      <meta name="description" content="Manage your editcreditcard easily with Saldin." />
+      <meta property="og:title" content="Saldin - EditCreditCard" />
+      <meta property="og:description" content="Manage your editcreditcard easily with Saldin." />
+        
                 <Loader2 className="w-8 h-8 animate-spin text-muted-foreground" />
             </div>
         );
@@ -132,19 +142,19 @@ export default function EditCreditCard() {
                             <CreditCardIcon className="w-16 h-16" />
                         </div>
                         <div className="relative z-10">
-                            <div className="w-10 h-10 rounded-full bg-white/20 flex items-center justify-center shadow-inner overflow-hidden border border-white/10 backdrop-blur-sm">
+                            <div className="w-10 h-10 rounded-full bg-background/20 flex items-center justify-center shadow-inner overflow-hidden border border-white/10 backdrop-blur-sm">
                                 <BankLogo
                                     bankName={bankTheme?.name || "Cartão"}
                                     className="w-full h-full border-0 bg-transparent"
                                     iconClassName="text-white"
                                 />
                             </div>
-                            <p className="text-sm opacity-80 font-semibold tracking-tight uppercase">
+                            <p className="max-w-[100vw] leading-relaxed text-sm leading-relaxed opacity-80 font-semibold tracking-tight uppercase">
                                 {cardBrand || bankTheme?.name || "Cartão"}
                             </p>
-                            <h3 className="text-xl font-bold mt-1">{cardName || "Nome do cartão"}</h3>
+                            <h3 className="max-w-[100vw] leading-relaxed text-xl font-bold mt-1">{cardName || "Nome do cartão"}</h3>
                             {lastFour && (
-                                <p className="text-sm opacity-70 font-mono mt-3">•••• •••• •••• {lastFour}</p>
+                                <p className="max-w-[100vw] leading-relaxed text-sm leading-relaxed opacity-70 font-mono mt-3">•••• •••• •••• {lastFour}</p>
                             )}
                         </div>
                     </div>
@@ -152,7 +162,7 @@ export default function EditCreditCard() {
                     {/* Form fields - Simplified for brevity but keeping essentials */}
                     <div className="space-y-4">
                         <div className="space-y-2">
-                            <label className="text-sm text-muted-foreground">Nome do cartão *</label>
+                            <label className="max-w-[100vw] leading-relaxed text-sm leading-relaxed text-muted-foreground">Nome do cartão *</label>
                             <Input
                                 placeholder="Ex: Nubank"
                                 value={cardName}
@@ -162,7 +172,7 @@ export default function EditCreditCard() {
                         </div>
 
                         <div className="space-y-2">
-                            <label className="text-sm text-muted-foreground">Limite total</label>
+                            <label className="max-w-[100vw] leading-relaxed text-sm leading-relaxed text-muted-foreground">Limite total</label>
                             <Input
                                 placeholder="5.000,00"
                                 value={limit}
@@ -176,7 +186,7 @@ export default function EditCreditCard() {
 
                         <div className="grid grid-cols-2 gap-3">
                             <div className="space-y-2">
-                                <label className="text-sm text-muted-foreground">Dia Fechamento *</label>
+                                <label className="max-w-[100vw] leading-relaxed text-sm leading-relaxed text-muted-foreground">Dia Fechamento *</label>
                                 <Input
                                     value={closingDay}
                                     onChange={e => setClosingDay(e.target.value.replace(/\D/g, "").slice(0, 2))}
@@ -184,7 +194,7 @@ export default function EditCreditCard() {
                                 />
                             </div>
                             <div className="space-y-2">
-                                <label className="text-sm text-muted-foreground">Dia Vencimento *</label>
+                                <label className="max-w-[100vw] leading-relaxed text-sm leading-relaxed text-muted-foreground">Dia Vencimento *</label>
                                 <Input
                                     value={dueDay}
                                     onChange={e => setDueDay(e.target.value.replace(/\D/g, "").slice(0, 2))}
@@ -196,8 +206,8 @@ export default function EditCreditCard() {
                         {/* Main card toggle */}
                         <div className="flex items-center justify-between p-4 rounded-xl bg-card border border-border shadow-soft mt-4">
                             <div>
-                                <p className="text-sm font-medium">Definir como cartão principal</p>
-                                <p className="text-xs text-muted-foreground">Usar para gastos via WhatsApp</p>
+                                <p className="max-w-[100vw] leading-relaxed text-sm leading-relaxed font-medium">Definir como cartão principal</p>
+                                <p className="max-w-[100vw] leading-relaxed text-xs text-muted-foreground">Usar para gastos via WhatsApp</p>
                             </div>
                             <Switch
                                 checked={isMainCard}

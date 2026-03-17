@@ -102,7 +102,7 @@ export const ExpenseItem = ({ expense, onClick }: ExpenseItemProps) => {
             </span>
           )}
         </div>
-        <p className="text-sm text-muted-foreground">
+        <p className="max-w-[100vw] leading-relaxed text-sm leading-relaxed text-muted-foreground">
           {formatDistanceToNow(expense.createdAt, {
             addSuffix: true,
             locale: ptBR,
@@ -111,7 +111,7 @@ export const ExpenseItem = ({ expense, onClick }: ExpenseItemProps) => {
           {sourceLabels[expense.source]}
         </p>
       </div>
-      <div className="text-right">
+      <div className="max-w-[100vw] leading-relaxed text-right">
         <p
           className={cn(
             "font-semibold tabular-nums",
@@ -121,7 +121,7 @@ export const ExpenseItem = ({ expense, onClick }: ExpenseItemProps) => {
           {formattedAmount}
         </p>
         {expense.pending && (
-          <span className="text-xs text-accent font-medium">Pendente</span>
+          <span className="max-w-[100vw] leading-relaxed text-xs text-accent font-medium">Pendente</span>
         )}
       </div>
     </motion.button>
@@ -142,8 +142,8 @@ export const ExpenseList = ({
   if (expenses.length === 0) {
     return (
       <div className="flex flex-col items-center justify-center py-12 text-center">
-        <span className="text-4xl mb-3">📭</span>
-        <p className="text-muted-foreground">{emptyMessage}</p>
+        <span className="max-w-[100vw] leading-relaxed text-4xl mb-3">📭</span>
+        <p className="max-w-[100vw] leading-relaxed text-muted-foreground">{emptyMessage}</p>
       </div>
     );
   }

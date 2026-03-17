@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 // Cálculos de saldo do Saldin
 // Implementa os 3 tipos de saldo: Bruto, Comprometido e Livre
 
@@ -149,14 +150,16 @@ export function calculateBalances(
   // Cálculos principais
   if (bankTotal !== undefined) {
     const confirmedUnlinkedIncome = filteredIncomes
+       
       .filter(i => !(i as any).bank_account_id && (i.status === "received" || i.status === "confirmed" || !i.status))
       .reduce((sum, i) => sum + Number(i.amount), 0);
     const confirmedUnlinkedExpenses = filteredExpenses
+       
       .filter(e => !(e as any).bank_account_id && e.status === "confirmed")
       .reduce((sum, e) => sum + Number(e.amount), 0);
-    var saldoBruto = bankTotal + confirmedUnlinkedIncome - confirmedUnlinkedExpenses;
+    const saldoBruto = bankTotal + confirmedUnlinkedIncome - confirmedUnlinkedExpenses;
   } else {
-    var saldoBruto = receitasTotal - gastosTotal;
+    const saldoBruto = receitasTotal - gastosTotal;
   }
   // Saldo Comprometido = o que ainda vai sair este mês
   const saldoComprometido = dividasAtivas + valoresParaTerceiros + ccInstallmentsTotal + contasRecorrentesPendentes + assinaturasPendentes;

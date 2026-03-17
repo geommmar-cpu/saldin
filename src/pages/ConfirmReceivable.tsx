@@ -100,6 +100,7 @@ const ConfirmReceivable = () => {
 
       toast.success(isLoan ? "Empréstimo registrado com sucesso!" : "Valor a receber registrado!");
       navigate("/");
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (error: any) {
       console.error("Failed to save receivable:", error);
       const errorMessage = error?.message || "Erro desconhecido";
@@ -114,6 +115,11 @@ const ConfirmReceivable = () => {
 
   return (
     <div className="min-h-screen bg-background pb-32">
+      <title>Saldin | ConfirmReceivable</title>
+      <meta name="description" content="Manage your confirmreceivable easily with Saldin." />
+      <meta property="og:title" content="Saldin - ConfirmReceivable" />
+      <meta property="og:description" content="Manage your confirmreceivable easily with Saldin." />
+        
       <header className="px-5 pt-safe-top">
         <div className="pt-4 pb-4">
           <FadeIn>
@@ -136,8 +142,8 @@ const ConfirmReceivable = () => {
 
       <main className="px-5 space-y-6">
         <FadeIn>
-          <div className="text-center py-4">
-            <p className="text-sm text-muted-foreground mb-1">Valor Total</p>
+          <div className="max-w-[100vw] leading-relaxed text-center py-4">
+            <p className="max-w-[100vw] leading-relaxed text-sm leading-relaxed text-muted-foreground mb-1">Valor Total</p>
             <p className="font-serif text-4xl font-semibold text-essential">{formattedAmount}</p>
           </div>
         </FadeIn>
@@ -145,7 +151,7 @@ const ConfirmReceivable = () => {
         <div className="space-y-5">
           {/* Debtor Name */}
           <FadeIn delay={0.05} className="space-y-2">
-            <Label htmlFor="debtorName" className="text-sm font-bold uppercase tracking-widest text-muted-foreground/80">
+            <Label htmlFor="debtorName" className="max-w-[100vw] leading-relaxed text-sm leading-relaxed font-bold uppercase tracking-widest text-muted-foreground/80">
               Nome da pessoa
             </Label>
             <div className="relative">
@@ -168,8 +174,8 @@ const ConfirmReceivable = () => {
                   <Handshake className="w-5 h-5 text-primary" />
                 </div>
                 <div>
-                  <p className="text-sm font-bold">É um empréstimo?</p>
-                  <p className="text-[10px] text-muted-foreground">O dinheiro sairá da sua conta agora.</p>
+                  <p className="max-w-[100vw] leading-relaxed text-sm leading-relaxed font-bold">É um empréstimo?</p>
+                  <p className="max-w-[100vw] leading-relaxed text-[10px] text-muted-foreground">O dinheiro sairá da sua conta agora.</p>
                 </div>
               </div>
               <Switch checked={isLoan} onCheckedChange={setIsLoan} />
@@ -180,7 +186,7 @@ const ConfirmReceivable = () => {
           <FadeIn delay={0.15} className="space-y-4">
             {isLoan && (
               <ScaleIn className="space-y-2">
-                <Label className="text-sm font-bold uppercase tracking-widest text-muted-foreground/80">Conta de Origem (Saída)</Label>
+                <Label className="max-w-[100vw] leading-relaxed text-sm leading-relaxed font-bold uppercase tracking-widest text-muted-foreground/80">Conta de Origem (Saída)</Label>
                 <Select value={sourceAccountId} onValueChange={setSourceAccountId}>
                   <SelectTrigger className="h-12 bg-secondary/30 border-none focus:ring-primary">
                     <SelectValue placeholder="De onde sai o dinheiro?" />
@@ -201,7 +207,7 @@ const ConfirmReceivable = () => {
 
             <div className="space-y-2">
               <div className="flex justify-between items-center">
-                <Label className="text-sm font-bold uppercase tracking-widest text-muted-foreground/80">
+                <Label className="max-w-[100vw] leading-relaxed text-sm leading-relaxed font-bold uppercase tracking-widest text-muted-foreground/80">
                   {isLoan ? "Conta de Destino (Opcional)" : "Conta de Destino (Futuro)"}
                 </Label>
                 {isLoan && bankAccountId && (
@@ -230,7 +236,7 @@ const ConfirmReceivable = () => {
 
           {/* Date Picker */}
           <FadeIn delay={0.2} className="space-y-2">
-            <Label className="text-sm font-bold uppercase tracking-widest text-muted-foreground/80">
+            <Label className="max-w-[100vw] leading-relaxed text-sm leading-relaxed font-bold uppercase tracking-widest text-muted-foreground/80">
               {isInstallment ? "Data da 1ª Parcela" : "Data do Recebimento"}
             </Label>
             <Popover>
@@ -268,8 +274,8 @@ const ConfirmReceivable = () => {
                   <Repeat className="w-5 h-5 text-accent" />
                 </div>
                 <div>
-                  <p className="text-sm font-bold">Parcelado?</p>
-                  <p className="text-[10px] text-muted-foreground">Serão criados registros mensais.</p>
+                  <p className="max-w-[100vw] leading-relaxed text-sm leading-relaxed font-bold">Parcelado?</p>
+                  <p className="max-w-[100vw] leading-relaxed text-[10px] text-muted-foreground">Serão criados registros mensais.</p>
                 </div>
               </div>
               <Switch checked={isInstallment} onCheckedChange={setIsInstallment} />
@@ -277,7 +283,7 @@ const ConfirmReceivable = () => {
 
             {isInstallment && (
               <ScaleIn className="space-y-2">
-                <Label className="text-sm font-bold uppercase tracking-widest text-muted-foreground/80">Número de Parcelas</Label>
+                <Label className="max-w-[100vw] leading-relaxed text-sm leading-relaxed font-bold uppercase tracking-widest text-muted-foreground/80">Número de Parcelas</Label>
                 <Input
                   type="number"
                   min="2"
@@ -292,7 +298,7 @@ const ConfirmReceivable = () => {
 
           {/* Description */}
           <FadeIn delay={0.3} className="space-y-2">
-            <Label htmlFor="description" className="text-sm font-bold uppercase tracking-widest text-muted-foreground/80">
+            <Label htmlFor="description" className="max-w-[100vw] leading-relaxed text-sm leading-relaxed font-bold uppercase tracking-widest text-muted-foreground/80">
               Descrição (opcional)
             </Label>
             <Textarea
@@ -307,7 +313,7 @@ const ConfirmReceivable = () => {
           {/* Validation & Submit */}
           <FadeIn delay={0.35} className="pt-4 pb-8">
             {validationError && (
-              <div className="flex items-center gap-2 p-4 rounded-2xl bg-destructive/10 text-destructive text-sm mb-4 border border-destructive/20 scale-in-sm">
+              <div className="flex items-center gap-2 p-4 rounded-2xl bg-destructive/10 text-destructive text-sm leading-relaxed mb-4 border border-destructive/20 scale-in-sm">
                 <AlertCircle className="w-5 h-5" />
                 {validationError}
               </div>

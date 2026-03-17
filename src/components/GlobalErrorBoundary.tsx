@@ -43,17 +43,17 @@ export class GlobalErrorBoundary extends Component<Props, State> {
     public render() {
         if (this.state.hasError) {
             return (
-                <div className="min-h-screen bg-black text-white p-6 flex flex-col items-center justify-center text-center">
-                    <h1 className="text-2xl font-bold text-red-500 mb-4">Algo deu errado :(</h1>
-                    <p className="mb-4 text-gray-300">
+                <div className="min-h-screen bg-foreground text-white p-6 flex flex-col items-center justify-center text-center">
+                    <h1 className="max-w-[100vw] leading-relaxed text-2xl font-bold text-red-500 mb-4">Algo deu errado :(</h1>
+                    <p className="leading-relaxed mb-4 text-gray-300">
                         Ocorreu um erro inesperado na aplicação.
                     </p>
-                    <div className="bg-gray-900 p-4 rounded-lg text-left overflow-auto w-full max-w-lg mb-6 border border-gray-800">
-                        <p className="text-red-400 font-mono text-sm break-all">
+                    <div className="bg-gray-900 p-4 rounded-lg text-left overflow-auto w-full max-w-lg mb-6 border border-border">
+                        <p className="max-w-[100vw] leading-relaxed text-red-400 font-mono text-sm leading-relaxed break-all">
                             {this.state.error?.toString()}
                         </p>
                         {this.state.errorInfo && (
-                            <pre className="text-gray-500 text-xs mt-2 overflow-auto">
+                            <pre className="max-w-[100vw] leading-relaxed text-gray-500 text-xs mt-2 overflow-auto">
                                 {this.state.errorInfo.componentStack}
                             </pre>
                         )}

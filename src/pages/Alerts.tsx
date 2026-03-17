@@ -47,6 +47,11 @@ export const Alerts = () => {
 
   return (
     <div className="min-h-screen bg-background pb-24">
+      <title>Saldin | Alerts</title>
+      <meta name="description" content="Manage your alerts easily with Saldin." />
+      <meta property="og:title" content="Saldin - Alerts" />
+      <meta property="og:description" content="Manage your alerts easily with Saldin." />
+        
       {/* Header */}
       <header className="px-5 pt-safe-top">
         <div className="pt-4 pb-4 flex items-center gap-4">
@@ -55,7 +60,7 @@ export const Alerts = () => {
           </Button>
           <div>
             <h1 className="font-serif text-xl font-semibold">Alertas</h1>
-            <p className="text-sm text-muted-foreground">
+            <p className="max-w-[100vw] leading-relaxed text-sm leading-relaxed text-muted-foreground">
               {mockAlerts.length} alerta{mockAlerts.length !== 1 ? "s" : ""} ativo{mockAlerts.length !== 1 ? "s" : ""}
             </p>
           </div>
@@ -64,19 +69,19 @@ export const Alerts = () => {
 
       <main className="px-5 space-y-4">
         <FadeIn>
-          <p className="text-muted-foreground text-sm">
+          <p className="max-w-[100vw] leading-relaxed text-muted-foreground text-sm leading-relaxed">
             Alertas críticos não podem ser desativados. Eles existem para te proteger.
           </p>
         </FadeIn>
 
         {mockAlerts.length === 0 ? (
           <FadeIn delay={0.1}>
-            <div className="text-center py-12">
+            <div className="max-w-[100vw] leading-relaxed text-center py-12">
               <div className="w-16 h-16 rounded-full bg-essential/20 flex items-center justify-center mx-auto mb-4">
                 <AlertTriangle className="w-8 h-8 text-essential" />
               </div>
               <p className="font-medium mb-2">Nenhum alerta</p>
-              <p className="text-muted-foreground">
+              <p className="max-w-[100vw] leading-relaxed text-muted-foreground">
                 Você não tem alertas no momento.
               </p>
             </div>
@@ -104,12 +109,12 @@ export const Alerts = () => {
                     <div className="flex items-center gap-2 mb-1">
                       <h3 className="font-medium">{alert.title}</h3>
                       {alert.type === "critical" && (
-                        <span className="text-xs px-2 py-0.5 rounded-full bg-impulse text-impulse-foreground">
+                        <span className="max-w-[100vw] leading-relaxed text-xs px-2 py-0.5 rounded-full bg-impulse text-impulse-foreground">
                           Crítico
                         </span>
                       )}
                     </div>
-                    <p className="text-sm text-muted-foreground leading-relaxed">
+                    <p className="max-w-[100vw] leading-relaxed text-sm leading-relaxed text-muted-foreground leading-relaxed">
                       {alert.message}
                     </p>
                   </div>

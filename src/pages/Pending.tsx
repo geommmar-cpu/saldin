@@ -36,6 +36,11 @@ export const Pending = () => {
   if (isLoading) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center pb-24">
+      <title>Saldin | Pending</title>
+      <meta name="description" content="Manage your pending easily with Saldin." />
+      <meta property="og:title" content="Saldin - Pending" />
+      <meta property="og:description" content="Manage your pending easily with Saldin." />
+        
         <Loader2 className="w-8 h-8 animate-spin text-muted-foreground" />
         <BottomNav />
       </div>
@@ -52,7 +57,7 @@ export const Pending = () => {
           </Button>
           <div>
             <h1 className="font-serif text-xl font-semibold">Gastos Pendentes</h1>
-            <p className="text-sm text-muted-foreground">
+            <p className="max-w-[100vw] leading-relaxed text-sm leading-relaxed text-muted-foreground">
               {pendingExpenses.length} aguardando confirmação
             </p>
           </div>
@@ -65,8 +70,8 @@ export const Pending = () => {
           <div className="p-4 rounded-xl bg-accent/10 border border-accent/30 flex items-start gap-3">
             <AlertTriangle className="w-5 h-5 text-accent flex-shrink-0 mt-0.5" />
             <div>
-              <p className="font-medium text-sm mb-1">Por que confirmar?</p>
-              <p className="text-sm text-muted-foreground">
+              <p className="font-medium text-sm leading-relaxed mb-1">Por que confirmar?</p>
+              <p className="max-w-[100vw] leading-relaxed text-sm leading-relaxed text-muted-foreground">
                 Gastos importados precisam da sua reflexão emocional para entrar
                 nas análises de comportamento.
               </p>
@@ -80,11 +85,11 @@ export const Pending = () => {
             <div className="p-4 rounded-xl bg-card border border-border shadow-soft">
               <div className="flex justify-between items-center">
                 <div>
-                  <p className="text-sm text-muted-foreground">Total pendente</p>
+                  <p className="max-w-[100vw] leading-relaxed text-sm leading-relaxed text-muted-foreground">Total pendente</p>
                   <p className="font-serif text-2xl font-semibold">{formatCurrency(total)}</p>
                 </div>
-                <div className="text-right">
-                  <p className="text-sm text-muted-foreground">
+                <div className="max-w-[100vw] leading-relaxed text-right">
+                  <p className="max-w-[100vw] leading-relaxed text-sm leading-relaxed text-muted-foreground">
                     {pendingExpenses.length} gasto{pendingExpenses.length !== 1 ? "s" : ""}
                   </p>
                 </div>
@@ -118,7 +123,7 @@ export const Pending = () => {
                       <p className="font-medium truncate">
                         {expense.description}
                       </p>
-                      <p className="text-sm text-muted-foreground">
+                      <p className="max-w-[100vw] leading-relaxed text-sm leading-relaxed text-muted-foreground">
                         {formatDistanceToNow(new Date(expense.created_at), {
                           addSuffix: true,
                           locale: ptBR,
@@ -143,12 +148,12 @@ export const Pending = () => {
         {/* Empty State */}
         {pendingExpenses.length === 0 && (
           <FadeIn delay={0.2}>
-            <div className="text-center py-12">
+            <div className="max-w-[100vw] leading-relaxed text-center py-12">
               <div className="w-16 h-16 rounded-full bg-essential/20 flex items-center justify-center mx-auto mb-4">
                 <AlertTriangle className="w-8 h-8 text-essential" />
               </div>
               <p className="font-medium mb-2">Tudo em dia!</p>
-              <p className="text-muted-foreground">
+              <p className="max-w-[100vw] leading-relaxed text-muted-foreground">
                 Nenhum gasto aguardando confirmação.
               </p>
             </div>

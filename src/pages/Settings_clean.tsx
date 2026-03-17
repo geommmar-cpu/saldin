@@ -92,6 +92,7 @@ export const Settings = () => {
     if (profile?.ai_name && profile.ai_name !== preferences.aiName) {
       updatePreference("aiName", profile.ai_name);
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [profile?.ai_name]);
 
   const [loggingOut, setLoggingOut] = useState(false);
@@ -154,6 +155,7 @@ export const Settings = () => {
       await updateProfile.mutateAsync({ avatar_url: publicUrl });
       toast({ title: "Foto de perfil atualizada!" });
 
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (error: any) {
       console.error("Erro ao atualizar avatar:", error);
       toast({
@@ -229,6 +231,7 @@ export const Settings = () => {
         receivables: allReceivables || [],
         goals: allGoals || [],
         subscriptions: allSubscriptions,
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         creditCardInstallments: ccInstallments as any,
         userName: user?.user_metadata?.full_name || profile?.full_name,
         selectedMonth: new Date(),
@@ -271,6 +274,11 @@ export const Settings = () => {
 
   return (
     <div className="min-h-screen bg-background pb-24">
+      <title>Saldin | Settings_clean</title>
+      <meta name="description" content="Manage your settings_clean easily with Saldin." />
+      <meta property="og:title" content="Saldin - Settings_clean" />
+      <meta property="og:description" content="Manage your settings_clean easily with Saldin." />
+        
       {/* Header */}
       <header className="px-5 pt-safe-top sticky top-0 bg-background/95 backdrop-blur-sm z-10 border-b border-border">
         <div className="pt-4 pb-3 flex items-center gap-4">
@@ -295,7 +303,7 @@ export const Settings = () => {
                 </div>
               )}
               {uploadingAvatar && (
-                <div className="absolute inset-0 bg-black/50 flex items-center justify-center">
+                <div className="absolute inset-0 bg-foreground/50 flex items-center justify-center">
                   <Loader2 className="w-8 h-8 text-white animate-spin" />
                 </div>
               )}
@@ -304,15 +312,15 @@ export const Settings = () => {
               <Camera className="w-4 h-4" />
             </div>
           </div>
-          <input
+          <input aria-label="Input field" 
             type="file"
             ref={fileInputRef}
             onChange={handleAvatarChange}
             className="hidden"
             accept="image/*"
           />
-          <h2 className="mt-3 text-lg font-semibold">{profile?.full_name || "Usu├írio"}</h2>
-          <p className="text-sm text-muted-foreground">{user?.email}</p>
+          <h2 className="mt-3 text-lg leading-relaxed font-semibold">{profile?.full_name || "Usu├írio"}</h2>
+          <p className="max-w-[100vw] leading-relaxed text-sm leading-relaxed text-muted-foreground">{user?.email}</p>
         </div>
 
         {/* Bloco 1 - Conta */}
@@ -548,11 +556,11 @@ export const Settings = () => {
 
         {/* Product Tagline */}
         <FadeIn delay={0.3}>
-          <div className="text-center py-4">
-            <p className="text-xs text-muted-foreground italic">
+          <div className="max-w-[100vw] leading-relaxed text-center py-4">
+            <p className="max-w-[100vw] leading-relaxed text-xs text-muted-foreground italic">
               "Voc├¬ fala com a IA. Voc├¬ encara a verdade no app."
             </p>
-            <p className="text-xs text-muted-foreground mt-1">v1.0.0</p>
+            <p className="max-w-[100vw] leading-relaxed text-xs text-muted-foreground mt-1">v1.0.0</p>
           </div>
         </FadeIn>
       </main>
@@ -593,7 +601,7 @@ const AutoCaptureSection = ({ phone }: { phone: string }) => {
 
   return (
     <div>
-      <h2 className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-2 px-1">
+      <h2 className="max-w-[100vw] leading-relaxed text-xs font-medium text-muted-foreground uppercase tracking-wide mb-2 px-1">
         Captura Autom├ítica de Gastos
       </h2>
       <div className="bg-card rounded-xl border border-border shadow-soft overflow-hidden">
@@ -605,8 +613,8 @@ const AutoCaptureSection = ({ phone }: { phone: string }) => {
               <Bell className="w-5 h-5 text-emerald-600" />
             </div>
             <div>
-              <p className="text-sm font-semibold text-foreground">Registro autom├ítico via notifica├º├úo</p>
-              <p className="text-xs text-muted-foreground mt-0.5 leading-relaxed">
+              <p className="max-w-[100vw] leading-relaxed text-sm leading-relaxed font-semibold text-foreground">Registro autom├ítico via notifica├º├úo</p>
+              <p className="max-w-[100vw] leading-relaxed text-xs text-muted-foreground mt-0.5 leading-relaxed">
                 Quando chegar uma notifica├º├úo de compra do banco, o Saldin registra e confirma no seu WhatsApp ÔÇö sem voc├¬ digitar nada.
               </p>
             </div>
@@ -618,7 +626,7 @@ const AutoCaptureSection = ({ phone }: { phone: string }) => {
           <button
             onClick={() => setActiveTab("android")}
             className={cn(
-              "flex-1 py-3 text-sm font-medium transition-colors",
+              "flex-1 py-3 text-sm leading-relaxed font-medium transition-colors",
               activeTab === "android"
                 ? "text-foreground border-b-2 border-primary bg-primary/5"
                 : "text-muted-foreground hover:text-foreground"
@@ -629,7 +637,7 @@ const AutoCaptureSection = ({ phone }: { phone: string }) => {
           <button
             onClick={() => setActiveTab("ios")}
             className={cn(
-              "flex-1 py-3 text-sm font-medium transition-colors",
+              "flex-1 py-3 text-sm leading-relaxed font-medium transition-colors",
               activeTab === "ios"
                 ? "text-foreground border-b-2 border-primary bg-primary/5"
                 : "text-muted-foreground hover:text-foreground"
@@ -643,8 +651,8 @@ const AutoCaptureSection = ({ phone }: { phone: string }) => {
         {activeTab === "android" && (
           <div className="p-4 space-y-4">
             <div className="space-y-2">
-              <p className="text-xs font-semibold text-foreground uppercase tracking-wide">Passo 1</p>
-              <p className="text-sm text-muted-foreground">Baixe o <strong className="text-foreground">MacroDroid</strong> na Play Store (gratuito).</p>
+              <p className="max-w-[100vw] leading-relaxed text-xs font-semibold text-foreground uppercase tracking-wide">Passo 1</p>
+              <p className="max-w-[100vw] leading-relaxed text-sm leading-relaxed text-muted-foreground">Baixe o <strong className="max-w-[100vw] leading-relaxed text-foreground">MacroDroid</strong> na Play Store (gratuito).</p>
               <Button
                 variant="outline"
                 size="sm"
@@ -657,26 +665,26 @@ const AutoCaptureSection = ({ phone }: { phone: string }) => {
             </div>
 
             <div className="space-y-2">
-              <p className="text-xs font-semibold text-foreground uppercase tracking-wide">Passo 2</p>
-              <p className="text-sm text-muted-foreground">No MacroDroid, crie uma nova Macro com:</p>
+              <p className="max-w-[100vw] leading-relaxed text-xs font-semibold text-foreground uppercase tracking-wide">Passo 2</p>
+              <p className="max-w-[100vw] leading-relaxed text-sm leading-relaxed text-muted-foreground">No MacroDroid, crie uma nova Macro com:</p>
               <div className="bg-muted/50 rounded-lg p-3 space-y-2 text-xs">
                 <div>
                   <span className="font-semibold text-foreground">Gatilho:</span>
-                  <span className="text-muted-foreground"> Notifica├º├úo Recebida ÔåÆ Apps: Nubank, Inter, C6, Bradesco, Ita├║</span>
+                  <span className="max-w-[100vw] leading-relaxed text-muted-foreground"> Notifica├º├úo Recebida ÔåÆ Apps: Nubank, Inter, C6, Bradesco, Ita├║</span>
                 </div>
                 <div>
                   <span className="font-semibold text-foreground">A├º├úo:</span>
-                  <span className="text-muted-foreground"> HTTP POST com o corpo abaixo</span>
+                  <span className="max-w-[100vw] leading-relaxed text-muted-foreground"> HTTP POST com o corpo abaixo</span>
                 </div>
               </div>
             </div>
 
             <div className="space-y-2">
               <div className="flex items-center justify-between">
-                <p className="text-xs font-semibold text-foreground uppercase tracking-wide">URL do Endpoint</p>
+                <p className="max-w-[100vw] leading-relaxed text-xs font-semibold text-foreground uppercase tracking-wide">URL do Endpoint</p>
                 <button
                   onClick={() => copyToClipboard(INJECT_URL, "URL")}
-                  className="text-xs text-primary flex items-center gap-1"
+                  className="max-w-[100vw] leading-relaxed text-xs text-primary flex items-center gap-1"
                 >
                   <Copy className="w-3 h-3" /> Copiar
                 </button>
@@ -688,10 +696,10 @@ const AutoCaptureSection = ({ phone }: { phone: string }) => {
 
             <div className="space-y-2">
               <div className="flex items-center justify-between">
-                <p className="text-xs font-semibold text-foreground uppercase tracking-wide">Corpo JSON (Body)</p>
+                <p className="max-w-[100vw] leading-relaxed text-xs font-semibold text-foreground uppercase tracking-wide">Corpo JSON (Body)</p>
                 <button
                   onClick={() => copyToClipboard(macrodroidBody, "JSON")}
-                  className="text-xs text-primary flex items-center gap-1"
+                  className="max-w-[100vw] leading-relaxed text-xs text-primary flex items-center gap-1"
                 >
                   <Copy className="w-3 h-3" /> Copiar
                 </button>
@@ -699,7 +707,7 @@ const AutoCaptureSection = ({ phone }: { phone: string }) => {
               <pre className="bg-muted rounded-lg p-3 text-xs font-mono text-muted-foreground overflow-x-auto whitespace-pre-wrap break-all">
                 {macrodroidBody}
               </pre>
-              <p className="text-xs text-muted-foreground">
+              <p className="max-w-[100vw] leading-relaxed text-xs text-muted-foreground">
                 <strong>ÔÜá´©Å Substitua</strong> <code className="bg-muted px-1 rounded">phone</code> pelo seu n├║mero j├í inclu├¡do acima.
               </p>
             </div>
@@ -710,9 +718,9 @@ const AutoCaptureSection = ({ phone }: { phone: string }) => {
         {activeTab === "ios" && (
           <div className="p-4 space-y-4">
             <div className="space-y-2">
-              <p className="text-xs font-semibold text-foreground uppercase tracking-wide">N├úo precisa instalar nada</p>
-              <p className="text-sm text-muted-foreground">
-                O app <strong className="text-foreground">Atalhos</strong> j├í vem instalado no iPhone. Siga os passos abaixo.
+              <p className="max-w-[100vw] leading-relaxed text-xs font-semibold text-foreground uppercase tracking-wide">N├úo precisa instalar nada</p>
+              <p className="max-w-[100vw] leading-relaxed text-sm leading-relaxed text-muted-foreground">
+                O app <strong className="max-w-[100vw] leading-relaxed text-foreground">Atalhos</strong> j├í vem instalado no iPhone. Siga os passos abaixo.
               </p>
             </div>
 
@@ -728,8 +736,8 @@ const AutoCaptureSection = ({ phone }: { phone: string }) => {
                     {step}
                   </div>
                   <div>
-                    <p className="text-sm font-medium text-foreground">{title}</p>
-                    <p className="text-xs text-muted-foreground">{desc}</p>
+                    <p className="max-w-[100vw] leading-relaxed text-sm leading-relaxed font-medium text-foreground">{title}</p>
+                    <p className="max-w-[100vw] leading-relaxed text-xs text-muted-foreground">{desc}</p>
                   </div>
                 </div>
               ))}
@@ -737,10 +745,10 @@ const AutoCaptureSection = ({ phone }: { phone: string }) => {
 
             <div className="space-y-2">
               <div className="flex items-center justify-between">
-                <p className="text-xs font-semibold text-foreground uppercase tracking-wide">URL do Endpoint</p>
+                <p className="max-w-[100vw] leading-relaxed text-xs font-semibold text-foreground uppercase tracking-wide">URL do Endpoint</p>
                 <button
                   onClick={() => copyToClipboard(INJECT_URL, "URL")}
-                  className="text-xs text-primary flex items-center gap-1"
+                  className="max-w-[100vw] leading-relaxed text-xs text-primary flex items-center gap-1"
                 >
                   <Copy className="w-3 h-3" /> Copiar
                 </button>
@@ -751,7 +759,7 @@ const AutoCaptureSection = ({ phone }: { phone: string }) => {
             </div>
 
             <div className="bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-800 rounded-lg p-3">
-              <p className="text-xs text-amber-800 dark:text-amber-200">
+              <p className="max-w-[100vw] leading-relaxed text-xs text-amber-800 dark:text-amber-200">
                 <strong>­ƒÆí Dica:</strong> No iOS 17+, a automa├º├úo pede confirma├º├úo na primeira vez. Depois, roda automaticamente para sempre.
               </p>
             </div>
@@ -760,8 +768,8 @@ const AutoCaptureSection = ({ phone }: { phone: string }) => {
 
         {/* Teste Manual */}
         <div className="border-t border-border p-4">
-          <p className="text-xs font-semibold text-foreground uppercase tracking-wide mb-2">Testar agora</p>
-          <p className="text-xs text-muted-foreground mb-3">
+          <p className="max-w-[100vw] leading-relaxed text-xs font-semibold text-foreground uppercase tracking-wide mb-2">Testar agora</p>
+          <p className="max-w-[100vw] leading-relaxed text-xs text-muted-foreground mb-3">
             Copie o comando abaixo e rode no terminal para testar se est├í funcionando:
           </p>
           <div className="relative">
@@ -775,7 +783,7 @@ const AutoCaptureSection = ({ phone }: { phone: string }) => {
               <Copy className="w-3 h-3 text-muted-foreground" />
             </button>
           </div>
-          <p className="text-xs text-muted-foreground mt-2">
+          <p className="max-w-[100vw] leading-relaxed text-xs text-muted-foreground mt-2">
             Se funcionar, o Saldin vai te enviar uma confirma├º├úo no WhatsApp! Ô£à
           </p>
         </div>
@@ -793,7 +801,7 @@ interface SettingsSectionProps {
 
 const SettingsSection = ({ title, children }: SettingsSectionProps) => (
   <div>
-    <h2 className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-2 px-1">
+    <h2 className="max-w-[100vw] leading-relaxed text-xs font-medium text-muted-foreground uppercase tracking-wide mb-2 px-1">
       {title}
     </h2>
     <div className="bg-card rounded-xl border border-border shadow-soft overflow-hidden">
@@ -850,19 +858,19 @@ const SettingsItem = ({
       </div>
       <div className="flex-1 min-w-0">
         <div className="flex items-center gap-2">
-          <p className={cn("text-sm font-medium", labelColor)}>{label}</p>
+          <p className={cn("text-sm leading-relaxed font-medium", labelColor)}>{label}</p>
           {badge && (
-            <span className="text-xs font-medium px-1.5 py-0.5 rounded bg-primary/10 text-primary">
+            <span className="max-w-[100vw] leading-relaxed text-xs font-medium px-1.5 py-0.5 rounded bg-primary/10 text-primary">
               {badge}
             </span>
           )}
         </div>
         {description && (
-          <p className="text-xs text-muted-foreground">{description}</p>
+          <p className="max-w-[100vw] leading-relaxed text-xs text-muted-foreground">{description}</p>
         )}
       </div>
       {value && !action && (
-        <span className={cn("text-sm truncate max-w-[140px] text-right", valueColor || "text-muted-foreground")}>{value}</span>
+        <span className={cn("text-sm leading-relaxed truncate max-w-[140px] text-right", valueColor || "text-muted-foreground")}>{value}</span>
       )}
       {action}
       {locked && <Lock className="w-4 h-4 text-muted-foreground" />}

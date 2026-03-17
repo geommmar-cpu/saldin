@@ -165,6 +165,7 @@ export const QuickExpense = () => {
         goalStats?.totalSaved || 0,
         totalCCInstallments,
         bankTotal
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     ), [incomes, expensesRepo, debts, subscriptions, goalStats?.totalSaved, totalCCInstallments, bankTotal]);
 
     const newSaldoLivre = currentBalance.saldoLivre - numericAmount;
@@ -207,6 +208,7 @@ export const QuickExpense = () => {
 
         const { data: created } = await supabase.from("categories").insert({
             user_id: user.id, name: cat.name, icon: "Tag", color: cat.color,
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
             type: "expense", group_name: cat.group, nature: cat.nature as any,
             is_default: true, allow_expense: cat.allowExpense ?? true,
             allow_card: cat.allowCard ?? true, allow_subscription: cat.allowSubscription ?? true,
@@ -253,6 +255,7 @@ export const QuickExpense = () => {
                             bank_account_id: bankId ?? undefined,
                             date: format(addMonths(purchaseDate, i), "yyyy-MM-dd"),
                             category_id: finalCategoryId,
+                        // eslint-disable-next-line @typescript-eslint/no-explicit-any
                         })) as any
                     );
                 } else {
@@ -266,6 +269,7 @@ export const QuickExpense = () => {
                         bank_account_id: bankId ?? undefined,
                         date,
                         category_id: finalCategoryId,
+                    // eslint-disable-next-line @typescript-eslint/no-explicit-any
                     } as any);
                 }
 
@@ -287,6 +291,7 @@ export const QuickExpense = () => {
 
             setShowSuccess(true);
             setTimeout(() => navigate("/", { state: { success: true } }), 1800);
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         } catch (err: any) {
             console.error(err);
             toast.error(err?.message || "Erro ao salvar. Tente novamente.");
@@ -299,6 +304,11 @@ export const QuickExpense = () => {
     if (showSuccess) {
         return (
             <div className="min-h-screen bg-background flex flex-col items-center justify-center gap-6 px-6">
+      <title>Saldin | QuickExpense</title>
+      <meta name="description" content="Manage your quickexpense easily with Saldin." />
+      <meta property="og:title" content="Saldin - QuickExpense" />
+      <meta property="og:description" content="Manage your quickexpense easily with Saldin." />
+        
                 <motion.div
                     initial={{ scale: 0 }} animate={{ scale: 1 }}
                     transition={{ type: "spring", damping: 14 }}
@@ -306,11 +316,11 @@ export const QuickExpense = () => {
                 >
                     <Check className="w-12 h-12 text-green-500" strokeWidth={2.5} />
                 </motion.div>
-                <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }} className="text-center">
-                    <p className="text-2xl font-bold">Gasto registrado!</p>
-                    <p className="text-muted-foreground mt-1">{formatCurrency(numericAmount)} debitado</p>
+                <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }} className="max-w-[100vw] leading-relaxed text-center">
+                    <p className="max-w-[100vw] leading-relaxed text-2xl font-bold">Gasto registrado!</p>
+                    <p className="max-w-[100vw] leading-relaxed text-muted-foreground mt-1">{formatCurrency(numericAmount)} debitado</p>
                     {isForOtherPerson && reimbName && (
-                        <p className="text-sm text-primary font-medium mt-2">
+                        <p className="max-w-[100vw] leading-relaxed text-sm leading-relaxed text-primary font-medium mt-2">
                             💬 Valor a receber criado para {reimbName}
                         </p>
                     )}
@@ -335,7 +345,7 @@ export const QuickExpense = () => {
                 <h1 className="font-bold text-base flex-1">Novo Gasto</h1>
                 <div className="flex items-center gap-1 px-2 py-1 rounded-full bg-primary/5 border border-primary/10">
                     <Sparkles className="w-3 h-3 text-primary animate-pulse" />
-                    <span className="text-[10px] font-bold text-primary uppercase">Quick Mode</span>
+                    <span className="max-w-[100vw] leading-relaxed text-[10px] font-bold text-primary uppercase">Quick Mode</span>
                 </div>
             </div>
 
@@ -350,7 +360,7 @@ export const QuickExpense = () => {
                         <div className="flex items-center justify-between mb-3">
                             <div className="flex items-center gap-1.5 text-muted-foreground">
                                 <Info className="w-3.5 h-3.5" />
-                                <span className="text-[10px] font-bold uppercase tracking-wider">Impacto no Saldo Livre</span>
+                                <span className="max-w-[100vw] leading-relaxed text-[10px] font-bold uppercase tracking-wider">Impacto no Saldo Livre</span>
                             </div>
                             <div className={cn(
                                 "px-2 py-0.5 rounded-full text-[10px] font-bold",
@@ -362,18 +372,18 @@ export const QuickExpense = () => {
 
                         <div className="flex items-end justify-between">
                             <div className="space-y-0.5">
-                                <p className="text-xs text-muted-foreground">Saldo Atual</p>
+                                <p className="max-w-[100vw] leading-relaxed text-xs text-muted-foreground">Saldo Atual</p>
                                 <p className="font-bold text-foreground">{formatCurrency(currentBalance.saldoLivre)}</p>
                             </div>
 
                             <div className="h-8 w-px bg-border/50 mx-2" />
 
-                            <div className="text-right space-y-0.5">
-                                <p className="text-xs text-muted-foreground">Após este gasto</p>
+                            <div className="max-w-[100vw] leading-relaxed text-right space-y-0.5">
+                                <p className="max-w-[100vw] leading-relaxed text-xs text-muted-foreground">Após este gasto</p>
                                 <Counter
                                     value={newSaldoLivre}
                                     className={cn(
-                                        "font-bold text-lg",
+                                        "font-bold text-lg leading-relaxed",
                                         newSaldoLivre < 0 ? "text-red-500" : "text-emerald-500"
                                     )}
                                 />
@@ -400,7 +410,7 @@ export const QuickExpense = () => {
                         onClick={() => setShowKeypad(v => !v)}
                         className="w-full text-center py-4 rounded-2xl bg-card border border-border shadow-soft active:scale-[0.98] transition-transform"
                     >
-                        <p className="text-[10px] uppercase tracking-widest text-muted-foreground mb-1">Valor do Gasto</p>
+                        <p className="max-w-[100vw] leading-relaxed text-[10px] uppercase tracking-widest text-muted-foreground mb-1">Valor do Gasto</p>
                         <motion.p
                             key={amount}
                             initial={{ scale: 0.95, opacity: 0.8 }}
@@ -411,7 +421,7 @@ export const QuickExpense = () => {
                             )}>
                             {amount ? formatCurrency(numericAmount) : "R$ 0,00"}
                         </motion.p>
-                        <p className="text-[10px] text-primary mt-2 font-bold uppercase tracking-wide">
+                        <p className="max-w-[100vw] leading-relaxed text-[10px] text-primary mt-2 font-bold uppercase tracking-wide">
                             {showKeypad ? "Ocultar Teclado" : "Editar Valor"}
                         </p>
                     </button>
@@ -420,7 +430,7 @@ export const QuickExpense = () => {
                 {/* ── Categories carousel: full-bleed horizontal scroll ── */}
                 <section>
                     <div className="px-4">
-                        <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground mb-2">
+                        <p className="max-w-[100vw] leading-relaxed text-[10px] font-bold uppercase tracking-widest text-muted-foreground mb-2">
                             Categoria {selectedCategory && <span className="normal-case font-normal text-primary">· {selectedCategory.name}</span>}
                         </p>
                     </div>
@@ -432,6 +442,7 @@ export const QuickExpense = () => {
                             overflowX: "auto",
                             overflowY: "hidden",
                             scrollbarWidth: "none",
+                            // eslint-disable-next-line @typescript-eslint/no-explicit-any
                             WebkitOverflowScrolling: "touch" as any,
                             touchAction: "pan-x",
                             paddingLeft: "1rem",
@@ -466,7 +477,7 @@ export const QuickExpense = () => {
                                         <span className="absolute top-1.5 right-1.5 w-1.5 h-1.5 rounded-full bg-primary/60" />
                                     )}
                                     <Icon className="w-5 h-5" />
-                                    <span className="text-[9px] font-bold text-center leading-tight w-14 line-clamp-2">{c.name}</span>
+                                    <span className="max-w-[100vw] leading-relaxed text-[9px] font-bold text-center leading-tight w-14 line-clamp-2">{c.name}</span>
                                 </motion.button>
                             );
                         })}
@@ -475,7 +486,7 @@ export const QuickExpense = () => {
 
                 {/* ── Payment method ── */}
                 <section className="px-4">
-                    <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground mb-2">Forma de Pagamento</p>
+                    <p className="max-w-[100vw] leading-relaxed text-[10px] font-bold uppercase tracking-widest text-muted-foreground mb-2">Forma de Pagamento</p>
                     <div className="grid grid-cols-4 gap-2">
                         {PAYMENT_OPTIONS.map(({ value, label, Icon }) => {
                             const isSelected = paymentMethod === value;
@@ -496,7 +507,7 @@ export const QuickExpense = () => {
                                     )}
                                 >
                                     <Icon className="w-5 h-5" />
-                                    <span className="text-[10px] font-bold">{label}</span>
+                                    <span className="max-w-[100vw] leading-relaxed text-[10px] font-bold">{label}</span>
                                 </motion.button>
                             );
                         })}
@@ -512,7 +523,7 @@ export const QuickExpense = () => {
                             exit={{ opacity: 0, height: 0 }}
                             className="px-4"
                         >
-                            <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground mb-2">
+                            <p className="max-w-[100vw] leading-relaxed text-[10px] font-bold uppercase tracking-widest text-muted-foreground mb-2">
                                 {paymentMethod === "credit" ? "Cartão" : "Conta"}
                             </p>
                             <div className="flex gap-2 overflow-x-auto pb-1 no-scrollbar">
@@ -525,7 +536,7 @@ export const QuickExpense = () => {
                                                 selectedCardId === card.id ? "border-primary bg-primary/10" : "border-border bg-card"
                                             )}>
                                             <BankLogo bankName={card.card_name || card.bank} className="w-6 h-6" size="sm" />
-                                            <span className="text-xs font-medium max-w-[90px] truncate">{card.card_name || card.bank}</span>
+                                            <span className="max-w-[100vw] leading-relaxed text-xs font-medium max-w-[90px] truncate">{card.card_name || card.bank}</span>
                                         </motion.button>
                                     ))
                                     : bankAccounts.map(acc => (
@@ -536,9 +547,9 @@ export const QuickExpense = () => {
                                                 selectedBankId === acc.id ? "border-primary bg-primary/10" : "border-border bg-card"
                                             )}>
                                             <BankLogo bankName={acc.bank_name} className="w-6 h-6" size="sm" />
-                                            <div className="text-left">
-                                                <p className="text-[11px] font-semibold max-w-[80px] truncate">{acc.bank_name}</p>
-                                                <p className="text-[9px] text-muted-foreground">{formatCurrency(Number(acc.current_balance))}</p>
+                                            <div className="max-w-[100vw] leading-relaxed text-left">
+                                                <p className="max-w-[100vw] leading-relaxed text-[11px] font-semibold max-w-[80px] truncate">{acc.bank_name}</p>
+                                                <p className="max-w-[100vw] leading-relaxed text-[9px] text-muted-foreground">{formatCurrency(Number(acc.current_balance))}</p>
                                             </div>
                                         </motion.button>
                                     ))
@@ -560,14 +571,14 @@ export const QuickExpense = () => {
                             <div className="flex items-center justify-between">
                                 <div className="flex items-center gap-2">
                                     <CreditCard className="w-4 h-4 text-muted-foreground" />
-                                    <span className="text-sm font-semibold">Parcelas</span>
+                                    <span className="max-w-[100vw] leading-relaxed text-sm leading-relaxed font-semibold">Parcelas</span>
                                 </div>
                                 <div className="flex items-center gap-3">
                                     <button onClick={() => setInstallments(v => Math.max(1, v - 1))}
                                         className="w-8 h-8 rounded-full bg-muted flex items-center justify-center">
                                         <Minus className="w-3 h-3" />
                                     </button>
-                                    <span className="text-base font-bold w-8 text-center">{installments}x</span>
+                                    <span className="max-w-[100vw] leading-relaxed text-base font-bold w-8 text-center">{installments}x</span>
                                     <button onClick={() => setInstallments(v => Math.min(48, v + 1))}
                                         className="w-8 h-8 rounded-full bg-muted flex items-center justify-center">
                                         <Plus className="w-3 h-3" />
@@ -575,7 +586,7 @@ export const QuickExpense = () => {
                                 </div>
                             </div>
                             {installments > 1 && numericAmount > 0 && (
-                                <p className="text-xs text-muted-foreground mt-2 text-right">
+                                <p className="max-w-[100vw] leading-relaxed text-xs text-muted-foreground mt-2 text-right">
                                     {installments}× de {formatCurrency(numericAmount / installments)}/mês
                                 </p>
                             )}
@@ -601,9 +612,9 @@ export const QuickExpense = () => {
                             >
                                 <div className="flex items-center gap-2">
                                     <RepeatIcon className="w-4 h-4" />
-                                    <span className="text-sm font-semibold">Gasto recorrente</span>
+                                    <span className="max-w-[100vw] leading-relaxed text-sm leading-relaxed font-semibold">Gasto recorrente</span>
                                 </div>
-                                <span className="text-xs font-bold">{isRecurring ? "Sim ✓" : "Não"}</span>
+                                <span className="max-w-[100vw] leading-relaxed text-xs font-bold">{isRecurring ? "Sim ✓" : "Não"}</span>
                             </button>
 
                             <AnimatePresence>
@@ -615,13 +626,13 @@ export const QuickExpense = () => {
                                         className="overflow-hidden mt-2"
                                     >
                                         <div className="bg-card rounded-2xl border border-border p-3 space-y-2">
-                                            <p className="text-xs text-muted-foreground">Quantas vezes se repete?</p>
+                                            <p className="max-w-[100vw] leading-relaxed text-xs text-muted-foreground">Quantas vezes se repete?</p>
                                             <div className="flex items-center gap-3">
                                                 <button onClick={() => setInstallments(v => Math.max(2, v - 1))}
                                                     className="w-8 h-8 rounded-full bg-muted flex items-center justify-center">
                                                     <Minus className="w-3 h-3" />
                                                 </button>
-                                                <span className="text-base font-bold w-16 text-center">{installments} meses</span>
+                                                <span className="max-w-[100vw] leading-relaxed text-base font-bold w-16 text-center">{installments} meses</span>
                                                 <button onClick={() => setInstallments(v => Math.min(36, v + 1))}
                                                     className="w-8 h-8 rounded-full bg-muted flex items-center justify-center">
                                                     <Plus className="w-3 h-3" />
@@ -641,7 +652,7 @@ export const QuickExpense = () => {
                         <Calendar className="w-4 h-4 text-muted-foreground flex-shrink-0" />
                         <input
                             type="date" value={date} onChange={e => setDate(e.target.value)}
-                            className="flex-1 bg-transparent text-sm font-medium outline-none min-w-0"
+                            className="flex-1 bg-transparent text-sm leading-relaxed font-medium outline-none min-w-0"
                         />
                     </div>
                 </section>
@@ -650,7 +661,7 @@ export const QuickExpense = () => {
                     <input
                         type="text" value={description} onChange={e => setDescription(e.target.value)}
                         placeholder="Descrição (opcional)"
-                        className="w-full p-3 bg-card rounded-xl border border-border text-sm outline-none placeholder:text-muted-foreground/40"
+                        className="w-full p-3 bg-card rounded-xl border border-border text-sm leading-relaxed outline-none placeholder:text-muted-foreground/40"
                     />
                 </section>
 
@@ -661,7 +672,7 @@ export const QuickExpense = () => {
                         <button
                             onClick={() => setIsForOtherPerson(false)}
                             className={cn(
-                                "flex-1 py-3.5 text-sm font-bold transition-all",
+                                "flex-1 py-3.5 text-sm leading-relaxed font-bold transition-all",
                                 !isForOtherPerson ? "bg-primary text-primary-foreground" : "text-muted-foreground"
                             )}
                         >
@@ -670,7 +681,7 @@ export const QuickExpense = () => {
                         <button
                             onClick={() => setIsForOtherPerson(true)}
                             className={cn(
-                                "flex-1 py-3.5 text-sm font-bold transition-all",
+                                "flex-1 py-3.5 text-sm leading-relaxed font-bold transition-all",
                                 isForOtherPerson ? "bg-primary text-primary-foreground" : "text-muted-foreground"
                             )}
                         >
@@ -694,17 +705,17 @@ export const QuickExpense = () => {
                                         <input
                                             type="text" value={reimbName} onChange={e => setReimbName(e.target.value)}
                                             placeholder="Nome da pessoa"
-                                            className="flex-1 bg-transparent text-sm outline-none placeholder:text-muted-foreground/50"
+                                            className="flex-1 bg-transparent text-sm leading-relaxed outline-none placeholder:text-muted-foreground/50"
                                         />
                                     </div>
 
                                     {/* Partial amount */}
                                     <div>
-                                        <p className="text-[10px] text-muted-foreground mb-1 ml-1">Valor a receber de volta</p>
+                                        <p className="max-w-[100vw] leading-relaxed text-[10px] text-muted-foreground mb-1 ml-1">Valor a receber de volta</p>
                                         <input
                                             type="text" value={reimbAmount} onChange={e => setReimbAmount(e.target.value)}
                                             placeholder={`Total: ${amount || "R$ 0,00"}`}
-                                            className="w-full p-2.5 bg-muted rounded-xl text-sm outline-none placeholder:text-muted-foreground/40"
+                                            className="w-full p-2.5 bg-muted rounded-xl text-sm leading-relaxed outline-none placeholder:text-muted-foreground/40"
                                         />
                                         {numericAmount > 0 && (
                                             <div className="flex gap-2 mt-2">
@@ -712,7 +723,7 @@ export const QuickExpense = () => {
                                                     <button
                                                         key={label}
                                                         onClick={() => setReimbFraction(frac)}
-                                                        className="text-[10px] px-2.5 py-1 rounded-full bg-primary/10 text-primary font-bold"
+                                                        className="max-w-[100vw] leading-relaxed text-[10px] px-2.5 py-1 rounded-full bg-primary/10 text-primary font-bold"
                                                     >
                                                         {label} – {formatCurrency(numericAmount * frac)}
                                                     </button>
@@ -728,7 +739,7 @@ export const QuickExpense = () => {
                                             type="date" value={reimbDate} onChange={e => setReimbDate(e.target.value)}
                                             className="flex-1 bg-transparent text-xs outline-none"
                                         />
-                                        <span className="text-[9px] text-muted-foreground whitespace-nowrap">previsão devolução</span>
+                                        <span className="max-w-[100vw] leading-relaxed text-[9px] text-muted-foreground whitespace-nowrap">previsão devolução</span>
                                     </div>
                                 </div>
                             </motion.div>

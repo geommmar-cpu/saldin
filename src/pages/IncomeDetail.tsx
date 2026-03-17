@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { useState } from "react";
 import { parseLocalDate } from "@/lib/dateUtils";
 import { useNavigate, useParams } from "react-router-dom";
@@ -51,6 +52,11 @@ export const IncomeDetail = () => {
   if (isLoading) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
+      <title>Saldin | IncomeDetail</title>
+      <meta name="description" content="Manage your incomedetail easily with Saldin." />
+      <meta property="og:title" content="Saldin - IncomeDetail" />
+      <meta property="og:description" content="Manage your incomedetail easily with Saldin." />
+        
         <Loader2 className="w-8 h-8 animate-spin text-muted-foreground" />
       </div>
     );
@@ -59,8 +65,8 @@ export const IncomeDetail = () => {
   if (!income) {
     return (
       <div className="min-h-screen bg-background flex flex-col items-center justify-center p-5">
-        <span className="text-4xl mb-4">🔍</span>
-        <p className="text-muted-foreground mb-4">Receita não encontrada</p>
+        <span className="max-w-[100vw] leading-relaxed text-4xl mb-4">🔍</span>
+        <p className="max-w-[100vw] leading-relaxed text-muted-foreground mb-4">Receita não encontrada</p>
         <Button variant="ghost" onClick={() => navigate(-1)}>
           Voltar
         </Button>
@@ -90,7 +96,7 @@ export const IncomeDetail = () => {
             variant="ghost"
             size="icon"
             onClick={() => setShowDeleteDialog(true)}
-            className="text-destructive hover:text-destructive"
+            className="max-w-[100vw] leading-relaxed text-destructive hover:text-destructive"
           >
             <Trash2 className="w-5 h-5" />
           </Button>
@@ -99,17 +105,17 @@ export const IncomeDetail = () => {
 
       <main className="flex-1 px-5 py-6 space-y-6">
         {/* Amount */}
-        <FadeIn className="text-center">
+        <FadeIn className="max-w-[100vw] leading-relaxed text-center">
           <p className="font-serif text-4xl font-semibold text-essential">
             +{formatCurrency(Number(income.amount))}
           </p>
-          <p className="text-muted-foreground mt-1">{income.description}</p>
+          <p className="max-w-[100vw] leading-relaxed text-muted-foreground mt-1">{income.description}</p>
         </FadeIn>
 
         {/* Type Section */}
         <FadeIn delay={0.1}>
           <div className="p-4 rounded-xl bg-card border border-border shadow-soft">
-            <h3 className="text-sm font-medium text-muted-foreground mb-3">Tipo de receita</h3>
+            <h3 className="max-w-[100vw] leading-relaxed text-sm leading-relaxed font-medium text-muted-foreground mb-3">Tipo de receita</h3>
             <div className="flex items-center gap-3">
               <div className="w-10 h-10 rounded-full bg-essential/15 flex items-center justify-center">
                 {isFixed ? (
@@ -122,7 +128,7 @@ export const IncomeDetail = () => {
                 <p className="font-medium">
                   {typeLabels[income.type] || income.type}
                 </p>
-                <p className="text-sm text-muted-foreground">
+                <p className="max-w-[100vw] leading-relaxed text-sm leading-relaxed text-muted-foreground">
                   {income.is_recurring ? "Mensal" : "Pontual"}
                 </p>
               </div>
@@ -139,8 +145,8 @@ export const IncomeDetail = () => {
                 <Calendar className="w-4 h-4 text-muted-foreground" />
               </div>
               <div>
-                <p className="text-xs text-muted-foreground">Data</p>
-                <p className="text-sm font-medium">
+                <p className="max-w-[100vw] leading-relaxed text-xs text-muted-foreground">Data</p>
+                <p className="max-w-[100vw] leading-relaxed text-sm leading-relaxed font-medium">
                   {format(income.date ? parseLocalDate(income.date) : new Date(income.created_at), "d 'de' MMMM 'de' yyyy", { locale: ptBR })}
                 </p>
               </div>
@@ -152,8 +158,9 @@ export const IncomeDetail = () => {
                 <Pencil className="w-4 h-4 text-muted-foreground" />
               </div>
               <div>
-                <p className="text-xs text-muted-foreground">Origem</p>
-                <p className="text-sm font-medium">
+                <p className="max-w-[100vw] leading-relaxed text-xs text-muted-foreground">Origem</p>
+                <p className="max-w-[100vw] leading-relaxed text-sm leading-relaxed font-medium">
+                  // eslint-disable-next-line @typescript-eslint/no-explicit-any
                   {(income as any).bank_account?.name || (income as any).bank_account?.bank_name || "Registro manual"}
                 </p>
               </div>

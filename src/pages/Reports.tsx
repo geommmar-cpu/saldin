@@ -38,7 +38,7 @@ import { cn } from "@/lib/utils";
 import { useAllCategories } from "@/hooks/useCategories";
 
 const COLORS = [
-    "#3B82F6", "#10B981", "#EF4444", "#8B5CF6", "#F59E0B",
+    "#3B82F6", "#10B981", "#EF4444", "#14b8a6", "#F59E0B",
     "#EC4899", "#14B8A6", "#6366F1", "#94A3B8"
 ];
 
@@ -81,6 +81,7 @@ export default function Reports() {
             // For installments, we should try to find the category from the purchase
             // Purchases are linked to installments, but the hook might not return it directly. 
             // Assuming i.purchases.category_id if available, else others.
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
             const catId = (i as any).purchases?.category_id || "outros";
             categoryTotals[catId] = (categoryTotals[catId] || 0) + Number(i.amount);
         });
@@ -116,6 +117,7 @@ export default function Reports() {
                 percentage: totalMonth > 0 ? (info.total / totalMonth) * 100 : 0
             }))
             .sort((a, b) => b.total - a.total);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [expenses, installments, selectedMonth, viewMode, allCategories]);
 
     // Comparison logic
@@ -155,6 +157,11 @@ export default function Reports() {
 
     return (
         <div className="min-h-screen bg-background pb-24">
+      <title>Saldin | Reports</title>
+      <meta name="description" content="Manage your reports easily with Saldin." />
+      <meta property="og:title" content="Saldin - Reports" />
+      <meta property="og:description" content="Manage your reports easily with Saldin." />
+        
             <header className="px-5 pt-safe-top sticky top-0 bg-background/95 backdrop-blur-sm z-10 border-b border-border">
                 <div className="pt-4 pb-3 flex items-center justify-between">
                     <div className="flex items-center gap-3">
@@ -189,18 +196,18 @@ export default function Reports() {
             <main className="p-5 space-y-8 pt-4">
                 {/* Month Selector Premium */}
                 <div className="flex items-center justify-between glass p-2 rounded-2xl border border-white/20 shadow-medium">
-                    <Button variant="ghost" size="icon" onClick={prevMonth} className="rounded-xl hover:bg-white/10">
+                    <Button variant="ghost" size="icon" onClick={prevMonth} className="rounded-xl hover:bg-background/10">
                         <ChevronLeft className="w-5 h-5" />
                     </Button>
                     <div className="flex flex-col items-center">
-                        <span className="text-[10px] font-black uppercase tracking-[0.2em] text-primary mb-0.5">
+                        <span className="max-w-[100vw] leading-relaxed text-[10px] font-black uppercase tracking-[0.2em] text-primary mb-0.5">
                             Referente a
                         </span>
-                        <h3 className="text-sm font-bold capitalize">
+                        <h3 className="max-w-[100vw] leading-relaxed text-sm leading-relaxed font-bold capitalize">
                             {format(selectedMonth, "MMMM", { locale: ptBR })} {format(selectedMonth, "yyyy")}
                         </h3>
                     </div>
-                    <Button variant="ghost" size="icon" onClick={nextMonth} className="rounded-xl hover:bg-white/10">
+                    <Button variant="ghost" size="icon" onClick={nextMonth} className="rounded-xl hover:bg-background/10">
                         <ChevronRight className="w-5 h-5" />
                     </Button>
                 </div>
@@ -212,9 +219,9 @@ export default function Reports() {
                         <div className="absolute -top-12 -right-12 w-48 h-48 bg-primary/10 rounded-full blur-[60px]" />
 
                         <div className="relative">
-                            <p className="text-[10px] font-black text-muted-foreground/60 uppercase tracking-[0.2em] mb-2">Desembolso Mensal</p>
+                            <p className="max-w-[100vw] leading-relaxed text-[10px] font-black text-muted-foreground/60 uppercase tracking-[0.2em] mb-2">Desembolso Mensal</p>
                             <div className="flex items-baseline justify-between gap-4">
-                                <h2 className="text-4xl font-serif font-bold tracking-tight text-foreground truncate">
+                                <h2 className="max-w-[100vw] leading-relaxed text-4xl font-serif font-bold tracking-tight text-foreground truncate">
                                     {formatCurrency(reportData.reduce((acc, curr) => acc + curr.total, 0))}
                                 </h2>
 
@@ -234,7 +241,7 @@ export default function Reports() {
                             {/* Visual Progress Bar - Relative to prev month */}
                             {comparison.totalPrev > 0 && (
                                 <div className="mt-6">
-                                    <div className="h-1.5 w-full bg-white/10 rounded-full overflow-hidden">
+                                    <div className="h-1.5 w-full bg-background/10 rounded-full overflow-hidden">
                                         <motion.div
                                             initial={{ width: 0 }}
                                             animate={{ width: `${Math.min((reportData.reduce((acc, curr) => acc + curr.total, 0) / (comparison.totalPrev || 1)) * 100, 100)}%` }}
@@ -244,7 +251,7 @@ export default function Reports() {
                                             )}
                                         />
                                     </div>
-                                    <p className="text-[9px] text-muted-foreground mt-2 font-medium">
+                                    <p className="max-w-[100vw] leading-relaxed text-[9px] text-muted-foreground mt-2 font-medium">
                                         Comparado a {formatCurrency(comparison.totalPrev)} do mês anterior
                                     </p>
                                 </div>
@@ -261,15 +268,15 @@ export default function Reports() {
                                 <div className="w-10 h-10 rounded-2xl bg-primary/10 flex items-center justify-center text-primary border border-primary/20">
                                     <PieIcon className="w-5 h-5" />
                                 </div>
-                                <h3 className="font-serif text-lg font-bold">Onde você gastou?</h3>
+                                <h3 className="font-serif text-lg leading-relaxed font-bold">Onde você gastou?</h3>
                             </div>
                         </div>
 
                         <div className="h-[280px] w-full relative">
                             {/* Center Summary for Donut */}
                             <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none translate-y-[-10px]">
-                                <span className="text-[9px] font-black text-muted-foreground/60 uppercase tracking-widest">Total</span>
-                                <span className="text-xl font-serif font-bold tracking-tight">
+                                <span className="max-w-[100vw] leading-relaxed text-[9px] font-black text-muted-foreground/60 uppercase tracking-widest">Total</span>
+                                <span className="max-w-[100vw] leading-relaxed text-xl font-serif font-bold tracking-tight">
                                     {formatCurrency(reportData.reduce((acc, curr) => acc + curr.total, 0)).split(',')[0]}
                                 </span>
                             </div>
@@ -316,8 +323,8 @@ export default function Reports() {
                                 <div key={item.id} className="flex items-center gap-2.5">
                                     <div className="w-2.5 h-2.5 rounded-full shadow-sm" style={{ backgroundColor: item.color || COLORS[index % COLORS.length] }} />
                                     <div className="min-w-0">
-                                        <p className="text-[10px] font-bold truncate leading-none mb-0.5">{item.name}</p>
-                                        <p className="text-[9px] text-muted-foreground font-medium">{item.percentage.toFixed(0)}% do mês</p>
+                                        <p className="max-w-[100vw] leading-relaxed text-[10px] font-bold truncate leading-none mb-0.5">{item.name}</p>
+                                        <p className="max-w-[100vw] leading-relaxed text-[9px] text-muted-foreground font-medium">{item.percentage.toFixed(0)}% do mês</p>
                                     </div>
                                 </div>
                             ))}
@@ -332,7 +339,7 @@ export default function Reports() {
                             <div className="w-10 h-10 rounded-2xl bg-primary/10 flex items-center justify-center text-primary border border-primary/20">
                                 <BarChart3 className="w-5 h-5" />
                             </div>
-                            <h3 className="font-serif text-lg font-bold">Concentração de Despesas</h3>
+                            <h3 className="font-serif text-lg leading-relaxed font-bold">Concentração de Despesas</h3>
                         </div>
 
                         <div className="h-[280px] w-full">
@@ -385,16 +392,16 @@ export default function Reports() {
                                     <div className="flex items-center gap-4">
                                         <div className="w-1.5 h-10 rounded-full" style={{ backgroundColor: item.color }} />
                                         <div>
-                                            <p className="text-sm font-bold group-hover:text-primary transition-colors">{item.name}</p>
+                                            <p className="max-w-[100vw] leading-relaxed text-sm leading-relaxed font-bold group-hover:text-primary transition-colors">{item.name}</p>
                                             <div className="flex items-center gap-2">
-                                                <span className="text-[10px] font-bold text-muted-foreground bg-muted/50 px-1.5 rounded uppercase tracking-tighter">
+                                                <span className="max-w-[100vw] leading-relaxed text-[10px] font-bold text-muted-foreground bg-muted/50 px-1.5 rounded uppercase tracking-tighter">
                                                     {item.percentage.toFixed(0)}% do mês
                                                 </span>
                                             </div>
                                         </div>
                                     </div>
-                                    <div className="text-right">
-                                        <p className="font-bold text-sm tracking-tight">{formatCurrency(item.total)}</p>
+                                    <div className="max-w-[100vw] leading-relaxed text-right">
+                                        <p className="font-bold text-sm leading-relaxed tracking-tight">{formatCurrency(item.total)}</p>
                                         <div className="h-0.5 w-full bg-muted rounded-full mt-1 overflow-hidden">
                                             <div
                                                 className="h-full bg-current opacity-20"

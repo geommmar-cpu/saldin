@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -72,6 +73,11 @@ export const ExpenseDetail = () => {
   if (isLoading) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
+      <title>Saldin | ExpenseDetail</title>
+      <meta name="description" content="Manage your expensedetail easily with Saldin." />
+      <meta property="og:title" content="Saldin - ExpenseDetail" />
+      <meta property="og:description" content="Manage your expensedetail easily with Saldin." />
+        
         <Loader2 className="w-8 h-8 animate-spin text-muted-foreground" />
       </div>
     );
@@ -80,8 +86,8 @@ export const ExpenseDetail = () => {
   if (!displayData) {
     return (
       <div className="min-h-screen bg-background flex flex-col items-center justify-center p-5">
-        <span className="text-4xl mb-4">🔍</span>
-        <p className="text-muted-foreground mb-4">Gasto não encontrado</p>
+        <span className="max-w-[100vw] leading-relaxed text-4xl mb-4">🔍</span>
+        <p className="max-w-[100vw] leading-relaxed text-muted-foreground mb-4">Gasto não encontrado</p>
         <Button variant="ghost" onClick={() => navigate(-1)}>Voltar</Button>
       </div>
     );
@@ -101,7 +107,7 @@ export const ExpenseDetail = () => {
             </Button>
           )}
           {!isCreditCard && (
-            <Button variant="ghost" size="icon" onClick={() => setShowDeleteDialog(true)} className="text-destructive hover:text-destructive">
+            <Button variant="ghost" size="icon" onClick={() => setShowDeleteDialog(true)} className="max-w-[100vw] leading-relaxed text-destructive hover:text-destructive">
               <Trash2 className="w-5 h-5" />
             </Button>
           )}
@@ -109,9 +115,9 @@ export const ExpenseDetail = () => {
       </header>
 
       <main className="flex-1 px-5 py-6">
-        <FadeIn className="text-center mb-8">
+        <FadeIn className="max-w-[100vw] leading-relaxed text-center mb-8">
           <p className="font-serif text-4xl font-semibold">{formattedAmount}</p>
-          <p className="text-muted-foreground mt-1">{displayData.description}</p>
+          <p className="max-w-[100vw] leading-relaxed text-muted-foreground mt-1">{displayData.description}</p>
           {displayData.status === "pending" && (
             <span className="inline-block mt-2 text-xs font-medium text-accent bg-accent/10 px-2 py-1 rounded-full">Pendente</span>
           )}
@@ -127,23 +133,24 @@ export const ExpenseDetail = () => {
             {displayData.emotion ? (
               <div className="flex items-center gap-3 p-3 rounded-xl bg-card border border-border">
                 <div className="w-9 h-9 rounded-full bg-muted flex items-center justify-center">
-                  <span className="text-sm">
+                  <span className="max-w-[100vw] leading-relaxed text-sm leading-relaxed">
                     {displayData.emotion === "pilar" ? "🏠" : displayData.emotion === "essencial" ? "📋" : "⚡"}
                   </span>
                 </div>
                 <div>
-                  <p className="text-xs text-muted-foreground">Classificação</p>
-                  <p className="text-sm font-medium capitalize">{displayData.emotion}</p>
+                  <p className="max-w-[100vw] leading-relaxed text-xs text-muted-foreground">Classificação</p>
+                  <p className="max-w-[100vw] leading-relaxed text-sm leading-relaxed font-medium capitalize">{displayData.emotion}</p>
                 </div>
               </div>
             ) : isCreditCard ? (
               <div className="flex items-center gap-3 p-3 rounded-xl bg-card border border-border">
                 <div className="w-9 h-9 rounded-full bg-muted flex items-center justify-center">
-                  <span className="text-sm">💳</span>
+                  <span className="max-w-[100vw] leading-relaxed text-sm leading-relaxed">💳</span>
                 </div>
                 <div>
-                  <p className="text-xs text-muted-foreground">Cartão</p>
-                  <p className="text-sm font-medium">{(displayData as any).card_name}</p>
+                  <p className="max-w-[100vw] leading-relaxed text-xs text-muted-foreground">Cartão</p>
+                  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                  <p className="max-w-[100vw] leading-relaxed text-sm leading-relaxed font-medium">{(displayData as any).card_name}</p>
                 </div>
               </div>
             ) : null}
@@ -153,8 +160,8 @@ export const ExpenseDetail = () => {
                 <Calendar className="w-4 h-4 text-muted-foreground" />
               </div>
               <div>
-                <p className="text-xs text-muted-foreground">Data da Compra</p>
-                <p className="text-sm font-medium">
+                <p className="max-w-[100vw] leading-relaxed text-xs text-muted-foreground">Data da Compra</p>
+                <p className="max-w-[100vw] leading-relaxed text-sm leading-relaxed font-medium">
                   {format(new Date(displayData.date || displayData.created_at), "d 'de' MMMM 'às' HH:mm", { locale: ptBR })}
                 </p>
               </div>
@@ -165,10 +172,11 @@ export const ExpenseDetail = () => {
                 <Smartphone className="w-4 h-4 text-muted-foreground" />
               </div>
               <div>
-                <p className="text-xs text-muted-foreground">Origem</p>
-                <p className="text-sm font-medium">
+                <p className="max-w-[100vw] leading-relaxed text-xs text-muted-foreground">Origem</p>
+                <p className="max-w-[100vw] leading-relaxed text-sm leading-relaxed font-medium">
                   {isCreditCard
                     ? "Cartão de Crédito"
+                     
                     : (displayData as any).bank_account?.name || (displayData as any).bank_account?.bank_name || (sourceLabels[displayData.source] || displayData.source)}
                 </p>
               </div>

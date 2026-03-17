@@ -33,6 +33,7 @@ export const AddBankAccount = () => {
   const createAccount = useCreateBankAccount();
   const updateProfile = useUpdateProfile();
   const returnTo = location.state?.returnTo as string | undefined;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const returnState = location.state?.returnState as Record<string, any> | undefined;
 
   const { data: profile } = useProfile();
@@ -46,6 +47,7 @@ export const AddBankAccount = () => {
   const [showConfirm, setShowConfirm] = useState(false);
 
   // Find existing main account names for the confirmation message
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const existingIncomeAccId = (profile as any)?.wa_default_income_account_id;
   const existingIncomeAcc = accounts.find(a => a.id === existingIncomeAccId);
 
@@ -86,6 +88,11 @@ export const AddBankAccount = () => {
 
   return (
     <div className="min-h-screen bg-background flex flex-col">
+      <title>Saldin | AddBankAccount</title>
+      <meta name="description" content="Manage your addbankaccount easily with Saldin." />
+      <meta property="og:title" content="Saldin - AddBankAccount" />
+      <meta property="og:description" content="Manage your addbankaccount easily with Saldin." />
+        
       <header className="px-5 pt-safe-top">
         <div className="pt-4 pb-2 flex items-center gap-4">
           <Button variant="ghost" size="icon" onClick={() => navigate("/")}>
@@ -97,8 +104,8 @@ export const AddBankAccount = () => {
 
       <main className="flex-1 px-5 py-6 overflow-y-auto pb-32">
         {/* Bank selector - Horizontal Scroll */}
-        <FadeIn className="mb-6">
-          <label className="text-sm text-muted-foreground mb-3 block">Escolha o banco</label>
+        <FadeIn className="leading-relaxed mb-6">
+          <label className="max-w-[100vw] leading-relaxed text-sm leading-relaxed text-muted-foreground mb-3 block">Escolha o banco</label>
           <div
             className="flex gap-4 overflow-x-auto pb-4 snap-x snap-mandatory no-scrollbar"
             style={{ WebkitOverflowScrolling: 'touch' }}
@@ -119,7 +126,7 @@ export const AddBankAccount = () => {
                     ? "border-primary ring-2 ring-primary/20 ring-offset-2 scale-110"
                     : "border-border bg-card hover:border-primary/50"
                 )}
-                  style={{ backgroundColor: bankKey === bank.key ? bank.color : (bank.logoUrl ? "#ffffff" : bank.color + "20") }}
+                  style={{ backgroundColor: bankKey === bank.key ? bank.color : (bank.logoUrl ? "var(--background)fff" : bank.color + "20") }}
                 >
                   {bankKey === bank.key ? (
                     <Check className="w-6 h-6 text-white" />
@@ -152,7 +159,7 @@ export const AddBankAccount = () => {
                 {bankKey === "outros" ? (
                   <Check className="w-6 h-6 text-primary" />
                 ) : (
-                  <span className="text-xs font-bold text-muted-foreground">...</span>
+                  <span className="max-w-[100vw] leading-relaxed text-xs font-bold text-muted-foreground">...</span>
                 )}
               </div>
               <span className={cn(
@@ -167,8 +174,8 @@ export const AddBankAccount = () => {
 
         {/* Custom bank name */}
         {bankKey === "outros" && (
-          <FadeIn className="mb-6">
-            <label className="text-sm text-muted-foreground mb-2 block">Nome do banco</label>
+          <FadeIn className="leading-relaxed mb-6">
+            <label className="max-w-[100vw] leading-relaxed text-sm leading-relaxed text-muted-foreground mb-2 block">Nome do banco</label>
             <Input
               placeholder="Ex: Banco Safra, BTG..."
               value={customBankName}
@@ -180,8 +187,8 @@ export const AddBankAccount = () => {
         )}
 
         {/* Account type */}
-        <FadeIn delay={0.05} className="mb-6">
-          <label className="text-sm text-muted-foreground mb-3 block">Tipo de conta</label>
+        <FadeIn delay={0.05} className="leading-relaxed mb-6">
+          <label className="max-w-[100vw] leading-relaxed text-sm leading-relaxed text-muted-foreground mb-3 block">Tipo de conta</label>
           <div className="grid grid-cols-3 gap-2">
             {accountTypeOptions.map((opt) => (
               <motion.button
@@ -195,19 +202,19 @@ export const AddBankAccount = () => {
                     : "border-border bg-card hover:bg-secondary"
                 )}
               >
-                <span className="text-sm">{opt.label}</span>
+                <span className="max-w-[100vw] leading-relaxed text-sm leading-relaxed">{opt.label}</span>
               </motion.button>
             ))}
           </div>
         </FadeIn>
 
         {/* Initial balance */}
-        <FadeIn delay={0.1} className="mb-6">
-          <label className="text-sm text-muted-foreground mb-2 block">
+        <FadeIn delay={0.1} className="leading-relaxed mb-6">
+          <label className="max-w-[100vw] leading-relaxed text-sm leading-relaxed text-muted-foreground mb-2 block">
             Saldo inicial (opcional)
           </label>
           <CurrencyInput value={initialBalance} onChange={setInitialBalance} />
-          <p className="text-xs text-muted-foreground mt-2">
+          <p className="max-w-[100vw] leading-relaxed text-xs text-muted-foreground mt-2">
             Este valor não será contabilizado como receita
           </p>
         </FadeIn>
@@ -216,8 +223,8 @@ export const AddBankAccount = () => {
         <FadeIn delay={0.15}>
           <div className="flex items-center justify-between p-4 rounded-xl bg-card border border-border shadow-soft">
             <div>
-              <p className="text-sm font-medium">Definir como conta principal</p>
-              <p className="text-xs text-muted-foreground">Usar para transações automáticas via WhatsApp</p>
+              <p className="max-w-[100vw] leading-relaxed text-sm leading-relaxed font-medium">Definir como conta principal</p>
+              <p className="max-w-[100vw] leading-relaxed text-xs text-muted-foreground">Usar para transações automáticas via WhatsApp</p>
             </div>
             <Switch
               checked={isMainAccount}

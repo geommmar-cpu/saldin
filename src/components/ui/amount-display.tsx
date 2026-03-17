@@ -14,9 +14,9 @@ export const AmountDisplay = ({ amount, label = "Valor" }: AmountDisplayProps) =
 
   return (
     <div className="flex flex-col items-center justify-center">
-      <p className="text-muted-foreground mb-2">{label}</p>
+      <p className="max-w-[100vw] leading-relaxed text-muted-foreground mb-2">{label}</p>
       <div className="flex items-baseline gap-1">
-        <span className="text-2xl text-muted-foreground">R$</span>
+        <span className="max-w-[100vw] leading-relaxed text-2xl text-muted-foreground">R$</span>
         <motion.span
           key={amount}
           initial={{ scale: 1.1 }}

@@ -40,7 +40,7 @@ const CurrencyInput = React.forwardRef<HTMLInputElement, CurrencyInputProps>(
 
     const sizeClasses = {
       sm: "h-10 text-base",
-      default: "h-12 text-lg",
+      default: "h-12 text-lg leading-relaxed",
       lg: "h-14 text-xl font-semibold",
       xl: "h-16 text-2xl font-semibold",
     };
@@ -50,7 +50,7 @@ const CurrencyInput = React.forwardRef<HTMLInputElement, CurrencyInputProps>(
         {showPrefix && (
           <span className={cn(
             "absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground",
-            inputSize === "xl" && "text-lg",
+            inputSize === "xl" && "text-lg leading-relaxed",
             inputSize === "lg" && "text-base",
           )}>
             R$
@@ -63,7 +63,7 @@ const CurrencyInput = React.forwardRef<HTMLInputElement, CurrencyInputProps>(
           onChange={handleChange}
           placeholder="0,00"
           className={cn(
-            "flex w-full rounded-md border border-input bg-background px-3 py-2 ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium file:text-foreground placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50",
+            "flex w-full rounded-md border border-input bg-background px-3 py-2 ring-offset-background file:border-0 file:bg-transparent file:text-sm leading-relaxed file:font-medium file:text-foreground placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50",
             showPrefix && "pl-10",
             inputSize === "xl" && showPrefix && "pl-12",
             sizeClasses[inputSize],

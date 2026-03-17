@@ -74,6 +74,11 @@ export const EditIncome = () => {
   if (isLoadingIncome) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
+      <title>Saldin | EditIncome</title>
+      <meta name="description" content="Manage your editincome easily with Saldin." />
+      <meta property="og:title" content="Saldin - EditIncome" />
+      <meta property="og:description" content="Manage your editincome easily with Saldin." />
+        
         <Loader2 className="w-8 h-8 animate-spin text-muted-foreground" />
       </div>
     );
@@ -82,7 +87,7 @@ export const EditIncome = () => {
   if (!income) {
     return (
       <div className="min-h-screen bg-background flex flex-col items-center justify-center p-5">
-        <p className="text-muted-foreground">Receita não encontrada</p>
+        <p className="max-w-[100vw] leading-relaxed text-muted-foreground">Receita não encontrada</p>
         <Button variant="ghost" onClick={() => navigate("/")} className="mt-4">Voltar</Button>
       </div>
     );
@@ -100,8 +105,8 @@ export const EditIncome = () => {
       </header>
 
       <main className="flex-1 px-5 py-6 overflow-y-auto pb-32">
-        <FadeIn className="mb-6">
-          <Label className="text-sm text-muted-foreground mb-2 block">Valor</Label>
+        <FadeIn className="leading-relaxed mb-6">
+          <Label className="max-w-[100vw] leading-relaxed text-sm leading-relaxed text-muted-foreground mb-2 block">Valor</Label>
           <CurrencyInput
             value={amount}
             onChange={setAmount}
@@ -109,30 +114,30 @@ export const EditIncome = () => {
           />
         </FadeIn>
 
-        <FadeIn delay={0.05} className="mb-6">
-          <Label className="text-sm text-muted-foreground mb-2 block">Descrição</Label>
+        <FadeIn delay={0.05} className="leading-relaxed mb-6">
+          <Label className="max-w-[100vw] leading-relaxed text-sm leading-relaxed text-muted-foreground mb-2 block">Descrição</Label>
           <Textarea placeholder="Ex: Salário, Freelance..." value={description} onChange={(e) => setDescription(e.target.value)} maxLength={100} className="resize-none" rows={2} />
         </FadeIn>
 
-        <FadeIn delay={0.1} className="mb-6">
+        <FadeIn delay={0.1} className="leading-relaxed mb-6">
           <div className={`p-4 rounded-xl border-2 flex items-center gap-3 cursor-pointer ${isRecurring ? "border-essential bg-essential/5" : "border-border bg-card"}`} onClick={() => setIsRecurring(!isRecurring)}>
             <div className={`w-5 h-5 rounded border-2 flex items-center justify-center ${isRecurring ? "border-essential bg-essential" : "border-muted-foreground"}`}>
               {isRecurring && <Check className="w-3 h-3 text-white" />}
             </div>
             <div>
               <p className="font-medium">Receita recorrente</p>
-              <p className="text-xs text-muted-foreground">Se repete todo mês</p>
+              <p className="max-w-[100vw] leading-relaxed text-xs text-muted-foreground">Se repete todo mês</p>
             </div>
           </div>
         </FadeIn>
 
         {/* Payment Day Selector */}
         {isRecurring && (
-          <FadeIn delay={0.15} className="mb-6">
+          <FadeIn delay={0.15} className="leading-relaxed mb-6">
             <div className="space-y-3">
               <div className="flex items-center gap-2">
                 <CalendarClock className="w-4 h-4 text-muted-foreground" />
-                <Label className="text-sm text-muted-foreground">Dia do recebimento *</Label>
+                <Label className="max-w-[100vw] leading-relaxed text-sm leading-relaxed text-muted-foreground">Dia do recebimento *</Label>
               </div>
               <Select value={paymentDay} onValueChange={setPaymentDay}>
                 <SelectTrigger className="h-12">
@@ -150,7 +155,7 @@ export const EditIncome = () => {
               {paymentDay && (
                 <div className="flex items-start gap-2 p-3 rounded-xl bg-muted/50 border border-border">
                   <Info className="w-4 h-4 text-muted-foreground mt-0.5 shrink-0" />
-                  <p className="text-xs text-muted-foreground">
+                  <p className="max-w-[100vw] leading-relaxed text-xs text-muted-foreground">
                     Essa receita será registrada e somada ao saldo apenas no dia {paymentDay} de cada mês.
                   </p>
                 </div>

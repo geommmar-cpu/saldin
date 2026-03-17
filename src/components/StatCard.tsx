@@ -37,7 +37,7 @@ export const StatCard = ({
     >
       <p
         className={cn(
-          "text-sm font-medium",
+          "text-sm leading-relaxed font-medium",
           variant === "highlight" ? "text-primary-foreground/80" : "text-muted-foreground"
         )}
       >
@@ -55,7 +55,7 @@ export const StatCard = ({
         {trend && trendValue && (
           <div
             className={cn(
-              "flex items-center gap-1 text-sm",
+              "flex items-center gap-1 text-sm leading-relaxed",
               trend === "up" && "text-impulse",
               trend === "down" && "text-essential",
               trend === "neutral" && "text-muted-foreground"
@@ -69,7 +69,7 @@ export const StatCard = ({
       {subtitle && (
         <p
           className={cn(
-            "mt-1 text-sm",
+            "mt-1 text-sm leading-relaxed",
             variant === "highlight" ? "text-primary-foreground/70" : "text-muted-foreground"
           )}
         >

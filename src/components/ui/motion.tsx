@@ -93,7 +93,7 @@ export const AnimatedAmount = ({
   const [displayValue, setDisplayValue] = React.useState(0);
 
   React.useEffect(() => {
-    let start = displayValue;
+    const start = displayValue;
     const end = value;
     const duration = 800;
     const startTime = performance.now();
@@ -114,7 +114,7 @@ export const AnimatedAmount = ({
     };
 
     requestAnimationFrame(animate);
-  }, [value]);
+  }, [value, displayValue]);
 
   return (
     <span className={className}>

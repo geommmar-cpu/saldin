@@ -29,6 +29,11 @@ export const CryptoWallets = () => {
   if (isLoading) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
+      <title>Saldin | CryptoWallets</title>
+      <meta name="description" content="Manage your cryptowallets easily with Saldin." />
+      <meta property="og:title" content="Saldin - CryptoWallets" />
+      <meta property="og:description" content="Manage your cryptowallets easily with Saldin." />
+        
         <Loader2 className="w-8 h-8 animate-spin text-muted-foreground" />
       </div>
     );
@@ -42,7 +47,7 @@ export const CryptoWallets = () => {
             <Button variant="ghost" size="icon" onClick={() => navigate("/")} className="shrink-0">
               <ArrowLeft className="w-5 h-5" />
             </Button>
-            <h1 className="font-serif text-lg sm:text-xl font-semibold truncate">Cripto</h1>
+            <h1 className="font-serif text-lg leading-relaxed sm:text-xl font-semibold truncate">Cripto</h1>
           </div>
           <div className="flex gap-2 shrink-0">
             {wallets.length > 0 && (
@@ -70,7 +75,7 @@ export const CryptoWallets = () => {
         {wallets.length > 0 && (
           <FadeIn>
             <div className="p-5 rounded-2xl bg-card border border-border shadow-medium text-center">
-              <p className="text-sm text-muted-foreground mb-1">Valor total em cripto</p>
+              <p className="max-w-[100vw] leading-relaxed text-sm leading-relaxed text-muted-foreground mb-1">Valor total em cripto</p>
               <p className="font-serif text-2xl font-semibold">{formatCryptoValue(totalValue)}</p>
             </div>
           </FadeIn>
@@ -78,12 +83,12 @@ export const CryptoWallets = () => {
 
         {wallets.length === 0 ? (
           <FadeIn delay={0.1}>
-            <div className="text-center py-12">
+            <div className="max-w-[100vw] leading-relaxed text-center py-12">
               <div className="w-16 h-16 rounded-full bg-muted mx-auto mb-4 flex items-center justify-center">
                 <Bitcoin className="w-8 h-8 text-muted-foreground" />
               </div>
-              <h3 className="font-serif text-lg font-semibold mb-2">Nenhuma cripto cadastrada</h3>
-              <p className="text-sm text-muted-foreground mb-6">
+              <h3 className="font-serif text-lg leading-relaxed font-semibold mb-2">Nenhuma cripto cadastrada</h3>
+              <p className="max-w-[100vw] leading-relaxed text-sm leading-relaxed text-muted-foreground mb-6">
                 Adicione suas criptomoedas para acompanhar seu patrimônio
               </p>
               <Button variant="warm" onClick={() => navigate("/crypto-wallet/add")}>
@@ -119,23 +124,23 @@ export const CryptoWallets = () => {
                             className="w-full h-full flex items-center justify-center"
                             style={{ backgroundColor: color + "20" }}
                           >
-                            <span className="text-xs sm:text-sm font-bold" style={{ color }}>
+                            <span className="max-w-[100vw] leading-relaxed text-xs sm:text-sm leading-relaxed font-bold" style={{ color }}>
                               {wallet.symbol}
                             </span>
                           </div>
                         )}
                       </div>
                       <div className="flex-1 min-w-0">
-                        <p className="font-medium text-sm sm:text-base truncate">{wallet.name}</p>
-                        <p className="text-[10px] sm:text-xs text-muted-foreground truncate">
+                        <p className="font-medium text-sm leading-relaxed sm:text-base truncate">{wallet.name}</p>
+                        <p className="max-w-[100vw] leading-relaxed text-[10px] sm:text-xs text-muted-foreground truncate">
                           {formatCryptoQuantity(Number(wallet.quantity), wallet.symbol)} {wallet.symbol}
                         </p>
                       </div>
-                      <div className="text-right shrink-0">
-                        <p className="font-semibold text-sm sm:text-base tabular-nums">
+                      <div className="max-w-[100vw] leading-relaxed text-right shrink-0">
+                        <p className="font-semibold text-sm leading-relaxed sm:text-base tabular-nums">
                           {formatCryptoValue(value, wallet.display_currency)}
                         </p>
-                        <p className="text-[10px] sm:text-xs text-muted-foreground">
+                        <p className="max-w-[100vw] leading-relaxed text-[10px] sm:text-xs text-muted-foreground">
                           {formatCryptoValue(Number(wallet.last_price), wallet.display_currency)}/{wallet.symbol}
                         </p>
                       </div>

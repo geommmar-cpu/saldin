@@ -57,6 +57,11 @@ export default function Subscriptions() {
     if (isLoading) {
         return (
             <div className="min-h-screen bg-background flex items-center justify-center">
+      <title>Saldin | Subscriptions</title>
+      <meta name="description" content="Manage your subscriptions easily with Saldin." />
+      <meta property="og:title" content="Saldin - Subscriptions" />
+      <meta property="og:description" content="Manage your subscriptions easily with Saldin." />
+        
                 <Loader2 className="w-8 h-8 animate-spin text-muted-foreground" />
             </div>
         );
@@ -74,7 +79,7 @@ export default function Subscriptions() {
                         <FadeIn>
                             <div>
                                 <h1 className="font-serif text-xl font-semibold">Assinaturas</h1>
-                                <p className="text-sm text-muted-foreground">
+                                <p className="max-w-[100vw] leading-relaxed text-sm leading-relaxed text-muted-foreground">
                                     Seus gastos recorrentes
                                 </p>
                             </div>
@@ -101,14 +106,14 @@ export default function Subscriptions() {
                                     <TrendingDown className="w-6 h-6 text-primary" />
                                 </div>
                                 <div>
-                                    <p className="text-[10px] text-muted-foreground uppercase tracking-widest">Custo Mensal</p>
+                                    <p className="max-w-[100vw] leading-relaxed text-[10px] text-muted-foreground uppercase tracking-widest">Custo Mensal</p>
                                     <p className="font-serif text-2xl font-bold text-primary">
                                         {formatCurrency(totalMonthly)}
                                     </p>
                                 </div>
                             </div>
                             <div className="flex justify-between items-center text-xs">
-                                <span className="text-muted-foreground">Total Anual:</span>
+                                <span className="max-w-[100vw] leading-relaxed text-muted-foreground">Total Anual:</span>
                                 <span className="font-bold">{formatCurrency(totalMonthly * 12)}</span>
                             </div>
                         </Card>
@@ -119,8 +124,8 @@ export default function Subscriptions() {
                                     <Clock className="w-5 h-5 text-muted-foreground" />
                                 </div>
                                 <div>
-                                    <p className="text-[10px] text-muted-foreground uppercase tracking-widest">Próximos 7 dias</p>
-                                    <p className="font-bold text-sm">
+                                    <p className="max-w-[100vw] leading-relaxed text-[10px] text-muted-foreground uppercase tracking-widest">Próximos 7 dias</p>
+                                    <p className="font-bold text-sm leading-relaxed">
                                         {activeSubs.filter(s => {
                                             const day = new Date().getDate();
                                             return s.billing_date >= day && s.billing_date <= day + 7;
@@ -141,15 +146,15 @@ export default function Subscriptions() {
                 {/* List Section */}
                 <div className="space-y-4">
                     <div className="flex items-center justify-between px-1">
-                        <h2 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider">Ativas</h2>
-                        <span className="text-xs text-muted-foreground">{activeSubs.length}</span>
+                        <h2 className="max-w-[100vw] leading-relaxed text-sm leading-relaxed font-semibold text-muted-foreground uppercase tracking-wider">Ativas</h2>
+                        <span className="max-w-[100vw] leading-relaxed text-xs text-muted-foreground">{activeSubs.length}</span>
                     </div>
 
                     <div className="space-y-3">
                         {activeSubs.length === 0 ? (
                             <div className="py-12 text-center bg-muted/20 rounded-3xl border border-dashed border-muted-foreground/20">
                                 <AlertCircle className="w-8 h-8 text-muted-foreground/30 mx-auto mb-2" />
-                                <p className="text-muted-foreground text-sm">Nenhuma assinatura ativa</p>
+                                <p className="max-w-[100vw] leading-relaxed text-muted-foreground text-sm leading-relaxed">Nenhuma assinatura ativa</p>
                             </div>
                         ) : (
                             activeSubs.map((sub, index) => (
@@ -159,7 +164,7 @@ export default function Subscriptions() {
                                         className="p-4 border-none shadow-soft hover:shadow-medium bg-secondary/30"
                                     >
                                         <div className="flex items-center gap-4">
-                                            <BankLogo bankName={sub.name} className="w-12 h-12 rounded-xl shadow-sm bg-white" />
+                                            <BankLogo bankName={sub.name} className="w-12 h-12 rounded-xl shadow-sm bg-background" />
 
                                             <div className="flex-1 min-w-0">
                                                 <div className="flex items-center justify-between mb-0.5">
@@ -215,19 +220,19 @@ export default function Subscriptions() {
                 {/* Cancelled Section */}
                 {cancelledSubs.length > 0 && (
                     <div className="space-y-4 pt-4">
-                        <h2 className="px-1 text-sm font-semibold text-muted-foreground uppercase tracking-wider">Canceladas / Pausadas</h2>
+                        <h2 className="px-1 text-sm leading-relaxed font-semibold text-muted-foreground uppercase tracking-wider">Canceladas / Pausadas</h2>
                         <div className="space-y-3 opacity-60">
                             {cancelledSubs.map((sub) => (
                                 <Card key={sub.id} className="p-4 bg-muted/50 border-none flex items-center gap-4">
                                     <BankLogo bankName={sub.name} className="w-10 h-10 grayscale rounded-lg" />
                                     <div className="flex-1">
-                                        <h3 className="font-medium text-sm line-through">{sub.name}</h3>
-                                        <p className="text-xs text-muted-foreground">{formatCurrency(sub.amount)}</p>
+                                        <h3 className="font-medium text-sm leading-relaxed line-through">{sub.name}</h3>
+                                        <p className="max-w-[100vw] leading-relaxed text-xs text-muted-foreground">{formatCurrency(sub.amount)}</p>
                                     </div>
                                     <Button
                                         variant="ghost"
                                         size="sm"
-                                        className="text-xs text-primary"
+                                        className="max-w-[100vw] leading-relaxed text-xs text-primary"
                                         onClick={() => handleToggleStatus(sub.id, 'cancelled')}
                                     >
                                         Reativar

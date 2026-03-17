@@ -44,6 +44,7 @@ export const EditBankAccount = () => {
     const { data: accounts = [] } = useBankAccounts();
 
     // Find existing main account for confirmation message
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const existingIncomeAccId = (profile as any)?.wa_default_income_account_id;
     const existingIncomeAcc = accounts.find(a => a.id === existingIncomeAccId);
     const isEditingCurrentMain = existingIncomeAccId === id;
@@ -57,7 +58,9 @@ export const EditBankAccount = () => {
 
             // Check if this is the main account in profile
             if (profile) {
+                // eslint-disable-next-line @typescript-eslint/no-explicit-any
                 const isMain = (profile as any).wa_default_income_account_id === account.id ||
+                    // eslint-disable-next-line @typescript-eslint/no-explicit-any
                     (profile as any).wa_default_expense_account_id === account.id;
                 setIsMainAccount(isMain);
             }
@@ -88,13 +91,16 @@ export const EditBankAccount = () => {
             await updateProfile.mutateAsync({
                 wa_default_income_account_id: id,
                 wa_default_expense_account_id: id
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
             } as any);
         } else {
             // Se era a principal e desmarcou, removemos (opcional, mas seguro)
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
             if ((profile as any).wa_default_income_account_id === id) {
                 await updateProfile.mutateAsync({
                     wa_default_income_account_id: null,
                     wa_default_expense_account_id: null
+                // eslint-disable-next-line @typescript-eslint/no-explicit-any
                 } as any);
             }
         }
@@ -105,6 +111,11 @@ export const EditBankAccount = () => {
     if (isLoading) {
         return (
             <div className="min-h-screen bg-background flex items-center justify-center">
+      <title>Saldin | EditBankAccount</title>
+      <meta name="description" content="Manage your editbankaccount easily with Saldin." />
+      <meta property="og:title" content="Saldin - EditBankAccount" />
+      <meta property="og:description" content="Manage your editbankaccount easily with Saldin." />
+        
                 <Loader2 className="w-8 h-8 animate-spin text-primary" />
             </div>
         );
@@ -123,8 +134,8 @@ export const EditBankAccount = () => {
 
             <main className="flex-1 px-5 py-6 overflow-y-auto pb-32">
                 {/* Bank selector */}
-                <FadeIn className="mb-6">
-                    <label className="text-sm text-muted-foreground mb-3 block">Escolha o banco</label>
+                <FadeIn className="leading-relaxed mb-6">
+                    <label className="max-w-[100vw] leading-relaxed text-sm leading-relaxed text-muted-foreground mb-3 block">Escolha o banco</label>
                     <div className="flex gap-4 overflow-x-auto pb-4 snap-x snap-mandatory no-scrollbar">
                         {BANK_LIST.filter((b) => b.key !== "outros").map((bank) => (
                             <motion.button
@@ -142,7 +153,7 @@ export const EditBankAccount = () => {
                                         ? "border-primary ring-2 ring-primary/20 ring-offset-2 scale-110"
                                         : "border-border bg-card hover:border-primary/50"
                                 )}
-                                    style={{ backgroundColor: bankKey === bank.key ? bank.color : "#ffffff" }}
+                                    style={{ backgroundColor: bankKey === bank.key ? bank.color : "var(--background)fff" }}
                                 >
                                     {bankKey === bank.key ? (
                                         <Check className="w-6 h-6 text-white" />
@@ -162,8 +173,8 @@ export const EditBankAccount = () => {
                 </FadeIn>
 
                 {/* Account type */}
-                <FadeIn delay={0.05} className="mb-6">
-                    <label className="text-sm text-muted-foreground mb-3 block">Tipo de conta</label>
+                <FadeIn delay={0.05} className="leading-relaxed mb-6">
+                    <label className="max-w-[100vw] leading-relaxed text-sm leading-relaxed text-muted-foreground mb-3 block">Tipo de conta</label>
                     <div className="grid grid-cols-3 gap-2">
                         {accountTypeOptions.map((opt) => (
                             <motion.button
@@ -177,15 +188,15 @@ export const EditBankAccount = () => {
                                         : "border-border bg-card hover:bg-secondary"
                                 )}
                             >
-                                <span className="text-sm">{opt.label}</span>
+                                <span className="max-w-[100vw] leading-relaxed text-sm leading-relaxed">{opt.label}</span>
                             </motion.button>
                         ))}
                     </div>
                 </FadeIn>
 
                 {/* Balance */}
-                <FadeIn delay={0.1} className="mb-6">
-                    <label className="text-sm text-muted-foreground mb-2 block">
+                <FadeIn delay={0.1} className="leading-relaxed mb-6">
+                    <label className="max-w-[100vw] leading-relaxed text-sm leading-relaxed text-muted-foreground mb-2 block">
                         Saldo Atual
                     </label>
                     <CurrencyInput value={currentBalance} onChange={setCurrentBalance} />
@@ -195,8 +206,8 @@ export const EditBankAccount = () => {
                 <FadeIn delay={0.15}>
                     <div className="flex items-center justify-between p-4 rounded-xl bg-card border border-border shadow-soft">
                         <div>
-                            <p className="text-sm font-medium">Definir como conta principal</p>
-                            <p className="text-xs text-muted-foreground">Usar para transações automáticas via WhatsApp</p>
+                            <p className="max-w-[100vw] leading-relaxed text-sm leading-relaxed font-medium">Definir como conta principal</p>
+                            <p className="max-w-[100vw] leading-relaxed text-xs text-muted-foreground">Usar para transações automáticas via WhatsApp</p>
                         </div>
                         <Switch
                             checked={isMainAccount}

@@ -29,7 +29,7 @@ export const CryptoSummary = () => {
       <div className="flex items-center justify-between mb-3">
         <div className="flex items-center gap-2">
           <Bitcoin className="w-4 h-4 text-[#F7931A]" />
-          <h3 className="font-medium text-sm">Carteira Cripto</h3>
+          <h3 className="font-medium text-sm leading-relaxed">Carteira Cripto</h3>
         </div>
         <Button
           variant="ghost"
@@ -43,9 +43,9 @@ export const CryptoSummary = () => {
       </div>
 
       {/* Total */}
-      <div className="mb-3 px-1">
-        <p className="text-xs text-muted-foreground">Valor total em cripto</p>
-        <p className="font-serif text-lg font-semibold">{formatCryptoValue(totalValue)}</p>
+      <div className="leading-relaxed mb-3 px-1">
+        <p className="max-w-[100vw] leading-relaxed text-xs text-muted-foreground">Valor total em cripto</p>
+        <p className="font-serif text-lg leading-relaxed font-semibold">{formatCryptoValue(totalValue)}</p>
       </div>
 
       {/* Wallet cards */}
@@ -74,19 +74,19 @@ export const CryptoSummary = () => {
                     className="w-full h-full flex items-center justify-center"
                     style={{ backgroundColor: color + "20" }}
                   >
-                    <span className="text-xs font-bold" style={{ color }}>
+                    <span className="max-w-[100vw] leading-relaxed text-xs font-bold" style={{ color }}>
                       {wallet.symbol}
                     </span>
                   </div>
                 )}
               </div>
               <div className="flex-1 min-w-0">
-                <p className="text-sm font-medium truncate">{wallet.name}</p>
-                <p className="text-xs text-muted-foreground">
+                <p className="max-w-[100vw] leading-relaxed text-sm leading-relaxed font-medium truncate">{wallet.name}</p>
+                <p className="max-w-[100vw] leading-relaxed text-xs text-muted-foreground">
                   {formatCryptoQuantity(Number(wallet.quantity), wallet.symbol)} {wallet.symbol}
                 </p>
               </div>
-              <p className="font-semibold text-sm tabular-nums">
+              <p className="font-semibold text-sm leading-relaxed tabular-nums">
                 {formatCryptoValue(value, wallet.display_currency)}
               </p>
             </motion.button>
@@ -95,7 +95,7 @@ export const CryptoSummary = () => {
       </div>
 
       {wallets.length > 3 && (
-        <p className="text-xs text-muted-foreground text-center mt-2">
+        <p className="max-w-[100vw] leading-relaxed text-xs text-muted-foreground text-center mt-2">
           +{wallets.length - 3} cripto{wallets.length - 3 > 1 ? "s" : ""}
         </p>
       )}

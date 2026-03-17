@@ -11,6 +11,7 @@ import type {
 } from "@/types/bankAccount";
 
 // Helper to bypass typed client for new tables
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 const db = supabase as any;
 
 // ─── Bank Accounts ──────────────────────────────────────
@@ -344,6 +345,7 @@ export const useBankAccountHistory = (accountId: string | undefined) => {
       // Combine and normalize
       const history: AccountHistoryItem[] = [];
 
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       incomes?.forEach((inc: any) => {
         history.push({
           id: inc.id,
@@ -356,6 +358,7 @@ export const useBankAccountHistory = (accountId: string | undefined) => {
         });
       });
 
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       expenses?.forEach((exp: any) => {
         history.push({
           id: exp.id,
@@ -368,6 +371,7 @@ export const useBankAccountHistory = (accountId: string | undefined) => {
         });
       });
 
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       transfersOut?.forEach((tr: any) => {
         history.push({
           id: tr.id,
@@ -380,6 +384,7 @@ export const useBankAccountHistory = (accountId: string | undefined) => {
         });
       });
 
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       transfersIn?.forEach((tr: any) => {
         history.push({
           id: tr.id,

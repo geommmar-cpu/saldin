@@ -43,6 +43,11 @@ export const BankTransfer = () => {
 
   return (
     <div className="min-h-screen bg-background flex flex-col">
+      <title>Saldin | BankTransfer</title>
+      <meta name="description" content="Manage your banktransfer easily with Saldin." />
+      <meta property="og:title" content="Saldin - BankTransfer" />
+      <meta property="og:description" content="Manage your banktransfer easily with Saldin." />
+        
       <header className="px-5 pt-safe-top">
         <div className="pt-4 pb-2 flex items-center gap-4">
           <Button variant="ghost" size="icon" onClick={() => navigate("/")}>
@@ -54,8 +59,8 @@ export const BankTransfer = () => {
 
       <main className="flex-1 px-5 py-6 overflow-y-auto pb-32">
         {/* Amount */}
-        <FadeIn className="mb-6">
-          <label className="text-sm text-muted-foreground mb-2 block">Valor</label>
+        <FadeIn className="leading-relaxed mb-6">
+          <label className="max-w-[100vw] leading-relaxed text-sm leading-relaxed text-muted-foreground mb-2 block">Valor</label>
           <CurrencyInput value={amount} onChange={setAmount} inputSize="xl" />
         </FadeIn>
 
@@ -86,8 +91,8 @@ export const BankTransfer = () => {
         </FadeIn>
 
         {/* Description */}
-        <FadeIn delay={0.15} className="mb-6">
-          <label className="text-sm text-muted-foreground mb-2 block">
+        <FadeIn delay={0.15} className="leading-relaxed mb-6">
+          <label className="max-w-[100vw] leading-relaxed text-sm leading-relaxed text-muted-foreground mb-2 block">
             Descrição (opcional)
           </label>
           <Input

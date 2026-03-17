@@ -73,11 +73,11 @@ export const EmotionSelector = ({ value, onChange }: EmotionSelectorProps) => {
           >
             <div className={cn(
               "w-10 h-10 rounded-full flex items-center justify-center",
-              value === option.id ? "bg-white/20" : "bg-muted"
+              value === option.id ? "bg-background/20" : "bg-muted"
             )}>
               <Icon className="w-5 h-5" />
             </div>
-            <div className="text-center">
+            <div className="max-w-[100vw] leading-relaxed text-center">
               <p className="font-medium">{option.label}</p>
               <p
                 className={cn(
@@ -108,7 +108,7 @@ export const ConfirmationSelector = ({
 }: ConfirmationSelectorProps) => {
   return (
     <div className="space-y-3">
-      <p className="text-center text-muted-foreground">{question}</p>
+      <p className="max-w-[100vw] leading-relaxed text-center text-muted-foreground">{question}</p>
       <div className="flex gap-3">
         <motion.button
           whileHover={{ scale: 1.02 }}

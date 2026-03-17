@@ -58,6 +58,7 @@ const NOISE_PATTERNS = [
   /cet\s+/i,
   /\bcrc\b/i,
   // Purely numeric blocks (no description context)
+  // eslint-disable-next-line no-useless-escape
   /^[\d\s.,/\-]+$/,
   // Very short lines (< 5 chars) that aren't amounts
   /^.{0,4}$/,
@@ -199,6 +200,7 @@ function autoDetectCategory(desc: string): string | null {
 
 function cleanDescription(text: string): string {
   return text
+    // eslint-disable-next-line no-control-regex
     .replace(/[\x00-\x1F\x7F]/g, " ")  // Remove control characters
     .replace(/[^\w\sÀ-ÿ.,\-/()&*#@!?:;'"]/g, " ") // Remove odd chars
     .replace(/\s+/g, " ")

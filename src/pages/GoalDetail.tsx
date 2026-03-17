@@ -48,7 +48,7 @@ import { cn } from "@/lib/utils";
 const goalColors: Record<string, { bg: string; text: string; border: string }> = {
   green: { bg: "bg-essential/10", text: "text-essential", border: "border-essential/30" },
   blue: { bg: "bg-calm/10", text: "text-calm", border: "border-calm/30" },
-  purple: { bg: "bg-pleasure/10", text: "text-pleasure", border: "border-pleasure/30" },
+  teal: { bg: "bg-pleasure/10", text: "text-pleasure", border: "border-pleasure/30" },
   orange: { bg: "bg-obligation/10", text: "text-obligation", border: "border-obligation/30" },
   red: { bg: "bg-impulse/10", text: "text-impulse", border: "border-impulse/30" },
   pink: { bg: "bg-pink-500/10", text: "text-pink-500", border: "border-pink-500/30" },
@@ -84,6 +84,11 @@ export default function GoalDetail() {
   if (isLoading) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
+      <title>Saldin | GoalDetail</title>
+      <meta name="description" content="Manage your goaldetail easily with Saldin." />
+      <meta property="og:title" content="Saldin - GoalDetail" />
+      <meta property="og:description" content="Manage your goaldetail easily with Saldin." />
+        
         <Loader2 className="w-8 h-8 animate-spin text-muted-foreground" />
       </div>
     );
@@ -207,7 +212,7 @@ export default function GoalDetail() {
     return {
       icon: Icon,
       image: "https://images.unsplash.com/photo-1557683316-973673baf926?q=80&w=500&auto=format&fit=crop",
-      overlay: "bg-purple-900/40"
+      overlay: "bg-teal-900/40"
     };
   };
 
@@ -226,12 +231,12 @@ export default function GoalDetail() {
               <h1 className="font-serif text-xl font-bold">{goal.name}</h1>
               <div className="flex items-center gap-2">
                 {isCompleted && (
-                  <span className="text-xs text-essential flex items-center gap-1">
+                  <span className="max-w-[100vw] leading-relaxed text-xs text-essential flex items-center gap-1">
                     <CheckCircle2 className="w-3 h-3" /> Concluída
                   </span>
                 )}
                 {goal.is_personal === false && (
-                  <span className="text-xs text-muted-foreground flex items-center gap-1">
+                  <span className="max-w-[100vw] leading-relaxed text-xs text-muted-foreground flex items-center gap-1">
                     <Users className="w-3 h-3" /> Para terceiro
                   </span>
                 )}
@@ -250,7 +255,7 @@ export default function GoalDetail() {
               variant="ghost"
               size="icon"
               onClick={() => setShowDeleteDialog(true)}
-              className="text-destructive"
+              className="max-w-[100vw] leading-relaxed text-destructive"
             >
               <Trash2 className="w-5 h-5" />
             </Button>
@@ -277,26 +282,26 @@ export default function GoalDetail() {
             {/* Content */}
             <div className="relative z-20">
               <div className="flex items-center gap-4 mb-6">
-                <div className="w-14 h-14 rounded-2xl bg-white/20 backdrop-blur-md flex items-center justify-center border border-white/10 shadow-sm">
+                <div className="w-14 h-14 rounded-2xl bg-background/20 backdrop-blur-md flex items-center justify-center border border-white/10 shadow-sm">
                   <Icon className="w-7 h-7 text-white" />
                 </div>
                 <div className="flex-1">
-                  <p className="text-sm text-white/80 font-medium">Guardado</p>
+                  <p className="max-w-[100vw] leading-relaxed text-sm leading-relaxed text-white/80 font-medium">Guardado</p>
                   <p className="font-serif text-3xl font-bold text-white drop-shadow-md">
                     {formatCurrency(Number(goal.current_amount))}
                   </p>
                 </div>
               </div>
 
-              <div className="h-2 w-full bg-white/20 rounded-full overflow-hidden backdrop-blur-md mb-3">
+              <div className="h-2 w-full bg-background/20 rounded-full overflow-hidden backdrop-blur-md mb-3">
                 <div
                   className="h-full bg-primary rounded-full shadow-[0_0_10px_rgba(255,255,255,0.5)]"
                   style={{ width: `${Math.min(progress, 100)}%` }}
                 />
               </div>
 
-              <div className="flex items-center justify-between text-sm">
-                <span className="text-white/90 font-medium">
+              <div className="flex items-center justify-between text-sm leading-relaxed">
+                <span className="max-w-[100vw] leading-relaxed text-white/90 font-medium">
                   {Math.round(progress)}% do objetivo
                 </span>
                 <span className="font-medium text-white/90">
@@ -307,13 +312,13 @@ export default function GoalDetail() {
           </div>
 
           {!isCompleted && remaining > 0 && (
-            <p className="text-sm text-muted-foreground mt-3 px-1">
+            <p className="max-w-[100vw] leading-relaxed text-sm leading-relaxed text-muted-foreground mt-3 px-1">
               Faltam <strong>{formatCurrency(remaining)}</strong> para atingir a meta
             </p>
           )}
 
           {goal.target_date && !isCompleted && (
-            <p className="text-sm text-muted-foreground mt-2 flex items-center gap-1 px-1">
+            <p className="max-w-[100vw] leading-relaxed text-sm leading-relaxed text-muted-foreground mt-2 flex items-center gap-1 px-1">
               <Clock className="w-4 h-4" />
               Objetivo para {new Date(goal.target_date).toLocaleDateString('pt-BR')}
             </p>
@@ -348,8 +353,8 @@ export default function GoalDetail() {
         {goal.notes && (
           <FadeIn delay={0.15}>
             <Card className="p-4">
-              <p className="text-sm text-muted-foreground mb-1">Observação</p>
-              <p className="text-sm">{goal.notes}</p>
+              <p className="max-w-[100vw] leading-relaxed text-sm leading-relaxed text-muted-foreground mb-1">Observação</p>
+              <p className="max-w-[100vw] leading-relaxed text-sm leading-relaxed">{goal.notes}</p>
             </Card>
           </FadeIn>
         )}
@@ -368,7 +373,7 @@ export default function GoalDetail() {
               </div>
             ) : transactions.length === 0 ? (
               <Card className="p-6 text-center">
-                <p className="text-sm text-muted-foreground">
+                <p className="max-w-[100vw] leading-relaxed text-sm leading-relaxed text-muted-foreground">
                   Nenhuma movimentação ainda
                 </p>
               </Card>
@@ -388,10 +393,10 @@ export default function GoalDetail() {
                         )}
                       </div>
                       <div>
-                        <p className="text-sm font-medium">
+                        <p className="max-w-[100vw] leading-relaxed text-sm leading-relaxed font-medium">
                           {trans.type === 'deposit' ? 'Depósito' : 'Resgate'}
                         </p>
-                        <p className="text-xs text-muted-foreground">
+                        <p className="max-w-[100vw] leading-relaxed text-xs text-muted-foreground">
                           {new Date(trans.created_at).toLocaleDateString('pt-BR', {
                             day: '2-digit',
                             month: 'short',
@@ -432,14 +437,14 @@ export default function GoalDetail() {
                 type="number"
                 step="0.01"
                 min="0"
-                className="pl-10 text-lg"
+                className="pl-10 text-lg leading-relaxed"
                 placeholder="0,00"
                 value={amount}
                 onChange={(e) => setAmount(e.target.value)}
                 autoFocus
               />
             </div>
-            <p className="text-xs text-muted-foreground mt-2">
+            <p className="max-w-[100vw] leading-relaxed text-xs text-muted-foreground mt-2">
               {goal.is_personal !== false
                 ? "Este valor será subtraído do seu Saldo Livre"
                 : "Meta para terceiro — não afeta seu saldo"}
@@ -480,17 +485,17 @@ export default function GoalDetail() {
                 step="0.01"
                 min="0"
                 max={Number(goal.current_amount)}
-                className="pl-10 text-lg"
+                className="pl-10 text-lg leading-relaxed"
                 placeholder="0,00"
                 value={amount}
                 onChange={(e) => setAmount(e.target.value)}
                 autoFocus
               />
             </div>
-            <p className="text-xs text-muted-foreground mt-2">
+            <p className="max-w-[100vw] leading-relaxed text-xs text-muted-foreground mt-2">
               Disponível: {formatCurrency(Number(goal.current_amount))}
             </p>
-            <p className="text-xs text-amber-600 dark:text-amber-500 mt-1 flex items-center gap-1">
+            <p className="max-w-[100vw] leading-relaxed text-xs text-amber-600 dark:text-amber-500 mt-1 flex items-center gap-1">
               <AlertTriangle className="w-3 h-3" />
               {goal.is_personal !== false
                 ? "Este valor voltará para seu Saldo Livre"

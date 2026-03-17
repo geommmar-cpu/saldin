@@ -86,6 +86,7 @@ export const Debts = () => {
 
     const fDate = addMonths(now, maxMonths);
     return { monthsToFreedom: maxMonths, freedomDate: fDate };
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [activeDebts]);
 
   const { acceleratedMonths, acceleratedDate, monthsSaved } = useMemo(() => {
@@ -112,6 +113,7 @@ export const Debts = () => {
       acceleratedDate: accDate,
       monthsSaved: saved > 0 ? saved : 0
     };
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [extraPayment, activeDebts, totalOwed, totalMonthlyCommitment, monthsToFreedom, freedomDate]);
 
   const formatCurrency = (value: number) =>
@@ -127,6 +129,11 @@ export const Debts = () => {
   if (isLoading) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center pb-24">
+      <title>Saldin | Debts</title>
+      <meta name="description" content="Manage your debts easily with Saldin." />
+      <meta property="og:title" content="Saldin - Debts" />
+      <meta property="og:description" content="Manage your debts easily with Saldin." />
+        
         <Loader2 className="w-8 h-8 animate-spin text-muted-foreground" />
         <BottomNav />
       </div>
@@ -144,7 +151,7 @@ export const Debts = () => {
             </Button>
             <div>
               <h1 className="font-serif text-xl font-semibold">Dívidas</h1>
-              <p className="text-xs text-muted-foreground">
+              <p className="max-w-[100vw] leading-relaxed text-xs text-muted-foreground">
                 Parcelamentos e compromissos
               </p>
             </div>
@@ -175,23 +182,23 @@ export const Debts = () => {
                   <div className="w-8 h-8 rounded-full bg-primary/20 flex items-center justify-center border border-primary/30">
                     <Zap className="w-4 h-4 text-primary" />
                   </div>
-                  <span className="text-[10px] font-bold uppercase tracking-widest text-primary/80">Plano de Guerra</span>
+                  <span className="max-w-[100vw] leading-relaxed text-[10px] font-bold uppercase tracking-widest text-primary/80">Plano de Guerra</span>
                 </div>
 
                 <div className="space-y-1 mb-6">
-                  <h2 className="text-2xl font-serif font-bold leading-tight">
-                    Sua Independência em <span className="text-primary capitalize">{format(extraPayment > 0 ? acceleratedDate : freedomDate, "MMMM yyyy", { locale: ptBR })}</span>
+                  <h2 className="max-w-[100vw] leading-relaxed text-2xl font-serif font-bold leading-tight">
+                    Sua Independência em <span className="max-w-[100vw] leading-relaxed text-primary capitalize">{format(extraPayment > 0 ? acceleratedDate : freedomDate, "MMMM yyyy", { locale: ptBR })}</span>
                   </h2>
-                  <p className="text-sm text-slate-400">
-                    Faltam <span className="text-white font-bold">{extraPayment > 0 ? acceleratedMonths : monthsToFreedom} meses</span> para você não dever mais nada a ninguém.
+                  <p className="max-w-[100vw] leading-relaxed text-sm leading-relaxed text-slate-400">
+                    Faltam <span className="max-w-[100vw] leading-relaxed text-white font-bold">{extraPayment > 0 ? acceleratedMonths : monthsToFreedom} meses</span> para você não dever mais nada a ninguém.
                   </p>
                 </div>
 
                 {/* Overall Progress */}
                 <div className="space-y-2 mb-6">
                   <div className="flex justify-between text-xs font-bold uppercase tracking-tighter">
-                    <span className="text-slate-400">Progresso de Quitação</span>
-                    <span className="text-primary">{overallProgress}%</span>
+                    <span className="max-w-[100vw] leading-relaxed text-slate-400">Progresso de Quitação</span>
+                    <span className="max-w-[100vw] leading-relaxed text-primary">{overallProgress}%</span>
                   </div>
                   <div className="h-2 w-full bg-slate-700 rounded-full overflow-hidden">
                     <motion.div
@@ -205,12 +212,12 @@ export const Debts = () => {
 
                 <div className="grid grid-cols-2 gap-4 pt-4 border-t border-white/10">
                   <div className="space-y-0.5">
-                    <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Total Restante</p>
-                    <p className="text-lg font-bold text-white tracking-tight">{formatCurrency(totalOwed)}</p>
+                    <p className="max-w-[100vw] leading-relaxed text-[10px] font-bold text-slate-400 uppercase tracking-wider">Total Restante</p>
+                    <p className="max-w-[100vw] leading-relaxed text-lg leading-relaxed font-bold text-white tracking-tight">{formatCurrency(totalOwed)}</p>
                   </div>
                   <div className="space-y-0.5 text-right">
-                    <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Peso Mensal</p>
-                    <p className="text-lg font-bold text-impulse tracking-tight">{formatCurrency(totalMonthlyCommitment)}</p>
+                    <p className="max-w-[100vw] leading-relaxed text-[10px] font-bold text-slate-400 uppercase tracking-wider">Peso Mensal</p>
+                    <p className="max-w-[100vw] leading-relaxed text-lg leading-relaxed font-bold text-impulse tracking-tight">{formatCurrency(totalMonthlyCommitment)}</p>
                   </div>
                 </div>
               </div>
@@ -226,8 +233,8 @@ export const Debts = () => {
                 <Target className="w-5 h-5 text-essential" />
               </div>
               <div>
-                <p className="text-xs font-bold text-essential uppercase">Estratégia Recomendada</p>
-                <p className="text-sm text-foreground">Focha em quitar <strong>{activeDebts.sort((a, b) => (Number(a.total_amount) - Number(a.paid_amount)) - (Number(b.total_amount) - Number(b.paid_amount)))[0].creditor_name}</strong> primeiro para ganhar fôlego.</p>
+                <p className="max-w-[100vw] leading-relaxed text-xs font-bold text-essential uppercase">Estratégia Recomendada</p>
+                <p className="max-w-[100vw] leading-relaxed text-sm leading-relaxed text-foreground">Focha em quitar <strong>{activeDebts.sort((a, b) => (Number(a.total_amount) - Number(a.paid_amount)) - (Number(b.total_amount) - Number(b.paid_amount)))[0].creditor_name}</strong> primeiro para ganhar fôlego.</p>
               </div>
             </div>
           </FadeIn>
@@ -240,7 +247,7 @@ export const Debts = () => {
               <div className="flex items-center justify-between">
                 <div>
                   <h3 className="font-bold text-base">Acelerador de Independência</h3>
-                  <p className="text-xs text-muted-foreground">Quanto você pode pagar a mais por mês?</p>
+                  <p className="max-w-[100vw] leading-relaxed text-xs text-muted-foreground">Quanto você pode pagar a mais por mês?</p>
                 </div>
                 {monthsSaved > 0 && (
                   <motion.div
@@ -255,11 +262,11 @@ export const Debts = () => {
 
               <div className="space-y-4">
                 <div className="flex justify-between items-end">
-                  <span className="text-2xl font-bold tracking-tight">{formatCurrency(extraPayment)}</span>
-                  <span className="text-[10px] font-bold uppercase text-muted-foreground tracking-widest pb-1">Pagamento Extra</span>
+                  <span className="max-w-[100vw] leading-relaxed text-2xl font-bold tracking-tight">{formatCurrency(extraPayment)}</span>
+                  <span className="max-w-[100vw] leading-relaxed text-[10px] font-bold uppercase text-muted-foreground tracking-widest pb-1">Pagamento Extra</span>
                 </div>
 
-                <input
+                <input aria-label="Input field" 
                   type="range"
                   min="0"
                   max={totalMonthlyCommitment * 2}
@@ -277,8 +284,8 @@ export const Debts = () => {
 
               {monthsSaved > 0 && (
                 <div className="pt-2">
-                  <p className="text-sm leading-relaxed">
-                    Com <strong className="text-primary">{formatCurrency(extraPayment)} extra</strong>, você antecipa sua liberdade para <strong className="text-foreground capitalize">{format(acceleratedDate, "MMMM 'de' yyyy", { locale: ptBR })}</strong>.
+                  <p className="max-w-[100vw] leading-relaxed text-sm leading-relaxed leading-relaxed">
+                    Com <strong className="max-w-[100vw] leading-relaxed text-primary">{formatCurrency(extraPayment)} extra</strong>, você antecipa sua liberdade para <strong className="max-w-[100vw] leading-relaxed text-foreground capitalize">{format(acceleratedDate, "MMMM 'de' yyyy", { locale: ptBR })}</strong>.
                   </p>
                 </div>
               )}
@@ -289,7 +296,7 @@ export const Debts = () => {
         {/* Active Debts */}
         {activeDebts.length > 0 && (
           <FadeIn delay={0.1}>
-            <h2 className="font-serif text-lg font-semibold mb-2">
+            <h2 className="font-serif text-lg leading-relaxed font-semibold mb-2">
               Dívidas ativas
             </h2>
             <div className="space-y-2">
@@ -307,12 +314,12 @@ export const Debts = () => {
 
         {/* Empty State */}
         {activeDebts.length === 0 && (
-          <FadeIn delay={0.1} className="text-center py-12">
+          <FadeIn delay={0.1} className="max-w-[100vw] leading-relaxed text-center py-12">
             <div className="w-16 h-16 rounded-full bg-essential/10 flex items-center justify-center mx-auto mb-4">
               <CheckCircle2 className="w-8 h-8 text-essential" />
             </div>
             <h3 className="font-semibold mb-1">Sem dívidas ativas</h3>
-            <p className="text-sm text-muted-foreground">
+            <p className="max-w-[100vw] leading-relaxed text-sm leading-relaxed text-muted-foreground">
               Você não tem compromissos pendentes
             </p>
           </FadeIn>
@@ -323,7 +330,7 @@ export const Debts = () => {
           <FadeIn delay={0.2}>
             <button
               onClick={() => setShowPaid(!showPaid)}
-              className="w-full p-3 rounded-xl bg-muted/50 text-center text-sm text-muted-foreground hover:bg-muted transition-colors"
+              className="w-full p-3 rounded-xl bg-muted/50 text-center text-sm leading-relaxed text-muted-foreground hover:bg-muted transition-colors"
             >
               {showPaid ? "Ocultar" : "Ver"} {paidDebts.length} dívida
               {paidDebts.length !== 1 ? "s" : ""} quitada
@@ -408,12 +415,12 @@ const DebtCard = ({ debt, onClick, delay = 0 }: DebtCardProps) => {
           <div className="flex items-center gap-2 mb-1">
             <p className="font-bold truncate text-base">{debt.creditor_name}</p>
             {isPaid && (
-              <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-essential/10 text-essential font-bold uppercase tracking-tighter shrink-0 border border-essential/20">
+              <span className="max-w-[100vw] leading-relaxed text-[10px] px-1.5 py-0.5 rounded-full bg-essential/10 text-essential font-bold uppercase tracking-tighter shrink-0 border border-essential/20">
                 Quitada
               </span>
             )}
             {isRecurring && !isPaid && (
-              <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-accent/10 text-accent font-bold uppercase tracking-tighter shrink-0 border border-accent/20">
+              <span className="max-w-[100vw] leading-relaxed text-[10px] px-1.5 py-0.5 rounded-full bg-accent/10 text-accent font-bold uppercase tracking-tighter shrink-0 border border-accent/20">
                 Recorrente
               </span>
             )}
@@ -447,11 +454,11 @@ const DebtCard = ({ debt, onClick, delay = 0 }: DebtCardProps) => {
         </div>
 
         {/* Amount */}
-        <div className="text-right flex-shrink-0 self-center">
-          <p className="font-bold tabular-nums text-lg tracking-tight">
+        <div className="max-w-[100vw] leading-relaxed text-right flex-shrink-0 self-center">
+          <p className="font-bold tabular-nums text-lg leading-relaxed tracking-tight">
             {formatCurrency(Number(debt.installment_amount || 0))}
           </p>
-          <p className="text-[10px] text-muted-foreground font-bold uppercase tracking-wider">Mensal</p>
+          <p className="max-w-[100vw] leading-relaxed text-[10px] text-muted-foreground font-bold uppercase tracking-wider">Mensal</p>
         </div>
       </div>
 

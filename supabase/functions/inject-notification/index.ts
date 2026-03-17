@@ -63,10 +63,11 @@ const BANK_PATTERNS: BankPattern[] = [
 
 // Mapeia package names de apps para nomes de bancos (para uso com {not_package} do MacroDroid)
 const APP_PACKAGE_MAP: Record<string, string> = {
-    "br.com.intermedium": "Inter",
+    "br.com.intermedium": "Inter",           // Inter (confirmado no MacroDroid)
+    "br.com.gabba.caixa": "Caixa",           // CAIXA (confirmado no MacroDroid)
+    "br.gov.caixa.tem": "Caixa",             // CAIXA Tem (variante)
     "com.nu.production": "Nubank",
     "com.nu.mobilemicrosoft": "Nubank",
-    "br.gov.caixa.tem": "Caixa",
     "br.com.bb.android": "BB",
     "com.bradesco": "Bradesco",
     "com.isban.mobile.android.main.c2b.pictetsantander": "Santander",
@@ -77,7 +78,25 @@ const APP_PACKAGE_MAP: Record<string, string> = {
     "br.com.pagseguro.issuer": "PagBank",
     "br.com.sicoob": "Sicoob",
     "br.com.sicredi": "Sicredi",
+    "banco.do.brasil": "BB",
+    "itau": "Itaú",
 };
+
+// Pacotes que nunca devem ser processados (Performance / Privacidade)
+const IGNORED_PACKAGES = [
+    "com.whatsapp",
+    "com.instagram.android",
+    "com.facebook.katana",
+    "com.facebook.orca",
+    "com.android.systemui",
+    "com.android.vending",
+    "com.google.android.gm",
+    "com.google.android.apps.messaging",
+    "com.android.chrome",
+    "com.microsoft.emmx",
+    "org.mozilla.firefox",
+    "com.spotify.music"
+];
 
 // Detecta o banco remetente a partir do nome do app / cabeçalho da notificação
 function detectSenderBank(text: string, packageName?: string): string {
@@ -399,26 +418,61 @@ function normalizePhone(phone: string): string {
     return digits;
 }
 
-// ─── Busca usuário por capture_token (novo fluxo GET simplificado) ───
-async function findUserByToken(token: string) {
+// ─── Busca usuário por device_token (Multi-tenant) ───
+async function findUserByDeviceToken(token: string) {
     const cleanToken = token.trim();
-    console.log(`[findUserByToken] Searching for: "${cleanToken}"`);
+    console.log(`[findUserByDeviceToken] Searching for device: "${cleanToken.substring(0, 8)}..."`);
+    
+    // Busca na nova tabela user_devices
     const { data, error } = await supabase
+        .from("user_devices")
+        .select("user_id, device_name")
+        .eq("device_token", cleanToken)
+        .maybeSingle();
+
+    if (error) {
+        console.error("❌ Device token lookup error:", error);
+        return null;
+    }
+
+    if (data) {
+        // Atualiza timestamp de uso (Fire and forget)
+        supabase.from("user_devices")
+            .update({ last_used_at: new Date().toISOString() })
+            .eq("device_token", cleanToken)
+            .then(({ error: e }: { error: any }) => e && console.error("Error updating last_used_at:", e));
+
+        // Busca o telefone do usuário para responder (whatsapp_users)
+        const { data: userData } = await supabase
+            .from("whatsapp_users")
+            .select("phone_number")
+            .eq("user_id", data.user_id)
+            .eq("is_verified", true)
+            .maybeSingle();
+
+        return {
+            user_id: data.user_id,
+            phone_number: userData?.phone_number || null,
+            device_name: data.device_name
+        };
+    }
+
+    // Fallback: Busca na tabela legada whatsapp_users (compatibilidade durante transição)
+    console.log(`[findUserByDeviceToken] Falling back to legacy whatsapp_users...`);
+    const { data: legacyData, error: legacyError } = await supabase
         .from("whatsapp_users")
         .select("user_id, phone_number, is_verified, capture_token")
         .filter("capture_token", "ilike", cleanToken)
         .eq("is_verified", true)
         .maybeSingle();
 
-    if (error) {
-        console.error("❌ Token lookup query error:", error);
-        return null;
-    }
-    if (!data) {
-        console.warn(`⚠️ No verified user found for token: "${cleanToken}"`);
-        return null;
-    }
-    return data;
+    if (legacyError || !legacyData) return null;
+
+    return {
+        user_id: legacyData.user_id,
+        phone_number: legacyData.phone_number,
+        device_name: "Legacy WhatsApp Device"
+    };
 }
 
 // ─── Busca usuário por telefone (fluxo POST legado) ───
@@ -493,12 +547,19 @@ async function processAndNotify(userId: string, phoneToReply: string, text: stri
     const { error: logError } = await supabase.from("whatsapp_logs").insert({
         phone_number: phoneToReply,
         whatsapp_user_id: null,
-        message_content: JSON.stringify({ text, source, isIncoming: true }),
+        message_content: JSON.stringify({ text, source, isIncoming: true, packageName: bankOverride }),
         message_type: "auto_notification",
         processed: false,
-        processing_result: { text_raw: text, source },
+        processing_result: { text_raw: text, source, package: bankOverride },
     });
     if (logError) console.error("❌ Failed to insert audit log:", logError);
+
+    // ─── FILTRO DE SEGURANÇA E PERFORMANCE ───
+    // Se o pacote estiver na lista de ignorados (ex: WhatsApp), descarta imediatamente
+    if (bankOverride && IGNORED_PACKAGES.some(pkg => bankOverride.toLowerCase().includes(pkg))) {
+        console.log(`🚫 [Ignored] Package skip: ${bankOverride}`);
+        return { status: "ignored", reason: "ignored_package" };
+    }
 
     const parsed = parseNotificationText(text, bankOverride);
 
@@ -819,25 +880,30 @@ Deno.serve(async (req: Request) => {
         // O MacroDroid só precisa de "Abrir URL" com essa URL.
         // ════════════════════════════════════════════
         if (req.method === "GET") {
-            const token = url.searchParams.get("t");
+            const token = url.searchParams.get("t") || req.headers.get("Authorization")?.replace("Bearer ", "");
             const notificationText = url.searchParams.get("n");
-            const bankName = url.searchParams.get("b") || undefined; // banco/app de origem (opcional)
+            const bankName = url.searchParams.get("b") || undefined; 
 
             if (!token || !notificationText) {
-                return new Response(JSON.stringify({ error: "Parâmetros t e n são obrigatórios" }), {
+                return new Response(JSON.stringify({ error: "Parâmetros t (token) e n (texto) são obrigatórios" }), {
                     status: 400,
                     headers: { "Content-Type": "application/json" },
                 });
             }
 
-            console.log(`📲 [GET] Token: ${token.substring(0, 8)}... | Bank: ${bankName || 'auto'} | Text: ${notificationText.substring(0, 60)}`);
+            console.log(`📲 [GET] Device Auth: ${token.substring(0, 8)}... | Bank: ${bankName || 'auto'}`);
 
-            // Busca usuário pelo token
-            const userLink = await findUserByToken(token);
+            const userLink = await findUserByDeviceToken(token);
             if (!userLink) {
-                console.warn("❌ Invalid or unverified token:", token.substring(0, 8));
-                return new Response(JSON.stringify({ error: "Token inválido" }), {
+                return new Response(JSON.stringify({ error: "Dispositivo não autorizado" }), {
                     status: 401,
+                    headers: { "Content-Type": "application/json" },
+                });
+            }
+
+            if (!userLink.phone_number) {
+                return new Response(JSON.stringify({ error: "Usuário sem WhatsApp configurado" }), {
+                    status: 400,
                     headers: { "Content-Type": "application/json" },
                 });
             }
@@ -896,12 +962,12 @@ Deno.serve(async (req: Request) => {
 
             if (token) {
                 // Novo: auth por token
-                const userLink = await findUserByToken(token);
+                const userLink = await findUserByDeviceToken(token);
                 if (!userLink) {
-                    return new Response(JSON.stringify({ error: "Token inválido" }), { status: 401 });
+                    return new Response(JSON.stringify({ error: "Token de dispositivo inválido" }), { status: 401 });
                 }
                 userId = userLink.user_id;
-                phoneToReply = userLink.phone_number;
+                phoneToReply = userLink.phone_number!;
             } else if (secret === INJECT_SECRET) {
                 // Legacy: auth por secret + phone
                 const { phone, text } = body;
@@ -913,7 +979,7 @@ Deno.serve(async (req: Request) => {
                     return new Response(JSON.stringify({ error: "Usuário não encontrado" }), { status: 404 });
                 }
                 userId = userLink.user_id;
-                phoneToReply = userLink.phone_number;
+                phoneToReply = userLink.phone_number!;
             } else {
                 return new Response(JSON.stringify({ error: "Unauthorized" }), { status: 401 });
             }

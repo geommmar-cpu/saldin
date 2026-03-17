@@ -98,7 +98,7 @@ export const Sidebar = () => {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 bg-black/50 z-50 md:hidden"
+            className="fixed inset-0 bg-foreground/50 z-50 md:hidden"
             onClick={() => setIsOpen(false)}
           />
         )}
@@ -133,7 +133,7 @@ export const Sidebar = () => {
 
             {/* Main Navigation */}
             <nav className="flex-1 p-4 space-y-1 overflow-y-auto custom-scrollbar">
-              <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider mb-2 px-3">
+              <p className="max-w-[100vw] leading-relaxed text-xs font-medium text-muted-foreground uppercase tracking-wider mb-2 px-3">
                 Principal
               </p>
               {mainNavItems.map((item) => {
@@ -145,7 +145,7 @@ export const Sidebar = () => {
                     key={item.path}
                     onClick={() => handleNavClick(item)}
                     className={cn(
-                      "w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors",
+                      "w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm leading-relaxed font-medium transition-colors",
                       isActive
                         ? "bg-sidebar-accent text-sidebar-accent-foreground"
                         : item.highlight
@@ -168,7 +168,7 @@ export const Sidebar = () => {
               })}
 
               <div className="pt-4">
-                <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider mb-2 px-3">
+                <p className="max-w-[100vw] leading-relaxed text-xs font-medium text-muted-foreground uppercase tracking-wider mb-2 px-3">
                   Outros
                 </p>
                 {secondaryNavItems.map((item) => {
@@ -180,7 +180,7 @@ export const Sidebar = () => {
                       key={item.path}
                       onClick={() => handleNavClick(item)}
                       className={cn(
-                        "w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors",
+                        "w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm leading-relaxed font-medium transition-colors",
                         isActive
                           ? "bg-sidebar-accent text-sidebar-accent-foreground"
                           : "text-sidebar-foreground hover:bg-sidebar-accent/50"
@@ -196,7 +196,7 @@ export const Sidebar = () => {
                 <button
                   onClick={handleLogout}
                   className={cn(
-                    "w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors",
+                    "w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm leading-relaxed font-medium transition-colors",
                     "text-destructive hover:bg-destructive/10 mt-1"
                   )}
                 >
@@ -207,7 +207,7 @@ export const Sidebar = () => {
 
               {/* Coming Soon Section */}
               <div className="pt-4 pb-4">
-                <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider mb-2 px-3">
+                <p className="max-w-[100vw] leading-relaxed text-xs font-medium text-muted-foreground uppercase tracking-wider mb-2 px-3">
                   Em breve
                 </p>
                 {comingSoonItems.map((item) => {
@@ -216,7 +216,7 @@ export const Sidebar = () => {
                   return (
                     <div
                       key={item.label}
-                      className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-muted-foreground/60 cursor-not-allowed"
+                      className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm leading-relaxed font-medium text-muted-foreground/60 cursor-not-allowed"
                     >
                       <Icon className="w-5 h-5" />
                       <span className="flex-1 text-left">{item.label}</span>
@@ -232,7 +232,7 @@ export const Sidebar = () => {
 
             {/* Footer */}
             <div className="p-4 border-t border-sidebar-border bg-sidebar-background sticky bottom-0">
-              <p className="text-xs text-muted-foreground text-center">
+              <p className="max-w-[100vw] leading-relaxed text-xs text-muted-foreground text-center">
                 Saldin © 2025
               </p>
             </div>

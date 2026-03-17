@@ -24,14 +24,14 @@ export const MonthlyResult = ({ totalIncome, totalSpent, investedAmount = 0, sub
 
   return (
     <div className="space-y-3">
-      <h3 className="px-1 text-sm font-semibold text-muted-foreground uppercase tracking-wider">Resumo do Mês</h3>
+      <h3 className="px-1 text-sm leading-relaxed font-semibold text-muted-foreground uppercase tracking-wider">Resumo do Mês</h3>
 
       <div className="p-5 rounded-2xl bg-card border border-border/50 shadow-sm space-y-5">
 
         {/* Visual Bar */}
         <div className="space-y-2">
           <div className="flex justify-between text-xs font-medium">
-            <span className="text-muted-foreground">Comprometimento da Renda</span>
+            <span className="max-w-[100vw] leading-relaxed text-muted-foreground">Comprometimento da Renda</span>
             <span className={cn(percentSpent > 90 ? "text-impulse" : "text-essential")} data-testid="percent-consumed">
               {percentSpent.toFixed(0)}%
             </span>
@@ -59,9 +59,9 @@ export const MonthlyResult = ({ totalIncome, totalSpent, investedAmount = 0, sub
           <div className="space-y-1">
             <div className="flex items-center justify-center gap-1.5 text-muted-foreground">
               <div className="w-1.5 h-1.5 rounded-full bg-essential" />
-              <span className="text-[10px] uppercase font-bold tracking-wider">Entradas</span>
+              <span className="max-w-[100vw] leading-relaxed text-[10px] uppercase font-bold tracking-wider">Entradas</span>
             </div>
-            <p className="text-sm sm:text-base font-bold text-foreground tracking-tight truncate" data-testid="monthly-income">
+            <p className="max-w-[100vw] leading-relaxed text-sm leading-relaxed sm:text-base font-bold text-foreground tracking-tight truncate" data-testid="monthly-income">
               {formatCurrency(totalIncome)}
             </p>
           </div>
@@ -69,9 +69,9 @@ export const MonthlyResult = ({ totalIncome, totalSpent, investedAmount = 0, sub
           <div className="space-y-1 border-x border-border/50 px-1">
             <div className="flex items-center justify-center gap-1.5 text-muted-foreground">
               <div className="w-1.5 h-1.5 rounded-full bg-impulse" />
-              <span className="text-[10px] uppercase font-bold tracking-wider">Saídas</span>
+              <span className="max-w-[100vw] leading-relaxed text-[10px] uppercase font-bold tracking-wider">Saídas</span>
             </div>
-            <p className="text-sm sm:text-base font-bold text-foreground tracking-tight truncate" data-testid="monthly-expense">
+            <p className="max-w-[100vw] leading-relaxed text-sm leading-relaxed sm:text-base font-bold text-foreground tracking-tight truncate" data-testid="monthly-expense">
               {formatCurrency(totalSpent)}
             </p>
           </div>
@@ -79,9 +79,9 @@ export const MonthlyResult = ({ totalIncome, totalSpent, investedAmount = 0, sub
           <div className="space-y-1">
             <div className="flex items-center justify-center gap-1.5 text-muted-foreground">
               <div className="w-1.5 h-1.5 rounded-full bg-accent" />
-              <span className="text-[10px] uppercase font-bold tracking-wider">Investido</span>
+              <span className="max-w-[100vw] leading-relaxed text-[10px] uppercase font-bold tracking-wider">Investido</span>
             </div>
-            <p className="text-sm sm:text-base font-bold text-foreground tracking-tight truncate">
+            <p className="max-w-[100vw] leading-relaxed text-sm leading-relaxed sm:text-base font-bold text-foreground tracking-tight truncate">
               {formatCurrency(investedAmount)}
             </p>
           </div>
@@ -100,15 +100,15 @@ export const MonthlyResult = ({ totalIncome, totalSpent, investedAmount = 0, sub
               {isDeficit ? <TrendingDown className="w-4 h-4" /> : <TrendingUp className="w-4 h-4" />}
             </div>
             <div>
-              <p className="text-xs font-medium opacity-80">
+              <p className="max-w-[100vw] leading-relaxed text-xs font-medium opacity-80">
                 {isDeficit ? "Déficit Mensal" : "Sobrou no mês"}
               </p>
-              <p className="text-[10px] opacity-60 leading-tight">
+              <p className="max-w-[100vw] leading-relaxed text-[10px] opacity-60 leading-tight">
                 (Após gastos e investimentos)
               </p>
             </div>
           </div>
-          <p className="text-lg font-bold tracking-tight">
+          <p className="max-w-[100vw] leading-relaxed text-lg leading-relaxed font-bold tracking-tight">
             {isDeficit ? "-" : "+"}{formatCurrency(Math.abs(resultado))}
           </p>
         </div>

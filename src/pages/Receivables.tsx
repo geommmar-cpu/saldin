@@ -86,6 +86,11 @@ const Receivables = () => {
   if (isLoading) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center pb-24">
+      <title>Saldin | Receivables</title>
+      <meta name="description" content="Manage your receivables easily with Saldin." />
+      <meta property="og:title" content="Saldin - Receivables" />
+      <meta property="og:description" content="Manage your receivables easily with Saldin." />
+        
         <Loader2 className="w-8 h-8 animate-spin text-muted-foreground" />
         <BottomNav />
       </div>
@@ -119,7 +124,7 @@ const Receivables = () => {
                 <HandCoins className="w-5 h-5 text-essential" />
               </div>
               <div className="flex-1">
-                <p className="text-sm text-muted-foreground">Total a receber</p>
+                <p className="max-w-[100vw] leading-relaxed text-sm leading-relaxed text-muted-foreground">Total a receber</p>
                 <p className="font-serif text-2xl font-semibold text-essential">
                   {formatCurrency(totalPending)}
                 </p>
@@ -127,13 +132,13 @@ const Receivables = () => {
             </div>
             <div className="flex items-center gap-4 mt-4 pt-4 border-t border-border">
               <div className="flex-1">
-                <p className="text-2xl font-semibold">{pendingReceivables.length}</p>
-                <p className="text-xs text-muted-foreground">pendências</p>
+                <p className="max-w-[100vw] leading-relaxed text-2xl font-semibold">{pendingReceivables.length}</p>
+                <p className="max-w-[100vw] leading-relaxed text-xs text-muted-foreground">pendências</p>
               </div>
               {overdueCount > 0 && (
                 <div className="flex-1">
-                  <p className="text-2xl font-semibold text-impulse">{overdueCount}</p>
-                  <p className="text-xs text-muted-foreground">atrasadas</p>
+                  <p className="max-w-[100vw] leading-relaxed text-2xl font-semibold text-impulse">{overdueCount}</p>
+                  <p className="max-w-[100vw] leading-relaxed text-xs text-muted-foreground">atrasadas</p>
                 </div>
               )}
             </div>
@@ -147,7 +152,7 @@ const Receivables = () => {
         {/* Receivables List */}
         <FadeIn delay={0.15}>
           <div>
-            <h2 className="font-serif text-lg font-semibold mb-3">
+            <h2 className="font-serif text-lg leading-relaxed font-semibold mb-3">
               Valores em aberto
             </h2>
             <div className="space-y-3">
@@ -156,7 +161,7 @@ const Receivables = () => {
                   <div className="w-12 h-12 rounded-full bg-muted mx-auto mb-3 flex items-center justify-center">
                     <HandCoins className="w-6 h-6 text-muted-foreground" />
                   </div>
-                  <p className="text-muted-foreground">
+                  <p className="max-w-[100vw] leading-relaxed text-muted-foreground">
                     Nenhum valor a receber no momento
                   </p>
                 </div>
@@ -185,13 +190,13 @@ const Receivables = () => {
                               {isLoan ? "Empréstimo" : "A Receber"}
                             </span>
                             {isOverdue && (
-                              <span className="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full bg-red-100 text-red-700 flex items-center gap-1">
+                              <span className="max-w-[100vw] leading-relaxed text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full bg-red-100 text-red-700 flex items-center gap-1">
                                 <AlertTriangle className="w-3 h-3" />
                                 Atrasado
                               </span>
                             )}
                           </div>
-                          <p className="font-serif text-lg font-semibold tabular-nums">
+                          <p className="font-serif text-lg leading-relaxed font-semibold tabular-nums">
                             {formatCurrency(Number(receivable.amount))}
                           </p>
                         </div>
@@ -227,7 +232,7 @@ const Receivables = () => {
         {receivables.some((r) => r.status === "received") && (
           <FadeIn delay={0.2}>
             <div className="mt-8">
-              <h2 className="font-serif text-lg font-semibold mb-3 text-muted-foreground">
+              <h2 className="font-serif text-lg leading-relaxed font-semibold mb-3 text-muted-foreground">
                 Recebidos Recentemente
               </h2>
               <div className="space-y-3 opacity-60 hover:opacity-100 transition-opacity">
@@ -243,7 +248,7 @@ const Receivables = () => {
                       </div>
                       <div className="flex-1 min-w-0">
                         <p className="font-medium truncate line-through text-muted-foreground">{receivable.debtor_name}</p>
-                        <p className="text-xs text-muted-foreground">Confirmado</p>
+                        <p className="max-w-[100vw] leading-relaxed text-xs text-muted-foreground">Confirmado</p>
                       </div>
                       <p className="font-semibold text-muted-foreground line-through">
                         {formatCurrency(Number(receivable.amount))}

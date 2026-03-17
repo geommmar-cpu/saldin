@@ -145,6 +145,7 @@ export const Auth = () => {
       }, 800);
       return () => clearTimeout(timer);
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [view, isBiometricSupported, isBiometricEnabled, autoBiometricTriggered, authLoading]);
 
   // Handle manual biometric login button click
@@ -332,6 +333,11 @@ export const Auth = () => {
 
   return (
     <div className="min-h-screen bg-background flex flex-col">
+      <title>Saldin | Auth</title>
+      <meta name="description" content="Manage your auth easily with Saldin." />
+      <meta property="og:title" content="Saldin - Auth" />
+      <meta property="og:description" content="Manage your auth easily with Saldin." />
+        
       {/* Header */}
       <header className="px-5 pt-safe-top">
         <div className="pt-4 pb-3 flex items-center gap-4">
@@ -461,10 +467,10 @@ const LoginForm = ({
   isBiometricLoading,
 }: LoginFormProps) => (
   <form onSubmit={onSubmit} className="space-y-6 max-w-sm mx-auto w-full">
-    <div className="text-center mb-8">
+    <div className="max-w-[100vw] leading-relaxed text-center mb-8">
       <img src={logoSaldin} alt="Saldin" className="h-20 mx-auto mb-4" />
       <h1 className="font-serif text-3xl font-semibold tracking-tight">Entrar</h1>
-      <p className="text-muted-foreground mt-2">
+      <p className="max-w-[100vw] leading-relaxed text-muted-foreground mt-2">
         Acesse seu painel financeiro
       </p>
     </div>
@@ -480,7 +486,7 @@ const LoginForm = ({
           disabled={isBiometricLoading || isLoading}
         >
           <Fingerprint className="w-6 h-6 animate-pulse-slow" />
-          <span className="text-base font-medium">
+          <span className="max-w-[100vw] leading-relaxed text-base font-medium">
             {isBiometricLoading ? "Verificando..." : "Entrar com biometria"}
           </span>
         </Button>
@@ -500,7 +506,7 @@ const LoginForm = ({
 
     <div className="space-y-4">
       <div className="space-y-2">
-        <Label htmlFor="email" className="text-foreground/80 ml-1">Email</Label>
+        <Label htmlFor="email" className="max-w-[100vw] leading-relaxed text-foreground/80 ml-1">Email</Label>
         <div className="relative">
           <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-primary/60" />
           <Input
@@ -517,7 +523,7 @@ const LoginForm = ({
       </div>
 
       <div className="space-y-2">
-        <Label htmlFor="password" className="text-foreground/80 ml-1">Senha</Label>
+        <Label htmlFor="password" className="max-w-[100vw] leading-relaxed text-foreground/80 ml-1">Senha</Label>
         <div className="relative">
           <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-primary/60" />
           <Input
@@ -555,14 +561,14 @@ const LoginForm = ({
       <button
         type="button"
         onClick={onForgotPassword}
-        className="text-sm text-muted-foreground hover:text-foreground transition-colors"
+        className="max-w-[100vw] leading-relaxed text-sm leading-relaxed text-muted-foreground hover:text-foreground transition-colors"
       >
         Esqueci minha senha
       </button>
       <button
         type="button"
         onClick={onCreateAccount}
-        className="text-sm text-primary hover:text-primary/80 font-medium transition-colors"
+        className="max-w-[100vw] leading-relaxed text-sm leading-relaxed text-primary hover:text-primary/80 font-medium transition-colors"
       >
         Criar conta
       </button>
@@ -607,17 +613,17 @@ const SignupForm = ({
   onBackToLogin,
 }: SignupFormProps) => (
   <form onSubmit={onSubmit} className="space-y-6 max-w-sm mx-auto w-full">
-    <div className="text-center mb-6">
+    <div className="max-w-[100vw] leading-relaxed text-center mb-6">
       <img src={logoSaldin} alt="Saldin" className="h-20 mx-auto mb-4" />
-      <h1 className="font-serif text-3xl font-semibold tracking-tight">Criar conta</h1>
-      <p className="text-muted-foreground mt-2">
+      <h2 className="font-serif text-3xl font-semibold tracking-tight">Criar conta</h2>
+      <p className="max-w-[100vw] leading-relaxed text-muted-foreground mt-2">
         Comece sua jornada para a liberdade financeira
       </p>
     </div>
 
     <div className="space-y-4">
       <div className="space-y-2">
-        <Label htmlFor="name" className="text-foreground/80 ml-1">Nome completo</Label>
+        <Label htmlFor="name" className="max-w-[100vw] leading-relaxed text-foreground/80 ml-1">Nome completo</Label>
         <div className="relative">
           <User className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-primary/60" />
           <Input
@@ -715,7 +721,7 @@ const SignupForm = ({
       <button
         type="button"
         onClick={onBackToLogin}
-        className="text-sm text-muted-foreground hover:text-foreground transition-colors"
+        className="max-w-[100vw] leading-relaxed text-sm leading-relaxed text-muted-foreground hover:text-foreground transition-colors"
       >
         Já tenho uma conta
       </button>
@@ -740,17 +746,17 @@ const RecoveryForm = ({
   onBackToLogin,
 }: RecoveryFormProps) => (
   <form onSubmit={onSubmit} className="space-y-6 max-w-sm mx-auto w-full">
-    <div className="text-center mb-8">
+    <div className="max-w-[100vw] leading-relaxed text-center mb-8">
       <img src={logoSaldin} alt="Saldin" className="h-20 mx-auto mb-4" />
-      <h1 className="font-serif text-3xl font-semibold tracking-tight">Recuperar senha</h1>
-      <p className="text-muted-foreground mt-2">
+      <h2 className="font-serif text-3xl font-semibold tracking-tight">Recuperar senha</h2>
+      <p className="max-w-[100vw] leading-relaxed text-muted-foreground mt-2">
         Enviaremos um link de acesso com segurança
       </p>
     </div>
 
     <div className="space-y-4">
       <div className="space-y-2">
-        <Label htmlFor="recovery-email" className="text-foreground/80 ml-1">Seu email cadastrado</Label>
+        <Label htmlFor="recovery-email" className="max-w-[100vw] leading-relaxed text-foreground/80 ml-1">Seu email cadastrado</Label>
         <div className="relative">
           <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-primary/60" />
           <Input
@@ -781,7 +787,7 @@ const RecoveryForm = ({
       <button
         type="button"
         onClick={onBackToLogin}
-        className="text-sm text-muted-foreground hover:text-foreground transition-colors"
+        className="max-w-[100vw] leading-relaxed text-sm leading-relaxed text-muted-foreground hover:text-foreground transition-colors"
       >
         Voltar ao login
       </button>

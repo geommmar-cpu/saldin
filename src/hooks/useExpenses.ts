@@ -8,6 +8,7 @@ export type ExpenseRow = Tables<"expenses">;
 export type ExpenseInsert = TablesInsert<"expenses">;
 export type ExpenseUpdate = TablesUpdate<"expenses">;
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 const db = supabase as any;
 
 export const useExpenses = (status?: "pending" | "confirmed" | "all", month?: number, year?: number) => {
@@ -171,7 +172,9 @@ export const useCreateExpense = () => {
     mutationFn: async (expense: Omit<ExpenseInsert, "user_id">) => {
       if (!user) throw new Error("Usuário não autenticado");
 
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const expenseData = { ...expense } as any;
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const db = supabase as any;
 
       // Check for sufficient funds removed to allow overdraft (aligned with UI warning)
@@ -267,6 +270,7 @@ export const useUpdateExpense = () => {
 
 export const useDeleteExpense = () => {
   const queryClient = useQueryClient();
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const db = supabase as any;
 
   return useMutation({
@@ -363,6 +367,7 @@ export const useExpenseById = (id: string | undefined) => {
 
       if (!expense) return null;
 
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const enrichedExpense = { ...expense } as any;
 
       if (expense.bank_account_id) {

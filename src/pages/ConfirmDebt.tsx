@@ -126,6 +126,11 @@ export const ConfirmDebt = () => {
 
   return (
     <div className="min-h-screen bg-background pb-8">
+      <title>Saldin | ConfirmDebt</title>
+      <meta name="description" content="Manage your confirmdebt easily with Saldin." />
+      <meta property="og:title" content="Saldin - ConfirmDebt" />
+      <meta property="og:description" content="Manage your confirmdebt easily with Saldin." />
+        
       {/* Header */}
       <header className="px-5 pt-safe-top sticky top-0 bg-background/95 backdrop-blur-sm z-10">
         <div className="pt-4 pb-3 flex items-center gap-3">
@@ -134,7 +139,7 @@ export const ConfirmDebt = () => {
           </Button>
           <div>
             <h1 className="font-serif text-xl font-semibold">Nova dívida</h1>
-            <p className="text-xs text-muted-foreground">
+            <p className="max-w-[100vw] leading-relaxed text-xs text-muted-foreground">
               Detalhes do compromisso
             </p>
           </div>
@@ -144,8 +149,8 @@ export const ConfirmDebt = () => {
       <main className="px-5 space-y-6">
         {/* Amount Display */}
         <FadeIn>
-          <div className="text-center py-4">
-            <p className="text-sm text-muted-foreground mb-1">Valor total</p>
+          <div className="max-w-[100vw] leading-relaxed text-center py-4">
+            <p className="max-w-[100vw] leading-relaxed text-sm leading-relaxed text-muted-foreground mb-1">Valor total</p>
             <p className="font-serif text-4xl font-semibold">{formattedAmount}</p>
           </div>
         </FadeIn>
@@ -181,8 +186,8 @@ export const ConfirmDebt = () => {
                       : "border-border bg-card hover:border-primary/30"
                   )}
                 >
-                  <p className="font-medium text-sm">{dt.label}</p>
-                  <p className="text-xs text-muted-foreground mt-0.5">
+                  <p className="font-medium text-sm leading-relaxed">{dt.label}</p>
+                  <p className="max-w-[100vw] leading-relaxed text-xs text-muted-foreground mt-0.5">
                     {dt.description}
                   </p>
                 </motion.button>
@@ -220,7 +225,7 @@ export const ConfirmDebt = () => {
         {type === "installment" && installments && parseInt(installments) > 0 && (
           <FadeIn delay={0.2}>
             <div className="p-3 rounded-xl bg-accent/10 border border-accent/20">
-              <p className="text-sm text-muted-foreground">
+              <p className="max-w-[100vw] leading-relaxed text-sm leading-relaxed text-muted-foreground">
                 Valor da parcela:{" "}
                 <span className="font-semibold text-foreground">
                   {formattedInstallment}
@@ -252,7 +257,7 @@ export const ConfirmDebt = () => {
           <FadeIn delay={0.3}>
             <div className="flex items-center gap-2 p-3 rounded-xl bg-destructive/10 border border-destructive/20 text-destructive">
               <AlertCircle className="w-4 h-4 flex-shrink-0" />
-              <p className="text-sm">{validationError}</p>
+              <p className="max-w-[100vw] leading-relaxed text-sm leading-relaxed">{validationError}</p>
             </div>
           </FadeIn>
         )}

@@ -99,13 +99,13 @@ export const BalanceHero = ({ balance, cryptoTotal = 0, cryptoEnabled = false }:
       {/* Top Section: Label & Badge */}
       <div className="relative flex items-center justify-between mb-8">
         <div className="flex items-center gap-4">
-          <div className="w-12 h-12 rounded-2xl bg-white/10 backdrop-blur-md flex items-center justify-center border border-white/20 shadow-soft group-hover:scale-110 transition-transform duration-500">
+          <div className="w-12 h-12 rounded-2xl bg-background/10 backdrop-blur-md flex items-center justify-center border border-white/20 shadow-soft group-hover:scale-110 transition-transform duration-500">
             <Coins className="w-6 h-6 text-primary" />
           </div>
           <div>
-            <span className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground/60 block mb-0.5">Saldo Disponível</span>
+            <span className="max-w-[100vw] leading-relaxed text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground/60 block mb-0.5">Saldo Disponível</span>
             <div className="flex items-center gap-1.5">
-              <h4 className="text-sm font-bold text-foreground/80 tracking-tight">Recursos em conta</h4>
+              <h4 className="max-w-[100vw] leading-relaxed text-sm leading-relaxed font-bold text-foreground/80 tracking-tight">Recursos em conta</h4>
               <Tooltip>
                 <TooltipTrigger>
                   <div className="w-4 h-4 rounded-full bg-muted/50 flex items-center justify-center hover:bg-muted transition-colors">
@@ -113,8 +113,8 @@ export const BalanceHero = ({ balance, cryptoTotal = 0, cryptoEnabled = false }:
                   </div>
                 </TooltipTrigger>
                 <TooltipContent className="max-w-[260px] glass p-4 rounded-2xl shadow-large border-primary/20">
-                  <p className="text-xs font-bold text-primary mb-2 uppercase tracking-wider">Como calculamos?</p>
-                  <p className="text-[11px] text-muted-foreground leading-relaxed">
+                  <p className="max-w-[100vw] leading-relaxed text-xs font-bold text-primary mb-2 uppercase tracking-wider">Como calculamos?</p>
+                  <p className="max-w-[100vw] leading-relaxed text-[11px] text-muted-foreground leading-relaxed">
                     Este é o seu **Saldo Livre**. Somamos tudo o que você tem e subtraímos o que já está comprometido com contas e dívidas este mês.
                   </p>
                 </TooltipContent>
@@ -262,7 +262,7 @@ export const BalanceHero = ({ balance, cryptoTotal = 0, cryptoEnabled = false }:
                             className="w-2.5 h-2.5 rounded-full shrink-0"
                             style={{ backgroundColor: entry.fill }}
                           />
-                          <span className="text-muted-foreground font-medium uppercase tracking-wider text-[10px]">
+                          <span className="max-w-[100vw] leading-relaxed text-muted-foreground font-medium uppercase tracking-wider text-[10px]">
                             {config.label}
                           </span>
                         </div>
@@ -277,9 +277,9 @@ export const BalanceHero = ({ balance, cryptoTotal = 0, cryptoEnabled = false }:
             </div>
 
             {/* View description of distribution */}
-            <div className="text-center px-4 pt-4 pb-2">
-              <p className="text-xs text-muted-foreground leading-relaxed">
-                Você tem <span className="text-essential font-bold font-sans">{Math.round((Math.max(0, balance.saldoLivre) / total) * 100)}%</span> do seu saldo total livre para uso imediato.
+            <div className="max-w-[100vw] leading-relaxed text-center px-4 pt-4 pb-2">
+              <p className="max-w-[100vw] leading-relaxed text-xs text-muted-foreground leading-relaxed">
+                Você tem <span className="max-w-[100vw] leading-relaxed text-essential font-bold font-sans">{Math.round((Math.max(0, balance.saldoLivre) / total) * 100)}%</span> do seu saldo total livre para uso imediato.
               </p>
             </div>
 
@@ -292,10 +292,10 @@ export const BalanceHero = ({ balance, cryptoTotal = 0, cryptoEnabled = false }:
                       <Lock className="w-4 h-4 text-impulse" />
                     </div>
                     <div>
-                      <p className="text-[10px] uppercase font-bold tracking-wider text-muted-foreground">Comprometido</p>
+                      <p className="max-w-[100vw] leading-relaxed text-[10px] uppercase font-bold tracking-wider text-muted-foreground">Comprometido</p>
                       <AnimatedAmount
                         value={balance.saldoComprometido}
-                        className="text-sm font-bold text-foreground"
+                        className="max-w-[100vw] leading-relaxed text-sm leading-relaxed font-bold text-foreground"
                       />
                     </div>
                   </div>
@@ -309,10 +309,10 @@ export const BalanceHero = ({ balance, cryptoTotal = 0, cryptoEnabled = false }:
                       <PiggyBank className="w-4 h-4 text-essential" />
                     </div>
                     <div>
-                      <p className="text-[10px] uppercase font-bold tracking-wider text-muted-foreground">Guardado</p>
+                      <p className="max-w-[100vw] leading-relaxed text-[10px] uppercase font-bold tracking-wider text-muted-foreground">Guardado</p>
                       <AnimatedAmount
                         value={balance.saldoGuardado}
-                        className="text-sm font-bold text-foreground"
+                        className="max-w-[100vw] leading-relaxed text-sm leading-relaxed font-bold text-foreground"
                       />
                     </div>
                   </div>
@@ -326,10 +326,10 @@ export const BalanceHero = ({ balance, cryptoTotal = 0, cryptoEnabled = false }:
                       <Bitcoin className="w-4 h-4 text-[#F7931A]" />
                     </div>
                     <div>
-                      <p className="text-[10px] uppercase font-bold tracking-wider text-muted-foreground">Criptoativos</p>
+                      <p className="max-w-[100vw] leading-relaxed text-[10px] uppercase font-bold tracking-wider text-muted-foreground">Criptoativos</p>
                       <AnimatedAmount
                         value={cryptoTotal}
-                        className="text-sm font-bold text-foreground"
+                        className="max-w-[100vw] leading-relaxed text-sm leading-relaxed font-bold text-foreground"
                       />
                     </div>
                   </div>
@@ -340,10 +340,10 @@ export const BalanceHero = ({ balance, cryptoTotal = 0, cryptoEnabled = false }:
             {/* Total Net Worth - Premium Style */}
             {cryptoEnabled && cryptoTotal > 0 && (
               <div className="p-4 rounded-[2rem] bg-gradient-to-r from-primary/10 to-accent/10 flex flex-col items-center gap-1">
-                <p className="text-[10px] uppercase font-bold tracking-[0.2em] text-muted-foreground/60">Patrimônio Real</p>
+                <p className="max-w-[100vw] leading-relaxed text-[10px] uppercase font-bold tracking-[0.2em] text-muted-foreground/60">Patrimônio Real</p>
                 <AnimatedAmount
                   value={patrimonioTotal}
-                  className="text-xl font-serif font-bold text-primary"
+                  className="max-w-[100vw] leading-relaxed text-xl font-serif font-bold text-primary"
                 />
               </div>
             )}

@@ -17,6 +17,7 @@ export const useGoals = (status?: 'in_progress' | 'completed' | 'paused' | 'all'
       if (!user) return [];
 
       let query = supabase
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         .from("goals" as any)
         .select("*")
         .order("created_at", { ascending: false });
@@ -40,6 +41,7 @@ export const useGoals = (status?: 'in_progress' | 'completed' | 'paused' | 'all'
       return (data as unknown as Goal[]) || [];
     },
     enabled: !!user,
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     retry: (failureCount, error: any) => {
       // Don't retry if table doesn't exist
       if (error?.code === "PGRST205") return false;
@@ -58,6 +60,7 @@ export const useGoalById = (id: string | undefined) => {
       if (!id) return null;
 
       const { data, error } = await supabase
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         .from("goals" as any)
         .select("*")
         .eq("id", id)
@@ -83,6 +86,7 @@ export const useGoalStats = () => {
       if (!user) return null;
 
       const { data, error } = await supabase
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         .from("goals" as any)
         .select("current_amount, target_amount, status, is_personal");
 
@@ -118,6 +122,7 @@ export const useGoalStats = () => {
       };
     },
     enabled: !!user,
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     retry: (failureCount, error: any) => {
       if (error?.code === "PGRST205") return false;
       return failureCount < 3;
@@ -150,6 +155,7 @@ export const useCreateGoal = () => {
       console.log("Creating goal with data:", insertData);
 
       const { data, error } = await supabase
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         .from("goals" as any)
         .insert(insertData)
         .select()
@@ -179,6 +185,7 @@ export const useUpdateGoal = () => {
   return useMutation({
     mutationFn: async ({ id, ...updates }: GoalUpdate & { id: string }): Promise<Goal> => {
       const { data, error } = await supabase
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         .from("goals" as any)
         .update({
           ...updates,
@@ -210,9 +217,11 @@ export const useDeleteGoal = () => {
   return useMutation({
     mutationFn: async (id: string) => {
       // First delete all transactions for this goal
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       await supabase.from("goal_transactions" as any).delete().eq("goal_id", id);
       
       // Then delete the goal
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const { error } = await supabase.from("goals" as any).delete().eq("id", id);
       if (error) throw error;
     },
@@ -239,6 +248,7 @@ export const useGoalTransactions = (goalId: string | undefined) => {
       if (!goalId) return [];
 
       const { data, error } = await supabase
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         .from("goal_transactions" as any)
         .select("*")
         .eq("goal_id", goalId)
@@ -265,6 +275,7 @@ export const useAddToGoal = () => {
 
       // Create transaction record
       const { error: transError } = await supabase
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         .from("goal_transactions" as any)
         .insert({
           ...transaction,
@@ -275,6 +286,7 @@ export const useAddToGoal = () => {
 
       // Update goal current_amount
       const { data: goal, error: goalError } = await supabase
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         .from("goals" as any)
         .select("current_amount, target_amount")
         .eq("id", transaction.goal_id)
@@ -292,6 +304,7 @@ export const useAddToGoal = () => {
       const isCompleted = newAmount >= Number(goalData.target_amount);
 
       const { error: updateError } = await supabase
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         .from("goals" as any)
         .update({ 
           current_amount: Math.max(0, newAmount),

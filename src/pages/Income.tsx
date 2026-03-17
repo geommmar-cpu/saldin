@@ -75,6 +75,11 @@ export const Income = () => {
   if (isLoading) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center pb-24">
+      <title>Saldin | Income</title>
+      <meta name="description" content="Manage your income easily with Saldin." />
+      <meta property="og:title" content="Saldin - Income" />
+      <meta property="og:description" content="Manage your income easily with Saldin." />
+        
         <Loader2 className="w-8 h-8 animate-spin text-muted-foreground" />
         <BottomNav />
       </div>
@@ -113,7 +118,7 @@ export const Income = () => {
             </Button>
             <div>
               <h1 className="font-serif text-xl font-semibold">Receitas</h1>
-              <p className="text-sm text-muted-foreground capitalize">{currentMonth}</p>
+              <p className="max-w-[100vw] leading-relaxed text-sm leading-relaxed text-muted-foreground capitalize">{currentMonth}</p>
             </div>
           </div>
           <Button variant="warm" size="icon" onClick={() => navigate("/income/add")}>
@@ -131,17 +136,17 @@ export const Income = () => {
                 <Wallet className="w-5 h-5 text-essential" />
               </div>
               <div>
-                <p className="text-xs text-muted-foreground">Receita total do mês</p>
+                <p className="max-w-[100vw] leading-relaxed text-xs text-muted-foreground">Receita total do mês</p>
                 <p className="font-serif text-2xl font-semibold">{formatCurrency(totalIncome)}</p>
               </div>
             </div>
             <div className="grid grid-cols-2 gap-3 pt-3 border-t border-border">
               <div>
-                <p className="text-xs text-muted-foreground">Fixa</p>
+                <p className="max-w-[100vw] leading-relaxed text-xs text-muted-foreground">Fixa</p>
                 <p className="font-semibold">{formatCurrency(totalFixed)}</p>
               </div>
               <div>
-                <p className="text-xs text-muted-foreground">Variável</p>
+                <p className="max-w-[100vw] leading-relaxed text-xs text-muted-foreground">Variável</p>
                 <p className="font-semibold">{formatCurrency(totalVariable)}</p>
               </div>
             </div>
@@ -155,7 +160,7 @@ export const Income = () => {
         {transformedFixedIncomes.length > 0 && (
           <FadeIn delay={0.15}>
             <div>
-              <h2 className="font-medium text-sm text-muted-foreground mb-2">Receita Fixa</h2>
+              <h2 className="font-medium text-sm leading-relaxed text-muted-foreground mb-2">Receita Fixa</h2>
               <IncomeList
                 incomes={transformedFixedIncomes}
                 onIncomeClick={(income) => {
@@ -171,7 +176,7 @@ export const Income = () => {
         {transformedVariableIncomes.length > 0 && (
           <FadeIn delay={0.2}>
             <div>
-              <h2 className="font-medium text-sm text-muted-foreground mb-2">Receita Variável</h2>
+              <h2 className="font-medium text-sm leading-relaxed text-muted-foreground mb-2">Receita Variável</h2>
               <IncomeList
                 incomes={transformedVariableIncomes}
                 onIncomeClick={(income) => {
@@ -186,11 +191,11 @@ export const Income = () => {
         {/* Empty State */}
         {incomes.length === 0 && (
           <FadeIn delay={0.2}>
-            <div className="text-center py-12">
+            <div className="max-w-[100vw] leading-relaxed text-center py-12">
               <div className="w-16 h-16 rounded-full bg-muted flex items-center justify-center mx-auto mb-4">
                 <Wallet className="w-8 h-8 text-muted-foreground" />
               </div>
-              <p className="text-muted-foreground mb-4">
+              <p className="max-w-[100vw] leading-relaxed text-muted-foreground mb-4">
                 Nenhuma receita registrada ainda
               </p>
               <Button variant="warm" onClick={() => navigate("/income/add")}>

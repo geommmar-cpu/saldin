@@ -26,7 +26,7 @@ import { cn } from "@/lib/utils";
 const goalColors: Record<string, { bg: string; text: string; border: string }> = {
   green: { bg: "bg-essential/10", text: "text-essential", border: "border-essential/30" },
   blue: { bg: "bg-calm/10", text: "text-calm", border: "border-calm/30" },
-  purple: { bg: "bg-pleasure/10", text: "text-pleasure", border: "border-pleasure/30" },
+  teal: { bg: "bg-pleasure/10", text: "text-pleasure", border: "border-pleasure/30" },
   orange: { bg: "bg-obligation/10", text: "text-obligation", border: "border-obligation/30" },
   red: { bg: "bg-impulse/10", text: "text-impulse", border: "border-impulse/30" },
   pink: { bg: "bg-pink-500/10", text: "text-pink-500", border: "border-pink-500/30" },
@@ -57,6 +57,11 @@ export default function Goals() {
   if (isLoading || statsLoading) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
+      <title>Saldin | Goals</title>
+      <meta name="description" content="Manage your goals easily with Saldin." />
+      <meta property="og:title" content="Saldin - Goals" />
+      <meta property="og:description" content="Manage your goals easily with Saldin." />
+        
         <Loader2 className="w-8 h-8 animate-spin text-muted-foreground" />
       </div>
     );
@@ -82,7 +87,7 @@ export default function Goals() {
             <FadeIn>
               <div>
                 <h1 className="font-serif text-xl font-semibold">Metas</h1>
-                <p className="text-sm text-muted-foreground">
+                <p className="max-w-[100vw] leading-relaxed text-sm leading-relaxed text-muted-foreground">
                   Organize seu dinheiro em caixinhas
                 </p>
               </div>
@@ -108,7 +113,7 @@ export default function Goals() {
                 <PiggyBank className="w-6 h-6 text-essential" />
               </div>
               <div className="flex-1">
-                <p className="text-sm text-muted-foreground">Total guardado</p>
+                <p className="max-w-[100vw] leading-relaxed text-sm leading-relaxed text-muted-foreground">Total guardado</p>
                 <p className="font-serif text-2xl font-semibold text-essential">
                   {formatCurrency(stats?.totalSaved || 0)}
                 </p>
@@ -121,7 +126,7 @@ export default function Goals() {
                   value={Math.min((stats.totalSaved / stats.totalTarget) * 100, 100)}
                   className="h-2 mb-2"
                 />
-                <p className="text-xs text-muted-foreground">
+                <p className="max-w-[100vw] leading-relaxed text-xs text-muted-foreground">
                   {Math.round((stats.totalSaved / stats.totalTarget) * 100)}% do objetivo total ({formatCurrency(stats.totalTarget)})
                 </p>
               </>
@@ -130,13 +135,13 @@ export default function Goals() {
             <div className="flex gap-4 mt-4 pt-4 border-t border-border">
               <div className="flex items-center gap-2">
                 <Clock className="w-4 h-4 text-muted-foreground" />
-                <span className="text-sm">
+                <span className="max-w-[100vw] leading-relaxed text-sm leading-relaxed">
                   <strong>{stats?.activeCount || 0}</strong> em andamento
                 </span>
               </div>
               <div className="flex items-center gap-2">
                 <CheckCircle2 className="w-4 h-4 text-essential" />
-                <span className="text-sm">
+                <span className="max-w-[100vw] leading-relaxed text-sm leading-relaxed">
                   <strong>{stats?.completedCount || 0}</strong> concluídas
                 </span>
               </div>
@@ -172,7 +177,7 @@ export default function Goals() {
                   <Target className="w-8 h-8 text-muted-foreground" />
                 </div>
                 <h3 className="font-semibold mb-2">Nenhuma meta encontrada</h3>
-                <p className="text-sm text-muted-foreground mb-4">
+                <p className="max-w-[100vw] leading-relaxed text-sm leading-relaxed text-muted-foreground mb-4">
                   Crie sua primeira meta para começar a guardar dinheiro
                 </p>
                 <Button onClick={() => navigate("/goals/add")}>
@@ -218,13 +223,13 @@ export default function Goals() {
                               <h3 className="font-semibold truncate">{goal.name}</h3>
                               <div className="flex items-center gap-1 shrink-0">
                                 {goal.is_personal === false && (
-                                  <span className="text-xs px-2 py-0.5 rounded-full bg-muted text-muted-foreground font-medium flex items-center gap-1">
+                                  <span className="max-w-[100vw] leading-relaxed text-xs px-2 py-0.5 rounded-full bg-muted text-muted-foreground font-medium flex items-center gap-1">
                                     <Users className="w-3 h-3" />
                                     Terceiro
                                   </span>
                                 )}
                                 {goal.status === 'completed' && (
-                                  <span className="text-xs px-2 py-0.5 rounded-full bg-essential/10 text-essential font-medium">
+                                  <span className="max-w-[100vw] leading-relaxed text-xs px-2 py-0.5 rounded-full bg-essential/10 text-essential font-medium">
                                     ✓ Concluída
                                   </span>
                                 )}
@@ -235,7 +240,7 @@ export default function Goals() {
                               <span className={cn("font-semibold", colorClasses.text)}>
                                 {formatCurrency(Number(goal.current_amount))}
                               </span>
-                              <span className="text-sm text-muted-foreground">
+                              <span className="max-w-[100vw] leading-relaxed text-sm leading-relaxed text-muted-foreground">
                                 de {formatCurrency(Number(goal.target_amount))}
                               </span>
                             </div>
@@ -246,18 +251,18 @@ export default function Goals() {
                             />
 
                             <div className="flex items-center justify-between">
-                              <span className="text-xs text-muted-foreground">
+                              <span className="max-w-[100vw] leading-relaxed text-xs text-muted-foreground">
                                 {Math.round(progress)}% guardado
                               </span>
                               {goal.status !== 'completed' && remaining > 0 && (
-                                <span className="text-xs text-muted-foreground">
+                                <span className="max-w-[100vw] leading-relaxed text-xs text-muted-foreground">
                                   Faltam {formatCurrency(remaining)}
                                 </span>
                               )}
                             </div>
 
                             {goal.target_date && goal.status !== 'completed' && (
-                              <p className="text-xs text-muted-foreground mt-2 flex items-center gap-1">
+                              <p className="max-w-[100vw] leading-relaxed text-xs text-muted-foreground mt-2 flex items-center gap-1">
                                 <Clock className="w-3 h-3" />
                                 Meta para {new Date(goal.target_date).toLocaleDateString('pt-BR')}
                               </p>
@@ -283,12 +288,12 @@ export default function Goals() {
                 <Sparkles className="w-5 h-5 text-muted-foreground" />
               </div>
               <div className="flex-1">
-                <p className="text-sm font-medium text-muted-foreground">Em breve</p>
-                <p className="text-xs text-muted-foreground">
+                <p className="max-w-[100vw] leading-relaxed text-sm leading-relaxed font-medium text-muted-foreground">Em breve</p>
+                <p className="max-w-[100vw] leading-relaxed text-xs text-muted-foreground">
                   Sugestões automáticas de metas e lembretes
                 </p>
               </div>
-              <span className="text-xs px-2 py-1 rounded bg-muted text-muted-foreground">
+              <span className="max-w-[100vw] leading-relaxed text-xs px-2 py-1 rounded bg-muted text-muted-foreground">
                 Em breve
               </span>
             </div>

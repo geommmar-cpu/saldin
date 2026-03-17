@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { useState, useMemo } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { motion } from "framer-motion";
@@ -107,6 +108,7 @@ const ReceivableDetail = () => {
       await deleteReceivable.mutateAsync({
         id,
         scope,
+         
         groupId: (receivable as any).installment_group_id,
         dueDate: receivable.due_date
       });
@@ -140,6 +142,11 @@ const ReceivableDetail = () => {
   if (isLoading) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
+      <title>Saldin | ReceivableDetail</title>
+      <meta name="description" content="Manage your receivabledetail easily with Saldin." />
+      <meta property="og:title" content="Saldin - ReceivableDetail" />
+      <meta property="og:description" content="Manage your receivabledetail easily with Saldin." />
+        
         <Loader2 className="w-8 h-8 animate-spin text-muted-foreground" />
       </div>
     );
@@ -148,8 +155,8 @@ const ReceivableDetail = () => {
   if (!receivable) {
     return (
       <div className="min-h-screen bg-background flex flex-col items-center justify-center p-5">
-        <span className="text-4xl mb-4">🔍</span>
-        <p className="text-muted-foreground mb-4">Valor a receber não encontrado</p>
+        <span className="max-w-[100vw] leading-relaxed text-4xl mb-4">🔍</span>
+        <p className="max-w-[100vw] leading-relaxed text-muted-foreground mb-4">Valor a receber não encontrado</p>
         <Button variant="ghost" onClick={() => navigate(-1)}>
           Voltar
         </Button>
@@ -191,7 +198,7 @@ const ReceivableDetail = () => {
                 variant="ghost"
                 size="icon"
                 onClick={() => setShowDeleteDialog(true)}
-                className="text-destructive hover:text-destructive"
+                className="max-w-[100vw] leading-relaxed text-destructive hover:text-destructive"
               >
                 <Trash2 className="w-5 h-5" />
               </Button>
@@ -207,8 +214,10 @@ const ReceivableDetail = () => {
             <div className="flex items-center gap-4 mb-6">
               <div className={cn(
                 "w-16 h-16 rounded-2xl flex items-center justify-center shadow-soft",
+                 
                 (receivable as any).type === "loan" ? "bg-primary/10" : "bg-muted"
               )}>
+                // eslint-disable-next-line @typescript-eslint/no-explicit-any
                 {(receivable as any).type === "loan" ? (
                   <Handshake className="w-8 h-8 text-primary" />
                 ) : (
@@ -218,8 +227,10 @@ const ReceivableDetail = () => {
               <div className="flex-1">
                 <p className="font-serif text-2xl font-semibold flex items-center gap-2">
                   {receivable.debtor_name}
+                  // eslint-disable-next-line @typescript-eslint/no-explicit-any
                   {(receivable as any).is_installment && (
-                    <span className="text-sm font-sans font-bold text-muted-foreground bg-secondary px-2 py-0.5 rounded-lg">
+                    <span className="max-w-[100vw] leading-relaxed text-sm leading-relaxed font-sans font-bold text-muted-foreground bg-secondary px-2 py-0.5 rounded-lg">
+                      // eslint-disable-next-line @typescript-eslint/no-explicit-any
                       {(receivable as any).installment_number}/{(receivable as any).total_installments}
                     </span>
                   )}
@@ -239,6 +250,7 @@ const ReceivableDetail = () => {
                     </span>
                   </div>
 
+                  // eslint-disable-next-line @typescript-eslint/no-explicit-any
                   {(receivable as any).type === "loan" && (
                     <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-primary/10 text-primary text-[10px] font-bold uppercase tracking-wider">
                       <Handshake className="w-3 h-3" />
@@ -250,8 +262,8 @@ const ReceivableDetail = () => {
             </div>
 
             {/* Amount */}
-            <div className="text-center py-6 border-y border-border/50">
-              <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-muted-foreground mb-2">Valor Total</p>
+            <div className="max-w-[100vw] leading-relaxed text-center py-6 border-y border-border/50">
+              <p className="max-w-[100vw] leading-relaxed text-[10px] font-bold uppercase tracking-[0.2em] text-muted-foreground mb-2">Valor Total</p>
               <p className="font-serif text-4xl font-semibold text-essential">
                 {formatCurrency(Number(receivable.amount))}
               </p>
@@ -269,8 +281,8 @@ const ReceivableDetail = () => {
                     <Calendar className="w-5 h-5" />
                   </div>
                   <div className="flex-1">
-                    <p className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">Vencimento</p>
-                    <p className={cn("text-sm font-semibold", isOverdue && !allReceived && "text-impulse")}>
+                    <p className="max-w-[100vw] leading-relaxed text-[10px] font-bold uppercase tracking-wider text-muted-foreground">Vencimento</p>
+                    <p className={cn("text-sm leading-relaxed font-semibold", isOverdue && !allReceived && "text-impulse")}>
                       {receivable.due_date
                         ? format(new Date(receivable.due_date), "dd/MM/yyyy")
                         : "A combinar"}
@@ -284,26 +296,33 @@ const ReceivableDetail = () => {
                     <Landmark className="w-5 h-5 text-essential" />
                   </div>
                   <div className="flex-1">
-                    <p className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">Receber na conta</p>
-                    <p className="text-sm font-semibold">
+                    <p className="max-w-[100vw] leading-relaxed text-[10px] font-bold uppercase tracking-wider text-muted-foreground">Receber na conta</p>
+                    <p className="max-w-[100vw] leading-relaxed text-sm leading-relaxed font-semibold">
+                      // eslint-disable-next-line @typescript-eslint/no-explicit-any
                       {(receivable as any).bank_account
+                         
                         ? ((receivable as any).bank_account.name || (receivable as any).bank_account.bank_name)
+                         
                         : (receivable as any).bank_account_id ? "Conta Vinculada" : "Não definida"}
                     </p>
                   </div>
                 </div>
 
                 {/* Source Account (If loan) */}
+                // eslint-disable-next-line @typescript-eslint/no-explicit-any
                 {(receivable as any).type === "loan" && (
                   <div className="flex items-center gap-3 p-3 rounded-2xl bg-secondary/20">
                     <div className="w-10 h-10 rounded-xl bg-card text-muted-foreground flex items-center justify-center">
                       <Landmark className="w-5 h-5 text-impulse" />
                     </div>
                     <div className="flex-1">
-                      <p className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">Saiu da conta</p>
-                      <p className="text-sm font-semibold">
+                      <p className="max-w-[100vw] leading-relaxed text-[10px] font-bold uppercase tracking-wider text-muted-foreground">Saiu da conta</p>
+                      <p className="max-w-[100vw] leading-relaxed text-sm leading-relaxed font-semibold">
+                        // eslint-disable-next-line @typescript-eslint/no-explicit-any
                         {(receivable as any).source_account
+                           
                           ? ((receivable as any).source_account.name || (receivable as any).source_account.bank_name)
+                           
                           : (receivable as any).source_account_id ? "Conta de Origem" : "Não definida"}
                       </p>
                     </div>
@@ -314,8 +333,8 @@ const ReceivableDetail = () => {
               {/* Description */}
               {receivable.description && (
                 <div className="p-4 rounded-2xl bg-secondary/10 border border-border/50">
-                  <p className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground mb-1">Notas</p>
-                  <p className="text-sm text-foreground/80 leading-relaxed">{receivable.description}</p>
+                  <p className="max-w-[100vw] leading-relaxed text-[10px] font-bold uppercase tracking-wider text-muted-foreground mb-1">Notas</p>
+                  <p className="max-w-[100vw] leading-relaxed text-sm leading-relaxed text-foreground/80 leading-relaxed">{receivable.description}</p>
                 </div>
               )}
             </div>
@@ -356,7 +375,9 @@ const ReceivableDetail = () => {
         open={showDeleteDialog}
         onOpenChange={setShowDeleteDialog}
         onConfirm={handleDelete}
+         
         isInstallment={!!(receivable as any).installment_group_id}
+         
         title={(receivable as any).installment_group_id ? "Excluir parcelas?" : "Excluir valor a receber?"}
         description="Esta ação não pode ser desfeita."
         isLoading={deleteReceivable.isPending}

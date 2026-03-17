@@ -35,7 +35,7 @@ const colorOptions = [
   { value: "#3B82F6", label: "Azul" },
   { value: "#10B981", label: "Verde" },
   { value: "#EF4444", label: "Vermelho" },
-  { value: "#8B5CF6", label: "Roxo" },
+  { value: "#14b8a6", label: "Roxo" },
   { value: "#F59E0B", label: "Laranja" },
   { value: "#EC4899", label: "Rosa" },
   { value: "#14B8A6", label: "Turquesa" },
@@ -82,6 +82,7 @@ export default function Categories() {
     setDialogOpen(true);
   };
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const openEditDialog = (cat: any) => {
     setEditingCategory({
       id: cat.id,
@@ -107,6 +108,7 @@ export default function Categories() {
         color: newColor,
         group_name: newGroup,
         nature: newNature,
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       } as any);
     } else {
       await createCategory.mutateAsync({
@@ -115,6 +117,7 @@ export default function Categories() {
         color: newColor,
         group_name: newGroup,
         nature: newNature,
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       } as any);
     }
     setDialogOpen(false);
@@ -130,6 +133,11 @@ export default function Categories() {
 
   return (
     <div className="min-h-screen bg-background pb-24">
+      <title>Saldin | Categories</title>
+      <meta name="description" content="Manage your categories easily with Saldin." />
+      <meta property="og:title" content="Saldin - Categories" />
+      <meta property="og:description" content="Manage your categories easily with Saldin." />
+        
       {/* Header */}
       <header className="px-5 pt-safe-top sticky top-0 bg-background/95 backdrop-blur-sm z-10 border-b border-border">
         <div className="pt-4 pb-3">
@@ -146,7 +154,7 @@ export default function Categories() {
                 </Button>
                 <div>
                   <h1 className="font-serif text-xl font-semibold">Categorias</h1>
-                  <p className="text-xs text-muted-foreground">
+                  <p className="max-w-[100vw] leading-relaxed text-xs text-muted-foreground">
                     Organize seus gastos por categoria
                   </p>
                 </div>
@@ -167,7 +175,7 @@ export default function Categories() {
             <div>
               <div className="flex items-center gap-2 mb-3">
                 <Tag className="w-4 h-4 text-primary" />
-                <h2 className="font-serif text-lg font-semibold">Minhas Categorias</h2>
+                <h2 className="font-serif text-lg leading-relaxed font-semibold">Minhas Categorias</h2>
               </div>
 
               <div className="grid grid-cols-1 gap-2">
@@ -186,12 +194,12 @@ export default function Categories() {
                       <Tag className="w-4 h-4" />
                     </div>
                     <div className="flex-1 min-w-0">
-                      <span className="text-sm font-medium truncate block">{cat.name}</span>
+                      <span className="max-w-[100vw] leading-relaxed text-sm leading-relaxed font-medium truncate block">{cat.name}</span>
                       <div className="flex gap-1.5 mt-0.5">
-                        <span className="text-[9px] uppercase tracking-wider px-1 bg-muted rounded text-muted-foreground">
+                        <span className="max-w-[100vw] leading-relaxed text-[9px] uppercase tracking-wider px-1 bg-muted rounded text-muted-foreground">
                           {categoryGroups[cat.group_name as CategoryGroup]?.name || "Outros"}
                         </span>
-                        <span className="text-[9px] uppercase tracking-wider px-1 bg-muted rounded text-muted-foreground">
+                        <span className="max-w-[100vw] leading-relaxed text-[9px] uppercase tracking-wider px-1 bg-muted rounded text-muted-foreground">
                           {cat.nature}
                         </span>
                       </div>
@@ -235,7 +243,7 @@ export default function Categories() {
               <div>
                 <div className="flex items-center gap-2 mb-3">
                   <GroupIcon className="w-4 h-4 text-muted-foreground" />
-                  <h2 className="font-serif text-lg font-semibold">{group.name}</h2>
+                  <h2 className="font-serif text-lg leading-relaxed font-semibold">{group.name}</h2>
                 </div>
 
                 <div className="grid grid-cols-2 gap-2">
@@ -256,7 +264,7 @@ export default function Categories() {
                         >
                           <Icon className="w-4 h-4" />
                         </div>
-                        <span className="text-sm font-medium truncate">{category.name}</span>
+                        <span className="max-w-[100vw] leading-relaxed text-sm leading-relaxed font-medium truncate">{category.name}</span>
                       </motion.div>
                     );
                   })}
@@ -277,7 +285,7 @@ export default function Categories() {
           </DialogHeader>
           <div className="space-y-4 pt-2">
             <div>
-              <label className="text-sm font-medium mb-2 block">Nome</label>
+              <label className="max-w-[100vw] leading-relaxed text-sm leading-relaxed font-medium mb-2 block">Nome</label>
               <Input
                 placeholder="Ex: Assinatura, Streaming..."
                 value={newName}
@@ -287,7 +295,7 @@ export default function Categories() {
               />
             </div>
             <div>
-              <label className="text-sm font-medium mb-2 block">Grupo</label>
+              <label className="max-w-[100vw] leading-relaxed text-sm leading-relaxed font-medium mb-2 block">Grupo</label>
               <Select value={newGroup} onValueChange={(val) => setNewGroup(val as CategoryGroup)}>
                 <SelectTrigger>
                   <SelectValue />
@@ -305,7 +313,7 @@ export default function Categories() {
               </Select>
             </div>
             <div>
-              <label className="text-sm font-medium mb-2 block">Natureza</label>
+              <label className="max-w-[100vw] leading-relaxed text-sm leading-relaxed font-medium mb-2 block">Natureza</label>
               <Select value={newNature} onValueChange={(val) => setNewNature(val as CategoryNature)}>
                 <SelectTrigger>
                   <SelectValue />
@@ -320,7 +328,7 @@ export default function Categories() {
               </Select>
             </div>
             <div>
-              <label className="text-sm font-medium mb-2 block">Cor</label>
+              <label className="max-w-[100vw] leading-relaxed text-sm leading-relaxed font-medium mb-2 block">Cor</label>
               <Select value={newColor} onValueChange={setNewColor}>
                 <SelectTrigger>
                   <SelectValue />

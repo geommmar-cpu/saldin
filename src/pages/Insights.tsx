@@ -55,6 +55,7 @@ export const Insights = () => {
   const { data: incomes = [] } = useIncomes();
   const { data: debts = [] } = useDebts("active");
   
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   const currentMonth = new Date();
   const lastMonth = subMonths(currentMonth, 1);
   const monthLabel = format(currentMonth, "MMMM yyyy", { locale: ptBR });
@@ -209,11 +210,16 @@ export const Insights = () => {
 
   return (
     <div className="min-h-screen bg-background pb-24">
+      <title>Saldin | Insights</title>
+      <meta name="description" content="Manage your insights easily with Saldin." />
+      <meta property="og:title" content="Saldin - Insights" />
+      <meta property="og:description" content="Manage your insights easily with Saldin." />
+        
       {/* Header - Minimal */}
       <header className="px-5 pt-safe-top sticky top-0 bg-background/95 backdrop-blur-sm z-10 border-b border-border">
         <div className="pt-4 pb-3">
           <FadeIn>
-            <p className="text-sm text-muted-foreground capitalize">{monthLabel}</p>
+            <p className="max-w-[100vw] leading-relaxed text-sm leading-relaxed text-muted-foreground capitalize">{monthLabel}</p>
             <h1 className="font-serif text-2xl font-semibold">Seus padrões</h1>
           </FadeIn>
         </div>
@@ -222,14 +228,14 @@ export const Insights = () => {
       <main className="px-5 space-y-4">
         {/* Info Text */}
         <FadeIn>
-          <p className="text-sm text-muted-foreground">
+          <p className="max-w-[100vw] leading-relaxed text-sm leading-relaxed text-muted-foreground">
             Alertas baseados no seu comportamento financeiro
           </p>
         </FadeIn>
 
         {visibleInsights.length === 0 ? (
-          <FadeIn className="text-center py-12">
-            <p className="text-muted-foreground">Nenhum padrão identificado ainda.</p>
+          <FadeIn className="max-w-[100vw] leading-relaxed text-center py-12">
+            <p className="max-w-[100vw] leading-relaxed text-muted-foreground">Nenhum padrão identificado ainda.</p>
           </FadeIn>
         ) : (
           <>
@@ -264,7 +270,7 @@ export const Insights = () => {
         {/* Ignored count - subtle */}
         {ignoredIds.size > 0 && (
           <FadeIn delay={0.3}>
-            <p className="text-xs text-muted-foreground text-center pt-4">
+            <p className="max-w-[100vw] leading-relaxed text-xs text-muted-foreground text-center pt-4">
               {ignoredIds.size} alerta{ignoredIds.size > 1 ? "s" : ""} ignorado{ignoredIds.size > 1 ? "s" : ""}
               <button
                 onClick={() => setIgnoredIds(new Set())}
@@ -279,7 +285,7 @@ export const Insights = () => {
         {/* Future AI note */}
         <FadeIn delay={0.4}>
           <div className="mt-8 p-4 rounded-xl bg-muted/30 border border-border">
-            <p className="text-xs text-muted-foreground text-center">
+            <p className="max-w-[100vw] leading-relaxed text-xs text-muted-foreground text-center">
               💡 Em breve: alertas automáticos baseados em IA analisando seus padrões de comportamento
             </p>
           </div>
@@ -346,7 +352,7 @@ const InsightCard = ({ insight, variant, onIgnore, onViewDetails }: InsightCardP
               <p
                 className={cn(
                   "font-semibold",
-                  isPrimary ? "text-base" : "text-sm"
+                  isPrimary ? "text-base" : "text-sm leading-relaxed"
                 )}
                 style={isPrimary ? { color: `hsl(var(--${config.color}))` } : undefined}
               >
@@ -367,7 +373,7 @@ const InsightCard = ({ insight, variant, onIgnore, onViewDetails }: InsightCardP
         <p
           className={cn(
             "leading-relaxed",
-            isPrimary ? "text-base text-foreground" : "text-sm text-muted-foreground"
+            isPrimary ? "text-base text-foreground" : "text-sm leading-relaxed text-muted-foreground"
           )}
         >
           {insight.text}
@@ -389,7 +395,7 @@ const InsightCard = ({ insight, variant, onIgnore, onViewDetails }: InsightCardP
             : undefined
         }
       >
-        <span className="text-sm font-medium">Ver detalhes</span>
+        <span className="max-w-[100vw] leading-relaxed text-sm leading-relaxed font-medium">Ver detalhes</span>
         <ChevronRight className="w-4 h-4 text-muted-foreground" />
       </button>
     </motion.div>

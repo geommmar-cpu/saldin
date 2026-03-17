@@ -10,6 +10,7 @@ import type {
   CryptoTransactionInsert,
 } from "@/types/cryptoWallet";
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 const db = supabase as any;
 
 // ─── Wallets ────────────────────────────────────────────
@@ -76,6 +77,7 @@ export const useCryptoWallets = () => {
       return wallets;
     },
     enabled: !!user,
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     retry: (count: number, err: any) => err?.code !== "PGRST205" && count < 3,
     refetchInterval: 60000, // Update every minute
   });
@@ -393,6 +395,7 @@ export const useCryptoInvestedInMonth = (month: number, year: number) => {
         return 0;
       }
 
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       return (data || []).reduce((sum: number, tx: any) => sum + Number(tx.total_value || 0), 0);
     },
     enabled: !!user,

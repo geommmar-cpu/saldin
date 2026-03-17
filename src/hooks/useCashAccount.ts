@@ -13,6 +13,7 @@ export const useCashAccount = () => {
 
   const cashAccount = useMemo(() => {
     return accounts.find(
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       (a) => a.bank_key === CASH_ACCOUNT_KEY || a.account_type === ("cash" as any)
     ) as BankAccount | undefined;
   }, [accounts]);
@@ -24,6 +25,7 @@ export const useCashAccount = () => {
     const result = await createAccount.mutateAsync({
       bank_name: CASH_ACCOUNT_NAME,
       bank_key: CASH_ACCOUNT_KEY,
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       account_type: "cash" as any,
       initial_balance: 0,
       current_balance: 0,

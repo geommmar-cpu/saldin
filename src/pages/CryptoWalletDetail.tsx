@@ -59,6 +59,11 @@ export const CryptoWalletDetail = () => {
   if (isLoading) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
+      <title>Saldin | CryptoWalletDetail</title>
+      <meta name="description" content="Manage your cryptowalletdetail easily with Saldin." />
+      <meta property="og:title" content="Saldin - CryptoWalletDetail" />
+      <meta property="og:description" content="Manage your cryptowalletdetail easily with Saldin." />
+        
         <Loader2 className="w-8 h-8 animate-spin text-muted-foreground" />
       </div>
     );
@@ -67,7 +72,7 @@ export const CryptoWalletDetail = () => {
   if (!wallet) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
-        <p className="text-muted-foreground">Carteira não encontrada</p>
+        <p className="max-w-[100vw] leading-relaxed text-muted-foreground">Carteira não encontrada</p>
       </div>
     );
   }
@@ -180,14 +185,14 @@ export const CryptoWalletDetail = () => {
                     className="w-full h-full flex items-center justify-center"
                     style={{ backgroundColor: color + "20" }}
                   >
-                    <span className="text-lg font-bold" style={{ color }}>
+                    <span className="max-w-[100vw] leading-relaxed text-lg leading-relaxed font-bold" style={{ color }}>
                       {wallet.symbol}
                     </span>
                   </div>
                 )}
               </div>
               <div>
-                <p className="text-sm text-muted-foreground">Valor total</p>
+                <p className="max-w-[100vw] leading-relaxed text-sm leading-relaxed text-muted-foreground">Valor total</p>
                 <p className="font-serif text-2xl font-bold">
                   {formatCryptoValue(totalValue, wallet.display_currency)}
                 </p>
@@ -196,13 +201,13 @@ export const CryptoWalletDetail = () => {
 
             <div className="grid grid-cols-2 gap-4 pt-4 border-t border-border">
               <div>
-                <p className="text-xs text-muted-foreground">Quantidade</p>
+                <p className="max-w-[100vw] leading-relaxed text-xs text-muted-foreground">Quantidade</p>
                 <p className="font-medium">
                   {formatCryptoQuantity(Number(wallet.quantity), wallet.symbol)} {wallet.symbol}
                 </p>
               </div>
               <div>
-                <p className="text-xs text-muted-foreground">Cotação</p>
+                <p className="max-w-[100vw] leading-relaxed text-xs text-muted-foreground">Cotação</p>
                 <p className="font-medium">
                   {formatCryptoValue(Number(wallet.last_price), wallet.display_currency)}
                 </p>
@@ -210,7 +215,7 @@ export const CryptoWalletDetail = () => {
             </div>
 
             {wallet.last_price_updated_at && (
-              <p className="text-xs text-muted-foreground mt-3">
+              <p className="max-w-[100vw] leading-relaxed text-xs text-muted-foreground mt-3">
                 Atualizado em {new Date(wallet.last_price_updated_at).toLocaleString("pt-BR")}
               </p>
             )}
@@ -226,7 +231,7 @@ export const CryptoWalletDetail = () => {
               onClick={() => openTxDialog("deposit")}
             >
               <Plus className="w-5 h-5 text-essential" />
-              <span className="text-xs">Aporte</span>
+              <span className="max-w-[100vw] leading-relaxed text-xs">Aporte</span>
             </Button>
             <Button
               variant="outline"
@@ -234,7 +239,7 @@ export const CryptoWalletDetail = () => {
               onClick={() => openTxDialog("withdraw")}
             >
               <Minus className="w-5 h-5 text-impulse" />
-              <span className="text-xs">Resgate</span>
+              <span className="max-w-[100vw] leading-relaxed text-xs">Resgate</span>
             </Button>
             <Button
               variant="outline"
@@ -242,16 +247,16 @@ export const CryptoWalletDetail = () => {
               onClick={() => openTxDialog("adjustment")}
             >
               <Edit2 className="w-5 h-5 text-muted-foreground" />
-              <span className="text-xs">Ajustar</span>
+              <span className="max-w-[100vw] leading-relaxed text-xs">Ajustar</span>
             </Button>
           </div>
         </FadeIn>
 
         {/* Transaction history */}
         <FadeIn delay={0.1}>
-          <h2 className="font-serif text-lg font-semibold mb-3">Histórico</h2>
+          <h2 className="font-serif text-lg leading-relaxed font-semibold mb-3">Histórico</h2>
           {transactions.length === 0 ? (
-            <p className="text-sm text-muted-foreground text-center py-6">
+            <p className="max-w-[100vw] leading-relaxed text-sm leading-relaxed text-muted-foreground text-center py-6">
               Nenhuma movimentação registrada
             </p>
           ) : (
@@ -277,22 +282,22 @@ export const CryptoWalletDetail = () => {
                       )}
                     </div>
                     <div className="flex-1 min-w-0">
-                      <p className="text-sm font-medium">{transactionTypeLabels[tx.type]}</p>
-                      <p className="text-xs text-muted-foreground">
+                      <p className="max-w-[100vw] leading-relaxed text-sm leading-relaxed font-medium">{transactionTypeLabels[tx.type]}</p>
+                      <p className="max-w-[100vw] leading-relaxed text-xs text-muted-foreground">
                         {new Date(tx.created_at).toLocaleString("pt-BR", { day: "2-digit", month: "2-digit", year: "numeric", hour: "2-digit", minute: "2-digit" })}
                         {tx.notes && ` • ${tx.notes}`}
                       </p>
                     </div>
-                    <div className="text-right">
+                    <div className="max-w-[100vw] leading-relaxed text-right">
                       <p className={cn(
-                        "text-sm font-semibold",
+                        "text-sm leading-relaxed font-semibold",
                         isDeposit ? "text-essential" : isAdjustment ? "" : "text-impulse"
                       )}>
                         {isDeposit ? "+" : isAdjustment ? "=" : "-"}
                         {formatCryptoQuantity(Number(tx.quantity), wallet.symbol)} {wallet.symbol}
                       </p>
                       {tx.total_value && (
-                        <p className="text-xs text-muted-foreground">
+                        <p className="max-w-[100vw] leading-relaxed text-xs text-muted-foreground">
                           {formatCryptoValue(Number(tx.total_value), wallet.display_currency)}
                         </p>
                       )}
@@ -321,7 +326,7 @@ export const CryptoWalletDetail = () => {
                   whileTap={{ scale: 0.95 }}
                   onClick={() => { setTxInputMode("brl"); setTxInputValue(""); }}
                   className={cn(
-                    "p-2.5 rounded-xl border-2 text-center transition-all text-sm",
+                    "p-2.5 rounded-xl border-2 text-center transition-all text-sm leading-relaxed",
                     txInputMode === "brl"
                       ? "border-primary bg-primary/10 text-primary font-medium"
                       : "border-border bg-card hover:bg-secondary"
@@ -333,7 +338,7 @@ export const CryptoWalletDetail = () => {
                   whileTap={{ scale: 0.95 }}
                   onClick={() => { setTxInputMode("quantity"); setTxInputValue(""); }}
                   className={cn(
-                    "p-2.5 rounded-xl border-2 text-center transition-all text-sm",
+                    "p-2.5 rounded-xl border-2 text-center transition-all text-sm leading-relaxed",
                     txInputMode === "quantity"
                       ? "border-primary bg-primary/10 text-primary font-medium"
                       : "border-border bg-card hover:bg-secondary"
@@ -346,20 +351,20 @@ export const CryptoWalletDetail = () => {
 
             {/* Price info */}
             {hasPriceData && txType !== "adjustment" && (
-              <div className="text-xs text-muted-foreground p-3 rounded-xl bg-muted/50">
+              <div className="max-w-[100vw] leading-relaxed text-xs text-muted-foreground p-3 rounded-xl bg-muted/50">
                 Cotação atual: <strong>{formatCryptoValue(walletPrice, wallet.display_currency)}</strong> por {wallet.symbol}
               </div>
             )}
 
             {!hasPriceData && txInputMode === "brl" && txType !== "adjustment" && (
-              <div className="flex items-center gap-2 text-sm text-warning p-3 rounded-xl bg-warning/10 border border-warning/20">
+              <div className="flex items-center gap-2 text-sm leading-relaxed text-warning p-3 rounded-xl bg-warning/10 border border-warning/20">
                 <AlertTriangle className="w-4 h-4 flex-shrink-0" />
                 Cotação indisponível. Atualize a cotação ou use o modo quantidade.
               </div>
             )}
 
             <div>
-              <label className="text-sm text-muted-foreground mb-2 block">
+              <label className="max-w-[100vw] leading-relaxed text-sm leading-relaxed text-muted-foreground mb-2 block">
                 {txType === "adjustment"
                   ? `Nova quantidade total (${wallet.symbol})`
                   : txInputMode === "brl"
@@ -374,16 +379,16 @@ export const CryptoWalletDetail = () => {
                 placeholder="0.00"
                 value={txInputValue}
                 onChange={(e) => setTxInputValue(e.target.value)}
-                className="h-12 text-lg"
+                className="h-12 text-lg leading-relaxed"
                 disabled={txInputMode === "brl" && !hasPriceData && txType !== "adjustment"}
               />
               {txType === "withdraw" && (
-                <p className="text-xs text-muted-foreground mt-1">
+                <p className="max-w-[100vw] leading-relaxed text-xs text-muted-foreground mt-1">
                   Disponível: {formatCryptoQuantity(Number(wallet.quantity), wallet.symbol)} {wallet.symbol}
                 </p>
               )}
               {txType === "adjustment" && (
-                <p className="text-xs text-muted-foreground mt-1">
+                <p className="max-w-[100vw] leading-relaxed text-xs text-muted-foreground mt-1">
                   Atual: {formatCryptoQuantity(Number(wallet.quantity), wallet.symbol)} {wallet.symbol}
                 </p>
               )}
@@ -392,17 +397,17 @@ export const CryptoWalletDetail = () => {
             {/* Conversion preview */}
             {txRawValue > 0 && hasPriceData && txType !== "adjustment" && (
               <div className="p-3 rounded-xl bg-card border border-border space-y-1.5">
-                <p className="text-xs text-muted-foreground font-medium">Resumo</p>
+                <p className="max-w-[100vw] leading-relaxed text-xs text-muted-foreground font-medium">Resumo</p>
                 <div className="grid grid-cols-2 gap-2">
                   <div>
-                    <p className="text-xs text-muted-foreground">Quantidade</p>
-                    <p className="text-sm font-semibold">
+                    <p className="max-w-[100vw] leading-relaxed text-xs text-muted-foreground">Quantidade</p>
+                    <p className="max-w-[100vw] leading-relaxed text-sm leading-relaxed font-semibold">
                       {formatCryptoQuantity(txComputedQuantity, wallet.symbol)} {wallet.symbol}
                     </p>
                   </div>
                   <div>
-                    <p className="text-xs text-muted-foreground">Valor</p>
-                    <p className="text-sm font-semibold">
+                    <p className="max-w-[100vw] leading-relaxed text-xs text-muted-foreground">Valor</p>
+                    <p className="max-w-[100vw] leading-relaxed text-sm leading-relaxed font-semibold">
                       {formatCryptoValue(txComputedValue, wallet.display_currency)}
                     </p>
                   </div>
@@ -412,11 +417,11 @@ export const CryptoWalletDetail = () => {
 
             {txType !== "adjustment" && (
               <div>
-                <label className="text-sm text-muted-foreground mb-2 block">
+                <label className="max-w-[100vw] leading-relaxed text-sm leading-relaxed text-muted-foreground mb-2 block">
                   {txType === "deposit" ? "Conta de origem *" : "Conta de destino *"}
                 </label>
                 {bankAccounts.length === 0 ? (
-                  <div className="flex items-center gap-2 text-sm text-warning p-3 rounded-xl bg-warning/10 border border-warning/20">
+                  <div className="flex items-center gap-2 text-sm leading-relaxed text-warning p-3 rounded-xl bg-warning/10 border border-warning/20">
                     <AlertTriangle className="w-4 h-4 flex-shrink-0" />
                     Cadastre uma conta bancária antes de investir.
                   </div>
@@ -434,7 +439,7 @@ export const CryptoWalletDetail = () => {
                         ))}
                       </SelectContent>
                     </Select>
-                    <p className="text-xs text-muted-foreground mt-1">
+                    <p className="max-w-[100vw] leading-relaxed text-xs text-muted-foreground mt-1">
                       {txType === "deposit"
                         ? "O valor será transferido desta conta para a carteira cripto"
                         : "O valor resgatado será devolvido a esta conta"
@@ -446,7 +451,7 @@ export const CryptoWalletDetail = () => {
             )}
 
             <div>
-              <label className="text-sm text-muted-foreground mb-2 block">Observação (opcional)</label>
+              <label className="max-w-[100vw] leading-relaxed text-sm leading-relaxed text-muted-foreground mb-2 block">Observação (opcional)</label>
               <Input
                 placeholder="Ex: DCA mensal"
                 value={txNotes}
@@ -464,9 +469,9 @@ export const CryptoWalletDetail = () => {
               >
                 <div className="flex items-start gap-3">
                   <AlertTriangle className="w-5 h-5 text-impulse shrink-0 mt-0.5" />
-                  <div className="text-xs">
+                  <div className="max-w-[100vw] leading-relaxed text-xs">
                     <p className="font-semibold text-impulse">Saldo insuficiente no banco</p>
-                    <p className="text-muted-foreground mt-0.5">
+                    <p className="max-w-[100vw] leading-relaxed text-muted-foreground mt-0.5">
                       Este aporte de {formatCryptoValue(txComputedValue, wallet.display_currency)} é maior que o saldo em {selectedBank.bank_name} ({formatCurrency(Number(selectedBank.current_balance))}).
                     </p>
                   </div>
@@ -482,9 +487,9 @@ export const CryptoWalletDetail = () => {
               >
                 <div className="flex items-start gap-3">
                   <AlertTriangle className="w-5 h-5 text-impulse shrink-0 mt-0.5" />
-                  <div className="text-xs">
+                  <div className="max-w-[100vw] leading-relaxed text-xs">
                     <p className="font-semibold text-impulse">Quantidade insuficiente</p>
-                    <p className="text-muted-foreground mt-0.5">
+                    <p className="max-w-[100vw] leading-relaxed text-muted-foreground mt-0.5">
                       Você está tentando resgatar mais {wallet.symbol} do que possui nesta carteira ({formatCryptoQuantity(Number(wallet.quantity), wallet.symbol)}).
                     </p>
                   </div>

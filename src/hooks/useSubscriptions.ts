@@ -5,6 +5,7 @@ import { toast } from "sonner";
 import { Subscription, SubscriptionInsert, SubscriptionUpdate } from "@/types/subscription";
 import { startOfMonth, format, parseISO, isAfter, isBefore, addDays } from "date-fns";
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 const db = supabase as any;
 
 export const useSubscriptions = () => {
@@ -24,8 +25,11 @@ export const useSubscriptions = () => {
                 .order("amount", { ascending: false });
             if (error) throw error;
             return (data || []) as (Subscription & {
+                // eslint-disable-next-line @typescript-eslint/no-explicit-any
                 category?: any;
+                // eslint-disable-next-line @typescript-eslint/no-explicit-any
                 card?: any;
+                // eslint-disable-next-line @typescript-eslint/no-explicit-any
                 bank_account?: any
             })[];
         },

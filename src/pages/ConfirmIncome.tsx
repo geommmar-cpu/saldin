@@ -134,6 +134,7 @@ export const ConfirmIncome = () => {
         bank_account_id: selectedBankId || undefined,
         date: incomeDate,
         ...(paymentDay ? { notes: `payment_day:${paymentDay}` } : {}),
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       } as any);
 
       // Only update bank balance for non-future incomes
@@ -165,6 +166,11 @@ export const ConfirmIncome = () => {
 
   return (
     <div className="min-h-screen bg-background flex flex-col">
+      <title>Saldin | ConfirmIncome</title>
+      <meta name="description" content="Manage your confirmincome easily with Saldin." />
+      <meta property="og:title" content="Saldin - ConfirmIncome" />
+      <meta property="og:description" content="Manage your confirmincome easily with Saldin." />
+        
       {/* Header */}
       <header className="px-5 pt-safe-top">
         <div className="pt-4 pb-3 flex items-center gap-4">
@@ -178,8 +184,8 @@ export const ConfirmIncome = () => {
       <main className="flex-1 px-5 space-y-6 overflow-y-auto pb-32">
         {/* Amount Display */}
         <FadeIn>
-          <div className="text-center py-4">
-            <p className="text-sm text-muted-foreground mb-1">Valor</p>
+          <div className="max-w-[100vw] leading-relaxed text-center py-4">
+            <p className="max-w-[100vw] leading-relaxed text-sm leading-relaxed text-muted-foreground mb-1">Valor</p>
             <p className="font-serif text-4xl font-semibold">{formattedAmount}</p>
           </div>
         </FadeIn>
@@ -187,7 +193,7 @@ export const ConfirmIncome = () => {
         {/* Description */}
         <FadeIn delay={0.1}>
           <div>
-            <p className="text-sm font-medium mb-2">Descrição</p>
+            <p className="max-w-[100vw] leading-relaxed text-sm leading-relaxed font-medium mb-2">Descrição</p>
             <Input
               type="text"
               value={description}
@@ -202,7 +208,7 @@ export const ConfirmIncome = () => {
         {/* Type Selection */}
         <FadeIn delay={0.2}>
           <div>
-            <p className="text-sm font-medium mb-3">Tipo de receita</p>
+            <p className="max-w-[100vw] leading-relaxed text-sm leading-relaxed font-medium mb-3">Tipo de receita</p>
             <div className="grid grid-cols-2 gap-3">
               {incomeTypes.map((type) => {
                 const Icon = type.icon;
@@ -233,7 +239,7 @@ export const ConfirmIncome = () => {
                       {isSelected && <Check className="w-4 h-4 text-primary ml-auto" />}
                     </div>
                     <p className="font-medium">{type.label}</p>
-                    <p className="text-xs text-muted-foreground">{type.description}</p>
+                    <p className="max-w-[100vw] leading-relaxed text-xs text-muted-foreground">{type.description}</p>
                   </motion.button>
                 );
               })}
@@ -266,7 +272,7 @@ export const ConfirmIncome = () => {
               </div>
               <div className="flex-1 text-left">
                 <p className="font-medium">Receita recorrente</p>
-                <p className="text-sm text-muted-foreground">
+                <p className="max-w-[100vw] leading-relaxed text-sm leading-relaxed text-muted-foreground">
                   Será registrada automaticamente todo mês
                 </p>
               </div>
@@ -287,7 +293,7 @@ export const ConfirmIncome = () => {
             <div className="space-y-3">
               <div className="flex items-center gap-2">
                 <CalendarClock className="w-4 h-4 text-muted-foreground" />
-                <p className="text-sm font-medium">Dia do recebimento *</p>
+                <p className="max-w-[100vw] leading-relaxed text-sm leading-relaxed font-medium">Dia do recebimento *</p>
               </div>
               <Select value={paymentDay} onValueChange={setPaymentDay}>
                 <SelectTrigger className="h-12">
@@ -305,7 +311,7 @@ export const ConfirmIncome = () => {
               {paymentDay && (
                 <div className="flex items-start gap-2 p-3 rounded-xl bg-muted/50 border border-border">
                   <Info className="w-4 h-4 text-muted-foreground mt-0.5 shrink-0" />
-                  <p className="text-xs text-muted-foreground">
+                  <p className="max-w-[100vw] leading-relaxed text-xs text-muted-foreground">
                     Essa receita será registrada e somada ao saldo apenas no dia {paymentDay} de cada mês. Até lá, ela aparecerá como receita prevista.
                   </p>
                 </div>

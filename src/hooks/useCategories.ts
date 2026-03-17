@@ -19,6 +19,7 @@ function toLocalConfig(row: CategoryRow): CategoryConfig {
     icon: Tag, // Default icon for custom
     group: (row.group_name as CategoryGroup) || "outros",
     color: row.color || "#94A3B8",
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     nature: row.nature as any || "Variável",
     isCustom: !row.is_default,
   };
@@ -121,7 +122,9 @@ export const useCreateCategory = () => {
           type: category.type,
           color: category.color || null,
           icon: category.icon || null,
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
           group_name: (category as any).group_name || "outros",
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
           nature: (category as any).nature || "Variável",
           user_id: user.id,
           is_default: false,

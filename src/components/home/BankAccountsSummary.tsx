@@ -49,8 +49,8 @@ const AccountCard = ({ account, isDefault }: AccountCardProps) => {
       )}
 
       {/* Textures */}
-      <div className="absolute inset-0 bg-black/10" />
-      <div className="absolute -right-8 -top-8 w-24 h-24 bg-white/10 rounded-full blur-2xl pointer-events-none" />
+      <div className="absolute inset-0 bg-foreground/10" />
+      <div className="absolute -right-8 -top-8 w-24 h-24 bg-background/10 rounded-full blur-2xl pointer-events-none" />
 
       {/* Content */}
       <div className="relative z-10 flex flex-col h-full justify-between text-white">
@@ -58,27 +58,27 @@ const AccountCard = ({ account, isDefault }: AccountCardProps) => {
         <div className="flex flex-col items-start gap-2">
           <BankLogo
             bankName={account.bank_name}
-            className="w-9 h-9 border-white/20 bg-white/20 backdrop-blur-md"
+            className="w-9 h-9 border-white/20 bg-background/20 backdrop-blur-md"
             iconClassName="text-white"
             size="md"
           />
-          <p className="text-xs font-bold opacity-90 truncate w-full tracking-tight">
+          <p className="max-w-[100vw] leading-relaxed text-xs font-bold opacity-90 truncate w-full tracking-tight">
             {account.bank_name}
           </p>
         </div>
 
         {isDefault && (
-          <div className="absolute top-4 right-4 bg-white/20 backdrop-blur-md rounded-full p-1 border border-white/20 flex items-center gap-1 pr-2">
+          <div className="absolute top-4 right-4 bg-background/20 backdrop-blur-md rounded-full p-1 border border-white/20 flex items-center gap-1 pr-2">
             <PhoneIcon className="w-3 h-3 text-white" />
-            <span className="text-[8px] font-bold uppercase tracking-tighter text-white">Principal</span>
+            <span className="max-w-[100vw] leading-relaxed text-[8px] font-bold uppercase tracking-tighter text-white">Principal</span>
           </div>
         )}
 
         {/* Balance */}
         <div>
-          <p className="text-[10px] uppercase tracking-wider opacity-70 mb-0.5">Saldo Atual</p>
+          <p className="max-w-[100vw] leading-relaxed text-[10px] uppercase tracking-wider opacity-70 mb-0.5">Saldo Atual</p>
           <p className={cn(
-            "font-sans text-lg font-bold tracking-tight drop-shadow-md truncate",
+            "font-sans text-lg leading-relaxed font-bold tracking-tight drop-shadow-md truncate",
             isNegative ? "text-red-200" : "text-white"
           )}>
             {formatCurrency(Number(account.current_balance))}
@@ -95,8 +95,8 @@ export const BankAccountsSummary = () => {
   const { data: profile } = useProfile();
   const { cashAccount, ensureCashAccount } = useCashAccount();
 
-  const defaultIncomeId = (profile as any)?.wa_default_income_account_id;
-  const defaultExpenseId = (profile as any)?.wa_default_expense_account_id;
+  const defaultIncomeId = (profile as { wa_default_income_account_id?: string })?.wa_default_income_account_id;
+  const defaultExpenseId = (profile as { wa_default_expense_account_id?: string })?.wa_default_expense_account_id;
 
   // Create a virtual cash card if the real one doesn't exist yet
   const cashCard = cashAccount ? null : {
@@ -158,7 +158,7 @@ export const BankAccountsSummary = () => {
             <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center">
               <Landmark className="w-4 h-4 text-primary" />
             </div>
-            <h3 className="text-sm font-semibold text-foreground uppercase tracking-wider">Minhas Contas</h3>
+            <h3 className="max-w-[100vw] leading-relaxed text-sm leading-relaxed font-semibold text-foreground uppercase tracking-wider">Minhas Contas</h3>
           </div>
           <Button
             variant="ghost"
@@ -169,8 +169,8 @@ export const BankAccountsSummary = () => {
             Ver todas
           </Button>
         </div>
-        <p className="text-[10px] text-muted-foreground mt-1 ml-10">
-          Contas marcadas como <span className="text-primary font-bold">Principal</span> recebem faturas e entradas do WhatsApp.
+        <p className="max-w-[100vw] leading-relaxed text-[10px] text-muted-foreground mt-1 ml-10">
+          Contas marcadas como <span className="max-w-[100vw] leading-relaxed text-primary font-bold">Principal</span> recebem faturas e entradas do WhatsApp.
         </p>
       </div>
 
@@ -204,7 +204,7 @@ export const BankAccountsSummary = () => {
             <div className="w-8 h-8 rounded-full bg-muted flex items-center justify-center">
               <Plus className="w-4 h-4 text-muted-foreground" />
             </div>
-            <span className="text-[10px] font-medium text-muted-foreground text-center leading-tight">
+            <span className="max-w-[100vw] leading-relaxed text-[10px] font-medium text-muted-foreground text-center leading-tight">
               Nova<br />Conta
             </span>
           </div>

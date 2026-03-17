@@ -26,7 +26,7 @@ import { parseCurrency, formatCurrencyInput } from "@/lib/currency";
 const colorOptions = [
   { id: 'green', label: 'Verde', class: 'bg-essential' },
   { id: 'blue', label: 'Azul', class: 'bg-calm' },
-  { id: 'purple', label: 'Roxo', class: 'bg-pleasure' },
+  { id: 'teal', label: 'Roxo', class: 'bg-pleasure' },
   { id: 'orange', label: 'Laranja', class: 'bg-obligation' },
   { id: 'red', label: 'Vermelho', class: 'bg-impulse' },
   { id: 'pink', label: 'Rosa', class: 'bg-pink-500' },
@@ -69,6 +69,11 @@ export default function EditGoal() {
   if (isLoading) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
+      <title>Saldin | EditGoal</title>
+      <meta name="description" content="Manage your editgoal easily with Saldin." />
+      <meta property="og:title" content="Saldin - EditGoal" />
+      <meta property="og:description" content="Manage your editgoal easily with Saldin." />
+        
         <Loader2 className="w-8 h-8 animate-spin text-muted-foreground" />
       </div>
     );
@@ -124,7 +129,7 @@ export default function EditGoal() {
           </Button>
           <div className="flex-1">
             <h1 className="font-serif text-xl font-bold">Editar Meta</h1>
-            <p className="text-sm text-muted-foreground">
+            <p className="max-w-[100vw] leading-relaxed text-sm leading-relaxed text-muted-foreground">
               Guardado: {formatCurrency(Number(goal.current_amount))}
             </p>
           </div>
@@ -135,7 +140,7 @@ export default function EditGoal() {
         {/* Nome */}
         <FadeIn>
           <div className="space-y-2">
-            <label className="text-sm font-medium">Nome da meta *</label>
+            <label className="max-w-[100vw] leading-relaxed text-sm leading-relaxed font-medium">Nome da meta *</label>
             <Input
               placeholder="Ex: Viagem, Reserva de emergência..."
               value={name}
@@ -147,13 +152,13 @@ export default function EditGoal() {
         {/* Valor objetivo */}
         <FadeIn delay={0.05}>
           <div className="space-y-2">
-            <label className="text-sm font-medium">Valor objetivo *</label>
+            <label className="max-w-[100vw] leading-relaxed text-sm leading-relaxed font-medium">Valor objetivo *</label>
             <CurrencyInput
               value={targetAmount}
               onChange={setTargetAmount}
             />
             {parseCurrency(targetAmount) < Number(goal.current_amount) && (
-              <p className="text-xs text-amber-600 dark:text-amber-500 flex items-center gap-1">
+              <p className="max-w-[100vw] leading-relaxed text-xs text-amber-600 dark:text-amber-500 flex items-center gap-1">
                 <AlertTriangle className="w-3 h-3" />
                 O valor objetivo é menor que o valor já guardado
               </p>
@@ -164,7 +169,7 @@ export default function EditGoal() {
         {/* Data objetivo */}
         <FadeIn delay={0.1}>
           <div className="space-y-2">
-            <label className="text-sm font-medium">Data objetivo (opcional)</label>
+            <label className="max-w-[100vw] leading-relaxed text-sm leading-relaxed font-medium">Data objetivo (opcional)</label>
             <div className="relative">
               <Calendar className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
               <Input
@@ -180,7 +185,7 @@ export default function EditGoal() {
         {/* Cor */}
         <FadeIn delay={0.15}>
           <div className="space-y-2">
-            <label className="text-sm font-medium">Cor da caixinha</label>
+            <label className="max-w-[100vw] leading-relaxed text-sm leading-relaxed font-medium">Cor da caixinha</label>
             <div className="flex gap-3 flex-wrap">
               {colorOptions.map((color) => (
                 <button
@@ -203,7 +208,7 @@ export default function EditGoal() {
         {/* Ícone */}
         <FadeIn delay={0.2}>
           <div className="space-y-2">
-            <label className="text-sm font-medium">Ícone</label>
+            <label className="max-w-[100vw] leading-relaxed text-sm leading-relaxed font-medium">Ícone</label>
             <div className="flex gap-3 flex-wrap">
               {iconOptions.map((iconOpt) => {
                 const Icon = iconOpt.icon;
@@ -230,7 +235,7 @@ export default function EditGoal() {
         {/* Observação */}
         <FadeIn delay={0.25}>
           <div className="space-y-2">
-            <label className="text-sm font-medium">Observação (opcional)</label>
+            <label className="max-w-[100vw] leading-relaxed text-sm leading-relaxed font-medium">Observação (opcional)</label>
             <Textarea
               placeholder="Adicione uma nota sobre essa meta..."
               value={notes}
@@ -249,8 +254,8 @@ export default function EditGoal() {
                   <Users className="w-5 h-5 text-muted-foreground" />
                 </div>
                 <div>
-                  <p className="text-sm font-medium">Meta para outra pessoa</p>
-                  <p className="text-xs text-muted-foreground">
+                  <p className="max-w-[100vw] leading-relaxed text-sm leading-relaxed font-medium">Meta para outra pessoa</p>
+                  <p className="max-w-[100vw] leading-relaxed text-xs text-muted-foreground">
                     Não afeta seu saldo livre
                   </p>
                 </div>

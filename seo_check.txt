@@ -1,0 +1,36 @@
+﻿
+============================================================
+  SEO CHECKER - Search Engine Optimization Audit
+============================================================
+Project: C:\Users\Geomar Ribeiro\Documents\Saldin
+Time: 2026-03-12 21:04:33
+------------------------------------------------------------
+Found 50 page files to analyze
+
+============================================================
+SEO ANALYSIS RESULTS
+============================================================
+
+Issue Summary:
+  [45] Missing meta description
+  [45] Missing Open Graph tags
+  [39] Missing <title> tag
+  [2] Multiple H1 tags (2)
+  [1] Multiple H1 tags (3)
+
+Affected files (46):
+  - AddBankAccount.tsx
+  - AddCreditCard.tsx
+  - AddCryptoWallet.tsx
+  - AddDebt.tsx
+  - AddExpense.tsx
+  ... and 41 more
+
+{
+  "script": "seo_checker",
+  "project": "C:\\Users\\Geomar Ribeiro\\Documents\\Saldin",
+  "files_checked": 50,
+  "files_with_issues": 46,
+  "issues_found": 132,
+  "passed": false
+}

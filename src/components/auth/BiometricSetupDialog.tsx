@@ -74,19 +74,19 @@ export function BiometricSetupDialog({
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-md">
-        <DialogHeader className="text-center">
+        <DialogHeader className="max-w-[100vw] leading-relaxed text-center">
           <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-primary/10">
             <Fingerprint className="h-8 w-8 text-primary" />
           </div>
-          <DialogTitle className="text-xl">Ativar login por biometria?</DialogTitle>
-          <DialogDescription className="text-center">
+          <DialogTitle className="max-w-[100vw] leading-relaxed text-xl">Ativar login por biometria?</DialogTitle>
+          <DialogDescription className="max-w-[100vw] leading-relaxed text-center">
             Use sua impressão digital ou Face ID para entrar mais rapidamente no próximo acesso.
           </DialogDescription>
         </DialogHeader>
 
         <div className="flex items-center gap-3 rounded-lg bg-muted/50 p-4">
           <Smartphone className="h-5 w-5 text-muted-foreground flex-shrink-0" />
-          <p className="text-sm text-muted-foreground">
+          <p className="max-w-[100vw] leading-relaxed text-sm leading-relaxed text-muted-foreground">
             Seus dados biométricos ficam armazenados apenas no seu dispositivo, garantindo sua segurança.
           </p>
         </div>

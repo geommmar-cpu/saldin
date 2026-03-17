@@ -277,6 +277,7 @@ export const ConfirmExpense = () => {
               color: selectedCategory.color,
               type: "expense",
               group_name: selectedCategory.group,
+              // eslint-disable-next-line @typescript-eslint/no-explicit-any
               nature: selectedCategory.nature as any, // Cast to match DB enum/text
               is_default: true, // Mark as default so it maps back to local config
               allow_expense: selectedCategory.allowExpense ?? true,
@@ -356,6 +357,7 @@ export const ConfirmExpense = () => {
               category_id: finalCategoryId || null,
             };
           });
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
           await createBulkExpenses.mutateAsync(bulkExpenses as any);
         } else if (!isNew && id) {
           // UPDATE EXISTING
@@ -381,6 +383,7 @@ export const ConfirmExpense = () => {
             bank_account_id: bankId || undefined,
             date: toLocalDateString(),
             category_id: finalCategoryId || null,
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
           } as any);
         }
 
@@ -410,6 +413,7 @@ export const ConfirmExpense = () => {
 
       toast.success(isCreditCard ? "Compra registrada no cartão!" : "Gasto confirmado com sucesso!");
       navigate("/", { state: { success: true } });
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (error: any) {
       console.error("Failed to save:", error);
 
@@ -444,6 +448,7 @@ export const ConfirmExpense = () => {
               bank_account_id: bankId || undefined,
               date: toLocalDateString(),
               category_id: null, // FORCE NULL
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
             } as any);
 
             if (bankId) {
@@ -479,6 +484,11 @@ export const ConfirmExpense = () => {
 
   return (
     <div className="min-h-screen bg-background flex flex-col">
+      <title>Saldin | ConfirmExpense</title>
+      <meta name="description" content="Manage your confirmexpense easily with Saldin." />
+      <meta property="og:title" content="Saldin - ConfirmExpense" />
+      <meta property="og:description" content="Manage your confirmexpense easily with Saldin." />
+        
       {/* Header */}
       <header className="px-5 pt-safe-top">
         <div className="pt-4 pb-2 flex items-center gap-4">
@@ -486,7 +496,7 @@ export const ConfirmExpense = () => {
             <ArrowLeft className="w-5 h-5" />
           </Button>
           <div className="flex-1">
-            <p className="text-sm text-muted-foreground">
+            <p className="max-w-[100vw] leading-relaxed text-sm leading-relaxed text-muted-foreground">
               Passo {getStepNumber()} de {totalSteps}
             </p>
             <h1 className="font-serif text-xl font-semibold">Novo Gasto</h1>
@@ -511,11 +521,11 @@ export const ConfirmExpense = () => {
 
       <main className="flex-1 flex flex-col px-5 py-6 overflow-y-auto">
         {/* Amount Display */}
-        <FadeIn className="text-center mb-6">
-          <p className="text-muted-foreground mb-1">Valor do gasto</p>
+        <FadeIn className="max-w-[100vw] leading-relaxed text-center mb-6">
+          <p className="max-w-[100vw] leading-relaxed text-muted-foreground mb-1">Valor do gasto</p>
           <p className="font-serif text-4xl font-semibold">{formattedAmount}</p>
           {!isNew && (
-            <p className="text-sm text-muted-foreground mt-2">
+            <p className="max-w-[100vw] leading-relaxed text-sm leading-relaxed text-muted-foreground mt-2">
               Mercado Central · Importado do banco
             </p>
           )}
@@ -524,13 +534,13 @@ export const ConfirmExpense = () => {
         {/* LAYER 1 - Basic Expense Info */}
         {step === "expense" && (
           <FadeIn key="expense" className="flex-1 flex flex-col">
-            <h2 className="text-center text-xl font-medium mb-6">
+            <h2 className="max-w-[100vw] leading-relaxed text-center text-xl font-medium mb-6">
               Detalhes do gasto
             </h2>
 
             {/* Description input */}
-            <div className="mb-5">
-              <label className="text-sm text-muted-foreground mb-2 block">
+            <div className="leading-relaxed mb-5">
+              <label className="max-w-[100vw] leading-relaxed text-sm leading-relaxed text-muted-foreground mb-2 block">
                 Onde foi esse gasto?
               </label>
               <Input
@@ -538,13 +548,13 @@ export const ConfirmExpense = () => {
                 value={description}
                 onChange={(e) => setDescription(e.target.value)}
                 maxLength={50}
-                className="text-base"
+                className="max-w-[100vw] leading-relaxed text-base"
               />
             </div>
 
             {/* Category selector */}
-            <div className="mb-5">
-              <label className="text-sm text-muted-foreground mb-3 block">
+            <div className="leading-relaxed mb-5">
+              <label className="max-w-[100vw] leading-relaxed text-sm leading-relaxed text-muted-foreground mb-3 block">
                 Categoria
               </label>
 
@@ -565,7 +575,7 @@ export const ConfirmExpense = () => {
                       )}
                     >
                       <Icon className={cn("w-5 h-5", category === cat.id ? "text-primary" : cat.color)} />
-                      <span className="text-xs font-medium truncate w-full text-center">{cat.name}</span>
+                      <span className="max-w-[100vw] leading-relaxed text-xs font-medium truncate w-full text-center">{cat.name}</span>
                     </motion.button>
                   );
                 })}
@@ -585,7 +595,7 @@ export const ConfirmExpense = () => {
                         <span>{selectedCategory.name}</span>
                       </div>
                     ) : (
-                      <span className="text-muted-foreground">Ver todas as categorias</span>
+                      <span className="max-w-[100vw] leading-relaxed text-muted-foreground">Ver todas as categorias</span>
                     )}
                     <ChevronDown className="w-4 h-4 text-muted-foreground" />
                   </Button>
@@ -616,7 +626,7 @@ export const ConfirmExpense = () => {
                           <div>
                             <div className="flex items-center gap-2 mb-2">
                               <Tag className="w-4 h-4 text-primary" />
-                              <span className="text-sm font-medium text-primary">
+                              <span className="max-w-[100vw] leading-relaxed text-sm leading-relaxed font-medium text-primary">
                                 Minhas Categorias
                               </span>
                             </div>
@@ -645,7 +655,7 @@ export const ConfirmExpense = () => {
                                     )}>
                                       <Icon className={cn("w-4 h-4", category === cat.id ? "text-primary" : cat.color)} />
                                     </div>
-                                    <span className="text-sm font-medium truncate">{cat.name}</span>
+                                    <span className="max-w-[100vw] leading-relaxed text-sm leading-relaxed font-medium truncate">{cat.name}</span>
                                   </motion.button>
                                 );
                               })}
@@ -668,7 +678,7 @@ export const ConfirmExpense = () => {
                           <div key={groupKey}>
                             <div className="flex items-center gap-2 mb-2">
                               <GroupIcon className="w-4 h-4 text-muted-foreground" />
-                              <span className="text-sm font-medium text-muted-foreground">
+                              <span className="max-w-[100vw] leading-relaxed text-sm leading-relaxed font-medium text-muted-foreground">
                                 {groupInfo.name}
                               </span>
                             </div>
@@ -700,7 +710,7 @@ export const ConfirmExpense = () => {
                                         category === cat.id ? "text-primary" : cat.color
                                       )} />
                                     </div>
-                                    <span className="text-sm font-medium truncate">
+                                    <span className="max-w-[100vw] leading-relaxed text-sm leading-relaxed font-medium truncate">
                                       {cat.name}
                                     </span>
                                   </motion.button>
@@ -730,8 +740,8 @@ export const ConfirmExpense = () => {
             </div>
 
             {/* Payment Method selector */}
-            <div className="mb-5">
-              <label className="text-sm text-muted-foreground mb-3 block">
+            <div className="leading-relaxed mb-5">
+              <label className="max-w-[100vw] leading-relaxed text-sm leading-relaxed text-muted-foreground mb-3 block">
                 Forma de pagamento
               </label>
               <div className="grid grid-cols-4 gap-2">
@@ -758,7 +768,7 @@ export const ConfirmExpense = () => {
                     )}
                   >
                     {opt.icon}
-                    <span className="text-xs font-medium">{opt.label}</span>
+                    <span className="max-w-[100vw] leading-relaxed text-xs font-medium">{opt.label}</span>
                   </motion.button>
                 ))}
               </div>
@@ -769,15 +779,15 @@ export const ConfirmExpense = () => {
               <motion.div
                 initial={{ opacity: 0, height: 0 }}
                 animate={{ opacity: 1, height: "auto" }}
-                className="mb-5"
+                className="leading-relaxed mb-5"
               >
                 <div className="flex items-center gap-3 p-3 rounded-xl border-2 border-primary bg-primary/10">
                   <div className="w-8 h-8 rounded-lg bg-muted flex items-center justify-center">
                     <Banknote className="w-4 h-4 text-muted-foreground" />
                   </div>
                   <div className="flex-1 min-w-0">
-                    <p className="text-sm font-medium">Dinheiro em mãos</p>
-                    <p className="text-xs text-muted-foreground">Conta criada automaticamente</p>
+                    <p className="max-w-[100vw] leading-relaxed text-sm leading-relaxed font-medium">Dinheiro em mãos</p>
+                    <p className="max-w-[100vw] leading-relaxed text-xs text-muted-foreground">Conta criada automaticamente</p>
                   </div>
                 </div>
               </motion.div>
@@ -788,14 +798,14 @@ export const ConfirmExpense = () => {
               <motion.div
                 initial={{ opacity: 0, height: 0 }}
                 animate={{ opacity: 1, height: "auto" }}
-                className="mb-5"
+                className="leading-relaxed mb-5"
               >
-                <label className="text-sm text-muted-foreground mb-3 block">
+                <label className="max-w-[100vw] leading-relaxed text-sm leading-relaxed text-muted-foreground mb-3 block">
                   Qual cartão? *
                 </label>
                 {creditCards.length === 0 ? (
                   <div className="p-4 rounded-xl border border-dashed border-border text-center">
-                    <p className="text-sm text-muted-foreground mb-2">Nenhum cartão cadastrado</p>
+                    <p className="max-w-[100vw] leading-relaxed text-sm leading-relaxed text-muted-foreground mb-2">Nenhum cartão cadastrado</p>
                     <Button
                       variant="outline"
                       size="sm"
@@ -825,9 +835,9 @@ export const ConfirmExpense = () => {
                           <CreditCardIcon className="w-4 h-4" style={{ color: card.color }} />
                         </div>
                         <div className="flex-1 min-w-0">
-                          <p className="text-sm font-medium truncate">{card.card_name}</p>
+                          <p className="max-w-[100vw] leading-relaxed text-sm leading-relaxed font-medium truncate">{card.card_name}</p>
                           {card.last_four_digits && (
-                            <p className="text-xs text-muted-foreground">
+                            <p className="max-w-[100vw] leading-relaxed text-xs text-muted-foreground">
                               •••• {card.last_four_digits}
                             </p>
                           )}
@@ -844,9 +854,9 @@ export const ConfirmExpense = () => {
               <motion.div
                 initial={{ opacity: 0, height: 0 }}
                 animate={{ opacity: 1, height: "auto" }}
-                className="mb-5"
+                className="leading-relaxed mb-5"
               >
-                <label className="text-sm text-muted-foreground mb-3 block">
+                <label className="max-w-[100vw] leading-relaxed text-sm leading-relaxed text-muted-foreground mb-3 block">
                   Conta de origem *
                 </label>
                 <div className="space-y-2">
@@ -866,7 +876,7 @@ export const ConfirmExpense = () => {
                         <Banknote className="w-4 h-4 text-muted-foreground" />
                       </div>
                       <div className="flex-1 min-w-0">
-                        <p className="text-sm font-medium truncate">{account.bank_name}</p>
+                        <p className="max-w-[100vw] leading-relaxed text-sm leading-relaxed font-medium truncate">{account.bank_name}</p>
                       </div>
                     </motion.button>
                   ))}
@@ -879,10 +889,10 @@ export const ConfirmExpense = () => {
         {/* LAYER 2 - Time Behavior */}
         {step === "recurring" && (
           <FadeIn key="recurring" className="flex-1 flex flex-col">
-            <h2 className="text-center text-xl font-medium mb-2">
+            <h2 className="max-w-[100vw] leading-relaxed text-center text-xl font-medium mb-2">
               {paymentMethod === "credit" ? "Quantas parcelas?" : "Esse gasto se repete?"}
             </h2>
-            <p className="text-center text-sm text-muted-foreground mb-8">
+            <p className="max-w-[100vw] leading-relaxed text-center text-sm leading-relaxed text-muted-foreground mb-8">
               {paymentMethod === "credit"
                 ? "Informe o número de parcelas da compra"
                 : "Ex: academia, streaming, financiamento"}
@@ -894,7 +904,7 @@ export const ConfirmExpense = () => {
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
               >
-                <label className="text-sm text-muted-foreground mb-3 block text-center">
+                <label className="max-w-[100vw] leading-relaxed text-sm leading-relaxed text-muted-foreground mb-3 block text-center">
                   Número de parcelas
                 </label>
                 <div className="flex justify-center">
@@ -917,7 +927,7 @@ export const ConfirmExpense = () => {
                     />
                   </div>
                 </div>
-                <p className="text-xs text-muted-foreground text-center mt-3">
+                <p className="max-w-[100vw] leading-relaxed text-xs text-muted-foreground text-center mt-3">
                   {installments && parseInt(installments) > 0
                     ? `${installments}x de ${new Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL" }).format(amount / parseInt(installments))}`
                     : "1x (à vista)"}
@@ -946,9 +956,9 @@ export const ConfirmExpense = () => {
                         isRecurring === true ? "text-primary" : "text-muted-foreground"
                       )} />
                     </div>
-                    <div className="text-center">
+                    <div className="max-w-[100vw] leading-relaxed text-center">
                       <p className="font-semibold">Sim</p>
-                      <p className="text-xs text-muted-foreground mt-1">
+                      <p className="max-w-[100vw] leading-relaxed text-xs text-muted-foreground mt-1">
                         Gasto recorrente
                       </p>
                     </div>
@@ -973,9 +983,9 @@ export const ConfirmExpense = () => {
                         isRecurring === false ? "text-muted-foreground" : "text-muted-foreground"
                       )} />
                     </div>
-                    <div className="text-center">
+                    <div className="max-w-[100vw] leading-relaxed text-center">
                       <p className="font-semibold">Não</p>
-                      <p className="text-xs text-muted-foreground mt-1">
+                      <p className="max-w-[100vw] leading-relaxed text-xs text-muted-foreground mt-1">
                         Gasto único
                       </p>
                     </div>
@@ -989,7 +999,7 @@ export const ConfirmExpense = () => {
                     animate={{ opacity: 1, y: 0 }}
                     className="mt-4"
                   >
-                    <label className="text-sm text-muted-foreground mb-3 block text-center">
+                    <label className="max-w-[100vw] leading-relaxed text-sm leading-relaxed text-muted-foreground mb-3 block text-center">
                       Por quantos meses esse gasto se repete?
                     </label>
                     <div className="flex justify-center">
@@ -1021,10 +1031,10 @@ export const ConfirmExpense = () => {
         {/* LAYER 3 - Reimbursement */}
         {step === "reimbursement" && (
           <FadeIn key="reimbursement" className="flex-1 flex flex-col">
-            <h2 className="text-center text-xl font-medium mb-2">
+            <h2 className="max-w-[100vw] leading-relaxed text-center text-xl font-medium mb-2">
               Foi para outra pessoa?
             </h2>
-            <p className="text-center text-sm text-muted-foreground mb-8">
+            <p className="max-w-[100vw] leading-relaxed text-center text-sm leading-relaxed text-muted-foreground mb-8">
               Alguém vai te reembolsar por esse gasto?
             </p>
 
@@ -1049,9 +1059,9 @@ export const ConfirmExpense = () => {
                     isForOtherPerson === true ? "text-essential" : "text-muted-foreground"
                   )} />
                 </div>
-                <div className="text-center">
+                <div className="max-w-[100vw] leading-relaxed text-center">
                   <p className="font-semibold">Sim</p>
-                  <p className="text-xs text-muted-foreground mt-1">
+                  <p className="max-w-[100vw] leading-relaxed text-xs text-muted-foreground mt-1">
                     Vou ser reembolsado
                   </p>
                 </div>
@@ -1076,9 +1086,9 @@ export const ConfirmExpense = () => {
                     isForOtherPerson === false ? "text-muted-foreground" : "text-muted-foreground"
                   )} />
                 </div>
-                <div className="text-center">
+                <div className="max-w-[100vw] leading-relaxed text-center">
                   <p className="font-semibold">Não</p>
-                  <p className="text-xs text-muted-foreground mt-1">
+                  <p className="max-w-[100vw] leading-relaxed text-xs text-muted-foreground mt-1">
                     Gasto meu
                   </p>
                 </div>
@@ -1092,7 +1102,7 @@ export const ConfirmExpense = () => {
                 animate={{ opacity: 1, y: 0 }}
                 className="mt-4"
               >
-                <label className="text-sm text-muted-foreground mb-3 block text-center">
+                <label className="max-w-[100vw] leading-relaxed text-sm leading-relaxed text-muted-foreground mb-3 block text-center">
                   Quem vai te reembolsar?
                 </label>
                 <Input
@@ -1100,7 +1110,7 @@ export const ConfirmExpense = () => {
                   value={reimbursementPersonName}
                   onChange={(e) => setReimbursementPersonName(e.target.value)}
                   maxLength={30}
-                  className="text-base text-center"
+                  className="max-w-[100vw] leading-relaxed text-base text-center"
                 />
               </motion.div>
             )}
@@ -1110,16 +1120,16 @@ export const ConfirmExpense = () => {
         {/* LAYER 4 - Confirmation */}
         {step === "confirm" && (
           <FadeIn key="confirm" className="flex-1 flex flex-col">
-            <h2 className="text-center text-xl font-medium mb-2">
+            <h2 className="max-w-[100vw] leading-relaxed text-center text-xl font-medium mb-2">
               Como você se sente sobre esse gasto?
             </h2>
-            <p className="text-center text-sm text-muted-foreground mb-8">
+            <p className="max-w-[100vw] leading-relaxed text-center text-sm leading-relaxed text-muted-foreground mb-8">
               Isso ajuda a entender seu comportamento financeiro
             </p>
 
             {/* Emotion Selector */}
-            <div className="mb-6">
-              <label className="text-sm text-muted-foreground mb-3 block">
+            <div className="leading-relaxed mb-6">
+              <label className="max-w-[100vw] leading-relaxed text-sm leading-relaxed text-muted-foreground mb-3 block">
                 Tipo de gasto
               </label>
               <div className="grid grid-cols-3 gap-2">
@@ -1137,20 +1147,20 @@ export const ConfirmExpense = () => {
                   >
                     <div className={cn(
                       "w-10 h-10 rounded-full flex items-center justify-center mb-1",
-                      selectedEmotion === opt.value ? "bg-white/20" : "bg-muted"
+                      selectedEmotion === opt.value ? "bg-background/20" : "bg-muted"
                     )}>
                       {(() => { const Icon = emotionIcons[opt.value]; return <Icon className="w-5 h-5" />; })()}
                     </div>
-                    <span className="text-sm font-medium">{opt.label}</span>
-                    <span className="text-xs text-muted-foreground">{opt.description}</span>
+                    <span className="max-w-[100vw] leading-relaxed text-sm leading-relaxed font-medium">{opt.label}</span>
+                    <span className="max-w-[100vw] leading-relaxed text-xs text-muted-foreground">{opt.description}</span>
                   </motion.button>
                 ))}
               </div>
             </div>
 
             {/* Would Do Again */}
-            <div className="mb-6">
-              <label className="text-sm text-muted-foreground mb-3 block">
+            <div className="leading-relaxed mb-6">
+              <label className="max-w-[100vw] leading-relaxed text-sm leading-relaxed text-muted-foreground mb-3 block">
                 Faria de novo?
               </label>
               <div className="grid grid-cols-2 gap-3">
@@ -1183,11 +1193,11 @@ export const ConfirmExpense = () => {
                 <div className="flex items-start gap-3">
                   <AlertTriangle className="w-5 h-5 text-impulse shrink-0 mt-0.5" />
                   <div>
-                    <p className="text-sm font-semibold text-impulse">Atenção: Dinheiro insuficiente</p>
-                    <p className="text-xs text-muted-foreground mt-1">
+                    <p className="max-w-[100vw] leading-relaxed text-sm leading-relaxed font-semibold text-impulse">Atenção: Dinheiro insuficiente</p>
+                    <p className="max-w-[100vw] leading-relaxed text-xs text-muted-foreground mt-1">
                       Este valor de {formattedAmount} é maior do que o seu {paymentMethod === "credit" ? "limite disponível" : "saldo atual"} ({formatCurrency(selectedAccountBalance)}).
                     </p>
-                    <p className="text-xs font-medium text-impulse/80 mt-2">
+                    <p className="max-w-[100vw] leading-relaxed text-xs font-medium text-impulse/80 mt-2">
                       Deseja prosseguir mesmo ficando no vermelho?
                     </p>
                   </div>

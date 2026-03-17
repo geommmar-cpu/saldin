@@ -68,6 +68,11 @@ const StyleGuide = () => {
 
   return (
     <div className="min-h-screen bg-background pb-24 animate-fade-in">
+      <title>Saldin | StyleGuide</title>
+      <meta name="description" content="Manage your styleguide easily with Saldin." />
+      <meta property="og:title" content="Saldin - StyleGuide" />
+      <meta property="og:description" content="Manage your styleguide easily with Saldin." />
+        
       {/* Header */}
       <header className="sticky top-0 z-50 bg-background/95 backdrop-blur-sm border-b border-border">
         <div className="container flex items-center justify-between h-16 px-4">
@@ -103,7 +108,7 @@ const StyleGuide = () => {
           <h2 className="font-serif text-2xl font-semibold mb-4">Filosofia</h2>
           <Card className="glass">
             <CardContent className="pt-6">
-              <p className="interpretive-text text-lg">
+              <p className="interpretive-text text-lg leading-relaxed">
                 Visual <strong>acolhedor e humano</strong>, não corporativo/bancário. 
                 Foco em <strong>mudança de comportamento</strong>, não números.
               </p>
@@ -117,16 +122,16 @@ const StyleGuide = () => {
           <Card className="glass">
             <CardContent className="pt-6 space-y-6">
               <div>
-                <Label className="text-sm text-muted-foreground mb-2">Títulos — Playfair Display</Label>
-                <h1 className="text-4xl font-semibold">Consciência Financeira</h1>
-                <h2 className="text-3xl font-semibold">Subtítulo Elegante</h2>
-                <h3 className="text-2xl font-medium">Seção Importante</h3>
+                <Label className="max-w-[100vw] leading-relaxed text-sm leading-relaxed text-muted-foreground mb-2">Títulos — Playfair Display</Label>
+                <h2 className="max-w-[100vw] leading-relaxed text-4xl font-semibold">Consciência Financeira</h2>
+                <h2 className="max-w-[100vw] leading-relaxed text-3xl font-semibold">Subtítulo Elegante</h2>
+                <h3 className="max-w-[100vw] leading-relaxed text-2xl font-medium">Seção Importante</h3>
               </div>
               <div>
-                <Label className="text-sm text-muted-foreground mb-2">Corpo — DM Sans</Label>
-                <p className="text-lg">Texto grande para destaques e introduções.</p>
-                <p className="text-base">Texto padrão para parágrafos e conteúdo geral.</p>
-                <p className="text-sm text-muted-foreground">Texto pequeno para legendas e metadados.</p>
+                <Label className="max-w-[100vw] leading-relaxed text-sm leading-relaxed text-muted-foreground mb-2">Corpo — DM Sans</Label>
+                <p className="max-w-[100vw] leading-relaxed text-lg leading-relaxed">Texto grande para destaques e introduções.</p>
+                <p className="max-w-[100vw] leading-relaxed text-base">Texto padrão para parágrafos e conteúdo geral.</p>
+                <p className="max-w-[100vw] leading-relaxed text-sm leading-relaxed text-muted-foreground">Texto pequeno para legendas e metadados.</p>
               </div>
             </CardContent>
           </Card>
@@ -157,7 +162,7 @@ const StyleGuide = () => {
                 className={`${color.class} ${color.textClass} p-6 rounded-xl shadow-soft`}
               >
                 <span className="font-semibold block">{color.name}</span>
-                <span className="text-sm opacity-90">{color.desc}</span>
+                <span className="max-w-[100vw] leading-relaxed text-sm leading-relaxed opacity-90">{color.desc}</span>
               </div>
             ))}
           </div>
@@ -173,7 +178,7 @@ const StyleGuide = () => {
                 className={`${grad.class} p-6 rounded-xl shadow-medium text-white`}
               >
                 <span className="font-semibold block">{grad.name}</span>
-                <span className="text-sm opacity-90">{grad.desc}</span>
+                <span className="max-w-[100vw] leading-relaxed text-sm leading-relaxed opacity-90">{grad.desc}</span>
               </div>
             ))}
           </div>
@@ -189,7 +194,7 @@ const StyleGuide = () => {
                 className={`bg-card p-6 rounded-xl ${shadow.class}`}
               >
                 <span className="font-semibold block">{shadow.name}</span>
-                <span className="text-sm text-muted-foreground">{shadow.desc}</span>
+                <span className="max-w-[100vw] leading-relaxed text-sm leading-relaxed text-muted-foreground">{shadow.desc}</span>
               </div>
             ))}
           </div>
@@ -201,7 +206,7 @@ const StyleGuide = () => {
           <Card className="glass">
             <CardContent className="pt-6 space-y-6">
               <div>
-                <Label className="text-sm text-muted-foreground mb-3 block">Variantes Principais</Label>
+                <Label className="max-w-[100vw] leading-relaxed text-sm leading-relaxed text-muted-foreground mb-3 block">Variantes Principais</Label>
                 <div className="flex flex-wrap gap-3">
                   <Button variant="default">Default</Button>
                   <Button variant="warm">Warm</Button>
@@ -213,7 +218,7 @@ const StyleGuide = () => {
                 </div>
               </div>
               <div>
-                <Label className="text-sm text-muted-foreground mb-3 block">Categorias Emocionais</Label>
+                <Label className="max-w-[100vw] leading-relaxed text-sm leading-relaxed text-muted-foreground mb-3 block">Categorias Emocionais</Label>
                 <div className="flex flex-wrap gap-3">
                   <Button variant="essential">Essential</Button>
                   <Button variant="obligation">Obligation</Button>
@@ -223,7 +228,7 @@ const StyleGuide = () => {
                 </div>
               </div>
               <div>
-                <Label className="text-sm text-muted-foreground mb-3 block">Tamanhos</Label>
+                <Label className="max-w-[100vw] leading-relaxed text-sm leading-relaxed text-muted-foreground mb-3 block">Tamanhos</Label>
                 <div className="flex flex-wrap items-center gap-3">
                   <Button size="sm">Small</Button>
                   <Button size="default">Default</Button>
@@ -262,43 +267,43 @@ const StyleGuide = () => {
                   <div className="p-3 bg-essential/10 rounded-xl text-essential">
                     <TrendingUp className="h-6 w-6" />
                   </div>
-                  <span className="text-xs text-muted-foreground">TrendingUp</span>
+                  <span className="max-w-[100vw] leading-relaxed text-xs text-muted-foreground">TrendingUp</span>
                 </div>
                 <div className="flex flex-col items-center gap-2">
                   <div className="p-3 bg-impulse/10 rounded-xl text-impulse">
                     <TrendingDown className="h-6 w-6" />
                   </div>
-                  <span className="text-xs text-muted-foreground">TrendingDown</span>
+                  <span className="max-w-[100vw] leading-relaxed text-xs text-muted-foreground">TrendingDown</span>
                 </div>
                 <div className="flex flex-col items-center gap-2">
                   <div className="p-3 bg-muted rounded-xl text-muted-foreground">
                     <Minus className="h-6 w-6" />
                   </div>
-                  <span className="text-xs text-muted-foreground">Minus</span>
+                  <span className="max-w-[100vw] leading-relaxed text-xs text-muted-foreground">Minus</span>
                 </div>
                 <div className="flex flex-col items-center gap-2">
                   <div className="p-3 gradient-warm rounded-xl text-white">
                     <Plus className="h-6 w-6" />
                   </div>
-                  <span className="text-xs text-muted-foreground">Plus</span>
+                  <span className="max-w-[100vw] leading-relaxed text-xs text-muted-foreground">Plus</span>
                 </div>
                 <div className="flex flex-col items-center gap-2">
                   <div className="p-3 bg-secondary rounded-xl text-secondary-foreground">
                     <Home className="h-6 w-6" />
                   </div>
-                  <span className="text-xs text-muted-foreground">Home</span>
+                  <span className="max-w-[100vw] leading-relaxed text-xs text-muted-foreground">Home</span>
                 </div>
                 <div className="flex flex-col items-center gap-2">
                   <div className="p-3 bg-secondary rounded-xl text-secondary-foreground">
                     <BarChart3 className="h-6 w-6" />
                   </div>
-                  <span className="text-xs text-muted-foreground">BarChart3</span>
+                  <span className="max-w-[100vw] leading-relaxed text-xs text-muted-foreground">BarChart3</span>
                 </div>
                 <div className="flex flex-col items-center gap-2">
                   <div className="p-3 bg-secondary rounded-xl text-secondary-foreground">
                     <Wallet className="h-6 w-6" />
                   </div>
-                  <span className="text-xs text-muted-foreground">Wallet</span>
+                  <span className="max-w-[100vw] leading-relaxed text-xs text-muted-foreground">Wallet</span>
                 </div>
               </div>
             </CardContent>
@@ -314,7 +319,7 @@ const StyleGuide = () => {
                 <CardTitle>Card Padrão</CardTitle>
               </CardHeader>
               <CardContent>
-                <p className="text-muted-foreground">Card com sombra suave e bordas arredondadas.</p>
+                <p className="max-w-[100vw] leading-relaxed text-muted-foreground">Card com sombra suave e bordas arredondadas.</p>
               </CardContent>
             </Card>
             <Card className="glass">
@@ -322,7 +327,7 @@ const StyleGuide = () => {
                 <CardTitle>Card Glass</CardTitle>
               </CardHeader>
               <CardContent>
-                <p className="text-muted-foreground">Efeito de vidro fosco com blur de fundo.</p>
+                <p className="max-w-[100vw] leading-relaxed text-muted-foreground">Efeito de vidro fosco com blur de fundo.</p>
               </CardContent>
             </Card>
           </div>
@@ -351,19 +356,19 @@ const StyleGuide = () => {
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
             <div className="bg-card p-6 rounded-xl shadow-soft animate-fade-in">
               <span className="font-medium">fade-in</span>
-              <span className="block text-sm text-muted-foreground">0.4s</span>
+              <span className="block text-sm leading-relaxed text-muted-foreground">0.4s</span>
             </div>
             <div className="bg-card p-6 rounded-xl shadow-soft animate-scale-in">
               <span className="font-medium">scale-in</span>
-              <span className="block text-sm text-muted-foreground">0.3s</span>
+              <span className="block text-sm leading-relaxed text-muted-foreground">0.3s</span>
             </div>
             <div className="bg-card p-6 rounded-xl shadow-soft animate-bounce-gentle">
               <span className="font-medium">bounce-gentle</span>
-              <span className="block text-sm text-muted-foreground">2s infinite</span>
+              <span className="block text-sm leading-relaxed text-muted-foreground">2s infinite</span>
             </div>
             <div className="bg-card p-6 rounded-xl shadow-soft animate-pulse">
               <span className="font-medium">pulse</span>
-              <span className="block text-sm text-muted-foreground">2s infinite</span>
+              <span className="block text-sm leading-relaxed text-muted-foreground">2s infinite</span>
             </div>
           </div>
         </section>
@@ -375,7 +380,7 @@ const StyleGuide = () => {
             <button className="w-16 h-16 rounded-full shadow-large flex items-center justify-center gradient-warm text-white">
               <Plus className="h-6 w-6" />
             </button>
-            <span className="text-muted-foreground">Botão flutuante para ações principais</span>
+            <span className="max-w-[100vw] leading-relaxed text-muted-foreground">Botão flutuante para ações principais</span>
           </div>
         </section>
       </main>

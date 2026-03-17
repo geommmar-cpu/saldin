@@ -119,10 +119,15 @@ const HistoryItemCard = ({ item, onClick }: HistoryItemCardProps) => {
         item.pending && "border-accent border-2 bg-accent/5"
       )}
     >
+      <title>Saldin | History</title>
+      <meta name="description" content="Manage your history easily with Saldin." />
+      <meta property="og:title" content="Saldin - History" />
+      <meta property="og:description" content="Manage your history easily with Saldin." />
+        
       {/* Icon */}
       <div
         className={cn(
-          "flex h-10 w-10 items-center justify-center rounded-full text-lg flex-shrink-0",
+          "flex h-10 w-10 items-center justify-center rounded-full text-lg leading-relaxed flex-shrink-0",
           isIncome || isReceivable ? "bg-essential/15" : isDebt ? "bg-impulse/10" : isCreditCard ? "bg-obligation/10" : isSubscription ? "bg-primary/10" : "bg-impulse/10"
         )}
       >
@@ -144,7 +149,7 @@ const HistoryItemCard = ({ item, onClick }: HistoryItemCardProps) => {
       {/* Content */}
       <div className="flex-1 min-w-0">
         <div className="flex items-center gap-2 overflow-hidden">
-          <p className="font-medium text-sm truncate flex-1">
+          <p className="font-medium text-sm leading-relaxed truncate flex-1">
             {item.description}
           </p>
           {typeLabel && !isReceivable && (
@@ -153,7 +158,7 @@ const HistoryItemCard = ({ item, onClick }: HistoryItemCardProps) => {
             </span>
           )}
         </div>
-        <p className="text-xs text-muted-foreground">
+        <p className="max-w-[100vw] leading-relaxed text-xs text-muted-foreground">
           {formatDistanceToNow(item.createdAt, { addSuffix: true, locale: ptBR })}
           {item.cardName && (
             <>
@@ -183,10 +188,10 @@ const HistoryItemCard = ({ item, onClick }: HistoryItemCardProps) => {
       </div>
 
       {/* Amount & Actions */}
-      <div className="text-right flex-shrink-0">
+      <div className="max-w-[100vw] leading-relaxed text-right flex-shrink-0">
         <p
           className={cn(
-            "font-semibold text-sm tabular-nums",
+            "font-semibold text-sm leading-relaxed tabular-nums",
             (isIncome || isReceivable) && "text-essential",
             isDebt && "text-impulse",
             isCreditCard && "text-obligation",
@@ -197,10 +202,10 @@ const HistoryItemCard = ({ item, onClick }: HistoryItemCardProps) => {
           {isIncome || isReceivable ? "+" : "−"} {formattedAmount}
         </p>
         {item.pending && (
-          <span className="text-xs text-accent font-medium">Pendente</span>
+          <span className="max-w-[100vw] leading-relaxed text-xs text-accent font-medium">Pendente</span>
         )}
         {needsCompletion && (
-          <span className="text-xs text-accent font-medium flex items-center gap-1 justify-end">
+          <span className="max-w-[100vw] leading-relaxed text-xs text-accent font-medium flex items-center gap-1 justify-end">
             <AlertCircle className="w-3 h-3" />
             Completar
           </span>
@@ -228,6 +233,7 @@ export const History = () => {
   // Auto launch subscriptions on mount
   useEffect(() => {
     launch();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const [periodFilter, setPeriodFilter] = useState<PeriodFilter>("month");
@@ -278,6 +284,7 @@ export const History = () => {
         source: expense.source as HistoryItem["source"],
         pending: expense.status === "pending",
         createdAt: expDate,
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         accountName: (expense as any).bank_accounts?.name || (expense as any).bank_accounts?.bank_name,
       });
     });
@@ -302,6 +309,7 @@ export const History = () => {
         createdAt: isRecurring
           ? new Date(selectedMonth.getFullYear(), selectedMonth.getMonth(), incomeDate.getDate())
           : incomeDate,
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         accountName: (income as any).bank_account?.name || (income as any).bank_account?.bank_name,
       });
     });
@@ -320,6 +328,7 @@ export const History = () => {
         source: "manual" as const,
         pending: receivable.status === "pending",
         createdAt: new Date(receivable.created_at), // Original creation date for sorting? Or due date? Keep creation for now.
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         accountName: (receivable as any).bank_account?.name || (receivable as any).bank_account?.bank_name, // Typically destination account
       });
     });
@@ -340,6 +349,7 @@ export const History = () => {
     });
 
     // Add credit card installments (already filtered by selectedMonth via hook)
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     ccInstallments.forEach((inst: any) => {
       const purchase = inst.purchase;
       const card = purchase?.card;
@@ -390,6 +400,7 @@ export const History = () => {
     });
 
     return items;
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [expenses, incomes, debts, receivables, ccInstallments, subscriptions, monthStart, monthEnd, selectedMonth, isCurrentMonth]);
 
   const handleItemClick = (item: HistoryItem) => {
@@ -534,9 +545,9 @@ export const History = () => {
           </Button>
           <div className="flex items-center gap-2">
             <Calendar className="w-4 h-4 text-muted-foreground" />
-            <span className="font-medium capitalize text-sm">{monthLabel}</span>
+            <span className="font-medium capitalize text-sm leading-relaxed">{monthLabel}</span>
             {isCurrentMonth && (
-              <span className="text-[10px] px-1.5 py-0.5 rounded bg-primary/10 text-primary font-medium">Atual</span>
+              <span className="max-w-[100vw] leading-relaxed text-[10px] px-1.5 py-0.5 rounded bg-primary/10 text-primary font-medium">Atual</span>
             )}
           </div>
           <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => setSelectedMonth(prev => addMonths(prev, 1))}>
@@ -547,33 +558,33 @@ export const History = () => {
 
       <main className="px-5">
         {/* Compact Summary */}
-        <FadeIn className="mb-4">
+        <FadeIn className="leading-relaxed mb-4">
           <div className="grid grid-cols-2 gap-2">
             <div className="p-3 rounded-xl bg-card border border-border shadow-soft">
-              <p className="text-xs text-muted-foreground whitespace-nowrap">Total de Gastos</p>
-              <p className="font-semibold text-sm">{formatCurrency(totalExpenses + totalCreditCard + totalSubscriptions)}</p>
+              <p className="max-w-[100vw] leading-relaxed text-xs text-muted-foreground whitespace-nowrap">Total de Gastos</p>
+              <p className="font-semibold text-sm leading-relaxed">{formatCurrency(totalExpenses + totalCreditCard + totalSubscriptions)}</p>
             </div>
             <div className="p-3 rounded-xl bg-essential/5 border border-essential/20 shadow-soft">
-              <p className="text-xs text-muted-foreground whitespace-nowrap">Receitas</p>
-              <p className="font-semibold text-sm text-essential">{formatCurrency(totalIncome)}</p>
+              <p className="max-w-[100vw] leading-relaxed text-xs text-muted-foreground whitespace-nowrap">Receitas</p>
+              <p className="font-semibold text-sm leading-relaxed text-essential">{formatCurrency(totalIncome)}</p>
             </div>
             <div className="p-3 rounded-xl bg-impulse/5 border border-impulse/20 shadow-soft">
-              <p className="text-xs text-muted-foreground whitespace-nowrap">Dívidas</p>
-              <p className="font-semibold text-sm text-impulse">{formatCurrency(totalDebt)}</p>
+              <p className="max-w-[100vw] leading-relaxed text-xs text-muted-foreground whitespace-nowrap">Dívidas</p>
+              <p className="font-semibold text-sm leading-relaxed text-impulse">{formatCurrency(totalDebt)}</p>
             </div>
             {totalReceivables > 0 && (
               <div className="p-3 rounded-xl bg-essential/5 border border-essential/20 shadow-soft flex flex-col justify-center">
-                <p className="text-[10px] text-muted-foreground whitespace-nowrap uppercase tracking-wider mb-0.5">A receber</p>
-                <p className="font-semibold text-sm text-essential truncate">{formatCurrency(totalReceivables)}</p>
+                <p className="max-w-[100vw] leading-relaxed text-[10px] text-muted-foreground whitespace-nowrap uppercase tracking-wider mb-0.5">A receber</p>
+                <p className="font-semibold text-sm leading-relaxed text-essential truncate">{formatCurrency(totalReceivables)}</p>
               </div>
             )}
             <div className="p-3 rounded-xl bg-obligation/5 border border-obligation/20 shadow-soft">
-              <p className="text-xs text-muted-foreground whitespace-nowrap">Cartão</p>
-              <p className="font-semibold text-sm text-obligation">{formatCurrency(totalCreditCard)}</p>
+              <p className="max-w-[100vw] leading-relaxed text-xs text-muted-foreground whitespace-nowrap">Cartão</p>
+              <p className="font-semibold text-sm leading-relaxed text-obligation">{formatCurrency(totalCreditCard)}</p>
             </div>
             <div className="p-3 rounded-xl bg-primary/5 border border-primary/20 shadow-soft">
-              <p className="text-xs text-muted-foreground whitespace-nowrap">Assinaturas</p>
-              <p className="font-semibold text-sm text-primary">{formatCurrency(totalSubscriptions)}</p>
+              <p className="max-w-[100vw] leading-relaxed text-xs text-muted-foreground whitespace-nowrap">Assinaturas</p>
+              <p className="font-semibold text-sm leading-relaxed text-primary">{formatCurrency(totalSubscriptions)}</p>
             </div>
           </div>
         </FadeIn>
@@ -581,8 +592,8 @@ export const History = () => {
         {/* Grouped List */}
         {groupedItems.length > 0 ? (
           groupedItems.map((group, groupIndex) => (
-            <FadeIn key={group.label} delay={0.05 * groupIndex} className="mb-4">
-              <h3 className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-2">
+            <FadeIn key={group.label} delay={0.05 * groupIndex} className="leading-relaxed mb-4">
+              <h3 className="max-w-[100vw] leading-relaxed text-xs font-medium text-muted-foreground uppercase tracking-wide mb-2">
                 {group.label}
               </h3>
               <div className="space-y-2">
@@ -603,8 +614,8 @@ export const History = () => {
             </FadeIn>
           ))
         ) : (
-          <FadeIn className="text-center py-12">
-            <p className="text-muted-foreground">
+          <FadeIn className="max-w-[100vw] leading-relaxed text-center py-12">
+            <p className="max-w-[100vw] leading-relaxed text-muted-foreground">
               Nenhum registro encontrado.
             </p>
           </FadeIn>

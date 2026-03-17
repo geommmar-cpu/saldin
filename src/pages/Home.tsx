@@ -50,6 +50,7 @@ export default function Home() {
   // Auto launch subscriptions on mount
   useEffect(() => {
     launch();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const { preferences } = useUserPreferences();
@@ -136,6 +137,11 @@ export default function Home() {
   if (isLoading) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
+      <title>Saldin | Home</title>
+      <meta name="description" content="Manage your home easily with Saldin." />
+      <meta property="og:title" content="Saldin - Home" />
+      <meta property="og:description" content="Manage your home easily with Saldin." />
+        
         <Loader2 className="w-8 h-8 animate-spin text-muted-foreground" />
       </div>
     );
@@ -151,7 +157,7 @@ export default function Home() {
           {/* Greeting / Title - Desktop Only */}
           <div className="hidden lg:block">
             <h1 className="font-serif text-2xl font-semibold">Visão Geral</h1>
-            <p className="text-sm text-muted-foreground">Resumo financeiro do mês.</p>
+            <p className="max-w-[100vw] leading-relaxed text-sm leading-relaxed text-muted-foreground">Resumo financeiro do mês.</p>
           </div>
 
           {/* Date Picker - Centered & Compact */}
@@ -164,7 +170,7 @@ export default function Home() {
               className="flex items-center gap-2 px-3 py-1 rounded-lg hover:bg-background transition-all active:scale-95 flex-1 justify-center"
             >
               <Calendar className="w-3.5 h-3.5 text-primary" />
-              <span className="font-bold capitalize text-sm tracking-tight" data-testid="month-label">{monthLabel}</span>
+              <span className="font-bold capitalize text-sm leading-relaxed tracking-tight" data-testid="month-label">{monthLabel}</span>
             </button>
             <Button variant="ghost" size="icon" className="h-7 w-7 rounded-lg" onClick={() => setSelectedMonth(prev => addMonths(prev, 1))}>
               <ChevronRight className="w-4 h-4" />
@@ -214,9 +220,9 @@ export default function Home() {
                       <div className="w-8 h-8 rounded-full bg-obligation/10 flex items-center justify-center">
                         <Wallet className="w-4 h-4 text-obligation" />
                       </div>
-                      <h3 className="text-sm font-semibold text-foreground uppercase tracking-wider">Meus Cartões</h3>
+                      <h3 className="max-w-[100vw] leading-relaxed text-sm leading-relaxed font-semibold text-foreground uppercase tracking-wider">Meus Cartões</h3>
                     </div>
-                    <button onClick={() => navigate("/cards")} className="text-xs text-primary font-medium hover:underline">Gerenciar</button>
+                    <button onClick={() => navigate("/cards")} className="max-w-[100vw] leading-relaxed text-xs text-primary font-medium hover:underline">Gerenciar</button>
                   </div>
                   <CreditCardsCarousel
                     cards={creditCards}
@@ -261,7 +267,7 @@ export default function Home() {
                 <Wallet className="w-10 h-10 text-primary" />
               </div>
               <h3 className="font-serif text-2xl font-bold mb-3 text-foreground">Sua liberdade começa aqui</h3>
-              <p className="text-sm text-muted-foreground max-w-[280px] mb-8 leading-relaxed mx-auto">
+              <p className="max-w-[100vw] leading-relaxed text-sm leading-relaxed text-muted-foreground max-w-[280px] mb-8 leading-relaxed mx-auto">
                 Para o Saldin funcionar, precisamos saber onde seu dinheiro está.
               </p>
 

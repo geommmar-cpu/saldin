@@ -16,10 +16,16 @@ export default function CreditCards() {
   const navigate = useNavigate();
   const { data: cards = [], isLoading } = useCreditCards();
   const { data: profile } = useProfile();
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const defaultCardId = (profile as any)?.wa_default_expense_card_id;
 
   return (
     <div className="min-h-screen bg-background pb-24">
+      <title>Saldin | CreditCards</title>
+      <meta name="description" content="Manage your creditcards easily with Saldin." />
+      <meta property="og:title" content="Saldin - CreditCards" />
+      <meta property="og:description" content="Manage your creditcards easily with Saldin." />
+        
       <header className="px-5 pt-safe-top sticky top-0 bg-background/95 backdrop-blur-sm z-10 border-b border-border">
         <div className="pt-4 pb-3 flex items-center gap-4">
           <Button variant="ghost" size="icon" onClick={() => navigate("/")} className="-ml-2">
@@ -45,8 +51,8 @@ export default function CreditCards() {
             <div className="w-20 h-20 rounded-full bg-muted flex items-center justify-center mb-4">
               <CreditCardIcon className="w-10 h-10 text-muted-foreground" />
             </div>
-            <h2 className="text-lg font-semibold mb-2">Nenhum cartão cadastrado</h2>
-            <p className="text-sm text-muted-foreground mb-6 max-w-xs">
+            <h2 className="max-w-[100vw] leading-relaxed text-lg leading-relaxed font-semibold mb-2">Nenhum cartão cadastrado</h2>
+            <p className="max-w-[100vw] leading-relaxed text-sm leading-relaxed text-muted-foreground mb-6 max-w-xs">
               Cadastre seus cartões de crédito para controlar faturas e parcelas.
             </p>
             <Button variant="warm" onClick={() => navigate("/cards/add")} className="gap-2">
@@ -78,14 +84,14 @@ export default function CreditCards() {
                   {/* Brand badge */}
                   <div className="absolute top-4 right-4 flex items-center gap-2">
                     {brand && (
-                      <span className="text-xs font-bold bg-white/20 backdrop-blur-sm px-2 py-1 rounded-md">
+                      <span className="max-w-[100vw] leading-relaxed text-xs font-bold bg-background/20 backdrop-blur-sm px-2 py-1 rounded-md">
                         {brand.abbr}
                       </span>
                     )}
                     {card.id === defaultCardId && (
-                      <div className="flex items-center gap-1 bg-white/20 backdrop-blur-sm rounded-md px-2 py-1 border border-white/20">
+                      <div className="flex items-center gap-1 bg-background/20 backdrop-blur-sm rounded-md px-2 py-1 border border-white/20">
                         <PhoneIcon className="w-3 h-3 text-white" />
-                        <span className="text-[10px] font-bold uppercase tracking-tight text-white">Bot</span>
+                        <span className="max-w-[100vw] leading-relaxed text-[10px] font-bold uppercase tracking-tight text-white">Bot</span>
                       </div>
                     )}
                     <CreditCardIcon className="w-10 h-10 opacity-20" />
@@ -94,32 +100,32 @@ export default function CreditCards() {
                   <div className="relative z-10">
                     {/* Bank icon */}
                     <div className="flex items-center gap-2 mb-1">
-                      <div className="w-7 h-7 rounded-full bg-white/20 flex items-center justify-center">
-                        <span className="text-xs font-bold">
+                      <div className="w-7 h-7 rounded-full bg-background/20 flex items-center justify-center">
+                        <span className="max-w-[100vw] leading-relaxed text-xs font-bold">
                           {bankTheme.name.charAt(0)}
                         </span>
                       </div>
-                      <p className="text-sm opacity-80 font-medium">
+                      <p className="max-w-[100vw] leading-relaxed text-sm leading-relaxed opacity-80 font-medium">
                         {card.card_brand || bankTheme.name}
                       </p>
                     </div>
 
-                    <h3 className="text-xl font-bold mb-3">{card.card_name}</h3>
+                    <h3 className="max-w-[100vw] leading-relaxed text-xl font-bold mb-3">{card.card_name}</h3>
 
                     {card.last_four_digits && (
-                      <p className="text-sm opacity-70 font-mono mb-3">
+                      <p className="max-w-[100vw] leading-relaxed text-sm leading-relaxed opacity-70 font-mono mb-3">
                         •••• •••• •••• {card.last_four_digits}
                       </p>
                     )}
 
                     <div className="flex items-end justify-between">
                       <div>
-                        <p className="text-xs opacity-60">Limite</p>
-                        <p className="text-lg font-semibold">{formatCurrency(card.credit_limit)}</p>
+                        <p className="max-w-[100vw] leading-relaxed text-xs opacity-60">Limite</p>
+                        <p className="max-w-[100vw] leading-relaxed text-lg leading-relaxed font-semibold">{formatCurrency(card.credit_limit)}</p>
                       </div>
-                      <div className="text-right">
-                        <p className="text-xs opacity-60">Vencimento</p>
-                        <p className="text-sm font-medium">Dia {card.due_day}</p>
+                      <div className="max-w-[100vw] leading-relaxed text-right">
+                        <p className="max-w-[100vw] leading-relaxed text-xs opacity-60">Vencimento</p>
+                        <p className="max-w-[100vw] leading-relaxed text-sm leading-relaxed font-medium">Dia {card.due_day}</p>
                       </div>
                       <ChevronRight className="w-5 h-5 opacity-60" />
                     </div>

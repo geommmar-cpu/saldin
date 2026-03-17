@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
@@ -81,6 +82,7 @@ export default function AddSubscription() {
         name: "",
         amount: "",
         billing_date: new Date().getDate(),
+         
         frequency: "monthly" as any,
         payment_type: "card" as "card" | "account",
         payment_id: "",
@@ -110,6 +112,7 @@ export default function AddSubscription() {
                 break;
             }
         }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [formData.name, allCategories]);
 
     const selectedPayment = formData.payment_type === 'card'
@@ -152,6 +155,11 @@ export default function AddSubscription() {
 
     return (
         <PageTransition>
+      <title>Saldin | AddSubscription</title>
+      <meta name="description" content="Manage your addsubscription easily with Saldin." />
+      <meta property="og:title" content="Saldin - AddSubscription" />
+      <meta property="og:description" content="Manage your addsubscription easily with Saldin." />
+        
             <div className="min-h-screen bg-background pb-32">
                 {/* Header Premium */}
                 <header className="px-5 pt-safe-top bg-background/80 backdrop-blur-xl sticky top-0 z-30 border-b border-border/50">
@@ -166,8 +174,8 @@ export default function AddSubscription() {
                                 <ChevronLeft className="w-5 h-5" />
                             </Button>
                             <div>
-                                <h1 className="font-serif text-lg font-bold">Assinatura</h1>
-                                <p className="text-[10px] text-muted-foreground uppercase tracking-widest leading-none">
+                                <h1 className="font-serif text-lg leading-relaxed font-bold">Assinatura</h1>
+                                <p className="max-w-[100vw] leading-relaxed text-[10px] text-muted-foreground uppercase tracking-widest leading-none">
                                     Passo {currentStep} de 3
                                 </p>
                             </div>
@@ -197,8 +205,8 @@ export default function AddSubscription() {
                                 className="space-y-8"
                             >
                                 <div className="space-y-2">
-                                    <h2 className="text-2xl font-serif font-bold tracking-tight">O que vamos assinar hoje?</h2>
-                                    <p className="text-sm text-muted-foreground">Preencha os detalhes básicos do serviço.</p>
+                                    <h2 className="max-w-[100vw] leading-relaxed text-2xl font-serif font-bold tracking-tight">O que vamos assinar hoje?</h2>
+                                    <p className="max-w-[100vw] leading-relaxed text-sm leading-relaxed text-muted-foreground">Preencha os detalhes básicos do serviço.</p>
                                 </div>
 
                                 <div className="space-y-6">
@@ -219,13 +227,13 @@ export default function AddSubscription() {
 
                                     <div className="space-y-4">
                                         <div className="space-y-2">
-                                            <Label className="text-xs font-bold uppercase tracking-widest text-muted-foreground ml-1">Serviço</Label>
+                                            <Label className="max-w-[100vw] leading-relaxed text-xs font-bold uppercase tracking-widest text-muted-foreground ml-1">Serviço</Label>
                                             <div className="relative">
                                                 <Input
                                                     placeholder="Netflix, Spotify, Academia..."
                                                     value={formData.name}
                                                     onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                                                    className="h-16 rounded-2xl bg-card border-muted-foreground/10 text-lg px-12 focus:ring-primary/20"
+                                                    className="h-16 rounded-2xl bg-card border-muted-foreground/10 text-lg leading-relaxed px-12 focus:ring-primary/20"
                                                 />
                                                 <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground/50" />
                                             </div>
@@ -233,7 +241,7 @@ export default function AddSubscription() {
 
                                         <div className="grid grid-cols-2 gap-4">
                                             <div className="space-y-2">
-                                                <Label className="text-xs font-bold uppercase tracking-widest text-muted-foreground ml-1">Valor</Label>
+                                                <Label className="max-w-[100vw] leading-relaxed text-xs font-bold uppercase tracking-widest text-muted-foreground ml-1">Valor</Label>
                                                 <div className="relative">
                                                     <Input
                                                         type="text"
@@ -244,13 +252,13 @@ export default function AddSubscription() {
                                                             vibrate();
                                                             setFormData({ ...formData, amount: formatCurrencyInput(e.target.value) });
                                                         }}
-                                                        className="h-16 rounded-2xl bg-card border-muted-foreground/10 text-lg px-12"
+                                                        className="h-16 rounded-2xl bg-card border-muted-foreground/10 text-lg leading-relaxed px-12"
                                                     />
                                                     <DollarSign className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground/50" />
                                                 </div>
                                             </div>
                                             <div className="space-y-2">
-                                                <Label className="text-xs font-bold uppercase tracking-widest text-muted-foreground ml-1">Vencimento</Label>
+                                                <Label className="max-w-[100vw] leading-relaxed text-xs font-bold uppercase tracking-widest text-muted-foreground ml-1">Vencimento</Label>
                                                 <div className="relative">
                                                     <Input
                                                         type="number"
@@ -261,14 +269,14 @@ export default function AddSubscription() {
                                                             vibrate();
                                                             setFormData({ ...formData, billing_date: Number(e.target.value) });
                                                         }}
-                                                        className="h-16 rounded-2xl bg-card border-muted-foreground/10 text-lg px-12 text-center"
+                                                        className="h-16 rounded-2xl bg-card border-muted-foreground/10 text-lg leading-relaxed px-12 text-center"
                                                     />
                                                     <CalendarIcon className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground/50" />
                                                 </div>
                                             </div>
                                         </div>
 
-                                        <Label className="text-xs font-bold uppercase tracking-widest text-muted-foreground ml-1">Categoria</Label>
+                                        <Label className="max-w-[100vw] leading-relaxed text-xs font-bold uppercase tracking-widest text-muted-foreground ml-1">Categoria</Label>
 
                                         {selectedCategory ? (
                                             <div className="flex items-center gap-2 p-3 bg-card border border-primary/20 rounded-xl shadow-sm">
@@ -276,13 +284,13 @@ export default function AddSubscription() {
                                                     <selectedCategory.icon className="w-5 h-5" />
                                                 </div>
                                                 <div className="flex-1">
-                                                    <p className="text-sm font-bold">{selectedCategory.name}</p>
-                                                    <p className="text-[10px] text-muted-foreground">Selecionada automaticamente</p>
+                                                    <p className="max-w-[100vw] leading-relaxed text-sm leading-relaxed font-bold">{selectedCategory.name}</p>
+                                                    <p className="max-w-[100vw] leading-relaxed text-[10px] text-muted-foreground">Selecionada automaticamente</p>
                                                 </div>
                                                 <Button
                                                     variant="ghost"
                                                     size="sm"
-                                                    className="text-xs h-8"
+                                                    className="max-w-[100vw] leading-relaxed text-xs h-8"
                                                     onClick={() => setFormData({ ...formData, category_id: "" })}
                                                 >
                                                     Alterar
@@ -291,7 +299,7 @@ export default function AddSubscription() {
                                         ) : (
                                             <div className="relative">
                                                 <select
-                                                    className="w-full h-12 pl-4 pr-10 rounded-xl bg-card border-border appearance-none text-sm font-medium focus:ring-primary/20 focus:border-primary transition-all"
+                                                    className="w-full h-12 pl-4 pr-10 rounded-xl bg-card border-border appearance-none text-sm leading-relaxed font-medium focus:ring-primary/20 focus:border-primary transition-all"
                                                     value={formData.category_id}
                                                     onChange={(e) => setFormData({ ...formData, category_id: e.target.value })}
                                                 >
@@ -321,8 +329,8 @@ export default function AddSubscription() {
                                 className="space-y-8"
                             >
                                 <div className="space-y-2">
-                                    <h2 className="text-2xl font-serif font-bold tracking-tight">Qual a origem do pagamento?</h2>
-                                    <p className="text-sm text-muted-foreground">Escolha o cartão ou conta bancária.</p>
+                                    <h2 className="max-w-[100vw] leading-relaxed text-2xl font-serif font-bold tracking-tight">Qual a origem do pagamento?</h2>
+                                    <p className="max-w-[100vw] leading-relaxed text-sm leading-relaxed text-muted-foreground">Escolha o cartão ou conta bancária.</p>
                                 </div>
 
                                 <div className="space-y-6">
@@ -331,7 +339,7 @@ export default function AddSubscription() {
                                             type="button"
                                             onClick={() => setFormData({ ...formData, payment_type: 'card', payment_id: "" })}
                                             className={cn(
-                                                "flex-1 flex items-center justify-center gap-2 h-12 rounded-xl text-sm font-bold transition-all",
+                                                "flex-1 flex items-center justify-center gap-2 h-12 rounded-xl text-sm leading-relaxed font-bold transition-all",
                                                 formData.payment_type === 'card' ? "bg-card shadow-sm text-foreground" : "text-muted-foreground"
                                             )}
                                         >
@@ -342,7 +350,7 @@ export default function AddSubscription() {
                                             type="button"
                                             onClick={() => setFormData({ ...formData, payment_type: 'account', payment_id: "" })}
                                             className={cn(
-                                                "flex-1 flex items-center justify-center gap-2 h-12 rounded-xl text-sm font-bold transition-all",
+                                                "flex-1 flex items-center justify-center gap-2 h-12 rounded-xl text-sm leading-relaxed font-bold transition-all",
                                                 formData.payment_type === 'account' ? "bg-card shadow-sm text-foreground" : "text-muted-foreground"
                                             )}
                                         >
@@ -354,9 +362,9 @@ export default function AddSubscription() {
                                     <div className="space-y-3">
                                         {formData.payment_type === 'card' ? (
                                             cards.length === 0 ? (
-                                                <div className="text-center py-12 bg-muted/10 rounded-3xl border-2 border-dashed border-muted">
+                                                <div className="max-w-[100vw] leading-relaxed text-center py-12 bg-muted/10 rounded-3xl border-2 border-dashed border-muted">
                                                     <CreditCard className="w-10 h-10 text-muted/30 mx-auto mb-3" />
-                                                    <p className="text-sm text-muted-foreground">Nenhum cartão cadastrado</p>
+                                                    <p className="max-w-[100vw] leading-relaxed text-sm leading-relaxed text-muted-foreground">Nenhum cartão cadastrado</p>
                                                     <Button variant="link" className="mt-2 text-primary" onClick={() => navigate("/cards/add")}>
                                                         Adicionar Cartão
                                                     </Button>
@@ -382,7 +390,7 @@ export default function AddSubscription() {
                                                         </div>
                                                         <div className="flex-1 min-w-0">
                                                             <p className="font-bold">{card.card_name}</p>
-                                                            <p className="text-xs text-muted-foreground">Final {card.last_four_digits} · Vence dia {card.due_day}</p>
+                                                            <p className="max-w-[100vw] leading-relaxed text-xs text-muted-foreground">Final {card.last_four_digits} · Vence dia {card.due_day}</p>
                                                         </div>
                                                         {formData.payment_id === card.id && (
                                                             <div className="w-6 h-6 rounded-full bg-primary flex items-center justify-center text-primary-foreground">
@@ -394,9 +402,9 @@ export default function AddSubscription() {
                                             )
                                         ) : (
                                             accounts.length === 0 ? (
-                                                <div className="text-center py-12 bg-muted/10 rounded-3xl border-2 border-dashed border-muted">
+                                                <div className="max-w-[100vw] leading-relaxed text-center py-12 bg-muted/10 rounded-3xl border-2 border-dashed border-muted">
                                                     <Landmark className="w-10 h-10 text-muted/30 mx-auto mb-3" />
-                                                    <p className="text-sm text-muted-foreground">Nenhuma conta cadastrada</p>
+                                                    <p className="max-w-[100vw] leading-relaxed text-sm leading-relaxed text-muted-foreground">Nenhuma conta cadastrada</p>
                                                     <Button variant="link" className="mt-2 text-primary" onClick={() => navigate("/banks")}>
                                                         Adicionar Conta
                                                     </Button>
@@ -422,7 +430,7 @@ export default function AddSubscription() {
                                                         </div>
                                                         <div className="flex-1 min-w-0">
                                                             <p className="font-bold">{acc.bank_name}</p>
-                                                            <p className="text-xs text-muted-foreground">{acc.account_type === 'checking' ? 'Conta Corrente' : 'Poupança'}</p>
+                                                            <p className="max-w-[100vw] leading-relaxed text-xs text-muted-foreground">{acc.account_type === 'checking' ? 'Conta Corrente' : 'Poupança'}</p>
                                                         </div>
                                                         {formData.payment_id === acc.id && (
                                                             <div className="w-6 h-6 rounded-full bg-primary flex items-center justify-center text-primary-foreground">
@@ -450,19 +458,19 @@ export default function AddSubscription() {
                                     <div className="inline-flex p-3 rounded-full bg-essential/10 text-essential mb-2">
                                         <Sparkles className="w-6 h-6" />
                                     </div>
-                                    <h2 className="text-2xl font-serif font-bold tracking-tight">Tudo pronto!</h2>
-                                    <p className="text-sm text-muted-foreground px-8">Revise os detalhes antes de confirmar sua nova assinatura.</p>
+                                    <h2 className="max-w-[100vw] leading-relaxed text-2xl font-serif font-bold tracking-tight">Tudo pronto!</h2>
+                                    <p className="max-w-[100vw] leading-relaxed text-sm leading-relaxed text-muted-foreground px-8">Revise os detalhes antes de confirmar sua nova assinatura.</p>
                                 </div>
 
                                 <Card className="overflow-hidden border-2 border-primary/20 shadow-xl bg-card">
                                     <div className="bg-primary/5 p-6 flex flex-col items-center border-b border-primary/10">
-                                        <div className="w-20 h-20 rounded-3xl bg-white shadow-lg flex items-center justify-center mb-4 ring-4 ring-primary/5">
+                                        <div className="w-20 h-20 rounded-3xl bg-background shadow-lg flex items-center justify-center mb-4 ring-4 ring-primary/5">
                                             <BankLogo bankName={formData.name} className="w-14 h-14" />
                                         </div>
-                                        <h3 className="text-xl font-bold">{formData.name}</h3>
-                                        <p className="text-primary font-serif text-2xl font-bold mt-1">
+                                        <h3 className="max-w-[100vw] leading-relaxed text-xl font-bold">{formData.name}</h3>
+                                        <p className="max-w-[100vw] leading-relaxed text-primary font-serif text-2xl font-bold mt-1">
                                             {formatCurrency(parseCurrency(formData.amount))}
-                                            <span className="text-xs font-sans text-muted-foreground ml-1">/mês</span>
+                                            <span className="max-w-[100vw] leading-relaxed text-xs font-sans text-muted-foreground ml-1">/mês</span>
                                         </p>
                                     </div>
 
@@ -470,7 +478,7 @@ export default function AddSubscription() {
                                         <div className="flex items-center justify-between py-2 border-b border-muted">
                                             <div className="flex items-center gap-2 text-muted-foreground">
                                                 <CalendarIcon className="w-4 h-4" />
-                                                <span className="text-sm">Vencimento</span>
+                                                <span className="max-w-[100vw] leading-relaxed text-sm leading-relaxed">Vencimento</span>
                                             </div>
                                             <span className="font-bold">Todo dia {formData.billing_date}</span>
                                         </div>
@@ -478,13 +486,14 @@ export default function AddSubscription() {
                                         <div className="flex items-center justify-between py-2 border-b border-muted">
                                             <div className="flex items-center gap-2 text-muted-foreground">
                                                 <CreditCard className="w-4 h-4" />
-                                                <span className="text-sm">Pagamento</span>
+                                                <span className="max-w-[100vw] leading-relaxed text-sm leading-relaxed">Pagamento</span>
                                             </div>
-                                            <div className="text-right">
-                                                <p className="text-sm font-bold">
+                                            <div className="max-w-[100vw] leading-relaxed text-right">
+                                                <p className="max-w-[100vw] leading-relaxed text-sm leading-relaxed font-bold">
+                                                    // eslint-disable-next-line @typescript-eslint/no-explicit-any
                                                     {(selectedPayment as any)?.card_name || (selectedPayment as any)?.bank_name}
                                                 </p>
-                                                <p className="text-[10px] text-muted-foreground">
+                                                <p className="max-w-[100vw] leading-relaxed text-[10px] text-muted-foreground">
                                                     {formData.payment_type === 'card' ? 'Cartão de Crédito' : 'Débito em Conta'}
                                                 </p>
                                             </div>
@@ -494,7 +503,7 @@ export default function AddSubscription() {
                                             <div className="flex items-center justify-between py-2">
                                                 <div className="flex items-center gap-2 text-muted-foreground">
                                                     <Tag className="w-4 h-4" />
-                                                    <span className="text-sm">Categoria</span>
+                                                    <span className="max-w-[100vw] leading-relaxed text-sm leading-relaxed">Categoria</span>
                                                 </div>
                                                 <span className="px-3 py-1 bg-muted rounded-full text-[10px] font-bold">
                                                     {selectedCategory.name}
@@ -506,7 +515,7 @@ export default function AddSubscription() {
 
                                 <div className="p-4 bg-muted/30 rounded-2xl flex gap-3 items-start">
                                     <Info className="w-5 h-5 text-muted-foreground mt-0.5 shrink-0" />
-                                    <p className="text-xs text-muted-foreground leading-relaxed">
+                                    <p className="max-w-[100vw] leading-relaxed text-xs text-muted-foreground leading-relaxed">
                                         Lançaremos este gasto automaticamente na sua conta todo dia {formData.billing_date},
                                         mantendo seu saldo sempre atualizado sem que você precise fazer nada.
                                     </p>
@@ -533,7 +542,7 @@ export default function AddSubscription() {
                         <Button
                             size="lg"
                             className={cn(
-                                "h-16 rounded-2xl text-lg font-bold shadow-large transition-all flex-1",
+                                "h-16 rounded-2xl text-lg leading-relaxed font-bold shadow-large transition-all flex-1",
                                 currentStep === STEPS.REVIEW ? "gradient-warm" : "gradient-primary"
                             )}
                             disabled={

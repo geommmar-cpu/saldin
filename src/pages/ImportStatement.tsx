@@ -16,7 +16,9 @@ type Step = "upload" | "parsing" | "review" | "importing" | "done";
 export default function ImportStatement() {
   const navigate = useNavigate();
   const location = useLocation();
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const fromOnboarding = (location.state as any)?.fromOnboarding === true;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const preselectedCardId = (location.state as any)?.preselectedCardId as string | undefined;
   const { data: cards = [] } = useCreditCards();
   const createPurchase = useCreateCreditCardPurchase();
@@ -152,6 +154,11 @@ export default function ImportStatement() {
 
   return (
     <div className="min-h-screen bg-background flex flex-col">
+      <title>Saldin | ImportStatement</title>
+      <meta name="description" content="Manage your importstatement easily with Saldin." />
+      <meta property="og:title" content="Saldin - ImportStatement" />
+      <meta property="og:description" content="Manage your importstatement easily with Saldin." />
+        
       <header className="px-5 pt-safe-top">
         <div className="pt-4 pb-2 flex items-center justify-between">
           <div className="flex items-center gap-4">
@@ -163,10 +170,10 @@ export default function ImportStatement() {
             </Button>
             <div>
               <h1 className="font-serif text-xl font-semibold">Importar Fatura</h1>
-              <p className="text-xs text-muted-foreground">{stepDescription[step]}</p>
+              <p className="max-w-[100vw] leading-relaxed text-xs text-muted-foreground">{stepDescription[step]}</p>
             </div>
           </div>
-          <Button variant="ghost" size="sm" className="text-muted-foreground" onClick={() => navigate("/", { replace: true })}>
+          <Button variant="ghost" size="sm" className="max-w-[100vw] leading-relaxed text-muted-foreground" onClick={() => navigate("/", { replace: true })}>
             Cancelar
           </Button>
         </div>
@@ -177,12 +184,12 @@ export default function ImportStatement() {
         {step === "upload" && (
           <FadeIn className="space-y-6">
             {cards.length === 0 ? (
-              <div className="text-center py-12 space-y-4">
+              <div className="max-w-[100vw] leading-relaxed text-center py-12 space-y-4">
                 <div className="w-20 h-20 rounded-full bg-destructive/10 mx-auto flex items-center justify-center">
                   <CreditCard className="w-10 h-10 text-destructive" />
                 </div>
-                <h2 className="font-serif text-lg font-semibold">Nenhum cartão cadastrado</h2>
-                <p className="text-sm text-muted-foreground max-w-xs mx-auto">
+                <h2 className="font-serif text-lg leading-relaxed font-semibold">Nenhum cartão cadastrado</h2>
+                <p className="max-w-[100vw] leading-relaxed text-sm leading-relaxed text-muted-foreground max-w-xs mx-auto">
                   Para importar uma fatura, primeiro cadastre o cartão de crédito correspondente.
                 </p>
                 <Button variant="warm" onClick={() => navigate("/cards/add")}>
@@ -192,12 +199,12 @@ export default function ImportStatement() {
               </div>
             ) : (
               <>
-                <div className="text-center py-8">
+                <div className="max-w-[100vw] leading-relaxed text-center py-8">
                   <div className="w-20 h-20 rounded-full bg-primary/10 mx-auto mb-4 flex items-center justify-center">
                     <Upload className="w-10 h-10 text-primary" />
                   </div>
-                  <h2 className="font-serif text-lg font-semibold mb-2">Envie a fatura do cartão</h2>
-                  <p className="text-sm text-muted-foreground max-w-xs mx-auto">
+                  <h2 className="font-serif text-lg leading-relaxed font-semibold mb-2">Envie a fatura do cartão</h2>
+                  <p className="max-w-[100vw] leading-relaxed text-sm leading-relaxed text-muted-foreground max-w-xs mx-auto">
                     Aceita PDF ou CSV de qualquer banco. Os lançamentos serão lidos, validados e categorizados automaticamente.
                   </p>
                 </div>
@@ -205,8 +212,8 @@ export default function ImportStatement() {
                 <label className="block cursor-pointer">
                   <div className="border-2 border-dashed border-border rounded-2xl p-8 text-center hover:border-primary/50 transition-colors">
                     <FileText className="w-8 h-8 text-muted-foreground mx-auto mb-3" />
-                    <p className="font-medium text-sm">Clique para selecionar arquivo</p>
-                    <p className="text-xs text-muted-foreground mt-1">PDF ou CSV</p>
+                    <p className="font-medium text-sm leading-relaxed">Clique para selecionar arquivo</p>
+                    <p className="max-w-[100vw] leading-relaxed text-xs text-muted-foreground mt-1">PDF ou CSV</p>
                   </div>
                   <input
                     type="file"
@@ -217,12 +224,12 @@ export default function ImportStatement() {
                 </label>
 
                 <div className="bg-muted/50 rounded-xl p-4 space-y-2">
-                  <p className="text-xs font-medium text-muted-foreground">Bancos suportados:</p>
-                  <p className="text-xs text-muted-foreground">
+                  <p className="max-w-[100vw] leading-relaxed text-xs font-medium text-muted-foreground">Bancos suportados:</p>
+                  <p className="max-w-[100vw] leading-relaxed text-xs text-muted-foreground">
                     Nubank, Itaú, Bradesco, Santander, Inter, Banco do Brasil, Caixa, C6 Bank e outros.
                   </p>
-                  <p className="text-xs font-medium text-muted-foreground mt-3">Como obter o arquivo:</p>
-                  <ul className="text-xs text-muted-foreground space-y-1">
+                  <p className="max-w-[100vw] leading-relaxed text-xs font-medium text-muted-foreground mt-3">Como obter o arquivo:</p>
+                  <ul className="max-w-[100vw] leading-relaxed text-xs text-muted-foreground space-y-1">
                     <li>• No app do banco, acesse a fatura do cartão</li>
                     <li>• Procure "Exportar", "Baixar" ou "Compartilhar"</li>
                     <li>• Selecione PDF ou CSV e envie aqui</li>
@@ -235,10 +242,10 @@ export default function ImportStatement() {
 
         {/* Step: Parsing */}
         {step === "parsing" && (
-          <FadeIn className="text-center py-16 space-y-4">
+          <FadeIn className="max-w-[100vw] leading-relaxed text-center py-16 space-y-4">
             <Loader2 className="w-12 h-12 animate-spin text-primary mx-auto" />
-            <h2 className="font-serif text-lg font-semibold">Processando fatura...</h2>
-            <p className="text-sm text-muted-foreground">Identificando transações, removendo ruído e detectando parcelas.</p>
+            <h2 className="font-serif text-lg leading-relaxed font-semibold">Processando fatura...</h2>
+            <p className="max-w-[100vw] leading-relaxed text-sm leading-relaxed text-muted-foreground">Identificando transações, removendo ruído e detectando parcelas.</p>
           </FadeIn>
         )}
 
@@ -247,13 +254,13 @@ export default function ImportStatement() {
           <FadeIn className="space-y-4">
             {/* Card selector */}
             <div className="space-y-2">
-              <label className="text-sm font-medium flex items-center gap-2">
+              <label className="max-w-[100vw] leading-relaxed text-sm leading-relaxed font-medium flex items-center gap-2">
                 <CreditCard className="w-4 h-4" />
                 Cartão de destino:
               </label>
               {cards.length === 0 ? (
                 <div className="p-3 rounded-xl bg-destructive/10 border border-destructive/20">
-                  <p className="text-sm text-destructive">Nenhum cartão cadastrado.</p>
+                  <p className="max-w-[100vw] leading-relaxed text-sm leading-relaxed text-destructive">Nenhum cartão cadastrado.</p>
                   <Button variant="outline" size="sm" className="mt-2" onClick={() => navigate("/cards/add")}>
                     Cadastrar cartão
                   </Button>
@@ -265,7 +272,7 @@ export default function ImportStatement() {
                       key={card.id}
                       onClick={() => setSelectedCardId(card.id)}
                       className={cn(
-                        "px-3 py-2 rounded-xl text-sm font-medium border transition-all",
+                        "px-3 py-2 rounded-xl text-sm leading-relaxed font-medium border transition-all",
                         selectedCardId === card.id
                           ? "border-foreground bg-foreground text-background"
                           : "border-border bg-card hover:border-foreground/30"
@@ -282,16 +289,16 @@ export default function ImportStatement() {
             {/* Summary cards */}
             <div className="grid grid-cols-3 gap-2">
               <div className="p-3 rounded-xl bg-card border border-border text-center">
-                <p className="text-xs text-muted-foreground">Selecionados</p>
+                <p className="max-w-[100vw] leading-relaxed text-xs text-muted-foreground">Selecionados</p>
                 <p className="font-bold text-base">{selectedCount}</p>
               </div>
               <div className="p-3 rounded-xl bg-card border border-border text-center">
-                <p className="text-xs text-muted-foreground">Parcelados</p>
+                <p className="max-w-[100vw] leading-relaxed text-xs text-muted-foreground">Parcelados</p>
                 <p className="font-bold text-base">{installmentCount}</p>
               </div>
               <div className="p-3 rounded-xl bg-card border border-border text-center">
-                <p className="text-xs text-muted-foreground">Total</p>
-                <p className="font-bold text-sm">{formatCurrency(totalSelected)}</p>
+                <p className="max-w-[100vw] leading-relaxed text-xs text-muted-foreground">Total</p>
+                <p className="font-bold text-sm leading-relaxed">{formatCurrency(totalSelected)}</p>
               </div>
             </div>
 
@@ -299,7 +306,7 @@ export default function ImportStatement() {
             {uncategorizedCount > 0 && (
               <div className="p-3 rounded-xl bg-accent/10 border border-accent/30 flex items-center gap-2">
                 <Tag className="w-4 h-4 text-accent shrink-0" />
-                <p className="text-xs text-accent">
+                <p className="max-w-[100vw] leading-relaxed text-xs text-accent">
                   {uncategorizedCount} lançamento(s) sem categoria. Toque para categorizar.
                 </p>
               </div>
@@ -343,13 +350,13 @@ export default function ImportStatement() {
                         className="flex-1 min-w-0 cursor-pointer"
                         onClick={() => tx.type === "purchase" && setCategorizingIndex(categorizingIndex === idx ? null : idx)}
                       >
-                        <p className="font-medium text-sm truncate">{tx.description}</p>
+                        <p className="font-medium text-sm leading-relaxed truncate">{tx.description}</p>
                         <div className="flex items-center gap-1.5 text-xs text-muted-foreground flex-wrap">
                           <span>{tx.date.split("-").reverse().join("/")}</span>
                           {tx.isInstallment && tx.currentInstallment && tx.totalInstallments && (
                             <>
                               <span>·</span>
-                              <span className="text-primary font-medium">
+                              <span className="max-w-[100vw] leading-relaxed text-primary font-medium">
                                 {tx.currentInstallment}/{tx.totalInstallments}x
                               </span>
                             </>
@@ -363,13 +370,13 @@ export default function ImportStatement() {
                           {!cat && tx.selected && tx.type === "purchase" && (
                             <>
                               <span>·</span>
-                              <span className="text-accent">Sem categoria</span>
+                              <span className="max-w-[100vw] leading-relaxed text-accent">Sem categoria</span>
                             </>
                           )}
                           {tx.type === "payment" && (
                             <>
                               <span>·</span>
-                              <span className="text-green-500">Pagamento</span>
+                              <span className="max-w-[100vw] leading-relaxed text-green-500">Pagamento</span>
                             </>
                           )}
                         </div>
@@ -377,7 +384,7 @@ export default function ImportStatement() {
 
                       <div className="flex items-center gap-2 shrink-0">
                         <p className={cn(
-                          "font-semibold text-sm tabular-nums",
+                          "font-semibold text-sm leading-relaxed tabular-nums",
                           tx.type === "payment" && "text-green-500"
                         )}>
                           {tx.type === "payment" ? "- " : ""}{formatCurrency(tx.amount)}
@@ -430,10 +437,10 @@ export default function ImportStatement() {
 
         {/* Step: Importing */}
         {step === "importing" && (
-          <FadeIn className="text-center py-12 space-y-4">
+          <FadeIn className="max-w-[100vw] leading-relaxed text-center py-12 space-y-4">
             <Loader2 className="w-12 h-12 animate-spin text-primary mx-auto" />
-            <h2 className="font-serif text-lg font-semibold">Importando lançamentos...</h2>
-            <p className="text-sm text-muted-foreground">
+            <h2 className="font-serif text-lg leading-relaxed font-semibold">Importando lançamentos...</h2>
+            <p className="max-w-[100vw] leading-relaxed text-sm leading-relaxed text-muted-foreground">
               Criando compras e distribuindo parcelas nos meses correspondentes.
             </p>
             <div className="max-w-xs mx-auto">
@@ -444,24 +451,24 @@ export default function ImportStatement() {
                   transition={{ duration: 0.3 }}
                 />
               </div>
-              <p className="text-sm text-muted-foreground mt-2">{importProgress}%</p>
+              <p className="max-w-[100vw] leading-relaxed text-sm leading-relaxed text-muted-foreground mt-2">{importProgress}%</p>
             </div>
           </FadeIn>
         )}
 
         {/* Step: Done */}
         {step === "done" && (
-          <FadeIn className="text-center py-12 space-y-6">
+          <FadeIn className="max-w-[100vw] leading-relaxed text-center py-12 space-y-6">
             <div className="w-20 h-20 rounded-full bg-green-500/10 mx-auto flex items-center justify-center">
               <Check className="w-10 h-10 text-green-500" />
             </div>
             <div>
-              <h2 className="font-serif text-lg font-semibold">Importação concluída!</h2>
-              <p className="text-sm text-muted-foreground mt-1">
+              <h2 className="font-serif text-lg leading-relaxed font-semibold">Importação concluída!</h2>
+              <p className="max-w-[100vw] leading-relaxed text-sm leading-relaxed text-muted-foreground mt-1">
                 {importedCount} lançamento(s) importados com sucesso.
               </p>
               {installmentCount > 0 && (
-                <p className="text-xs text-muted-foreground mt-1">
+                <p className="max-w-[100vw] leading-relaxed text-xs text-muted-foreground mt-1">
                   Parcelas distribuídas automaticamente nos meses correspondentes.
                 </p>
               )}

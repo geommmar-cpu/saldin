@@ -1,0 +1,29 @@
+﻿[
+  {
+    "created_at": 1771045221700,
+    "entrypoint_path": "file:///tmp/user_fn_vmkhqtuqgvtcapwmxtov_f1108fec-dc27-4d7e-8375-1d350c48dd11_150/source/supabase/functions/whatsapp-webhook/index.ts",
+    "ezbr_sha256": "d0ab873fa59783917199a4dfab81ee3d8632ea2fd3091c8a402be0c37d21aec9",
+    "id": "f1108fec-dc27-4d7e-8375-1d350c48dd11",
+    "import_map": true,
+    "import_map_path": "file:///tmp/user_fn_vmkhqtuqgvtcapwmxtov_f1108fec-dc27-4d7e-8375-1d350c48dd11_150/source/supabase/functions/whatsapp-webhook/deno.json",
+    "name": "whatsapp-webhook",
+    "slug": "whatsapp-webhook",
+    "status": "ACTIVE",
+    "updated_at": 1773370674006,
+    "verify_jwt": false,
+    "version": 150
+  },
+  {
+    "created_at": 1772161271180,
+    "entrypoint_path": "file:///tmp/user_fn_vmkhqtuqgvtcapwmxtov_91bb64c0-658d-42a2-b1e9-d6d16f886156_20/source/supabase/functions/inject-notification/index.ts",
+    "ezbr_sha256": "2c8a0a347c5055cb21d425d1775310e747bc67f295b03cdda340814cc0da2a0e",
+    "id": "91bb64c0-658d-42a2-b1e9-d6d16f886156",
+    "import_map": false,
+    "name": "inject-notification",
+    "slug": "inject-notification",
+    "status": "ACTIVE",
+    "updated_at": 1773374804804,
+    "verify_jwt": false,
+    "version": 20
+  }
+]

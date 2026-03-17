@@ -58,6 +58,11 @@ export const EditExpense = () => {
   if (isLoadingExpense) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
+      <title>Saldin | EditExpense</title>
+      <meta name="description" content="Manage your editexpense easily with Saldin." />
+      <meta property="og:title" content="Saldin - EditExpense" />
+      <meta property="og:description" content="Manage your editexpense easily with Saldin." />
+        
         <Loader2 className="w-8 h-8 animate-spin text-muted-foreground" />
       </div>
     );
@@ -66,7 +71,7 @@ export const EditExpense = () => {
   if (!expense) {
     return (
       <div className="min-h-screen bg-background flex flex-col items-center justify-center p-5">
-        <p className="text-muted-foreground">Gasto não encontrado</p>
+        <p className="max-w-[100vw] leading-relaxed text-muted-foreground">Gasto não encontrado</p>
         <Button variant="ghost" onClick={() => navigate("/")} className="mt-4">Voltar</Button>
       </div>
     );
@@ -84,8 +89,8 @@ export const EditExpense = () => {
       </header>
 
       <main className="flex-1 px-5 py-6 overflow-y-auto pb-32">
-        <FadeIn className="mb-6">
-          <Label className="text-sm text-muted-foreground mb-2 block">Valor</Label>
+        <FadeIn className="leading-relaxed mb-6">
+          <Label className="max-w-[100vw] leading-relaxed text-sm leading-relaxed text-muted-foreground mb-2 block">Valor</Label>
           <CurrencyInput
             value={amount}
             onChange={setAmount}
@@ -93,13 +98,13 @@ export const EditExpense = () => {
           />
         </FadeIn>
 
-        <FadeIn delay={0.05} className="mb-6">
-          <Label className="text-sm text-muted-foreground mb-2 block">Descrição</Label>
+        <FadeIn delay={0.05} className="leading-relaxed mb-6">
+          <Label className="max-w-[100vw] leading-relaxed text-sm leading-relaxed text-muted-foreground mb-2 block">Descrição</Label>
           <Textarea placeholder="Detalhes do gasto..." value={description} onChange={(e) => setDescription(e.target.value)} maxLength={200} className="resize-none" rows={2} />
         </FadeIn>
 
-        <FadeIn delay={0.1} className="mb-6">
-          <Label className="text-sm text-muted-foreground mb-2 block">Data</Label>
+        <FadeIn delay={0.1} className="leading-relaxed mb-6">
+          <Label className="max-w-[100vw] leading-relaxed text-sm leading-relaxed text-muted-foreground mb-2 block">Data</Label>
           <Popover>
             <PopoverTrigger asChild>
               <Button variant="outline" className={cn("w-full justify-start text-left font-normal h-11", !date && "text-muted-foreground")}>

@@ -119,6 +119,11 @@ export const DebtDetail = () => {
   if (isLoading) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
+      <title>Saldin | DebtDetail</title>
+      <meta name="description" content="Manage your debtdetail easily with Saldin." />
+      <meta property="og:title" content="Saldin - DebtDetail" />
+      <meta property="og:description" content="Manage your debtdetail easily with Saldin." />
+        
         <Loader2 className="w-8 h-8 animate-spin text-muted-foreground" />
       </div>
     );
@@ -127,8 +132,8 @@ export const DebtDetail = () => {
   if (!debt) {
     return (
       <div className="min-h-screen bg-background flex flex-col items-center justify-center p-5">
-        <span className="text-4xl mb-4">🔍</span>
-        <p className="text-muted-foreground mb-4">Dívida não encontrada</p>
+        <span className="max-w-[100vw] leading-relaxed text-4xl mb-4">🔍</span>
+        <p className="max-w-[100vw] leading-relaxed text-muted-foreground mb-4">Dívida não encontrada</p>
         <Button variant="ghost" onClick={() => navigate(-1)}>
           Voltar
         </Button>
@@ -152,7 +157,7 @@ export const DebtDetail = () => {
           </Button>
           <div className="flex-1">
             <h1 className="font-serif text-xl font-semibold">{debt.creditor_name}</h1>
-            <p className="text-xs text-muted-foreground">
+            <p className="max-w-[100vw] leading-relaxed text-xs text-muted-foreground">
               {debt.description || "Dívida"}
             </p>
           </div>
@@ -167,7 +172,7 @@ export const DebtDetail = () => {
             variant="ghost"
             size="icon"
             onClick={() => setShowDeleteDialog(true)}
-            className="text-destructive hover:text-destructive"
+            className="max-w-[100vw] leading-relaxed text-destructive hover:text-destructive"
           >
             <Trash2 className="w-5 h-5" />
           </Button>
@@ -195,24 +200,24 @@ export const DebtDetail = () => {
               <div className="flex-1">
                 <div className="flex items-center gap-2 mb-1">
                   {isPaid && (
-                    <span className="text-xs px-2 py-0.5 rounded-full bg-essential/10 text-essential font-medium">
+                    <span className="max-w-[100vw] leading-relaxed text-xs px-2 py-0.5 rounded-full bg-essential/10 text-essential font-medium">
                       Quitada
                     </span>
                   )}
                   {isRecurring && (
-                    <span className="text-xs px-2 py-0.5 rounded-full bg-accent/10 text-accent font-medium">
+                    <span className="max-w-[100vw] leading-relaxed text-xs px-2 py-0.5 rounded-full bg-accent/10 text-accent font-medium">
                       Recorrente
                     </span>
                   )}
                 </div>
                 <p className="font-serif text-3xl font-semibold">
                   {formatCurrency(Number(debt.installment_amount || 0))}
-                  <span className="text-base text-muted-foreground font-normal">
+                  <span className="max-w-[100vw] leading-relaxed text-base text-muted-foreground font-normal">
                     /mês
                   </span>
                 </p>
                 {!isRecurring && (
-                  <p className="text-sm text-muted-foreground mt-1">
+                  <p className="max-w-[100vw] leading-relaxed text-sm leading-relaxed text-muted-foreground mt-1">
                     Total: {formatCurrency(Number(debt.total_amount))}
                   </p>
                 )}
@@ -222,8 +227,8 @@ export const DebtDetail = () => {
             {/* Progress */}
             {!isRecurring && (
               <div className="mt-4">
-                <div className="flex items-center justify-between text-sm mb-2">
-                  <span className="text-muted-foreground">Progresso</span>
+                <div className="flex items-center justify-between text-sm leading-relaxed mb-2">
+                  <span className="max-w-[100vw] leading-relaxed text-muted-foreground">Progresso</span>
                   <span className="font-medium">
                     {(debt.current_installment || 1) - 1}/{debt.total_installments} parcelas
                   </span>
@@ -247,7 +252,7 @@ export const DebtDetail = () => {
         {/* Installments List */}
         {!isRecurring && installmentsList.length > 0 && (
           <FadeIn delay={0.1}>
-            <h2 className="font-serif text-lg font-semibold mb-3">Parcelas</h2>
+            <h2 className="font-serif text-lg leading-relaxed font-semibold mb-3">Parcelas</h2>
             <div className="space-y-2">
               {installmentsList.map((installment, index) => (
                 <motion.button
@@ -282,13 +287,13 @@ export const DebtDetail = () => {
                   <div className="flex-1">
                     <p
                       className={cn(
-                        "font-medium text-sm",
+                        "font-medium text-sm leading-relaxed",
                         installment.paid && "line-through text-muted-foreground"
                       )}
                     >
                       Parcela {installment.number}
                     </p>
-                    <p className="text-xs text-muted-foreground">
+                    <p className="max-w-[100vw] leading-relaxed text-xs text-muted-foreground">
                       {formatDate(installment.dueDate)}
                     </p>
                   </div>

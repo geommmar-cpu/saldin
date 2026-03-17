@@ -24,13 +24,13 @@ const formatCurrency = (v: number) =>
   new Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL" }).format(v);
 
 const CARD_COLORS: Record<string, string> = {
-  "#8B5CF6": "from-violet-500 to-purple-700",
+  "#14b8a6": "from-cyan-500 to-teal-700",
   "#3B82F6": "from-blue-500 to-indigo-700",
   "#10B981": "from-emerald-500 to-teal-700",
   "#F59E0B": "from-amber-500 to-orange-700",
   "#EF4444": "from-red-500 to-rose-700",
   "#EC4899": "from-pink-500 to-fuchsia-700",
-  "#6366F1": "from-indigo-500 to-violet-700",
+  "#6366F1": "from-indigo-500 to-cyan-700",
   "#14B8A6": "from-teal-500 to-cyan-700",
 };
 
@@ -59,6 +59,11 @@ export default function CreditCardDetail() {
   if (isLoading) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
+      <title>Saldin | CreditCardDetail</title>
+      <meta name="description" content="Manage your creditcarddetail easily with Saldin." />
+      <meta property="og:title" content="Saldin - CreditCardDetail" />
+      <meta property="og:description" content="Manage your creditcarddetail easily with Saldin." />
+        
         <Loader2 className="w-8 h-8 animate-spin text-muted-foreground" />
       </div>
     );
@@ -67,7 +72,7 @@ export default function CreditCardDetail() {
   if (!card) {
     return (
       <div className="min-h-screen bg-background flex flex-col items-center justify-center p-5">
-        <p className="text-muted-foreground">Cartão não encontrado</p>
+        <p className="max-w-[100vw] leading-relaxed text-muted-foreground">Cartão não encontrado</p>
         <Button variant="outline" className="mt-4" onClick={() => navigate("/")}>
           Voltar
         </Button>
@@ -121,29 +126,29 @@ export default function CreditCardDetail() {
               <CreditCardIcon className="w-16 h-16" />
             </div>
             <div className="relative z-10">
-              <p className="text-sm opacity-80">{card.card_brand || "Cartão"}</p>
-              <h3 className="text-xl font-bold">{card.card_name}</h3>
+              <p className="max-w-[100vw] leading-relaxed text-sm leading-relaxed opacity-80">{card.card_brand || "Cartão"}</p>
+              <h3 className="max-w-[100vw] leading-relaxed text-xl font-bold">{card.card_name}</h3>
               {card.last_four_digits && (
-                <p className="text-sm opacity-70 font-mono mt-2">•••• {card.last_four_digits}</p>
+                <p className="max-w-[100vw] leading-relaxed text-sm leading-relaxed opacity-70 font-mono mt-2">•••• {card.last_four_digits}</p>
               )}
-              <div className="mt-4 grid grid-cols-3 gap-2 text-sm">
+              <div className="mt-4 grid grid-cols-3 gap-2 text-sm leading-relaxed">
                 <div>
-                  <p className="text-xs opacity-60">Limite</p>
+                  <p className="max-w-[100vw] leading-relaxed text-xs opacity-60">Limite</p>
                   <p className="font-semibold">{formatCurrency(card.credit_limit)}</p>
                 </div>
                 <div>
-                  <p className="text-xs opacity-60">Usado</p>
+                  <p className="max-w-[100vw] leading-relaxed text-xs opacity-60">Usado</p>
                   <p className="font-semibold">{formatCurrency(usedLimit)}</p>
                 </div>
-                <div className="text-right">
-                  <p className="text-xs opacity-60">Disponível</p>
+                <div className="max-w-[100vw] leading-relaxed text-right">
+                  <p className="max-w-[100vw] leading-relaxed text-xs opacity-60">Disponível</p>
                   <p className="font-semibold">{formatCurrency(availableLimit)}</p>
                 </div>
               </div>
               {/* Limit bar */}
-              <div className="mt-3 h-2 rounded-full bg-white/20">
+              <div className="mt-3 h-2 rounded-full bg-background/20">
                 <div
-                  className="h-full rounded-full bg-white/80 transition-all"
+                  className="h-full rounded-full bg-background/80 transition-all"
                   style={{ width: `${Math.min((usedLimit / (card.credit_limit || 1)) * 100, 100)}%` }}
                 />
               </div>
@@ -157,7 +162,7 @@ export default function CreditCardDetail() {
             <Button variant="ghost" size="icon" onClick={() => setSelectedMonth(m => subMonths(m, 1))}>
               <ChevronLeft className="w-5 h-5" />
             </Button>
-            <h2 className="font-serif text-lg font-semibold capitalize">
+            <h2 className="font-serif text-lg leading-relaxed font-semibold capitalize">
               {format(selectedMonth, "MMMM yyyy", { locale: ptBR })}
             </h2>
             <Button variant="ghost" size="icon" onClick={() => setSelectedMonth(m => addMonths(m, 1))}>
@@ -171,10 +176,10 @@ export default function CreditCardDetail() {
           <div className="bg-card rounded-xl border border-border p-4">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-muted-foreground">Fatura do mês</p>
-                <p className="text-2xl font-serif font-bold">{formatCurrency(statementTotal)}</p>
+                <p className="max-w-[100vw] leading-relaxed text-sm leading-relaxed text-muted-foreground">Fatura do mês</p>
+                <p className="max-w-[100vw] leading-relaxed text-2xl font-serif font-bold">{formatCurrency(statementTotal)}</p>
               </div>
-              <div className="text-right text-sm text-muted-foreground">
+              <div className="max-w-[100vw] leading-relaxed text-right text-sm leading-relaxed text-muted-foreground">
                 <p>Fecha dia {card.closing_day}</p>
                 <p>Vence dia {card.due_day}</p>
               </div>
@@ -184,13 +189,13 @@ export default function CreditCardDetail() {
 
         {/* Installments List */}
         <FadeIn delay={0.2}>
-          <h3 className="text-sm font-semibold text-muted-foreground mb-3">
+          <h3 className="max-w-[100vw] leading-relaxed text-sm leading-relaxed font-semibold text-muted-foreground mb-3">
             Lançamentos ({statementItems.length})
           </h3>
           {statementItems.length === 0 ? (
-            <div className="text-center py-8">
-              <span className="text-3xl mb-2 block">📭</span>
-              <p className="text-sm text-muted-foreground">Nenhuma parcela neste mês</p>
+            <div className="max-w-[100vw] leading-relaxed text-center py-8">
+              <span className="max-w-[100vw] leading-relaxed text-3xl mb-2 block">📭</span>
+              <p className="max-w-[100vw] leading-relaxed text-sm leading-relaxed text-muted-foreground">Nenhuma parcela neste mês</p>
             </div>
           ) : (
             <div className="space-y-2">
@@ -219,16 +224,16 @@ export default function CreditCardDetail() {
                       )}
                     </div>
                     <div className="flex-1 min-w-0">
-                      <p className="font-medium text-sm truncate">
+                      <p className="font-medium text-sm leading-relaxed truncate">
                         {item.purchase?.description || "Compra"}
                       </p>
-                      <p className="text-xs text-muted-foreground">
+                      <p className="max-w-[100vw] leading-relaxed text-xs text-muted-foreground">
                         {item.installment_number}/{item.purchase?.total_installments || 1}
                         {" · "}
                         {item.status === "paid" ? "Paga" : "Aberta"}
                       </p>
                     </div>
-                    <p className="font-semibold text-sm tabular-nums">
+                    <p className="font-semibold text-sm leading-relaxed tabular-nums">
                       {formatCurrency(item.amount)}
                     </p>
                   </motion.div>

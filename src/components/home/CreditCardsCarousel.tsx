@@ -11,13 +11,14 @@ import { useCardUsedLimit } from "@/hooks/useCreditCards";
 
 interface CreditCardsCarouselProps {
     cards: CreditCardType[];
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     installments: any[];
     selectedMonth: Date;
 }
 
 export const CreditCardsCarousel = ({ cards, installments, selectedMonth }: CreditCardsCarouselProps) => {
     const { data: profile } = useProfile();
-    const defaultCardId = (profile as any)?.wa_default_expense_card_id;
+    const defaultCardId = (profile as { wa_default_expense_card_id?: string })?.wa_default_expense_card_id;
 
     if (cards.length === 0) return null;
 
@@ -34,9 +35,9 @@ export const CreditCardsCarousel = ({ cards, installments, selectedMonth }: Cred
         <div className="space-y-4">
             {/* Legend for Main Card */}
             <div className="px-4 pb-2">
-                <p className="text-[10px] text-muted-foreground flex items-center gap-1.5 bg-muted/30 w-fit px-3 py-1 rounded-full border border-muted-foreground/10">
+                <p className="max-w-[100vw] leading-relaxed text-[10px] text-muted-foreground flex items-center gap-1.5 bg-muted/30 w-fit px-3 py-1 rounded-full border border-muted-foreground/10">
                     <span className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse" />
-                    Gastos enviados pelo WhatsApp são registrados no cartão <span className="text-primary font-bold">Principal</span> por padrão.
+                    Gastos enviados pelo WhatsApp são registrados no cartão <span className="max-w-[100vw] leading-relaxed text-primary font-bold">Principal</span> por padrão.
                 </p>
             </div>
 
@@ -67,6 +68,7 @@ interface CreditCardItemProps {
     card: CreditCardType;
     index: number;
     isMain: boolean;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     installments: any[];
 }
 
@@ -114,7 +116,7 @@ const CreditCardItem = ({ card, index, isMain, installments }: CreditCardItemPro
                 {/* Top row: Bank Logo & Wireless Icon */}
                 <div className="flex justify-between items-start">
                     <div className="flex items-center gap-3">
-                        <div className="p-2 rounded-xl bg-white/20 backdrop-blur-md border border-white/30 shadow-soft">
+                        <div className="p-2 rounded-xl bg-background/20 backdrop-blur-md border border-white/30 shadow-soft">
                             <BankLogo
                                 bankName={card.card_name}
                                 className="w-8 h-8"
@@ -123,10 +125,10 @@ const CreditCardItem = ({ card, index, isMain, installments }: CreditCardItemPro
                             />
                         </div>
                         <div>
-                            <p className="text-sm font-bold tracking-tight drop-shadow-md">
+                            <p className="max-w-[100vw] leading-relaxed text-sm leading-relaxed font-bold tracking-tight drop-shadow-md">
                                 {card.card_name}
                             </p>
-                            <p className="text-[9px] uppercase font-bold tracking-[0.1em] opacity-60">
+                            <p className="max-w-[100vw] leading-relaxed text-[9px] uppercase font-bold tracking-[0.1em] opacity-60">
                                 {card.card_brand || "Crédito"}
                             </p>
                         </div>
@@ -140,9 +142,9 @@ const CreditCardItem = ({ card, index, isMain, installments }: CreditCardItemPro
                             </svg>
                         </div>
                         {isMain && (
-                            <div className="flex items-center gap-1 bg-white/20 backdrop-blur-md rounded-full px-2 py-0.5 border border-white/10">
+                            <div className="flex items-center gap-1 bg-background/20 backdrop-blur-md rounded-full px-2 py-0.5 border border-white/10">
                                 <PhoneIcon className="w-2.5 h-2.5 text-white" />
-                                <span className="text-[7px] font-black uppercase tracking-widest">Principal</span>
+                                <span className="max-w-[100vw] leading-relaxed text-[7px] font-black uppercase tracking-widest">Principal</span>
                             </div>
                         )}
                     </div>
@@ -151,15 +153,15 @@ const CreditCardItem = ({ card, index, isMain, installments }: CreditCardItemPro
                 {/* Middle row: The metallic Chip */}
                 <div className="mt-2 flex items-center justify-between">
                     <div className="w-10 h-8 rounded-md bg-gradient-to-br from-yellow-200 via-yellow-400 to-yellow-600 relative overflow-hidden shadow-inner border border-yellow-700/30">
-                        <div className="absolute inset-x-0 top-1/2 h-[1px] bg-black/20" />
-                        <div className="absolute inset-y-0 left-1/3 w-[1px] bg-black/20" />
-                        <div className="absolute inset-y-0 right-1/3 w-[1px] bg-black/20" />
+                        <div className="absolute inset-x-0 top-1/2 h-[1px] bg-foreground/20" />
+                        <div className="absolute inset-y-0 left-1/3 w-[1px] bg-foreground/20" />
+                        <div className="absolute inset-y-0 right-1/3 w-[1px] bg-foreground/20" />
                     </div>
 
                     {/* Last 4 digits in monospace premium style */}
-                    <div className="text-right">
-                        <span className="text-[10px] font-mono tracking-[0.3em] opacity-60 mr-1">••••</span>
-                        <span className="text-sm font-mono font-bold tracking-widest drop-shadow-lg">{card.last_four_digits || "0000"}</span>
+                    <div className="max-w-[100vw] leading-relaxed text-right">
+                        <span className="max-w-[100vw] leading-relaxed text-[10px] font-mono tracking-[0.3em] opacity-60 mr-1">••••</span>
+                        <span className="max-w-[100vw] leading-relaxed text-sm leading-relaxed font-mono font-bold tracking-widest drop-shadow-lg">{card.last_four_digits || "0000"}</span>
                     </div>
                 </div>
 
@@ -167,28 +169,28 @@ const CreditCardItem = ({ card, index, isMain, installments }: CreditCardItemPro
                 <div className="mt-auto pt-3">
                     <div className="flex justify-between items-end mb-2">
                         <div className="flex flex-col">
-                            <p className="text-[8px] uppercase font-black tracking-widest opacity-60 mb-1">Fatura Atual</p>
-                            <p className="text-2xl font-bold tracking-tight drop-shadow-md text-white">
+                            <p className="max-w-[100vw] leading-relaxed text-[8px] uppercase font-black tracking-widest opacity-60 mb-1">Fatura Atual</p>
+                            <p className="max-w-[100vw] leading-relaxed text-2xl font-bold tracking-tight drop-shadow-md text-white">
                                 {formatCurrency(currentInvoice)}
                             </p>
                         </div>
-                        <div className="text-right pb-1">
-                            <p className="text-[9px] font-bold opacity-80 mb-0.5">Vence {card.due_day}</p>
-                            <p className="text-[8px] opacity-70 uppercase tracking-tighter font-bold text-white/90">
+                        <div className="max-w-[100vw] leading-relaxed text-right pb-1">
+                            <p className="max-w-[100vw] leading-relaxed text-[9px] font-bold opacity-80 mb-0.5">Vence {card.due_day}</p>
+                            <p className="max-w-[100vw] leading-relaxed text-[8px] opacity-70 uppercase tracking-tighter font-bold text-white/90">
                                 Disponível: {formatCurrency(availableLimit).split(',')[0]}
                             </p>
                         </div>
                     </div>
 
                     {/* Visual Usage Bar with Glow */}
-                    <div className="h-1.5 w-full bg-black/20 rounded-full overflow-hidden backdrop-blur-sm border border-white/5">
+                    <div className="h-1.5 w-full bg-foreground/20 rounded-full overflow-hidden backdrop-blur-sm border border-white/5">
                         <motion.div
                             initial={{ width: 0 }}
                             animate={{ width: `${Math.min(usage, 100)}%` }}
                             transition={{ duration: 1.2, ease: "easeOut" }}
                             className={cn(
                                 "h-full rounded-full relative",
-                                usage > 90 ? "bg-destructive shadow-[0_0_8px_rgba(239,68,68,0.5)]" : "bg-white/80 shadow-[0_0_8px_rgba(255,255,255,0.3)]"
+                                usage > 90 ? "bg-destructive shadow-[0_0_8px_rgba(239,68,68,0.5)]" : "bg-background/80 shadow-[0_0_8px_rgba(255,255,255,0.3)]"
                             )}
                         >
                             <div className="absolute inset-0 bg-gradient-to-r from-transparent to-white/20" />

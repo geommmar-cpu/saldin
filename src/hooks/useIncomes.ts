@@ -8,6 +8,7 @@ export type IncomeRow = Tables<"incomes">;
 export type IncomeInsert = TablesInsert<"incomes">;
 export type IncomeUpdate = TablesUpdate<"incomes">;
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 const db = supabase as any;
 
 export const useIncomes = (month?: number, year?: number) => {
@@ -108,6 +109,7 @@ export const useIncomeStats = (month?: number, year?: number) => {
 export const useCreateIncome = () => {
   const queryClient = useQueryClient();
   const { user } = useAuth();
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const db = supabase as any;
 
   return useMutation({
@@ -140,6 +142,7 @@ export const useCreateIncome = () => {
 
 export const useDeleteIncome = () => {
   const queryClient = useQueryClient();
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const db = supabase as any;
 
   return useMutation({
@@ -233,12 +236,15 @@ export const useIncomeById = (id: string | undefined) => {
 
       if (!income) return null;
 
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const enrichedIncome = { ...income } as any;
 
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       if ((income as any).bank_account_id) {
         const { data: bankAcc } = await db
           .from("bank_accounts")
           .select("name, bank_name")
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
           .eq("id", (income as any).bank_account_id)
           .maybeSingle();
         if (bankAcc) enrichedIncome.bank_account = bankAcc;

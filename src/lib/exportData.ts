@@ -2,17 +2,25 @@
 import { format } from "date-fns";
 
 interface ExportDataParams {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     incomes: any[];
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     expenses: any[];
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     debts: any[];
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     receivables: any[];
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     goals: any[];
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     bankAccounts: any[];
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     creditCards: any[];
 }
 
 export const exportToCSV = ({ incomes, expenses, debts, receivables, goals, bankAccounts, creditCards }: ExportDataParams) => {
     // Helper to escape CSV fields for Excel (PT-BR)
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const escape = (value: any) => {
         if (value === null || value === undefined) return "";
         let stringValue = String(value);

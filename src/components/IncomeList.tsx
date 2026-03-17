@@ -57,9 +57,9 @@ export const IncomeList = ({ incomes, onIncomeClick }: IncomeListProps) => {
             {/* Content */}
             <div className="flex-1 min-w-0">
               <div className="flex items-center gap-2">
-                <p className="font-medium text-sm truncate">{income.description}</p>
+                <p className="font-medium text-sm leading-relaxed truncate">{income.description}</p>
                 {isInitialBalance && (
-                  <Badge variant="secondary" className="text-[10px] px-1.5 py-0 h-4 shrink-0">
+                  <Badge variant="secondary" className="max-w-[100vw] leading-relaxed text-[10px] px-1.5 py-0 h-4 shrink-0">
                     Saldo inicial
                   </Badge>
                 )}
@@ -92,7 +92,7 @@ export const IncomeList = ({ incomes, onIncomeClick }: IncomeListProps) => {
             </div>
 
             {/* Amount */}
-            <p className="font-semibold text-sm text-essential whitespace-nowrap">
+            <p className="font-semibold text-sm leading-relaxed text-essential whitespace-nowrap">
               +{formatCurrency(income.amount)}
             </p>
           </motion.button>

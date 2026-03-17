@@ -149,8 +149,8 @@ export const AlertsSection = ({ debts, goals, creditCards, installments, subscri
           >
             <div className="shrink-0">{alert.icon}</div>
             <div className="flex-1 min-w-0">
-              <p className="text-sm font-medium">{alert.title}</p>
-              <p className="text-xs opacity-70">{alert.description}</p>
+              <p className="max-w-[100vw] leading-relaxed text-sm leading-relaxed font-medium">{alert.title}</p>
+              <p className="max-w-[100vw] leading-relaxed text-xs opacity-70">{alert.description}</p>
             </div>
           </motion.button>
         ))}

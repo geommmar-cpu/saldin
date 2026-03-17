@@ -70,7 +70,7 @@ export const FloatingActionMenu = () => {
                                     transition={{ duration: 0.2, delay: action.delay }}
                                     className="flex items-center gap-3"
                                 >
-                                    <span className="text-sm font-medium bg-card px-2 py-1 rounded-md shadow-sm border border-border/50">
+                                    <span className="max-w-[100vw] leading-relaxed text-sm leading-relaxed font-medium bg-card px-2 py-1 rounded-md shadow-sm border border-border/50">
                                         {action.label}
                                     </span>
                                     <Button

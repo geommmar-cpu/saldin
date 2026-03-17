@@ -75,20 +75,20 @@ export const CreditCardSummary = ({ cards, installments, selectedMonth }: Credit
             })()}
             <div className="flex-1 text-left min-w-0">
               <div className="flex items-center gap-2">
-                <p className="font-medium text-sm truncate">{statement.card.card_name}</p>
+                <p className="font-medium text-sm leading-relaxed truncate">{statement.card.card_name}</p>
                 {statement.card.card_brand && (
-                  <span className="text-xs text-muted-foreground">{statement.card.card_brand}</span>
+                  <span className="max-w-[100vw] leading-relaxed text-xs text-muted-foreground">{statement.card.card_brand}</span>
                 )}
               </div>
               <div className="flex items-center gap-3 mt-0.5">
-                <span className="text-xs text-muted-foreground flex items-center gap-1">
+                <span className="max-w-[100vw] leading-relaxed text-xs text-muted-foreground flex items-center gap-1">
                   <Calendar className="w-3 h-3" />
                   Fecha dia {statement.card.closing_day} · Vence dia {statement.card.due_day}
                 </span>
               </div>
             </div>
-            <div className="text-right shrink-0">
-              <p className="font-semibold text-sm tabular-nums">
+            <div className="max-w-[100vw] leading-relaxed text-right shrink-0">
+              <p className="font-semibold text-sm leading-relaxed tabular-nums">
                 {formatCurrency(statement.total)}
               </p>
               <span className={cn(
@@ -120,10 +120,10 @@ export const CreditCardSummary = ({ cards, installments, selectedMonth }: Credit
                 />
               </div>
               <div className="flex justify-between mt-1">
-                <span className="text-[10px] text-muted-foreground">
+                <span className="max-w-[100vw] leading-relaxed text-[10px] text-muted-foreground">
                   {Math.round((statement.total / statement.card.credit_limit) * 100)}% usado
                 </span>
-                <span className="text-[10px] text-muted-foreground">
+                <span className="max-w-[100vw] leading-relaxed text-[10px] text-muted-foreground">
                   Limite: {formatCurrency(statement.card.credit_limit)}
                 </span>
               </div>

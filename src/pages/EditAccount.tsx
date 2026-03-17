@@ -77,8 +77,11 @@ export const EditAccount = () => {
     }
 
     if (profile) {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       if ((profile as any).wa_default_income_account_id) setDefaultIncomeAcc((profile as any).wa_default_income_account_id);
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       if ((profile as any).wa_default_expense_account_id) setDefaultExpenseAcc((profile as any).wa_default_expense_account_id);
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       if ((profile as any).wa_default_expense_card_id) setDefaultExpenseCard((profile as any).wa_default_expense_card_id);
     }
   }, [profile, user]);
@@ -125,6 +128,7 @@ export const EditAccount = () => {
         wa_default_income_account_id: defaultIncomeAcc === "none" ? null : defaultIncomeAcc,
         wa_default_expense_account_id: defaultExpenseAcc === "none" ? null : defaultExpenseAcc,
         wa_default_expense_card_id: defaultExpenseCard === "none" ? null : defaultExpenseCard,
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       } as any);
 
       // Also update user_metadata in Supabase Auth
@@ -145,6 +149,7 @@ export const EditAccount = () => {
 
       // Navigate to settings after successful save
       navigate("/settings");
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (error: any) {
       console.error("Erro ao salvar perfil:", error);
       toast({
@@ -218,6 +223,7 @@ export const EditAccount = () => {
         title: "Senha alterada",
         description: "Sua senha foi atualizada com sucesso.",
       });
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (error: any) {
       toast({
         title: "Erro ao alterar senha",
@@ -232,6 +238,11 @@ export const EditAccount = () => {
   if (profileLoading) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
+      <title>Saldin | EditAccount</title>
+      <meta name="description" content="Manage your editaccount easily with Saldin." />
+      <meta property="og:title" content="Saldin - EditAccount" />
+      <meta property="og:description" content="Manage your editaccount easily with Saldin." />
+        
         <Loader2 className="w-8 h-8 animate-spin text-primary" />
       </div>
     );
@@ -253,7 +264,7 @@ export const EditAccount = () => {
         {/* Profile Section */}
         <FadeIn>
           <div className="bg-card rounded-xl border border-border shadow-soft p-5 space-y-4">
-            <h2 className="text-sm font-medium text-muted-foreground uppercase tracking-wide">
+            <h2 className="max-w-[100vw] leading-relaxed text-sm leading-relaxed font-medium text-muted-foreground uppercase tracking-wide">
               Informações pessoais
             </h2>
 
@@ -309,12 +320,12 @@ export const EditAccount = () => {
         {/* WhatsApp Config Section */}
         <FadeIn delay={0.05}>
           <div className="bg-card rounded-xl border border-border shadow-soft p-5 space-y-4">
-            <h2 className="text-sm font-medium text-muted-foreground uppercase tracking-wide flex items-center gap-2">
+            <h2 className="max-w-[100vw] leading-relaxed text-sm leading-relaxed font-medium text-muted-foreground uppercase tracking-wide flex items-center gap-2">
               <PhoneIcon className="w-4 h-4" />
               WhatsApp (Saldin AI)
             </h2>
 
-            <p className="text-sm text-muted-foreground">
+            <p className="max-w-[100vw] leading-relaxed text-sm leading-relaxed text-muted-foreground">
               Configure as contas padrão para quando você registrar transações pelo WhatsApp.
             </p>
 
@@ -327,6 +338,7 @@ export const EditAccount = () => {
                 <Select
                   value={defaultIncomeAcc}
                   onValueChange={(val) => {
+                    // eslint-disable-next-line @typescript-eslint/no-explicit-any
                     const existingId = (profile as any)?.wa_default_income_account_id;
                     if (val !== "none" && existingId && val !== existingId) {
                       const oldName = bankAccounts.find(a => a.id === existingId)?.bank_name;
@@ -358,12 +370,13 @@ export const EditAccount = () => {
 
               <div className="space-y-2">
                 <Label className="flex items-center gap-2">
-                  <CreditCard className="w-4 h-4 text-violet-500" />
+                  <CreditCard className="w-4 h-4 text-cyan-500" />
                   Cartão para Gastos (Crédito)
                 </Label>
                 <Select
                   value={defaultExpenseCard}
                   onValueChange={(val) => {
+                    // eslint-disable-next-line @typescript-eslint/no-explicit-any
                     const existingId = (profile as any)?.wa_default_expense_card_id;
                     if (val !== "none" && existingId && val !== existingId) {
                       const oldName = creditCards.find(c => c.id === existingId)?.card_name;
@@ -401,6 +414,7 @@ export const EditAccount = () => {
                 <Select
                   value={defaultExpenseAcc}
                   onValueChange={(val) => {
+                    // eslint-disable-next-line @typescript-eslint/no-explicit-any
                     const existingId = (profile as any)?.wa_default_expense_account_id;
                     if (val !== "none" && existingId && val !== existingId) {
                       const oldName = bankAccounts.find(a => a.id === existingId)?.bank_name;
@@ -466,12 +480,12 @@ export const EditAccount = () => {
         {/* Security Section */}
         <FadeIn delay={0.1}>
           <div className="bg-card rounded-xl border border-border shadow-soft p-5 space-y-4">
-            <h2 className="text-sm font-medium text-muted-foreground uppercase tracking-wide flex items-center gap-2">
+            <h2 className="max-w-[100vw] leading-relaxed text-sm leading-relaxed font-medium text-muted-foreground uppercase tracking-wide flex items-center gap-2">
               <Lock className="w-4 h-4" />
               Segurança
             </h2>
 
-            <p className="text-sm text-muted-foreground">
+            <p className="max-w-[100vw] leading-relaxed text-sm leading-relaxed text-muted-foreground">
               Para alterar sua senha, preencha os campos abaixo.
             </p>
 

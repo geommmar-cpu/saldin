@@ -8,7 +8,7 @@ const supabase = createClient(supabaseUrl, supabaseKey);
 async function signUp() {
     const { data, error } = await supabase.auth.signUp({
         email: 'teste2@gmail.com',
-        password: 'Admin123@',
+        password: process.env.TEST_USER_PASSWORD || 'local_test_pwd',
         options: {
             data: {
                 full_name: 'Teste User',

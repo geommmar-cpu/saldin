@@ -125,7 +125,7 @@ export const AppLayout = ({ children, className }: AppLayoutProps) => {
                         {profile?.avatar_url ? (
                             <img src={profile.avatar_url} alt="Avatar" className="w-full h-full object-cover" />
                         ) : (
-                            <span className="font-bold text-sm">
+                            <span className="font-bold text-sm leading-relaxed">
                                 {profile?.full_name
                                     ? profile.full_name.split(" ").map(n => n[0]).join("").substring(0, 2).toUpperCase()
                                     : <User className="w-5 h-5" />}
@@ -133,8 +133,8 @@ export const AppLayout = ({ children, className }: AppLayoutProps) => {
                         )}
                     </div>
                     <div className="flex-1 min-w-0">
-                        <p className="font-semibold text-sm truncate">{profile?.full_name || "Usuário"}</p>
-                        <p className="text-xs text-muted-foreground truncate">{user?.email || ""}</p>
+                        <p className="font-semibold text-sm leading-relaxed truncate">{profile?.full_name || "Usuário"}</p>
+                        <p className="max-w-[100vw] leading-relaxed text-xs text-muted-foreground truncate">{user?.email || ""}</p>
                     </div>
                 </div>
             </div>
@@ -151,7 +151,7 @@ export const AppLayout = ({ children, className }: AppLayoutProps) => {
                             key={item.path}
                             to={item.path}
                             className={cn(
-                                "flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-colors",
+                                "flex items-center gap-3 px-4 py-3 rounded-xl text-sm leading-relaxed font-medium transition-colors",
                                 isActive
                                     ? "bg-primary/10 text-primary"
                                     : "text-muted-foreground hover:bg-muted hover:text-foreground"
@@ -175,7 +175,7 @@ export const AppLayout = ({ children, className }: AppLayoutProps) => {
                                 key={item.path}
                                 to={item.path}
                                 className={cn(
-                                    "flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-colors",
+                                    "flex items-center gap-3 px-4 py-3 rounded-xl text-sm leading-relaxed font-medium transition-colors",
                                     isActive
                                         ? "bg-primary/10 text-primary"
                                         : "text-muted-foreground hover:bg-muted hover:text-foreground"
@@ -194,7 +194,7 @@ export const AppLayout = ({ children, className }: AppLayoutProps) => {
                             setOpen(false);
                             signOut();
                         }}
-                        className="flex items-center gap-3 px-4 py-3 w-full rounded-xl text-sm font-medium text-destructive hover:bg-destructive/10 transition-colors mt-2"
+                        className="flex items-center gap-3 px-4 py-3 w-full rounded-xl text-sm leading-relaxed font-medium text-destructive hover:bg-destructive/10 transition-colors mt-2"
                     >
                         <LogOut className="w-5 h-5" />
                         Sair

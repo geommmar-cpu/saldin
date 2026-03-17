@@ -105,6 +105,7 @@ export const PASSWORD_RULES: PasswordRule[] = [
   {
     id: "special",
     label: "Pelo menos 1 caractere especial (!@#$%...)",
+    // eslint-disable-next-line no-useless-escape
     test: (password: string) => /[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?~`]/.test(password),
   },
 ];

@@ -97,6 +97,7 @@ export const DebugStress = () => {
 
             setStatus("success");
             toast.success("5.000 registros inseridos com sucesso!");
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         } catch (error: any) {
             console.error("Stress Test Error:", error);
             setStatus("error");
@@ -119,6 +120,7 @@ export const DebugStress = () => {
             toast.success("Dados limpos com sucesso!");
             setStatus("idle");
             setProgress(0);
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         } catch (error: any) {
             toast.error("Erro ao limpar dados");
         } finally {
@@ -128,6 +130,11 @@ export const DebugStress = () => {
 
     return (
         <AppLayout>
+      <title>Saldin | DebugStress</title>
+      <meta name="description" content="Manage your debugstress easily with Saldin." />
+      <meta property="og:title" content="Saldin - DebugStress" />
+      <meta property="og:description" content="Manage your debugstress easily with Saldin." />
+        
             <div className="min-h-screen bg-background p-6 flex flex-col items-center justify-center">
                 <FadeIn className="max-w-md w-full space-y-8 text-center">
                     <div className="w-20 h-20 bg-primary/10 rounded-3xl flex items-center justify-center mx-auto mb-6">
@@ -135,8 +142,8 @@ export const DebugStress = () => {
                     </div>
 
                     <div className="space-y-2">
-                        <h1 className="text-3xl font-serif font-bold">Simulador de Estresse</h1>
-                        <p className="text-muted-foreground">
+                        <h1 className="max-w-[100vw] leading-relaxed text-3xl font-serif font-bold">Simulador de Estresse</h1>
+                        <p className="max-w-[100vw] leading-relaxed text-muted-foreground">
                             Esta ferramenta irá inserir 5.000 registros de transações para testar a performance e escala do Saldin.
                         </p>
                     </div>
@@ -175,7 +182,7 @@ export const DebugStress = () => {
 
                         {status === "running" && (
                             <div className="space-y-4">
-                                <div className="flex justify-between text-sm mb-2">
+                                <div className="flex justify-between text-sm leading-relaxed mb-2">
                                     <span>Processando registros...</span>
                                     <span className="font-bold">{progress}%</span>
                                 </div>
@@ -185,7 +192,7 @@ export const DebugStress = () => {
                                         style={{ width: `${progress}%` }}
                                     />
                                 </div>
-                                <p className="text-xs text-muted-foreground animate-pulse">
+                                <p className="max-w-[100vw] leading-relaxed text-xs text-muted-foreground animate-pulse">
                                     Inserindo lotes no Supabase. Não feche a aba.
                                 </p>
                             </div>
@@ -194,8 +201,8 @@ export const DebugStress = () => {
                         {status === "success" && (
                             <div className="space-y-4 py-4">
                                 <CheckCircle2 className="w-16 h-16 text-essential mx-auto" />
-                                <h3 className="text-xl font-bold">Simulação Concluída!</h3>
-                                <p className="text-sm text-muted-foreground">
+                                <h3 className="max-w-[100vw] leading-relaxed text-xl font-bold">Simulação Concluída!</h3>
+                                <p className="max-w-[100vw] leading-relaxed text-sm leading-relaxed text-muted-foreground">
                                     A base de dados agora contém 5.000 transações simuladas.
                                 </p>
                                 <Button onClick={() => navigate("/")} variant="outline" className="w-full">
@@ -207,7 +214,7 @@ export const DebugStress = () => {
                         {status === "error" && (
                             <div className="space-y-4 py-4">
                                 <AlertCircle className="w-16 h-16 text-impulse mx-auto" />
-                                <h3 className="text-xl font-bold">Erro na Simulação</h3>
+                                <h3 className="max-w-[100vw] leading-relaxed text-xl font-bold">Erro na Simulação</h3>
                                 <Button onClick={() => setStatus("idle")} variant="outline" className="w-full">
                                     Tentar Novamente
                                 </Button>

@@ -149,7 +149,7 @@ export const BottomNav = React.forwardRef<HTMLDivElement>((_, ref) => {
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               transition={{ duration: 0.2 }}
-              className="fixed inset-0 bg-black/50 z-50"
+              className="fixed inset-0 bg-foreground/50 z-50"
               onClick={closeAll}
             />
             <motion.div
@@ -219,7 +219,7 @@ export const BottomNav = React.forwardRef<HTMLDivElement>((_, ref) => {
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               transition={{ duration: 0.2 }}
-              className="fixed inset-0 bg-black/50 z-50"
+              className="fixed inset-0 bg-foreground/50 z-50"
               onClick={closeAll}
             />
             <motion.div
@@ -249,8 +249,8 @@ export const BottomNav = React.forwardRef<HTMLDivElement>((_, ref) => {
                     <Home className="w-5 h-5 text-primary" />
                   </div>
                   <div className="flex-1 min-w-0">
-                    <p className="font-medium text-sm text-primary">Voltar ao Início</p>
-                    <p className="text-xs text-muted-foreground">Ir para a tela principal</p>
+                    <p className="font-medium text-sm leading-relaxed text-primary">Voltar ao Início</p>
+                    <p className="max-w-[100vw] leading-relaxed text-xs text-muted-foreground">Ir para a tela principal</p>
                   </div>
                 </motion.button>
               </div>
@@ -267,8 +267,8 @@ export const BottomNav = React.forwardRef<HTMLDivElement>((_, ref) => {
                       <item.icon className="w-5 h-5 text-muted-foreground" />
                     </div>
                     <div className="flex-1 min-w-0">
-                      <p className="font-medium text-sm">{item.label}</p>
-                      <p className="text-xs text-muted-foreground truncate">{item.desc}</p>
+                      <p className="font-medium text-sm leading-relaxed">{item.label}</p>
+                      <p className="max-w-[100vw] leading-relaxed text-xs text-muted-foreground truncate">{item.desc}</p>
                     </div>
                   </motion.button>
                 ))}
@@ -298,7 +298,7 @@ export const BottomNav = React.forwardRef<HTMLDivElement>((_, ref) => {
                   className="flex flex-col items-center gap-1 px-3 py-2 text-muted-foreground transition-colors duration-200"
                 >
                   <Icon className="h-5 w-5" />
-                  <span className="text-xs font-medium">{item.label}</span>
+                  <span className="max-w-[100vw] leading-relaxed text-xs font-medium">{item.label}</span>
                 </button>
               );
             }
@@ -313,7 +313,7 @@ export const BottomNav = React.forwardRef<HTMLDivElement>((_, ref) => {
                 )}
               >
                 <Icon className="h-5 w-5" />
-                <span className="text-xs font-medium">{item.label}</span>
+                <span className="max-w-[100vw] leading-relaxed text-xs font-medium">{item.label}</span>
                 {active && (
                   <motion.div
                     layoutId="activeTab"
@@ -368,8 +368,8 @@ const RegisterOption = ({ icon: Icon, label, desc, colorClass, onClick, large }:
         )} />
       </div>
       <div className="flex-1">
-        <p className={cn("font-medium", large ? "text-lg" : "text-sm")}>{label}</p>
-        <p className={cn("text-muted-foreground", large ? "text-sm" : "text-xs")}>{desc}</p>
+        <p className={cn("font-medium", large ? "text-lg leading-relaxed" : "text-sm leading-relaxed")}>{label}</p>
+        <p className={cn("text-muted-foreground", large ? "text-sm leading-relaxed" : "text-xs")}>{desc}</p>
       </div>
     </motion.button>
   );

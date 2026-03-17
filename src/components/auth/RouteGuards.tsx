@@ -16,16 +16,16 @@ export const LoadingScreen = () => (
     <div className="relative mb-8">
       <div className="absolute inset-0 bg-primary/20 blur-2xl rounded-full animate-pulse"></div>
       <div className="relative w-16 h-16 bg-gradient-to-tr from-primary to-accent rounded-2xl rotate-12 flex items-center justify-center shadow-lg animate-bounce-slow">
-        <span className="text-white text-2xl font-bold -rotate-12">S</span>
+        <span className="max-w-[100vw] leading-relaxed text-white text-2xl font-bold -rotate-12">S</span>
       </div>
     </div>
-    <h2 className="text-2xl font-serif font-bold text-foreground mb-2">Saldin</h2>
+    <h2 className="max-w-[100vw] leading-relaxed text-2xl font-serif font-bold text-foreground mb-2">Saldin</h2>
     <div className="flex items-center gap-1 justify-center">
       <div className="w-1.5 h-1.5 bg-primary rounded-full animate-bounce [animation-delay:-0.3s]"></div>
       <div className="w-1.5 h-1.5 bg-primary rounded-full animate-bounce [animation-delay:-0.15s]"></div>
       <div className="w-1.5 h-1.5 bg-primary rounded-full animate-bounce"></div>
     </div>
-    <p className="text-muted-foreground text-sm mt-4 font-medium">Preparando seu ambiente financeiro...</p>
+    <p className="max-w-[100vw] leading-relaxed text-muted-foreground text-sm leading-relaxed mt-4 font-medium">Preparando seu ambiente financeiro...</p>
   </div>
 );
 
@@ -57,12 +57,12 @@ const useOnboardingStatus = (userId: string | undefined) => {
         .eq("user_id", userId)
         .maybeSingle();
 
-      const timeoutPromise = new Promise<{ data: any; error: any }>((_, reject) => {
+      const timeoutPromise = new Promise<{ data: { onboarding_completed?: boolean } | null; error: unknown }>((_, reject) => {
         setTimeout(() => reject(new Error("Timeout checking onboarding status")), 10000);
       });
 
       try {
-        const { data, error } = await Promise.race([fetchPromise, timeoutPromise]) as any;
+        const { data, error } = await Promise.race([fetchPromise, timeoutPromise]) as { data: { onboarding_completed?: boolean } | null; error: unknown };
 
         if (error) {
           console.error("Error checking onboarding:", error);

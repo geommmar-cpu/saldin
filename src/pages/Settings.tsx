@@ -1,4 +1,4 @@
-﻿import { useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { useState, useEffect, useRef, ChangeEvent } from "react";
 import { supabase } from "@/lib/backendClient";
 import { generateFinancialReport } from "@/lib/exportPdf";
@@ -6,7 +6,6 @@ import { useExpenses } from "@/hooks/useExpenses";
 import { useIncomes } from "@/hooks/useIncomes";
 import { useDebts } from "@/hooks/useDebts";
 import { useReceivables } from "@/hooks/useReceivables";
-import { useCardInstallmentsByMonth } from "@/hooks/useCreditCards";
 import { useGoals, useGoalStats } from "@/hooks/useGoals";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -59,6 +58,7 @@ import { cn } from "@/lib/utils";
 import { useToast } from "@/hooks/use-toast";
 
 import { useWhatsAppStatus } from "@/hooks/useWhatsAppStatus";
+import { AutoCaptureSection } from "@/components/settings/AutoCaptureSection";
 
 export const Settings = () => {
   const navigate = useNavigate();
@@ -92,6 +92,7 @@ export const Settings = () => {
     if (profile?.ai_name && profile.ai_name !== preferences.aiName) {
       updatePreference("aiName", profile.ai_name);
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [profile?.ai_name]);
 
   const [loggingOut, setLoggingOut] = useState(false);
@@ -154,6 +155,7 @@ export const Settings = () => {
       await updateProfile.mutateAsync({ avatar_url: publicUrl });
       toast({ title: "Foto de perfil atualizada!" });
 
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (error: any) {
       console.error("Erro ao atualizar avatar:", error);
       toast({
@@ -229,6 +231,7 @@ export const Settings = () => {
         receivables: allReceivables || [],
         goals: allGoals || [],
         subscriptions: allSubscriptions,
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         creditCardInstallments: ccInstallments as any,
         userName: user?.user_metadata?.full_name || profile?.full_name,
         selectedMonth: new Date(),
@@ -271,6 +274,11 @@ export const Settings = () => {
 
   return (
     <div className="min-h-screen bg-background pb-24">
+      <title>Saldin | Settings</title>
+      <meta name="description" content="Manage your settings easily with Saldin." />
+      <meta property="og:title" content="Saldin - Settings" />
+      <meta property="og:description" content="Manage your settings easily with Saldin." />
+        
       {/* Header */}
       <header className="px-5 pt-safe-top sticky top-0 bg-background/95 backdrop-blur-sm z-10 border-b border-border">
         <div className="pt-4 pb-3 flex items-center gap-4">
@@ -295,7 +303,7 @@ export const Settings = () => {
                 </div>
               )}
               {uploadingAvatar && (
-                <div className="absolute inset-0 bg-black/50 flex items-center justify-center">
+                <div className="absolute inset-0 bg-foreground/50 flex items-center justify-center">
                   <Loader2 className="w-8 h-8 text-white animate-spin" />
                 </div>
               )}
@@ -311,8 +319,8 @@ export const Settings = () => {
             className="hidden"
             accept="image/*"
           />
-          <h2 className="mt-3 text-lg font-semibold">{profile?.full_name || "Usuário"}</h2>
-          <p className="text-sm text-muted-foreground">{user?.email}</p>
+          <h2 className="mt-3 text-lg leading-relaxed font-semibold">{profile?.full_name || "Usuário"}</h2>
+          <p className="max-w-[100vw] leading-relaxed text-sm leading-relaxed text-muted-foreground">{user?.email}</p>
         </div>
 
         {/* Bloco 1 - Conta */}
@@ -383,9 +391,9 @@ export const Settings = () => {
           </SettingsSection>
         </FadeIn>
 
-        {/* Bloco: Captura Automática de Gastos */}
+        {/* Bloco: Captura Automática de Gastos (Multi-tenant) */}
         <FadeIn delay={0.08}>
-          <AutoCaptureSection phone={whatsappData?.number || ""} captureToken={whatsappData?.captureToken || null} />
+          <AutoCaptureSection userId={user?.id} />
         </FadeIn>
 
         {/* Bloco 3 - Segurança */}
@@ -548,11 +556,11 @@ export const Settings = () => {
 
         {/* Product Tagline */}
         <FadeIn delay={0.3}>
-          <div className="text-center py-4">
-            <p className="text-xs text-muted-foreground italic">
+          <div className="max-w-[100vw] leading-relaxed text-center py-4">
+            <p className="max-w-[100vw] leading-relaxed text-xs text-muted-foreground italic">
               "Você fala com a IA. Você encara a verdade no app."
             </p>
-            <p className="text-xs text-muted-foreground mt-1">v1.0.0</p>
+            <p className="max-w-[100vw] leading-relaxed text-xs text-muted-foreground mt-1">v1.0.0</p>
           </div>
         </FadeIn>
       </main>
@@ -562,326 +570,6 @@ export const Settings = () => {
   );
 };
 
-// ─── AutoCaptureSection ───
-
-const INJECT_BASE_URL = "https://vmkhqtuqgvtcapwmxtov.supabase.co/functions/v1/inject-notification";
-
-function detectPlatform(): "android" | "ios" {
-  return /iphone|ipad|ipod/i.test(navigator.userAgent) ? "ios" : "android";
-}
-
-const AutoCaptureSection = ({ phone, captureToken }: { phone: string; captureToken: string | null }) => {
-  const { toast } = useToast();
-  const [activeTab, setActiveTab] = useState<"android" | "ios">(detectPlatform());
-  const [copied, setCopied] = useState(false);
-  const [currentStep, setCurrentStep] = useState(1);
-
-  const captureUrl = captureToken
-    ? `${INJECT_BASE_URL}?t=${captureToken}&n=`
-    : null;
-
-  const handleCopyUrl = () => {
-    if (captureUrl) {
-      navigator.clipboard.writeText(captureUrl);
-      setCopied(true);
-      toast({ title: "✅ URL copiada!", description: "Agora cole no MacroDroid no campo de URL." });
-      setTimeout(() => setCopied(false), 3000);
-    }
-  };
-
-  const isDisabled = !captureToken;
-  const totalSteps = 5;
-
-  return (
-    <div>
-      <h2 className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-2 px-1">
-        Captura Automática de Gastos
-      </h2>
-      <div className="bg-card rounded-xl border border-border shadow-soft overflow-hidden">
-
-        {/* Hero */}
-        <div className="p-5 bg-gradient-to-br from-emerald-50 via-teal-50 to-cyan-50 dark:from-emerald-950/40 dark:via-teal-950/30 dark:to-cyan-950/20 border-b border-border text-center">
-          <div className="w-14 h-14 rounded-2xl bg-emerald-100 dark:bg-emerald-900/60 flex items-center justify-center mx-auto mb-3">
-            <Bell className="w-7 h-7 text-emerald-600" />
-          </div>
-          <p className="text-base font-bold text-foreground">Gastos registrados sozinhos</p>
-          <p className="text-sm text-muted-foreground mt-1 leading-relaxed">
-            Comprou no débito ou crédito? O Saldin detecta a notificação do banco e já registra — sem você fazer nada.
-          </p>
-        </div>
-
-        {/* Tabs */}
-        <div className="flex border-b border-border">
-          {(["android", "ios"] as const).map((tab) => (
-            <button
-              key={tab}
-              onClick={() => { setActiveTab(tab); setCurrentStep(1); }}
-              className={cn(
-                "flex-1 py-3 text-sm font-medium transition-colors",
-                activeTab === tab
-                  ? "text-foreground border-b-2 border-primary bg-primary/5"
-                  : "text-muted-foreground hover:text-foreground"
-              )}
-            >
-              {tab === "android" ? "📱 Android" : "🍎 iPhone"}
-            </button>
-          ))}
-        </div>
-
-        {/* Conteúdo Android */}
-        {activeTab === "android" && (
-          <div className="p-5 space-y-4">
-
-            {/* Status de conexão */}
-            {isDisabled && (
-              <div className="flex items-center gap-2 bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-800 rounded-lg px-3 py-2">
-                <XCircle className="w-4 h-4 text-amber-600 flex-shrink-0" />
-                <p className="text-xs text-amber-800 dark:text-amber-200">
-                  <strong>WhatsApp não conectado.</strong> Conecte primeiro na seção acima.
-                </p>
-              </div>
-            )}
-
-            {/* Progress bar */}
-            <div className="flex items-center gap-1.5">
-              {Array.from({ length: totalSteps }).map((_, i) => (
-                <div
-                  key={i}
-                  className={cn(
-                    "h-1.5 flex-1 rounded-full transition-all duration-300",
-                    i < currentStep ? "bg-primary" : "bg-muted"
-                  )}
-                />
-              ))}
-              <span className="text-xs text-muted-foreground ml-1">{currentStep}/{totalSteps}</span>
-            </div>
-
-            {/* Step 1: Instalar MacroDroid */}
-            {currentStep === 1 && (
-              <div className="space-y-3">
-                <div className="flex items-start gap-3">
-                  <div className="w-10 h-10 rounded-full bg-primary text-primary-foreground text-sm font-bold flex items-center justify-center flex-shrink-0">1</div>
-                  <div className="pt-1">
-                    <p className="text-sm font-bold text-foreground">Instale o MacroDroid</p>
-                    <p className="text-xs text-muted-foreground mt-1">App gratuito da Play Store. Instala uma vez e esquece.</p>
-                  </div>
-                </div>
-                <Button size="sm" variant="outline" className="w-full gap-2" onClick={() => {
-                  window.open("https://play.google.com/store/apps/details?id=com.arlosoft.macrodroid", "_blank");
-                }}>
-                  <ExternalLink className="w-4 h-4" /> Abrir Play Store
-                </Button>
-                <div className="flex gap-2 pt-1">
-                  <Button size="sm" className="flex-1" onClick={() => setCurrentStep(2)}>Próximo →</Button>
-                </div>
-              </div>
-            )}
-
-            {/* Step 2: Adicionar macro */}
-            {currentStep === 2 && (
-              <div className="space-y-3">
-                <div className="flex items-start gap-3">
-                  <div className="w-10 h-10 rounded-full bg-primary text-primary-foreground text-sm font-bold flex items-center justify-center flex-shrink-0">2</div>
-                  <div className="pt-1">
-                    <p className="text-sm font-bold text-foreground">Criar nova macro</p>
-                    <p className="text-xs text-muted-foreground mt-1">Abra o MacroDroid e toque em <strong>"Adicionar macro"</strong> (botão <strong>➕</strong> no canto superior esquerdo).</p>
-                  </div>
-                </div>
-                <div className="flex gap-2 pt-1">
-                  <Button size="sm" variant="outline" className="flex-1" onClick={() => setCurrentStep(1)}>← Voltar</Button>
-                  <Button size="sm" className="flex-1" onClick={() => setCurrentStep(3)}>Próximo →</Button>
-                </div>
-              </div>
-            )}
-
-            {/* Step 3: Configurar Gatilho */}
-            {currentStep === 3 && (
-              <div className="space-y-3">
-                <div className="flex items-start gap-3">
-                  <div className="w-10 h-10 rounded-full bg-primary text-primary-foreground text-sm font-bold flex items-center justify-center flex-shrink-0">3</div>
-                  <div className="pt-1">
-                    <p className="text-sm font-bold text-foreground">Configurar o Gatilho</p>
-                    <p className="text-xs text-muted-foreground mt-1 leading-relaxed">
-                      Toque em <strong>"Gatilhos"</strong> → <strong>"Dispositivo"</strong> → <strong>"Notificação recebida"</strong>.
-                    </p>
-                    <p className="text-xs text-muted-foreground mt-1 leading-relaxed">
-                      Em "Selecionar app(s)", marque os apps dos seus bancos (Nubank, Inter, Itaú, etc).
-                    </p>
-                  </div>
-                </div>
-                <div className="flex gap-2 pt-1">
-                  <Button size="sm" variant="outline" className="flex-1" onClick={() => setCurrentStep(2)}>← Voltar</Button>
-                  <Button size="sm" className="flex-1" onClick={() => setCurrentStep(4)}>Próximo →</Button>
-                </div>
-              </div>
-            )}
-
-            {/* Step 4: Configurar Ação - COPIAR URL */}
-            {currentStep === 4 && (
-              <div className="space-y-3">
-                <div className="flex items-start gap-3">
-                  <div className="w-10 h-10 rounded-full bg-primary text-primary-foreground text-sm font-bold flex items-center justify-center flex-shrink-0">4</div>
-                  <div className="pt-1">
-                    <p className="text-sm font-bold text-foreground">Configurar a Ação</p>
-                    <p className="text-xs text-muted-foreground mt-1 leading-relaxed">
-                      Toque em <strong>"Ações"</strong> → <strong>"Conectividade"</strong> → <strong>"Requisição HTTP"</strong>.
-                    </p>
-                  </div>
-                </div>
-
-                <div className="space-y-1.5 text-xs text-muted-foreground bg-muted/50 rounded-lg p-3">
-                  <p><strong>Método:</strong> selecione <strong>GET</strong></p>
-                </div>
-
-                {captureUrl && (
-                  <div className="space-y-2">
-                    <p className="text-xs font-semibold text-foreground">No campo URL, faça nesta ordem:</p>
-
-                    <div className="space-y-3">
-                      {/* Sub-step A: Cole a URL */}
-                      <div className="flex items-start gap-2">
-                        <span className="text-xs font-bold text-primary bg-primary/10 rounded-full w-5 h-5 flex items-center justify-center flex-shrink-0">a</span>
-                        <div className="flex-1">
-                          <p className="text-xs text-muted-foreground">Cole esta URL:</p>
-                          <div className="bg-background border-2 border-primary/30 rounded-lg p-2.5 mt-1">
-                            <p className="text-xs font-mono text-foreground break-all leading-relaxed select-all">
-                              {captureUrl}
-                            </p>
-                          </div>
-                          <Button
-                            className="w-full gap-2 h-10 mt-1.5"
-                            onClick={handleCopyUrl}
-                            variant={copied ? "outline" : "default"}
-                            size="sm"
-                          >
-                            {copied ? (
-                              <><CheckCircle2 className="w-4 h-4 text-emerald-600" /> Copiada!</>
-                            ) : (
-                              <><Copy className="w-4 h-4" /> Copiar URL</>
-                            )}
-                          </Button>
-                        </div>
-                      </div>
-
-                      {/* Sub-step B: Inserir Magic Text */}
-                      <div className="flex items-start gap-2">
-                        <span className="text-xs font-bold text-primary bg-primary/10 rounded-full w-5 h-5 flex items-center justify-center flex-shrink-0">b</span>
-                        <div className="flex-1">
-                          <p className="text-xs text-muted-foreground">Depois de colar, <strong>sem dar espaço</strong>, toque no ícone <strong>🏷️ (Magic Text)</strong> no canto do campo de URL</p>
-                        </div>
-                      </div>
-
-                      {/* Sub-step C: Selecionar variável */}
-                      <div className="flex items-start gap-2">
-                        <span className="text-xs font-bold text-primary bg-primary/10 rounded-full w-5 h-5 flex items-center justify-center flex-shrink-0">c</span>
-                        <div className="flex-1">
-                          <p className="text-xs text-muted-foreground">Selecione: <strong>"Gatilho"</strong> → <strong>"Texto do gatilho"</strong></p>
-                          <p className="text-xs text-muted-foreground mt-1">Vai aparecer algo como <code className="bg-muted px-1 rounded text-foreground">[trigger_text]</code> no final da URL</p>
-                        </div>
-                      </div>
-                    </div>
-
-                    <div className="bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-800 rounded-lg p-2.5">
-                      <p className="text-xs text-amber-800 dark:text-amber-200">
-                        <strong>Corpo e Cabeçalhos:</strong> deixe em branco.
-                      </p>
-                    </div>
-                  </div>
-                )}
-
-                <div className="flex gap-2 pt-1">
-                  <Button size="sm" variant="outline" className="flex-1" onClick={() => setCurrentStep(3)}>← Voltar</Button>
-                  <Button size="sm" className="flex-1" onClick={() => setCurrentStep(5)}>Próximo →</Button>
-                </div>
-              </div>
-            )}
-
-            {/* Step 5: Salvar */}
-            {currentStep === 5 && (
-              <div className="space-y-3">
-                <div className="flex items-start gap-3">
-                  <div className="w-10 h-10 rounded-full bg-emerald-600 text-white text-sm font-bold flex items-center justify-center flex-shrink-0">✓</div>
-                  <div className="pt-1">
-                    <p className="text-sm font-bold text-foreground">Salvar e ativar</p>
-                    <p className="text-xs text-muted-foreground mt-1 leading-relaxed">
-                      Dê um nome (ex: <strong>"Saldin"</strong>) → toque em <strong>salvar</strong> → verifique que a macro está <strong>ativada</strong> (toggle ligado).
-                    </p>
-                  </div>
-                </div>
-                <div className="bg-emerald-50 dark:bg-emerald-950/30 border border-emerald-200 dark:border-emerald-800 rounded-xl p-4 text-center">
-                  <p className="text-2xl mb-1">🎉</p>
-                  <p className="text-sm font-semibold text-emerald-800 dark:text-emerald-200">Pronto! Captura automática ativada.</p>
-                  <p className="text-xs text-emerald-700 dark:text-emerald-300 mt-1">Cada compra será registrada automaticamente no Saldin.</p>
-                </div>
-                <div className="flex gap-2 pt-1">
-                  <Button size="sm" variant="outline" className="flex-1" onClick={() => setCurrentStep(4)}>← Voltar</Button>
-                </div>
-              </div>
-            )}
-
-            {/* Bancos suportados */}
-            <div className="border-t border-border pt-4">
-              <p className="text-xs text-muted-foreground mb-2 text-center">Funciona com os principais bancos</p>
-              <div className="flex flex-wrap gap-2 justify-center">
-                {["Nubank", "Inter", "C6", "Itaú", "Bradesco", "Santander", "Caixa", "Mercado Pago"].map((b) => (
-                  <span key={b} className="text-xs bg-muted text-muted-foreground px-2 py-1 rounded-full">{b}</span>
-                ))}
-              </div>
-            </div>
-          </div>
-        )}
-
-        {/* iOS */}
-        {activeTab === "ios" && (
-          <div className="p-5 space-y-4">
-            <div className="flex items-center gap-2 bg-blue-50 dark:bg-blue-950/30 border border-blue-200 dark:border-blue-800 rounded-lg px-3 py-2">
-              <CheckCircle2 className="w-4 h-4 text-blue-600 flex-shrink-0" />
-              <p className="text-xs text-blue-800 dark:text-blue-200"><strong>Não precisa instalar nada.</strong> O app Atalhos já vem no iPhone.</p>
-            </div>
-
-            <div className="space-y-3">
-              {[
-                { n: 1, title: "Toque no botão abaixo", desc: "O iPhone pede para adicionar o atalho do Saldin. Toque em \"Adicionar\"." },
-                { n: 2, title: "Ative a automação", desc: "No app Atalhos, vá em Automação e ative \"Saldin Captura\". Feito!" },
-              ].map(({ n, title, desc }) => (
-                <div key={n} className="flex items-start gap-3">
-                  <div className="w-8 h-8 rounded-full bg-primary/10 text-primary text-sm font-bold flex items-center justify-center flex-shrink-0">{n}</div>
-                  <div>
-                    <p className="text-sm font-semibold text-foreground">{title}</p>
-                    <p className="text-xs text-muted-foreground mt-0.5">{desc}</p>
-                  </div>
-                </div>
-              ))}
-            </div>
-
-            <Button className="w-full gap-2" disabled={isDisabled} onClick={() => {
-              window.open("https://www.icloud.com/shortcuts/placeholder", "_blank");
-              toast({ title: "Abrindo Atalhos..." });
-            }}>
-              <ExternalLink className="w-4 h-4" />
-              Adicionar Atalho do Saldin
-            </Button>
-
-            <div className="bg-emerald-50 dark:bg-emerald-950/30 border border-emerald-200 dark:border-emerald-800 rounded-xl p-4 text-center">
-              <p className="text-2xl mb-1">🎉</p>
-              <p className="text-sm font-semibold text-emerald-800 dark:text-emerald-200">2 toques e está ativo para sempre.</p>
-              <p className="text-xs text-emerald-700 dark:text-emerald-300 mt-1">Cada compra do banco chega automaticamente no Saldin.</p>
-            </div>
-
-            <div className="border-t border-border pt-4">
-              <p className="text-xs text-muted-foreground mb-2 text-center">Funciona com os principais bancos</p>
-              <div className="flex flex-wrap gap-2 justify-center">
-                {["Nubank", "Inter", "C6", "Itaú", "Bradesco", "Santander"].map((b) => (
-                  <span key={b} className="text-xs bg-muted text-muted-foreground px-2 py-1 rounded-full">{b}</span>
-                ))}
-              </div>
-            </div>
-          </div>
-        )}
-      </div>
-    </div>
-  );
-};
 
 // Helper Components
 
@@ -893,7 +581,7 @@ interface SettingsSectionProps {
 
 const SettingsSection = ({ title, children }: SettingsSectionProps) => (
   <div>
-    <h2 className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-2 px-1">
+    <h2 className="max-w-[100vw] leading-relaxed text-xs font-medium text-muted-foreground uppercase tracking-wide mb-2 px-1">
       {title}
     </h2>
     <div className="bg-card rounded-xl border border-border shadow-soft overflow-hidden">
@@ -950,19 +638,19 @@ const SettingsItem = ({
       </div>
       <div className="flex-1 min-w-0">
         <div className="flex items-center gap-2">
-          <p className={cn("text-sm font-medium", labelColor)}>{label}</p>
+          <p className={cn("text-sm leading-relaxed font-medium", labelColor)}>{label}</p>
           {badge && (
-            <span className="text-xs font-medium px-1.5 py-0.5 rounded bg-primary/10 text-primary">
+            <span className="max-w-[100vw] leading-relaxed text-xs font-medium px-1.5 py-0.5 rounded bg-primary/10 text-primary">
               {badge}
             </span>
           )}
         </div>
         {description && (
-          <p className="text-xs text-muted-foreground">{description}</p>
+          <p className="max-w-[100vw] leading-relaxed text-xs text-muted-foreground">{description}</p>
         )}
       </div>
       {value && !action && (
-        <span className={cn("text-sm truncate max-w-[140px] text-right", valueColor || "text-muted-foreground")}>{value}</span>
+        <span className={cn("text-sm leading-relaxed truncate max-w-[140px] text-right", valueColor || "text-muted-foreground")}>{value}</span>
       )}
       {action}
       {locked && <Lock className="w-4 h-4 text-muted-foreground" />}

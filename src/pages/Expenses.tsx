@@ -99,6 +99,11 @@ export const Expenses = () => {
   if (isLoading) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center pb-24">
+      <title>Saldin | Expenses</title>
+      <meta name="description" content="Manage your expenses easily with Saldin." />
+      <meta property="og:title" content="Saldin - Expenses" />
+      <meta property="og:description" content="Manage your expenses easily with Saldin." />
+        
         <Loader2 className="w-8 h-8 animate-spin text-muted-foreground" />
         <BottomNav />
       </div>
@@ -116,7 +121,7 @@ export const Expenses = () => {
             </Button>
             <div>
               <h1 className="font-serif text-xl font-semibold">Gastos</h1>
-              <p className="text-sm text-muted-foreground capitalize">{currentMonth}</p>
+              <p className="max-w-[100vw] leading-relaxed text-sm leading-relaxed text-muted-foreground capitalize">{currentMonth}</p>
             </div>
           </div>
           <Button variant="warm" size="icon" onClick={() => navigate("/expenses/add")}>
@@ -134,22 +139,22 @@ export const Expenses = () => {
                 <Receipt className="w-5 h-5 text-impulse" />
               </div>
               <div>
-                <p className="text-xs text-muted-foreground">Gasto total do mês</p>
+                <p className="max-w-[100vw] leading-relaxed text-xs text-muted-foreground">Gasto total do mês</p>
                 <p className="font-serif text-2xl font-semibold">{formatCurrency(totalSpent)}</p>
               </div>
             </div>
             <div className="grid grid-cols-3 gap-3 pt-3 border-t border-border">
               <div>
-                <p className="text-xs text-muted-foreground">Essenciais</p>
-                <p className="font-semibold text-sm text-essential">{formatCurrency(essentialTotal)}</p>
+                <p className="max-w-[100vw] leading-relaxed text-xs text-muted-foreground">Essenciais</p>
+                <p className="font-semibold text-sm leading-relaxed text-essential">{formatCurrency(essentialTotal)}</p>
               </div>
               <div>
-                <p className="text-xs text-muted-foreground">Impulsos</p>
-                <p className="font-semibold text-sm text-impulse">{formatCurrency(impulseTotal)}</p>
+                <p className="max-w-[100vw] leading-relaxed text-xs text-muted-foreground">Impulsos</p>
+                <p className="font-semibold text-sm leading-relaxed text-impulse">{formatCurrency(impulseTotal)}</p>
               </div>
               <div>
-                <p className="text-xs text-muted-foreground">Cartão</p>
-                <p className="font-semibold text-sm text-primary">{formatCurrency(cardTotal)}</p>
+                <p className="max-w-[100vw] leading-relaxed text-xs text-muted-foreground">Cartão</p>
+                <p className="font-semibold text-sm leading-relaxed text-primary">{formatCurrency(cardTotal)}</p>
               </div>
             </div>
           </div>
@@ -162,8 +167,8 @@ export const Expenses = () => {
         {essentialItems.length > 0 && (
           <FadeIn delay={0.15}>
             <div>
-              <h2 className="font-medium text-sm text-muted-foreground mb-2 flex items-center gap-2">
-                <span className="text-lg">✅</span> Essenciais
+              <h2 className="font-medium text-sm leading-relaxed text-muted-foreground mb-2 flex items-center gap-2">
+                <span className="max-w-[100vw] leading-relaxed text-lg leading-relaxed">✅</span> Essenciais
               </h2>
               <ExpenseList
                 expenses={essentialItems}
@@ -177,8 +182,8 @@ export const Expenses = () => {
         {obligationItems.length > 0 && (
           <FadeIn delay={0.2}>
             <div>
-              <h2 className="font-medium text-sm text-muted-foreground mb-2 flex items-center gap-2">
-                <span className="text-lg">🎯</span> Pilares
+              <h2 className="font-medium text-sm leading-relaxed text-muted-foreground mb-2 flex items-center gap-2">
+                <span className="max-w-[100vw] leading-relaxed text-lg leading-relaxed">🎯</span> Pilares
               </h2>
               <ExpenseList
                 expenses={obligationItems}
@@ -192,8 +197,8 @@ export const Expenses = () => {
         {impulseItems.length > 0 && (
           <FadeIn delay={0.25}>
             <div>
-              <h2 className="font-medium text-sm text-muted-foreground mb-2 flex items-center gap-2">
-                <span className="text-lg">🔥</span> Impulsos
+              <h2 className="font-medium text-sm leading-relaxed text-muted-foreground mb-2 flex items-center gap-2">
+                <span className="max-w-[100vw] leading-relaxed text-lg leading-relaxed">🔥</span> Impulsos
               </h2>
               <ExpenseList
                 expenses={impulseItems}
@@ -207,8 +212,8 @@ export const Expenses = () => {
         {cardItems.length > 0 && (
           <FadeIn delay={0.3}>
             <div>
-              <h2 className="font-medium text-sm text-muted-foreground mb-2 flex items-center gap-2">
-                <span className="text-lg">💳</span> Cartão de crédito
+              <h2 className="font-medium text-sm leading-relaxed text-muted-foreground mb-2 flex items-center gap-2">
+                <span className="max-w-[100vw] leading-relaxed text-lg leading-relaxed">💳</span> Cartão de crédito
               </h2>
               <ExpenseList
                 expenses={cardItems}
@@ -222,8 +227,8 @@ export const Expenses = () => {
         {otherItems.length > 0 && (
           <FadeIn delay={0.35}>
             <div>
-              <h2 className="font-medium text-sm text-muted-foreground mb-2 flex items-center gap-2">
-                <span className="text-lg">📝</span> Outros
+              <h2 className="font-medium text-sm leading-relaxed text-muted-foreground mb-2 flex items-center gap-2">
+                <span className="max-w-[100vw] leading-relaxed text-lg leading-relaxed">📝</span> Outros
               </h2>
               <ExpenseList
                 expenses={otherItems}
@@ -236,11 +241,11 @@ export const Expenses = () => {
         {/* Empty State */}
         {allItems.length === 0 && (
           <FadeIn delay={0.2}>
-            <div className="text-center py-12">
+            <div className="max-w-[100vw] leading-relaxed text-center py-12">
               <div className="w-16 h-16 rounded-full bg-muted flex items-center justify-center mx-auto mb-4">
                 <Receipt className="w-8 h-8 text-muted-foreground" />
               </div>
-              <p className="text-muted-foreground mb-4">
+              <p className="max-w-[100vw] leading-relaxed text-muted-foreground mb-4">
                 Nenhum gasto registrado ainda
               </p>
               <Button variant="warm" onClick={() => navigate("/expenses/add")}>
@@ -258,6 +263,7 @@ export const Expenses = () => {
 };
 
 // Transform database expense to ExpenseList format
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 function transformExpense(e: any): Expense {
   const installmentLabel = e.total_installments && e.total_installments > 1
     ? ` (${e.installment_number}/${e.total_installments}x)`

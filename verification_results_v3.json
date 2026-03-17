@@ -1,0 +1,101 @@
+[
+  {
+    "text": "Caixa: Compra R$ 1,00 inter",
+    "match": true,
+    "bank": "Caixa",
+    "valor": "1,00",
+    "estab": "inter",
+    "income": false,
+    "correct": true
+  },
+  {
+    "text": "Caixa: Transferência realizada R$ 1,00 para Banco Inter",
+    "match": true,
+    "bank": "Caixa",
+    "valor": "1,00",
+    "estab": "para Banco Inter",
+    "income": false,
+    "correct": true
+  },
+  {
+    "text": "Caixa: Pix enviado R$ 1,00 para Banco Inter",
+    "match": true,
+    "bank": "Caixa",
+    "valor": "1,00",
+    "estab": "para Banco Inter",
+    "income": false,
+    "correct": true
+  },
+  {
+    "text": "Transferência enviada: R$ 1,00 para Banco Inter",
+    "match": true,
+    "bank": "Transferência_Expense",
+    "valor": "1,00",
+    "estab": "Banco Inter",
+    "income": false,
+    "correct": true
+  },
+  {
+    "text": "Pix enviado: R$ 1,00 para Inter",
+    "match": true,
+    "bank": "Pix_Expense",
+    "valor": "1,00",
+    "estab": "Inter",
+    "income": false,
+    "correct": true
+  },
+  {
+    "text": "Inter: Pix recebido de R$ 1,00 de Fulano",
+    "match": true,
+    "bank": "Pix_Income",
+    "valor": "1,00",
+    "estab": "Fulano",
+    "income": true,
+    "correct": true
+  },
+  {
+    "text": "Caixa: Voce realizou uma transferencia de R$ 1,00 para Inter",
+    "match": true,
+    "bank": "Caixa",
+    "valor": "1,00",
+    "estab": "para Inter",
+    "income": false,
+    "correct": true
+  },
+  {
+    "text": "Transferencia de R$ 1,00 realizada para Inter",
+    "match": true,
+    "bank": "Transferência_Expense",
+    "valor": "1,00",
+    "estab": "para Inter",
+    "income": false,
+    "correct": true
+  },
+  {
+    "text": "Transferência de R$ 1,00 para Banco Inter",
+    "match": true,
+    "bank": "Transferência_Expense",
+    "valor": "1,00",
+    "estab": "Banco Inter",
+    "income": false,
+    "correct": true
+  },
+  {
+    "text": "Nubank: Compra aprovada de R$ 89,90 no MERCADO LIVRE",
+    "match": true,
+    "bank": "Nubank",
+    "valor": "89,90",
+    "estab": "MERCADO LIVRE",
+    "income": false,
+    "correct": true
+  },
+  {
+    "text": "Pix recebido de Fulano no valor de R$ 50,00",
+    "match": true,
+    "bank": "Pix_Income_Swap",
+    "valor": "50,00",
+    "estab": "Fulano",
+    "income": true,
+    "correct": true
+  }
+]

@@ -33,8 +33,10 @@ interface TransactionsSectionProps {
   expenses: ExpenseRow[];
   incomes: IncomeRow[];
   debts: DebtRow[];
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   receivables: any[];
   creditCardInstallments: (CreditCardInstallment & { purchase: CreditCardPurchase & { card: CreditCardType } })[];
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   subscriptions?: any[];
   selectedMonth: Date;
 }
@@ -254,11 +256,11 @@ export const TransactionsSection = ({
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between px-1">
-        <h2 className="text-base font-semibold text-foreground">Últimas movimentações</h2>
+        <h2 className="max-w-[100vw] leading-relaxed text-base font-semibold text-foreground">Últimas movimentações</h2>
         <Button
           variant="ghost"
           size="sm"
-          className="text-xs h-7 hover:bg-transparent hover:text-primary"
+          className="max-w-[100vw] leading-relaxed text-xs h-7 hover:bg-transparent hover:text-primary"
           onClick={() => navigate("/history")}
         >
           Ver histórico
@@ -308,7 +310,7 @@ export const TransactionsSection = ({
                     >
                       <div className={cn(
                         "w-10 h-10 rounded-full flex items-center justify-center shrink-0 transition-colors",
-                        "bg-muted/50 group-hover:bg-white/80 dark:group-hover:bg-muted"
+                        "bg-muted/50 group-hover:bg-background/80 dark:group-hover:bg-muted"
                       )}>
                         {tx.type === "subscription" ? (
                           <BankLogo bankName={tx.description.replace("Assinatura: ", "")} size="sm" />
@@ -318,7 +320,7 @@ export const TransactionsSection = ({
                       </div>
 
                       <div className="flex-1 text-left min-w-0">
-                        <p className="font-medium text-sm truncate text-foreground/90">{tx.description}</p>
+                        <p className="font-medium text-sm leading-relaxed truncate text-foreground/90">{tx.description}</p>
                         <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
                           {typeIcon(tx.type)}
                           <span>{typeLabel[tx.type]}</span>
@@ -330,7 +332,7 @@ export const TransactionsSection = ({
                       </div>
 
                       <p className={cn(
-                        "font-bold text-sm tabular-nums tracking-tight",
+                        "font-bold text-sm leading-relaxed tabular-nums tracking-tight",
                         isPositive ? "text-essential" : "text-foreground"
                       )}>
                         {isPositive ? "+" : "−"} {formatCurrency(tx.amount)}
@@ -345,7 +347,7 @@ export const TransactionsSection = ({
       ) : (
         <div className="py-12 text-center bg-muted/20 rounded-2xl border border-dashed border-muted-foreground/20">
           <Receipt className="w-8 h-8 text-muted-foreground/30 mx-auto mb-2" />
-          <p className="text-muted-foreground text-xs">
+          <p className="max-w-[100vw] leading-relaxed text-muted-foreground text-xs">
             Nada por aqui {period === "today" ? "hoje" : period === "week" ? "nesta semana" : "neste mês"}
           </p>
         </div>

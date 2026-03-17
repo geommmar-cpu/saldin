@@ -26,6 +26,11 @@ const AddReceivable = () => {
 
   return (
     <div className="min-h-screen bg-background flex flex-col pb-24">
+      <title>Saldin | AddReceivable</title>
+      <meta name="description" content="Manage your addreceivable easily with Saldin." />
+      <meta property="og:title" content="Saldin - AddReceivable" />
+      <meta property="og:description" content="Manage your addreceivable easily with Saldin." />
+        
       {/* Header */}
       <header className="px-5 pt-safe-top">
         <div className="pt-4 pb-2 flex items-center gap-4">
@@ -40,13 +45,13 @@ const AddReceivable = () => {
         {/* Amount Display */}
         <FadeIn className="flex-1 flex flex-col items-center justify-center">
           <AmountDisplay amount={amount} label="Quanto você vai receber?" />
-          <p className="text-sm text-muted-foreground mt-4 text-center max-w-xs">
+          <p className="max-w-[100vw] leading-relaxed text-sm leading-relaxed text-muted-foreground mt-4 text-center max-w-xs">
             Registre rápido aqui, ou envie por texto/foto para {preferences.aiName} no WhatsApp.
           </p>
         </FadeIn>
 
         {/* WhatsApp Alternative */}
-        <FadeIn delay={0.1} className="mb-6">
+        <FadeIn delay={0.1} className="leading-relaxed mb-6">
           <div className="flex justify-center">
             <Button 
               variant="soft" 
@@ -58,7 +63,7 @@ const AddReceivable = () => {
               Enviar via WhatsApp
             </Button>
           </div>
-          <p className="text-xs text-muted-foreground text-center mt-2">
+          <p className="max-w-[100vw] leading-relaxed text-xs text-muted-foreground text-center mt-2">
             Texto, foto ou áudio — {preferences.aiName} extrai tudo automaticamente
           </p>
         </FadeIn>

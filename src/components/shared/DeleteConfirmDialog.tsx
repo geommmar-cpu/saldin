@@ -50,15 +50,15 @@ export const DeleteConfirmDialog = ({
           <div className="mx-auto w-12 h-12 rounded-full bg-destructive/10 flex items-center justify-center mb-2">
             <Trash2 className="w-6 h-6 text-destructive" />
           </div>
-          <AlertDialogTitle className="text-center">{title}</AlertDialogTitle>
-          <AlertDialogDescription className="text-center">
+          <AlertDialogTitle className="max-w-[100vw] leading-relaxed text-center">{title}</AlertDialogTitle>
+          <AlertDialogDescription className="max-w-[100vw] leading-relaxed text-center">
             {description}
           </AlertDialogDescription>
         </AlertDialogHeader>
 
         {isInstallment && (
           <div className="py-4">
-            <p className="text-sm text-muted-foreground mb-3">
+            <p className="max-w-[100vw] leading-relaxed text-sm leading-relaxed text-muted-foreground mb-3">
               O que você deseja excluir?
             </p>
             <RadioGroup
@@ -78,7 +78,7 @@ export const DeleteConfirmDialog = ({
                 <RadioGroupItem value="current" id="del-current" />
                 <Label htmlFor="del-current" className="flex-1 cursor-pointer">
                   <p className="font-medium">Apenas esta parcela</p>
-                  <p className="text-xs text-muted-foreground">
+                  <p className="max-w-[100vw] leading-relaxed text-xs text-muted-foreground">
                     Mantém as outras parcelas intactas
                   </p>
                 </Label>
@@ -96,7 +96,7 @@ export const DeleteConfirmDialog = ({
                 <RadioGroupItem value="future" id="del-future" />
                 <Label htmlFor="del-future" className="flex-1 cursor-pointer">
                   <p className="font-medium">Esta e as próximas</p>
-                  <p className="text-xs text-muted-foreground">
+                  <p className="max-w-[100vw] leading-relaxed text-xs text-muted-foreground">
                     Parcelas anteriores são mantidas
                   </p>
                 </Label>
@@ -114,7 +114,7 @@ export const DeleteConfirmDialog = ({
                 <RadioGroupItem value="all" id="del-all" />
                 <Label htmlFor="del-all" className="flex-1 cursor-pointer">
                   <p className="font-medium">Excluir {entityName} completo</p>
-                  <p className="text-xs text-muted-foreground">
+                  <p className="max-w-[100vw] leading-relaxed text-xs text-muted-foreground">
                     Remove todas as parcelas
                   </p>
                 </Label>

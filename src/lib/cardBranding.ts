@@ -16,7 +16,7 @@ export interface BankTheme {
 }
 
 export const BANK_THEMES: Record<string, BankTheme> = {
-  nubank: { name: "Nubank", color: "#8B10AE", gradient: "from-purple-600 to-violet-800", bgClass: "bg-purple-600", logoUrl: "https://logodownload.org/wp-content/uploads/2014/05/banco-nubank-logo.png" },
+  nubank: { name: "Nubank", color: "#8B10AE", gradient: "from-teal-600 to-cyan-800", bgClass: "bg-teal-600", logoUrl: "https://logodownload.org/wp-content/uploads/2014/05/banco-nubank-logo.png" },
   itau: { name: "Itaú", color: "#FF6200", gradient: "from-orange-500 to-orange-700", bgClass: "bg-orange-600", logoUrl: "https://logodownload.org/wp-content/uploads/2014/05/itau-logo-1.png" },
   bradesco: { name: "Bradesco", color: "#CC092F", gradient: "from-red-600 to-red-800", bgClass: "bg-red-600", logoUrl: "https://logodownload.org/wp-content/uploads/2014/02/bradesco-logo-1.png" },
   inter: { name: "Inter", color: "#FF7A00", gradient: "from-orange-500 to-orange-700", bgClass: "bg-orange-500", logoUrl: "https://logodownload.org/wp-content/uploads/2018/06/banco-inter-logo.png" },
@@ -32,7 +32,7 @@ export const BANK_THEMES: Record<string, BankTheme> = {
   pan: { name: "Banco Pan", color: "#0066CC", gradient: "from-blue-500 to-blue-700", bgClass: "bg-blue-500", logoUrl: "https://logodownload.org/wp-content/uploads/2019/10/banco-pan-logo-1.png" },
   next: { name: "Next", color: "#00E676", gradient: "from-green-400 to-green-600", bgClass: "bg-green-400", logoUrl: "https://logodownload.org/wp-content/uploads/2018/06/banco-next-logo.png" },
   dinheiro: { name: "Dinheiro", color: "#10B981", gradient: "from-emerald-600 to-teal-800", bgClass: "bg-emerald-600" },
-  outros: { name: "Outro", color: "#8B5CF6", gradient: "from-violet-500 to-purple-700", bgClass: "bg-violet-500" },
+  outros: { name: "Outro", color: "#8B5CF6", gradient: "from-cyan-500 to-teal-700", bgClass: "bg-cyan-500" },
 };
 
 export const BANK_LIST = Object.entries(BANK_THEMES).map(([key, theme]) => ({
@@ -92,7 +92,7 @@ export function detectBrand(brandField?: string | null): BrandInfo | null {
 
 /** Get the appropriate color for a card — user color > bank theme */
 export function getCardColor(cardColor: string, cardName: string, bankField?: string | null): string {
-  // If user picked a color that's not the default violet, use it
+  // If user picked a color that's not the default cyan, use it
   if (cardColor && cardColor !== "#8B5CF6") {
     return cardColor;
   }

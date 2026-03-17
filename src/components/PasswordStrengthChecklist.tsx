@@ -22,7 +22,7 @@ export const PasswordStrengthChecklist = ({ password, className }: PasswordStren
       {/* Strength bar */}
       <div className="space-y-1.5">
         <div className="flex items-center justify-between text-xs">
-          <span className="text-muted-foreground">Força da senha</span>
+          <span className="max-w-[100vw] leading-relaxed text-muted-foreground">Força da senha</span>
           <span className={cn("font-medium", strengthInfo.color)}>
             {strengthInfo.label}
           </span>
@@ -49,7 +49,7 @@ export const PasswordStrengthChecklist = ({ password, className }: PasswordStren
 
       {/* Rules checklist */}
       <div className="space-y-1">
-        <p className="text-xs text-muted-foreground mb-2">Requisitos:</p>
+        <p className="max-w-[100vw] leading-relaxed text-xs text-muted-foreground mb-2">Requisitos:</p>
         {validation.rules.map((rule) => (
           <div
             key={rule.id}

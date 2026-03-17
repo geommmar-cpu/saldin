@@ -68,6 +68,11 @@ export const EditDebt = () => {
   if (isLoadingDebt) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
+      <title>Saldin | EditDebt</title>
+      <meta name="description" content="Manage your editdebt easily with Saldin." />
+      <meta property="og:title" content="Saldin - EditDebt" />
+      <meta property="og:description" content="Manage your editdebt easily with Saldin." />
+        
         <Loader2 className="w-8 h-8 animate-spin text-muted-foreground" />
       </div>
     );
@@ -76,7 +81,7 @@ export const EditDebt = () => {
   if (!debt) {
     return (
       <div className="min-h-screen bg-background flex flex-col items-center justify-center p-5">
-        <p className="text-muted-foreground">Dívida não encontrada</p>
+        <p className="max-w-[100vw] leading-relaxed text-muted-foreground">Dívida não encontrada</p>
         <Button variant="ghost" onClick={() => navigate("/")} className="mt-4">Voltar</Button>
       </div>
     );
@@ -94,13 +99,13 @@ export const EditDebt = () => {
       </header>
 
       <main className="flex-1 px-5 py-6 overflow-y-auto pb-32">
-        <FadeIn className="mb-6">
-          <Label className="text-sm text-muted-foreground mb-2 block">Nome da dívida</Label>
+        <FadeIn className="leading-relaxed mb-6">
+          <Label className="max-w-[100vw] leading-relaxed text-sm leading-relaxed text-muted-foreground mb-2 block">Nome da dívida</Label>
           <Input placeholder="Ex: Cartão Nubank..." value={creditorName} onChange={(e) => setCreditorName(e.target.value)} maxLength={50} />
         </FadeIn>
 
-        <FadeIn delay={0.05} className="mb-6">
-          <Label className="text-sm text-muted-foreground mb-2 block">Valor total</Label>
+        <FadeIn delay={0.05} className="leading-relaxed mb-6">
+          <Label className="max-w-[100vw] leading-relaxed text-sm leading-relaxed text-muted-foreground mb-2 block">Valor total</Label>
           <CurrencyInput
             value={totalAmount}
             onChange={setTotalAmount}
@@ -109,14 +114,14 @@ export const EditDebt = () => {
         </FadeIn>
 
         {!isRecurring && (
-          <FadeIn delay={0.1} className="mb-6">
+          <FadeIn delay={0.1} className="leading-relaxed mb-6">
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <Label className="text-sm text-muted-foreground mb-2 block">Nº de parcelas</Label>
+                <Label className="max-w-[100vw] leading-relaxed text-sm leading-relaxed text-muted-foreground mb-2 block">Nº de parcelas</Label>
                 <Input type="number" inputMode="numeric" value={installments} onChange={(e) => setInstallments(e.target.value)} min={1} max={120} className="h-12" />
               </div>
               <div>
-                <Label className="text-sm text-muted-foreground mb-2 block">Valor da parcela</Label>
+                <Label className="max-w-[100vw] leading-relaxed text-sm leading-relaxed text-muted-foreground mb-2 block">Valor da parcela</Label>
                 <CurrencyInput
                   value={installmentAmount}
                   onChange={setInstallmentAmount}
@@ -126,8 +131,8 @@ export const EditDebt = () => {
           </FadeIn>
         )}
 
-        <FadeIn delay={0.15} className="mb-6">
-          <Label className="text-sm text-muted-foreground mb-2 block">Data de vencimento</Label>
+        <FadeIn delay={0.15} className="leading-relaxed mb-6">
+          <Label className="max-w-[100vw] leading-relaxed text-sm leading-relaxed text-muted-foreground mb-2 block">Data de vencimento</Label>
           <Popover>
             <PopoverTrigger asChild>
               <Button variant="outline" className={cn("w-full justify-start text-left font-normal h-11", !dueDate && "text-muted-foreground")}>

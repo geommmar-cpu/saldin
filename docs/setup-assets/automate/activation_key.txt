@@ -1,0 +1,7 @@
+URL do Webhook: https://[SEU_SUBDOMAIN].supabase.co/functions/v1/inject-notification?t=[SEU_TOKEN]&n={texto}&b={app}
+
+--- 
+Instruções para o Automate:
+1. Salve este arquivo na pasta Download do seu Android.
+2. No Automate, use o bloco 'File read' apontando para este arquivo.
+3. Use o conteúdo lido no bloco 'HTTP Request'.

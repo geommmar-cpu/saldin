@@ -44,10 +44,10 @@ export const DeleteExpenseDialog = ({
           <div className="mx-auto w-12 h-12 rounded-full bg-destructive/10 flex items-center justify-center mb-2">
             <Trash2 className="w-6 h-6 text-destructive" />
           </div>
-          <AlertDialogTitle className="text-center">
+          <AlertDialogTitle className="max-w-[100vw] leading-relaxed text-center">
             Excluir gasto?
           </AlertDialogTitle>
-          <AlertDialogDescription className="text-center">
+          <AlertDialogDescription className="max-w-[100vw] leading-relaxed text-center">
             {isFromIntegration ? (
               <span className="flex items-center justify-center gap-2 text-amber-600 dark:text-amber-500">
                 <AlertTriangle className="w-4 h-4" />
@@ -61,7 +61,7 @@ export const DeleteExpenseDialog = ({
 
         {isRecurring && (
           <div className="py-4">
-            <p className="text-sm text-muted-foreground mb-3">
+            <p className="max-w-[100vw] leading-relaxed text-sm leading-relaxed text-muted-foreground mb-3">
               O que você deseja excluir?
             </p>
             <RadioGroup
@@ -81,7 +81,7 @@ export const DeleteExpenseDialog = ({
                 <RadioGroupItem value="current" id="current" />
                 <Label htmlFor="current" className="flex-1 cursor-pointer">
                   <p className="font-medium">Apenas esta parcela</p>
-                  <p className="text-xs text-muted-foreground">
+                  <p className="max-w-[100vw] leading-relaxed text-xs text-muted-foreground">
                     Mantém as outras parcelas intactas
                   </p>
                 </Label>
@@ -99,7 +99,7 @@ export const DeleteExpenseDialog = ({
                 <RadioGroupItem value="future" id="future" />
                 <Label htmlFor="future" className="flex-1 cursor-pointer">
                   <p className="font-medium">Esta e as próximas</p>
-                  <p className="text-xs text-muted-foreground">
+                  <p className="max-w-[100vw] leading-relaxed text-xs text-muted-foreground">
                     Parcelas anteriores são mantidas
                   </p>
                 </Label>
@@ -117,7 +117,7 @@ export const DeleteExpenseDialog = ({
                 <RadioGroupItem value="all" id="all" />
                 <Label htmlFor="all" className="flex-1 cursor-pointer">
                   <p className="font-medium">Todas as parcelas</p>
-                  <p className="text-xs text-muted-foreground">
+                  <p className="max-w-[100vw] leading-relaxed text-xs text-muted-foreground">
                     Remove o gasto completamente
                   </p>
                 </Label>

@@ -27,13 +27,13 @@ export const BalanceCard = ({ balance }: BalanceCardProps) => {
        >
          <div className="flex items-center justify-between mb-1">
            <div className="flex items-center gap-2">
-             <p className="text-sm text-muted-foreground">Saldo Livre</p>
+             <p className="max-w-[100vw] leading-relaxed text-sm leading-relaxed text-muted-foreground">Saldo Livre</p>
              <Tooltip>
                <TooltipTrigger>
                  <Info className="w-3.5 h-3.5 text-muted-foreground/60" />
                </TooltipTrigger>
                <TooltipContent className="max-w-[250px]">
-                 <p className="text-xs">
+                 <p className="max-w-[100vw] leading-relaxed text-xs">
                    Dinheiro realmente disponível após descontar compromissos futuros (dívidas, parcelas).
                  </p>
                </TooltipContent>
@@ -83,8 +83,8 @@ export const BalanceCard = ({ balance }: BalanceCardProps) => {
                    <Wallet className="w-4 h-4 text-muted-foreground" />
                  </div>
                  <div>
-                   <p className="text-sm font-medium">Saldo Bruto</p>
-                   <p className="text-xs text-muted-foreground">Receitas - Gastos</p>
+                   <p className="max-w-[100vw] leading-relaxed text-sm leading-relaxed font-medium">Saldo Bruto</p>
+                   <p className="max-w-[100vw] leading-relaxed text-xs text-muted-foreground">Receitas - Gastos</p>
                  </div>
                </div>
                <p className={cn(
@@ -102,8 +102,8 @@ export const BalanceCard = ({ balance }: BalanceCardProps) => {
                    <Lock className="w-4 h-4 text-impulse" />
                  </div>
                  <div>
-                   <p className="text-sm font-medium">Comprometido</p>
-                   <p className="text-xs text-muted-foreground">Dívidas e parcelas</p>
+                   <p className="max-w-[100vw] leading-relaxed text-sm leading-relaxed font-medium">Comprometido</p>
+                   <p className="max-w-[100vw] leading-relaxed text-xs text-muted-foreground">Dívidas e parcelas</p>
                  </div>
                </div>
                <p className="font-semibold text-impulse">
@@ -113,18 +113,18 @@ export const BalanceCard = ({ balance }: BalanceCardProps) => {
              
              {/* Breakdown */}
              <div className="p-3 rounded-xl bg-muted/50 space-y-2">
-               <div className="flex justify-between text-sm">
-                 <span className="text-muted-foreground">Receitas do mês</span>
-                 <span className="text-essential">+ {formatCurrency(balance.detalhes.receitasTotal)}</span>
+               <div className="flex justify-between text-sm leading-relaxed">
+                 <span className="max-w-[100vw] leading-relaxed text-muted-foreground">Receitas do mês</span>
+                 <span className="max-w-[100vw] leading-relaxed text-essential">+ {formatCurrency(balance.detalhes.receitasTotal)}</span>
                </div>
-               <div className="flex justify-between text-sm">
-                 <span className="text-muted-foreground">Gastos do mês</span>
+               <div className="flex justify-between text-sm leading-relaxed">
+                 <span className="max-w-[100vw] leading-relaxed text-muted-foreground">Gastos do mês</span>
                  <span>- {formatCurrency(balance.detalhes.gastosTotal)}</span>
                </div>
                {balance.detalhes.dividasAtivas > 0 && (
-                 <div className="flex justify-between text-sm">
-                   <span className="text-muted-foreground">Dívidas ativas</span>
-                   <span className="text-impulse">- {formatCurrency(balance.detalhes.dividasAtivas)}</span>
+                 <div className="flex justify-between text-sm leading-relaxed">
+                   <span className="max-w-[100vw] leading-relaxed text-muted-foreground">Dívidas ativas</span>
+                   <span className="max-w-[100vw] leading-relaxed text-impulse">- {formatCurrency(balance.detalhes.dividasAtivas)}</span>
                  </div>
                )}
              </div>

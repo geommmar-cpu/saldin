@@ -34,10 +34,10 @@ export const BankAccountSelector = ({
 
   if (filteredAccounts.length === 0) {
     return (
-      <div className="mb-5">
-        <label className="text-sm text-muted-foreground mb-3 block">{label}</label>
+      <div className="leading-relaxed mb-5">
+        <label className="max-w-[100vw] leading-relaxed text-sm leading-relaxed text-muted-foreground mb-3 block">{label}</label>
         <div className="p-4 rounded-xl border border-dashed border-border text-center">
-          <p className="text-sm text-muted-foreground mb-2">{emptyMessage}</p>
+          <p className="max-w-[100vw] leading-relaxed text-sm leading-relaxed text-muted-foreground mb-2">{emptyMessage}</p>
           <Button variant="outline" size="sm" onClick={() => onCreateAccount ? onCreateAccount() : navigate("/banks/add")}>
             <Plus className="w-4 h-4 mr-1" />
             Criar conta agora
@@ -48,11 +48,11 @@ export const BankAccountSelector = ({
   }
 
   return (
-    <div className="mb-5">
-      <label className="text-sm text-muted-foreground mb-3 block">{label}</label>
+    <div className="leading-relaxed mb-5">
+      <label className="max-w-[100vw] leading-relaxed text-sm leading-relaxed text-muted-foreground mb-3 block">{label}</label>
       <div className="space-y-2">
         {filteredAccounts.map((account) => {
-          const isCash = account.bank_key === CASH_ACCOUNT_KEY || account.account_type === ("cash" as any);
+          const isCash = account.bank_key === CASH_ACCOUNT_KEY || account.account_type === ("cash" as string);
           const bankTheme = detectBank(account.bank_name, account.bank_key);
           const color = isCash ? "#6B7280" : (account.color || bankTheme.color);
           const Icon = isCash ? Wallet : Landmark;
@@ -76,8 +76,8 @@ export const BankAccountSelector = ({
                 <Icon className="w-4 h-4" style={{ color }} />
               </div>
               <div className="flex-1 min-w-0">
-                <p className="text-sm font-medium truncate">{account.bank_name}</p>
-                <p className="text-xs text-muted-foreground">
+                <p className="max-w-[100vw] leading-relaxed text-sm leading-relaxed font-medium truncate">{account.bank_name}</p>
+                <p className="max-w-[100vw] leading-relaxed text-xs text-muted-foreground">
                   {formatCurrency(Number(account.current_balance))}
                 </p>
               </div>

@@ -89,7 +89,7 @@ export const FilterSheet = ({
         <div className="space-y-6 pb-6">
           {/* Period Filter */}
           <div>
-            <p className="text-sm font-medium mb-3 flex items-center gap-2">
+            <p className="max-w-[100vw] leading-relaxed text-sm leading-relaxed font-medium mb-3 flex items-center gap-2">
               <Calendar className="w-4 h-4" />
               Período
             </p>
@@ -99,7 +99,7 @@ export const FilterSheet = ({
                   key={option.id}
                   whileTap={{ scale: 0.95 }}
                   onClick={() => onPeriodChange(option.id)}
-                  className={`px-4 py-2 rounded-full text-sm font-medium transition-all ${
+                  className={`px-4 py-2 rounded-full text-sm leading-relaxed font-medium transition-all ${
                     periodFilter === option.id
                       ? "bg-primary text-primary-foreground"
                       : "bg-muted text-muted-foreground hover:bg-muted/80"
@@ -114,14 +114,14 @@ export const FilterSheet = ({
           {/* Type Filter */}
           {onTypeChange && (
             <div>
-              <p className="text-sm font-medium mb-3">Tipo</p>
+              <p className="max-w-[100vw] leading-relaxed text-sm leading-relaxed font-medium mb-3">Tipo</p>
               <div className="flex flex-wrap gap-2">
                 {typeOptions.map((option) => (
                   <motion.button
                     key={option.id}
                     whileTap={{ scale: 0.95 }}
                     onClick={() => onTypeChange(option.id)}
-                    className={`px-4 py-2 rounded-full text-sm font-medium transition-all ${
+                    className={`px-4 py-2 rounded-full text-sm leading-relaxed font-medium transition-all ${
                       typeFilter === option.id
                         ? "bg-primary text-primary-foreground"
                         : "bg-muted text-muted-foreground hover:bg-muted/80"
@@ -136,7 +136,7 @@ export const FilterSheet = ({
 
           {/* Source Filter */}
           <div>
-            <p className="text-sm font-medium mb-3">Origem</p>
+            <p className="max-w-[100vw] leading-relaxed text-sm leading-relaxed font-medium mb-3">Origem</p>
             <div className="flex flex-wrap gap-2">
               {sourceOptions.map((option) => {
                 const Icon = option.icon;
@@ -145,7 +145,7 @@ export const FilterSheet = ({
                     key={option.id}
                     whileTap={{ scale: 0.95 }}
                     onClick={() => onSourceChange(option.id)}
-                    className={`px-4 py-2 rounded-full text-sm font-medium flex items-center gap-2 transition-all ${
+                    className={`px-4 py-2 rounded-full text-sm leading-relaxed font-medium flex items-center gap-2 transition-all ${
                       sourceFilter === option.id
                         ? "bg-primary text-primary-foreground"
                         : "bg-muted text-muted-foreground hover:bg-muted/80"
@@ -161,14 +161,14 @@ export const FilterSheet = ({
 
           {/* Emotion Filter */}
           <div>
-            <p className="text-sm font-medium mb-3">Categoria emocional</p>
+            <p className="max-w-[100vw] leading-relaxed text-sm leading-relaxed font-medium mb-3">Categoria emocional</p>
             <div className="flex flex-wrap gap-2">
               {emotionOptions.map((option) => (
                 <motion.button
                   key={option.id}
                   whileTap={{ scale: 0.95 }}
                   onClick={() => onEmotionChange(option.id)}
-                  className={`px-4 py-2 rounded-full text-sm font-medium transition-all ${
+                  className={`px-4 py-2 rounded-full text-sm leading-relaxed font-medium transition-all ${
                     emotionFilter === option.id
                       ? option.color === "muted"
                         ? "bg-primary text-primary-foreground"

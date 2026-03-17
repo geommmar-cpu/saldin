@@ -105,6 +105,11 @@ export default function Overview() {
   if (isLoading) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center pb-24">
+      <title>Saldin | Overview</title>
+      <meta name="description" content="Manage your overview easily with Saldin." />
+      <meta property="og:title" content="Saldin - Overview" />
+      <meta property="og:description" content="Manage your overview easily with Saldin." />
+        
         <Loader2 className="w-8 h-8 animate-spin text-muted-foreground" />
         <BottomNav />
       </div>
@@ -128,7 +133,7 @@ export default function Overview() {
               </Button>
               <div>
                 <h1 className="font-serif text-xl font-semibold">Parcelas Futuras</h1>
-                <p className="text-xs text-muted-foreground">Mapa de compromissos</p>
+                <p className="max-w-[100vw] leading-relaxed text-xs text-muted-foreground">Mapa de compromissos</p>
               </div>
             </div>
           </FadeIn>
@@ -144,13 +149,13 @@ export default function Overview() {
                 <Layers className="h-6 w-6 text-impulse" />
               </div>
               <div>
-                <p className="text-sm text-muted-foreground">Total comprometido</p>
+                <p className="max-w-[100vw] leading-relaxed text-sm leading-relaxed text-muted-foreground">Total comprometido</p>
                 <p className="font-serif text-2xl font-semibold text-impulse">
                   {formatCurrency(totalCommitted)}
                 </p>
               </div>
             </div>
-            <p className="text-xs text-muted-foreground">
+            <p className="max-w-[100vw] leading-relaxed text-xs text-muted-foreground">
               Próximos {monthsToShow} meses · {debts.length} dívida{debts.length !== 1 ? "s" : ""} ativa{debts.length !== 1 ? "s" : ""}
             </p>
           </div>
@@ -159,7 +164,7 @@ export default function Overview() {
         {/* Timeline Visual */}
         <FadeIn delay={0.1}>
           <div className="space-y-3">
-            <h2 className="font-serif text-lg font-semibold flex items-center gap-2">
+            <h2 className="font-serif text-lg leading-relaxed font-semibold flex items-center gap-2">
               <Calendar className="w-4 h-4 text-muted-foreground" />
               Linha do tempo
             </h2>
@@ -170,7 +175,7 @@ export default function Overview() {
                   <Clock className="w-6 h-6 text-essential" />
                 </div>
                 <p className="font-medium mb-1">Nenhum compromisso futuro</p>
-                <p className="text-sm text-muted-foreground">
+                <p className="max-w-[100vw] leading-relaxed text-sm leading-relaxed text-muted-foreground">
                   Você não tem parcelas ou dívidas ativas.
                 </p>
               </div>
@@ -215,18 +220,18 @@ export default function Overview() {
                         <button
                           key={item.id}
                           onClick={() => navigate(`/debts/${item.id}`)}
-                          className="w-full flex items-center justify-between text-sm hover:bg-muted/50 p-2 -mx-2 rounded-lg transition-colors"
+                          className="w-full flex items-center justify-between text-sm leading-relaxed hover:bg-muted/50 p-2 -mx-2 rounded-lg transition-colors"
                         >
                           <div className="flex items-center gap-2">
                             <CreditCard className="w-3.5 h-3.5 text-muted-foreground" />
                             <span className="truncate">{item.name}</span>
                             {item.type === "installment" && item.currentInstallment && item.totalInstallments && (
-                              <span className="text-xs text-muted-foreground">
+                              <span className="max-w-[100vw] leading-relaxed text-xs text-muted-foreground">
                                 ({item.currentInstallment}/{item.totalInstallments})
                               </span>
                             )}
                           </div>
-                          <span className="text-muted-foreground">
+                          <span className="max-w-[100vw] leading-relaxed text-muted-foreground">
                             {formatCurrency(item.amount)}
                           </span>
                         </button>

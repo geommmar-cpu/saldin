@@ -128,6 +128,11 @@ export const AddCryptoWallet = () => {
 
   return (
     <div className="min-h-screen bg-background flex flex-col">
+      <title>Saldin | AddCryptoWallet</title>
+      <meta name="description" content="Manage your addcryptowallet easily with Saldin." />
+      <meta property="og:title" content="Saldin - AddCryptoWallet" />
+      <meta property="og:description" content="Manage your addcryptowallet easily with Saldin." />
+        
       <header className="px-5 pt-safe-top">
         <div className="pt-4 pb-2 flex items-center gap-4">
           <Button variant="ghost" size="icon" onClick={() => navigate("/crypto-wallet")}>
@@ -139,8 +144,8 @@ export const AddCryptoWallet = () => {
 
       <main className="flex-1 px-5 py-6 overflow-y-auto pb-32">
         {/* Crypto selector */}
-        <FadeIn className="mb-6">
-          <label className="text-sm text-muted-foreground mb-3 block">Criptomoeda</label>
+        <FadeIn className="leading-relaxed mb-6">
+          <label className="max-w-[100vw] leading-relaxed text-sm leading-relaxed text-muted-foreground mb-3 block">Criptomoeda</label>
           <div className="grid grid-cols-3 gap-2">
             {CRYPTO_LIST.map((crypto) => (
               <motion.button
@@ -166,13 +171,13 @@ export const AddCryptoWallet = () => {
                       className="w-full h-full flex items-center justify-center"
                       style={{ backgroundColor: crypto.color + "20" }}
                     >
-                      <span className="text-xs font-bold" style={{ color: crypto.color }}>
+                      <span className="max-w-[100vw] leading-relaxed text-xs font-bold" style={{ color: crypto.color }}>
                         {crypto.symbol}
                       </span>
                     </div>
                   )}
                 </div>
-                <span className="text-xs font-medium truncate w-full text-center">{crypto.name}</span>
+                <span className="max-w-[100vw] leading-relaxed text-xs font-medium truncate w-full text-center">{crypto.name}</span>
               </motion.button>
             ))}
             <motion.button
@@ -186,26 +191,26 @@ export const AddCryptoWallet = () => {
               <div className="w-8 h-8 rounded-lg flex items-center justify-center bg-muted">
                 <Bitcoin className="w-4 h-4 text-muted-foreground" />
               </div>
-              <span className="text-xs font-medium">Outra</span>
+              <span className="max-w-[100vw] leading-relaxed text-xs font-medium">Outra</span>
             </motion.button>
           </div>
         </FadeIn>
 
         {/* Custom crypto fields */}
         {isCustom && (
-          <FadeIn className="mb-6 space-y-4">
+          <FadeIn className="leading-relaxed mb-6 space-y-4">
             <div>
-              <label className="text-sm text-muted-foreground mb-2 block">Nome</label>
+              <label className="max-w-[100vw] leading-relaxed text-sm leading-relaxed text-muted-foreground mb-2 block">Nome</label>
               <Input placeholder="Ex: Avalanche" value={customName} onChange={(e) => setCustomName(e.target.value)} maxLength={40} className="h-12" />
             </div>
             <div>
-              <label className="text-sm text-muted-foreground mb-2 block">Símbolo</label>
+              <label className="max-w-[100vw] leading-relaxed text-sm leading-relaxed text-muted-foreground mb-2 block">Símbolo</label>
               <Input placeholder="Ex: AVAX" value={customSymbol} onChange={(e) => setCustomSymbol(e.target.value.toUpperCase())} maxLength={10} className="h-12" />
             </div>
             <div>
-              <label className="text-sm text-muted-foreground mb-2 block">ID CoinGecko (opcional)</label>
+              <label className="max-w-[100vw] leading-relaxed text-sm leading-relaxed text-muted-foreground mb-2 block">ID CoinGecko (opcional)</label>
               <Input placeholder="Ex: avalanche-2" value={customCoinGeckoId} onChange={(e) => setCustomCoinGeckoId(e.target.value)} maxLength={60} className="h-12" />
-              <p className="text-xs text-muted-foreground mt-1">Usado para atualizar a cotação automaticamente</p>
+              <p className="max-w-[100vw] leading-relaxed text-xs text-muted-foreground mt-1">Usado para atualizar a cotação automaticamente</p>
             </div>
           </FadeIn>
         )}
@@ -213,14 +218,14 @@ export const AddCryptoWallet = () => {
         {/* Input mode toggle + value */}
         {showCryptoSelected && (
           <>
-            <FadeIn delay={0.05} className="mb-4">
-              <label className="text-sm text-muted-foreground mb-3 block">Como deseja informar?</label>
+            <FadeIn delay={0.05} className="leading-relaxed mb-4">
+              <label className="max-w-[100vw] leading-relaxed text-sm leading-relaxed text-muted-foreground mb-3 block">Como deseja informar?</label>
               <div className="grid grid-cols-2 gap-2">
                 <motion.button
                   whileTap={{ scale: 0.95 }}
                   onClick={() => { setInputMode("brl"); setInputValue(""); }}
                   className={cn(
-                    "p-3 rounded-xl border-2 text-center transition-all text-sm",
+                    "p-3 rounded-xl border-2 text-center transition-all text-sm leading-relaxed",
                     inputMode === "brl"
                       ? "border-primary bg-primary/10 text-primary font-medium"
                       : "border-border bg-card hover:bg-secondary"
@@ -232,7 +237,7 @@ export const AddCryptoWallet = () => {
                   whileTap={{ scale: 0.95 }}
                   onClick={() => { setInputMode("quantity"); setInputValue(""); }}
                   className={cn(
-                    "p-3 rounded-xl border-2 text-center transition-all text-sm",
+                    "p-3 rounded-xl border-2 text-center transition-all text-sm leading-relaxed",
                     inputMode === "quantity"
                       ? "border-primary bg-primary/10 text-primary font-medium"
                       : "border-border bg-card hover:bg-secondary"
@@ -245,8 +250,8 @@ export const AddCryptoWallet = () => {
 
             {/* Price status */}
             {priceLoading && (
-              <FadeIn className="mb-4">
-                <div className="flex items-center gap-2 text-sm text-muted-foreground p-3 rounded-xl bg-muted/50">
+              <FadeIn className="leading-relaxed mb-4">
+                <div className="flex items-center gap-2 text-sm leading-relaxed text-muted-foreground p-3 rounded-xl bg-muted/50">
                   <Loader2 className="w-4 h-4 animate-spin" />
                   Buscando cotação...
                 </div>
@@ -254,8 +259,8 @@ export const AddCryptoWallet = () => {
             )}
 
             {priceError && !priceLoading && (
-              <FadeIn className="mb-4">
-                <div className="flex items-center gap-2 text-sm text-warning p-3 rounded-xl bg-warning/10 border border-warning/20">
+              <FadeIn className="leading-relaxed mb-4">
+                <div className="flex items-center gap-2 text-sm leading-relaxed text-warning p-3 rounded-xl bg-warning/10 border border-warning/20">
                   <AlertTriangle className="w-4 h-4" />
                   Cotação indisponível. {inputMode === "brl" ? "Use o modo quantidade." : "O valor em reais não será calculado."}
                 </div>
@@ -263,16 +268,16 @@ export const AddCryptoWallet = () => {
             )}
 
             {currentPrice !== null && !priceLoading && (
-              <FadeIn className="mb-4">
-                <div className="text-xs text-muted-foreground p-3 rounded-xl bg-muted/50">
+              <FadeIn className="leading-relaxed mb-4">
+                <div className="max-w-[100vw] leading-relaxed text-xs text-muted-foreground p-3 rounded-xl bg-muted/50">
                   Cotação atual: <strong>{formatCryptoValue(currentPrice, displayCurrency)}</strong> por {symbol}
                 </div>
               </FadeIn>
             )}
 
             {/* Input field */}
-            <FadeIn delay={0.05} className="mb-4">
-              <label className="text-sm text-muted-foreground mb-2 block">
+            <FadeIn delay={0.05} className="leading-relaxed mb-4">
+              <label className="max-w-[100vw] leading-relaxed text-sm leading-relaxed text-muted-foreground mb-2 block">
                 {inputMode === "brl"
                   ? `Valor (${displayCurrency})`
                   : `Quantidade (${symbol})`
@@ -285,32 +290,32 @@ export const AddCryptoWallet = () => {
                 placeholder="0.00"
                 value={inputValue}
                 onChange={(e) => setInputValue(e.target.value)}
-                className="h-12 text-lg font-medium"
+                className="h-12 text-lg leading-relaxed font-medium"
                 disabled={inputMode === "brl" && currentPrice === null && !priceLoading}
               />
             </FadeIn>
 
             {/* Conversion preview */}
             {rawValue > 0 && currentPrice !== null && currentPrice > 0 && (
-              <FadeIn className="mb-6">
+              <FadeIn className="leading-relaxed mb-6">
                 <div className="p-4 rounded-xl bg-card border border-border space-y-2">
-                  <p className="text-sm text-muted-foreground font-medium">Resumo da conversão</p>
+                  <p className="max-w-[100vw] leading-relaxed text-sm leading-relaxed text-muted-foreground font-medium">Resumo da conversão</p>
                   <div className="grid grid-cols-2 gap-3">
                     <div>
-                      <p className="text-xs text-muted-foreground">Quantidade</p>
-                      <p className="text-sm font-semibold">
+                      <p className="max-w-[100vw] leading-relaxed text-xs text-muted-foreground">Quantidade</p>
+                      <p className="max-w-[100vw] leading-relaxed text-sm leading-relaxed font-semibold">
                         {formatCryptoQuantity(computedQuantity, symbol)} {symbol}
                       </p>
                     </div>
                     <div>
-                      <p className="text-xs text-muted-foreground">Valor</p>
-                      <p className="text-sm font-semibold">
+                      <p className="max-w-[100vw] leading-relaxed text-xs text-muted-foreground">Valor</p>
+                      <p className="max-w-[100vw] leading-relaxed text-sm leading-relaxed font-semibold">
                         {formatCryptoValue(computedValue, displayCurrency)}
                       </p>
                     </div>
                     <div>
-                      <p className="text-xs text-muted-foreground">Cotação usada</p>
-                      <p className="text-sm font-medium">
+                      <p className="max-w-[100vw] leading-relaxed text-xs text-muted-foreground">Cotação usada</p>
+                      <p className="max-w-[100vw] leading-relaxed text-sm leading-relaxed font-medium">
                         {formatCryptoValue(currentPrice, displayCurrency)}
                       </p>
                     </div>
@@ -323,10 +328,10 @@ export const AddCryptoWallet = () => {
 
         {/* Bank account selector for initial deposit */}
         {showCryptoSelected && hasInitialValue && (
-          <FadeIn delay={0.08} className="mb-6">
-            <label className="text-sm text-muted-foreground mb-2 block">Conta de origem *</label>
+          <FadeIn delay={0.08} className="leading-relaxed mb-6">
+            <label className="max-w-[100vw] leading-relaxed text-sm leading-relaxed text-muted-foreground mb-2 block">Conta de origem *</label>
             {bankAccounts.length === 0 ? (
-              <div className="flex items-center gap-2 text-sm text-warning p-3 rounded-xl bg-warning/10 border border-warning/20">
+              <div className="flex items-center gap-2 text-sm leading-relaxed text-warning p-3 rounded-xl bg-warning/10 border border-warning/20">
                 <AlertTriangle className="w-4 h-4 flex-shrink-0" />
                 Cadastre uma conta bancária antes de investir.
               </div>
@@ -344,7 +349,7 @@ export const AddCryptoWallet = () => {
                     ))}
                   </SelectContent>
                 </Select>
-                <p className="text-xs text-muted-foreground mt-1">
+                <p className="max-w-[100vw] leading-relaxed text-xs text-muted-foreground mt-1">
                   O valor será transferido desta conta para a carteira cripto
                 </p>
               </>
@@ -353,8 +358,8 @@ export const AddCryptoWallet = () => {
         )}
 
         {/* Display currency */}
-        <FadeIn delay={0.1} className="mb-6">
-          <label className="text-sm text-muted-foreground mb-3 block">Moeda de exibição</label>
+        <FadeIn delay={0.1} className="leading-relaxed mb-6">
+          <label className="max-w-[100vw] leading-relaxed text-sm leading-relaxed text-muted-foreground mb-3 block">Moeda de exibição</label>
           <div className="grid grid-cols-2 gap-2">
             {(["BRL", "USD"] as const).map((curr) => (
               <motion.button
@@ -368,7 +373,7 @@ export const AddCryptoWallet = () => {
                     : "border-border bg-card hover:bg-secondary"
                 )}
               >
-                <span className="text-sm">{curr === "BRL" ? "🇧🇷 Real (BRL)" : "🇺🇸 Dólar (USD)"}</span>
+                <span className="max-w-[100vw] leading-relaxed text-sm leading-relaxed">{curr === "BRL" ? "🇧🇷 Real (BRL)" : "🇺🇸 Dólar (USD)"}</span>
               </motion.button>
             ))}
           </div>
@@ -380,11 +385,11 @@ export const AddCryptoWallet = () => {
             <div className="flex items-start gap-3">
               <AlertTriangle className="w-5 h-5 text-impulse shrink-0 mt-0.5" />
               <div>
-                <p className="text-sm font-semibold text-impulse">Atenção: Saldo insuficiente</p>
-                <p className="text-xs text-muted-foreground mt-1">
+                <p className="max-w-[100vw] leading-relaxed text-sm leading-relaxed font-semibold text-impulse">Atenção: Saldo insuficiente</p>
+                <p className="max-w-[100vw] leading-relaxed text-xs text-muted-foreground mt-1">
                   O valor de <strong>{formatCryptoValue(computedValue, displayCurrency)}</strong> é maior do que o saldo atual da conta <strong>{selectedBank.bank_name}</strong>.
                 </p>
-                <p className="text-xs font-medium text-impulse/80 mt-2">
+                <p className="max-w-[100vw] leading-relaxed text-xs font-medium text-impulse/80 mt-2">
                   Deseja prosseguir com o investimento mesmo assim?
                 </p>
               </div>

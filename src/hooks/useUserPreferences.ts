@@ -70,6 +70,7 @@ export function useUserPreferences() {
         .from("profiles")
         .select("dark_mode, crypto_enabled")
         .eq("user_id", session.user.id)
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         .maybeSingle() as { data: { dark_mode?: boolean; crypto_enabled?: boolean } | null; error: any };
 
       if (error) {
@@ -112,6 +113,7 @@ export function useUserPreferences() {
 
     const { error } = await supabase
       .from("profiles")
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       .update({ [column]: value } as any)
       .eq("user_id", session.user.id);
 

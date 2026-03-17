@@ -62,6 +62,11 @@ export const EditReceivable = () => {
   if (isLoadingReceivable) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
+      <title>Saldin | EditReceivable</title>
+      <meta name="description" content="Manage your editreceivable easily with Saldin." />
+      <meta property="og:title" content="Saldin - EditReceivable" />
+      <meta property="og:description" content="Manage your editreceivable easily with Saldin." />
+        
         <Loader2 className="w-8 h-8 animate-spin text-muted-foreground" />
       </div>
     );
@@ -70,7 +75,7 @@ export const EditReceivable = () => {
   if (!receivable) {
     return (
       <div className="min-h-screen bg-background flex flex-col items-center justify-center p-5">
-        <p className="text-muted-foreground">Valor a receber não encontrado</p>
+        <p className="max-w-[100vw] leading-relaxed text-muted-foreground">Valor a receber não encontrado</p>
         <Button variant="ghost" onClick={() => navigate("/")} className="mt-4">Voltar</Button>
       </div>
     );
@@ -88,16 +93,16 @@ export const EditReceivable = () => {
       </header>
 
       <main className="flex-1 px-5 py-6 overflow-y-auto pb-32">
-        <FadeIn className="mb-6">
-          <Label className="text-sm text-muted-foreground mb-2 block">Quem deve?</Label>
+        <FadeIn className="leading-relaxed mb-6">
+          <Label className="max-w-[100vw] leading-relaxed text-sm leading-relaxed text-muted-foreground mb-2 block">Quem deve?</Label>
           <div className="relative">
             <User className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
             <Input placeholder="Nome da pessoa" value={debtorName} onChange={(e) => setDebtorName(e.target.value)} maxLength={50} className="pl-10" />
           </div>
         </FadeIn>
 
-        <FadeIn delay={0.05} className="mb-6">
-          <Label className="text-sm text-muted-foreground mb-2 block">Valor</Label>
+        <FadeIn delay={0.05} className="leading-relaxed mb-6">
+          <Label className="max-w-[100vw] leading-relaxed text-sm leading-relaxed text-muted-foreground mb-2 block">Valor</Label>
           <CurrencyInput
             value={amount}
             onChange={setAmount}
@@ -105,13 +110,13 @@ export const EditReceivable = () => {
           />
         </FadeIn>
 
-        <FadeIn delay={0.1} className="mb-6">
-          <Label className="text-sm text-muted-foreground mb-2 block">Descrição (opcional)</Label>
+        <FadeIn delay={0.1} className="leading-relaxed mb-6">
+          <Label className="max-w-[100vw] leading-relaxed text-sm leading-relaxed text-muted-foreground mb-2 block">Descrição (opcional)</Label>
           <Textarea placeholder="Ex: Almoço dividido..." value={description} onChange={(e) => setDescription(e.target.value)} maxLength={100} className="resize-none" rows={2} />
         </FadeIn>
 
-        <FadeIn delay={0.15} className="mb-6">
-          <Label className="text-sm text-muted-foreground mb-2 block">Data de vencimento</Label>
+        <FadeIn delay={0.15} className="leading-relaxed mb-6">
+          <Label className="max-w-[100vw] leading-relaxed text-sm leading-relaxed text-muted-foreground mb-2 block">Data de vencimento</Label>
           <Popover>
             <PopoverTrigger asChild>
               <Button variant="outline" className={cn("w-full justify-start text-left font-normal h-11", !dueDate && "text-muted-foreground")}>
