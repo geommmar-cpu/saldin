@@ -60,6 +60,93 @@ import { useToast } from "@/hooks/use-toast";
 import { useWhatsAppStatus } from "@/hooks/useWhatsAppStatus";
 import { AutoCaptureSection } from "@/components/settings/AutoCaptureSection";
 
+// Helper Components
+
+interface SettingsSectionProps {
+  title: string;
+  children: React.ReactNode;
+}
+
+const SettingsSection = ({ title, children }: SettingsSectionProps) => (
+  <div>
+    <h2 className="max-w-[100vw] leading-relaxed text-xs font-medium text-muted-foreground uppercase tracking-wide mb-2 px-1">
+      {title}
+    </h2>
+    <div className="bg-card rounded-xl border border-border shadow-soft overflow-hidden">
+      {children}
+    </div>
+  </div>
+);
+
+interface SettingsItemProps {
+  icon: React.ElementType;
+  iconColor?: string;
+  label: string;
+  labelColor?: string;
+  description?: string;
+  value?: string;
+  valueColor?: string;
+  badge?: string;
+  action?: React.ReactNode;
+  onClick?: () => void;
+  showArrow?: boolean;
+  locked?: boolean;
+}
+
+const SettingsItem = ({
+  icon: Icon,
+  iconColor,
+  label,
+  labelColor,
+  description,
+  value,
+  valueColor,
+  badge,
+  action,
+  onClick,
+  showArrow,
+  locked,
+}: SettingsItemProps) => {
+  const Wrapper = onClick ? "button" : "div";
+
+  return (
+    <Wrapper
+      onClick={onClick}
+      className={cn(
+        "w-full flex items-center gap-3 p-3 text-left border-b border-border last:border-b-0",
+        onClick && "hover:bg-secondary/50 transition-colors",
+        locked && "opacity-60"
+      )}
+    >
+      <div className={cn(
+        "w-9 h-9 rounded-full flex items-center justify-center flex-shrink-0",
+        locked ? "bg-muted" : "bg-muted"
+      )}>
+        <Icon className={cn("w-4 h-4", iconColor || "text-muted-foreground")} />
+      </div>
+      <div className="flex-1 min-w-0">
+        <div className="flex items-center gap-2">
+          <p className={cn("text-sm leading-relaxed font-medium", labelColor)}>{label}</p>
+          {badge && (
+            <span className="max-w-[100vw] leading-relaxed text-xs font-medium px-1.5 py-0.5 rounded bg-primary/10 text-primary">
+              {badge}
+            </span>
+          )}
+        </div>
+        {description && (
+          <p className="max-w-[100vw] leading-relaxed text-xs text-muted-foreground">{description}</p>
+        )}
+      </div>
+      {value && !action && (
+        <span className={cn("text-sm leading-relaxed truncate max-w-[140px] text-right", valueColor || "text-muted-foreground")}>{value}</span>
+      )}
+      {action}
+      {locked && <Lock className="w-4 h-4 text-muted-foreground" />}
+      {showArrow && !locked && <ChevronRight className="w-4 h-4 text-muted-foreground" />}
+    </Wrapper>
+  );
+};
+
 export const Settings = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
@@ -571,92 +658,5 @@ export const Settings = () => {
 };
 
 
-// Helper Components
-
-
-interface SettingsSectionProps {
-  title: string;
-  children: React.ReactNode;
-}
-
-const SettingsSection = ({ title, children }: SettingsSectionProps) => (
-  <div>
-    <h2 className="max-w-[100vw] leading-relaxed text-xs font-medium text-muted-foreground uppercase tracking-wide mb-2 px-1">
-      {title}
-    </h2>
-    <div className="bg-card rounded-xl border border-border shadow-soft overflow-hidden">
-      {children}
-    </div>
-  </div>
-);
-
-interface SettingsItemProps {
-  icon: React.ElementType;
-  iconColor?: string;
-  label: string;
-  labelColor?: string;
-  description?: string;
-  value?: string;
-  valueColor?: string;
-  badge?: string;
-  action?: React.ReactNode;
-  onClick?: () => void;
-  showArrow?: boolean;
-  locked?: boolean;
-}
-
-const SettingsItem = ({
-  icon: Icon,
-  iconColor,
-  label,
-  labelColor,
-  description,
-  value,
-  valueColor,
-  badge,
-  action,
-  onClick,
-  showArrow,
-  locked,
-}: SettingsItemProps) => {
-  const Wrapper = onClick ? "button" : "div";
-
-  return (
-    <Wrapper
-      onClick={onClick}
-      className={cn(
-        "w-full flex items-center gap-3 p-3 text-left border-b border-border last:border-b-0",
-        onClick && "hover:bg-secondary/50 transition-colors",
-        locked && "opacity-60"
-      )}
-    >
-      <div className={cn(
-        "w-9 h-9 rounded-full flex items-center justify-center flex-shrink-0",
-        locked ? "bg-muted" : "bg-muted"
-      )}>
-        <Icon className={cn("w-4 h-4", iconColor || "text-muted-foreground")} />
-      </div>
-      <div className="flex-1 min-w-0">
-        <div className="flex items-center gap-2">
-          <p className={cn("text-sm leading-relaxed font-medium", labelColor)}>{label}</p>
-          {badge && (
-            <span className="max-w-[100vw] leading-relaxed text-xs font-medium px-1.5 py-0.5 rounded bg-primary/10 text-primary">
-              {badge}
-            </span>
-          )}
-        </div>
-        {description && (
-          <p className="max-w-[100vw] leading-relaxed text-xs text-muted-foreground">{description}</p>
-        )}
-      </div>
-      {value && !action && (
-        <span className={cn("text-sm leading-relaxed truncate max-w-[140px] text-right", valueColor || "text-muted-foreground")}>{value}</span>
-      )}
-      {action}
-      {locked && <Lock className="w-4 h-4 text-muted-foreground" />}
-      {showArrow && !locked && <ChevronRight className="w-4 h-4 text-muted-foreground" />}
-    </Wrapper>
-  );
-};
 
 export default Settings;
