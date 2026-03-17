@@ -16,7 +16,7 @@ export interface BankTheme {
 }
 
 export const BANK_THEMES: Record<string, BankTheme> = {
-  nubank: { name: "Nubank", color: "#8B10AE", gradient: "from-[#8B10AE] to-[#630D7F]", bgClass: "bg-[#8B10AE]", logoUrl: "https://logodownload.org/wp-content/uploads/2014/05/banco-nubank-logo.png" },
+  nubank: { name: "Nubank", color: "#8B10AE", gradient: "from-[#8B10AE] to-[#51086A]", bgClass: "bg-[#8B10AE]", logoUrl: "https://logodownload.org/wp-content/uploads/2014/05/banco-nubank-logo.png" },
   itau: { name: "Itaú", color: "#FF6200", gradient: "from-orange-500 to-orange-700", bgClass: "bg-orange-600", logoUrl: "https://logodownload.org/wp-content/uploads/2014/05/itau-logo-1.png" },
   bradesco: { name: "Bradesco", color: "#CC092F", gradient: "from-red-600 to-red-800", bgClass: "bg-red-600", logoUrl: "https://logodownload.org/wp-content/uploads/2014/02/bradesco-logo-1.png" },
   inter: { name: "Inter", color: "#FF7A00", gradient: "from-orange-500 to-orange-700", bgClass: "bg-orange-500", logoUrl: "https://logodownload.org/wp-content/uploads/2018/06/banco-inter-logo.png" },
@@ -65,11 +65,14 @@ export const BRAND_LIST = Object.entries(CARD_BRANDS).map(([key, brand]) => ({
 
 /** Match a card_name or bank field to a known bank theme */
 export function detectBank(cardName: string, bankField?: string | null): BankTheme {
-  const search = (bankField || cardName || "").toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+  const normalize = (s: string) => s.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+  
+  const searchInput = `${bankField || ""} ${cardName || ""}`;
+  const search = normalize(searchInput);
 
   for (const [key, theme] of Object.entries(BANK_THEMES)) {
     if (key === "outros") continue;
-    const bankSearch = theme.name.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+    const bankSearch = normalize(theme.name);
     if (search.includes(bankSearch) || search.includes(key)) {
       return theme;
     }
