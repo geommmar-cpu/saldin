@@ -240,12 +240,16 @@ export function AutoCaptureSection({ userId }: AutoCaptureSectionProps) {
                           </p>
                         </div>
                       </div>
-                      <Button size="sm" variant="outline" className="w-full gap-2" onClick={() => {
-                         window.open("/flows/saldin_v5.flo", "_blank");
-                         toast({ title: "Iniciando download", description: "O arquivo .flo está sendo baixado." });
-                      }}>
+                      <a 
+                        href="/flows/saldin_v5.flo" 
+                        download="saldin_v5.flo"
+                        className="w-full flex items-center justify-center gap-2 h-9 rounded-md border border-input bg-background px-3 text-sm font-medium hover:bg-accent hover:text-accent-foreground transition-colors"
+                        onClick={() => {
+                          toast({ title: "Iniciando download", description: "O arquivo .flo está sendo baixado." });
+                        }}
+                      >
                         <Plus className="w-4 h-4" /> Baixar Script (.flo)
-                      </Button>
+                      </a>
                       <div className="flex gap-2">
                         <Button size="sm" variant="outline" className="flex-1" onClick={() => setCurrentStep(1)}>← Voltar</Button>
                         <Button size="sm" className="flex-1" onClick={() => setCurrentStep(3)}>Próximo →</Button>
