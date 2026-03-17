@@ -3,7 +3,7 @@
     "outputDirectory": "dist",
     "rewrites": [
         {
-            "source": "/(?!saldin_v5.flo).*",
+            "source": "/((?!assets/|saldin_v5.flo|favicon.ico|manifest.json|pwa-|sw.js|workbox-).*)",
             "destination": "/index.html"
         }
     ],
