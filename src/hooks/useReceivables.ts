@@ -382,12 +382,13 @@ export function useReceivableById(id: string | undefined) {
   return useQuery({
     queryKey: ["receivable", id],
     queryFn: async () => {
-      if (!id) return null;
+      const cleanId = id?.trim();
+      if (!cleanId) return null;
 
-      const { data: receivable, error } = await db
+      const { data: receivable, error } = await supabase
         .from("receivables")
         .select("*")
-        .eq("id", id)
+        .eq("id", cleanId)
         .maybeSingle();
 
       if (error) {

@@ -11,6 +11,7 @@ import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
 import { FadeIn } from "@/components/ui/motion";
+import { useUserPreferences } from "@/hooks/useUserPreferences";
 
 interface AutoCaptureSectionProps {
   userId: string | undefined;
@@ -18,6 +19,8 @@ interface AutoCaptureSectionProps {
 
 export function AutoCaptureSection({ userId }: AutoCaptureSectionProps) {
   const { toast } = useToast();
+  const { preferences } = useUserPreferences();
+  const aiName = preferences.aiName;
   
   const openWhatsApp = () => {
     // Substitua pelo número real do seu bot
@@ -48,7 +51,7 @@ export function AutoCaptureSection({ userId }: AutoCaptureSectionProps) {
           <div className="space-y-1">
             <h3 className="text-base font-bold text-foreground">Saldin no seu WhatsApp</h3>
             <p className="text-sm text-muted-foreground leading-relaxed">
-              Fale com o {process.env.NEXT_PUBLIC_AI_NAME || 'Saldin'} por texto, áudio ou envie fotos de recibos. Sua IA financeira extrai tudo na hora.
+              Fale com o {aiName || 'Saldin'} por texto, áudio ou envie fotos de recibos. Sua IA financeira extrai tudo na hora.
             </p>
           </div>
           

@@ -136,6 +136,7 @@ export const Onboarding = () => {
   };
 
   const handleNext = async () => {
+    if (isSaving) return;
     if (isLastStep) {
       const success = await saveProfileToSupabase();
       if (success) {

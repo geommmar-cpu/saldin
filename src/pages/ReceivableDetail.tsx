@@ -68,9 +68,17 @@ const getDueDateInfo = (dueDate: Date | null) => {
 const ReceivableDetail = () => {
   const { id } = useParams();
   const navigate = useNavigate();
-  const { data: receivable, isLoading } = useReceivableById(id);
+  const { data: receivable, isLoading, isError, error } = useReceivableById(id);
   const updateReceivable = useUpdateReceivable();
   const deleteReceivable = useDeleteReceivable();
+
+  if (isError) {
+    console.error("Error loading receivable:", error);
+  }
+
+  if (receivable === null && !isLoading) {
+    console.warn("Receivable not found for ID:", id);
+  }
 
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
 
