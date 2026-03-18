@@ -21,7 +21,7 @@ export const AddExpense = () => {
   };
 
   const openWhatsApp = () => {
-    const whatsappUrl = "https://wa.me/5511999999999";
+    const whatsappUrl = "https://wa.me/556193984169";
     window.open(whatsappUrl, "_blank");
   };
 
@@ -58,7 +58,7 @@ export const AddExpense = () => {
             </motion.span>
           </div>
           <p className="max-w-[100vw] leading-relaxed text-sm leading-relaxed text-muted-foreground mt-4 text-center max-w-xs">
-            Registre rápido aqui, ou envie por texto/foto para {preferences.aiName} no WhatsApp.
+            Registre rápido aqui, ou envie por texto, áudio ou foto para {preferences.aiName} no WhatsApp.
           </p>
         </FadeIn>
 

@@ -120,7 +120,7 @@ Os usuários precisam ser vinculados no banco de dados:
 INSERT INTO public.whatsapp_users (user_id, phone_number, is_verified)
 VALUES (
     'uuid-do-usuario',  -- ID do auth.users
-    '5511999999999',    -- Número no formato E.164 (com DDI)
+    '556193984169',    -- Número no formato E.164 (com DDI)
     true                -- Usuário verificado
 );
 ```
@@ -129,7 +129,7 @@ VALUES (
 1. Visualiza seu número de telefone atual (do perfil)
 2. Clica em "Ativar WhatsApp Agent"
 3. Sistema cria o registro automaticamente
-4. Exibe instruções: "Envie 'Oi' para +55 11 99999-9999"
+4. Exibe instruções: "Envie 'Oi' para +55 61 9398-4169"
 
 ---
 

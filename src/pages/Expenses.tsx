@@ -64,7 +64,7 @@ export const Expenses = () => {
   }, [expenses, cardExpenses]);
 
   const openWhatsApp = () => {
-    window.open("https://wa.me/5511999999999", "_blank");
+    window.open("https://wa.me/556193984169", "_blank");
   };
 
   const handleExpenseClick = (expense: Expense) => {

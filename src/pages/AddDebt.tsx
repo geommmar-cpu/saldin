@@ -20,7 +20,8 @@ export const AddDebt = () => {
   };
 
   const openWhatsApp = () => {
-    const whatsappUrl = "https://wa.me/5511999999999";
+    // TODO: Substituir pelo número real do bot
+    const whatsappUrl = "https://wa.me/556193984169";
     window.open(whatsappUrl, "_blank");
   };
 
@@ -46,7 +47,7 @@ export const AddDebt = () => {
         <FadeIn className="flex-1 flex flex-col items-center justify-center">
           <AmountDisplay amount={amount} label="Valor da dívida" />
           <p className="max-w-[100vw] leading-relaxed text-sm leading-relaxed text-muted-foreground mt-4 text-center max-w-xs">
-            Registre rápido aqui, ou envie por texto/foto para {preferences.aiName} no WhatsApp.
+            Registre rápido aqui, ou envie por texto, áudio ou foto para {preferences.aiName} no WhatsApp.
           </p>
         </FadeIn>
 

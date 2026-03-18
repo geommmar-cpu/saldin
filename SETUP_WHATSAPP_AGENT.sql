@@ -7,7 +7,7 @@
 CREATE TABLE IF NOT EXISTS public.whatsapp_users (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     user_id UUID NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
-    phone_number TEXT NOT NULL UNIQUE, -- Formato E.164 (ex: 5511999999999)
+    phone_number TEXT NOT NULL UNIQUE, -- Formato E.164 (ex: 556193984169)
     is_verified BOOLEAN DEFAULT false,
     created_at TIMESTAMPTZ DEFAULT now(),
     UNIQUE(user_id, phone_number)

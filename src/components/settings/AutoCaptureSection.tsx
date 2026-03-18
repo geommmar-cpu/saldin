@@ -21,7 +21,7 @@ export function AutoCaptureSection({ userId }: AutoCaptureSectionProps) {
   
   const openWhatsApp = () => {
     // Substitua pelo número real do seu bot
-    window.open("https://wa.me/5511999999999", "_blank");
+    window.open("https://wa.me/556193984169", "_blank");
     toast({ 
       title: "Abrindo WhatsApp...", 
       description: "Mande um 'Oi' para seu assistente." 
@@ -48,7 +48,7 @@ export function AutoCaptureSection({ userId }: AutoCaptureSectionProps) {
           <div className="space-y-1">
             <h3 className="text-base font-bold text-foreground">Saldin no seu WhatsApp</h3>
             <p className="text-sm text-muted-foreground leading-relaxed">
-              Fale com a IA, registre gastos por texto, áudio ou foto e receba alertas inteligentes direto no chat.
+              Fale com o {process.env.NEXT_PUBLIC_AI_NAME || 'Saldin'} por texto, áudio ou envie fotos de recibos. Sua IA financeira extrai tudo na hora.
             </p>
           </div>
           
@@ -95,7 +95,7 @@ export function AutoCaptureSection({ userId }: AutoCaptureSectionProps) {
         <div className="space-y-1">
           <p className="text-xs font-bold text-blue-900 dark:text-blue-300">Como funciona?</p>
           <p className="text-[11px] text-blue-800/70 dark:text-blue-400/70 leading-relaxed">
-            Mande um "Oi" pro Saldin. Quando você gastar algo, mande: "Gastei 20 Reais com Mercado". A IA faz o resto.
+            Mande um "Oi" pro Saldin. Você pode enviar mensagens de texto, áudios descrevendo o gasto ou até fotos de recibos. A IA processa tudo automaticamente.
           </p>
         </div>
       </div>

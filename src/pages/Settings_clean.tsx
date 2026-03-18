@@ -1,4 +1,4 @@
-﻿import { useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { useState, useEffect, useRef, ChangeEvent } from "react";
 import { supabase } from "@/lib/backendClient";
 import { generateFinancialReport } from "@/lib/exportPdf";
@@ -6,7 +6,7 @@ import { useExpenses } from "@/hooks/useExpenses";
 import { useIncomes } from "@/hooks/useIncomes";
 import { useDebts } from "@/hooks/useDebts";
 import { useReceivables } from "@/hooks/useReceivables";
-import { useCardInstallmentsByMonth } from "@/hooks/useCreditCards";
+
 import { useGoals, useGoalStats } from "@/hooks/useGoals";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -169,7 +169,7 @@ export const Settings = () => {
   };
 
   const openWhatsApp = () => {
-    window.open("https://wa.me/5511999999999", "_blank");
+    window.open("https://wa.me/556193984169", "_blank");
   };
 
   const handleLogout = async () => {
