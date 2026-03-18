@@ -183,8 +183,8 @@ VALUES (
 | Verificação de assinatura | ✅ | Opcional |
 | Logs de auditoria | ✅ | Completo |
 | Resposta formatada | ✅ | Com markdown |
-| Transcrição de áudio | ⚠️ | Mock (TODO: OpenAI Whisper) |
-| OCR de imagens | ⚠️ | Mock (TODO: Vision API) |
+| Transcrição de áudio | ✅ | OpenAI Whisper (pt-BR) |
+| OCR de imagens | ✅ | GPT-4o Vision API |
 
 ---
 
