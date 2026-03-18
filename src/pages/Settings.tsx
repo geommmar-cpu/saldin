@@ -428,9 +428,18 @@ export function Settings() {
             <SettingsItem
               icon={Crown}
               label="Plano atual"
-              value="Grátis"
-              badge="Upgrade"
-              onClick={() => { }}
+              value={profile?.subscription_active ? "Premium" : "Grátis"}
+              badge={profile?.subscription_active ? "Premium" : "Upgrade"}
+              iconColor={profile?.subscription_active ? "text-amber-500" : "text-muted-foreground"}
+              description={profile?.subscription_active 
+                ? `Válido até: ${profile.subscription_expires_at ? new Date(profile.subscription_expires_at).toLocaleDateString() : 'Automática'}` 
+                : "Libere o assistente no WhatsApp"}
+              onClick={() => {
+                if (!profile?.subscription_active) {
+                   window.open("https://hotmart.com", "_blank");
+                }
+              }}
+              showArrow={!profile?.subscription_active}
             />
             <div className="p-3 border-t border-border">
               <Button

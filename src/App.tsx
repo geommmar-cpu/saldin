@@ -64,6 +64,7 @@ const Categories = lazy(() => import("./pages/Categories"));
 const Subscriptions = lazy(() => import("./pages/Subscriptions"));
 const AddSubscription = lazy(() => import("./pages/AddSubscription"));
 const DebugStress = lazy(() => import("./pages/DebugStress"));
+const SubscriptionExpired = lazy(() => import("./pages/SubscriptionExpired"));
 
 const Help = lazy(() => import("./pages/Help"));
 const Terms = lazy(() => import("./pages/Terms"));
@@ -189,6 +190,7 @@ export function App() {
 
               {/* Debug & Simulation */}
               <Route path="/debug-stress" element={<OnboardingRoute><DebugStress /></OnboardingRoute>} />
+              <Route path="/subscription-expired" element={<AuthRoute><SubscriptionExpired /></AuthRoute>} />
 
               {/* Catch-all */}
               <Route path="*" element={<OnboardingRoute><NotFound /></OnboardingRoute>} />

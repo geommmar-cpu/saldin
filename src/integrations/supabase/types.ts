@@ -713,6 +713,10 @@ export type Database = {
           phone: string | null
           updated_at: string
           user_id: string
+          subscription_active: boolean
+          subscription_status: string | null
+          subscription_expires_at: string | null
+          hotmart_subscriber_code: string | null
         }
         Insert: {
           ai_name?: string | null
@@ -726,6 +730,10 @@ export type Database = {
           phone?: string | null
           updated_at?: string
           user_id: string
+          subscription_active?: boolean
+          subscription_status?: string | null
+          subscription_expires_at?: string | null
+          hotmart_subscriber_code?: string | null
         }
         Update: {
           ai_name?: string | null
@@ -739,6 +747,10 @@ export type Database = {
           phone?: string | null
           updated_at?: string
           user_id?: string
+          subscription_active?: boolean
+          subscription_status?: string | null
+          subscription_expires_at?: string | null
+          hotmart_subscriber_code?: string | null
         }
         Relationships: []
       }

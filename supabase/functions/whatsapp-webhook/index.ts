@@ -309,6 +309,21 @@ Deno.serve(async (req: Request) => {
         const userId = userLink.user_id;
         const phoneToSend = remoteJid; // IMPORTANTE: Responder EXATAMENTE para o número de onde veio (remoteJid), não variações.
 
+        // 2.5 Subscription Check (Premium Only)
+        const { data: profile, error: profileErr } = await supabaseAdmin
+            .from("profiles")
+            .select("subscription_active")
+            .eq("user_id", userId)
+            .single();
+
+        if (profileErr || !profile?.subscription_active) {
+            console.warn(`🛑 Access Denied: User ${userId} (${remoteJid}) has no active subscription.`);
+            const inactiveMsg = "⚠️ *Sua assinatura do Saldin expirou ou está inativa.*\n━━━━━━━━━━━━━━━━━━━━\nPara continuar usando o assistente e registrar seus gastos, regularize seu pagamento no aplicativo ou na Hotmart.\n\n_Acesse o app para mais detalhes._";
+            await sendWhatsApp(phoneToSend, inactiveMsg);
+            if (logId) await supabaseAdmin.from("whatsapp_logs").update({ processed: true, error_message: "Subscription Inactive" }).eq("id", logId);
+            return new Response("Unauthorized Subscription", { status: 200 });
+        }
+
         console.log(`🎯 Target phone for reply: ${phoneToSend}`);
 
         // 3. Content Extraction

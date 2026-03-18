@@ -160,7 +160,14 @@ export function OnboardingRoute({ children }: { children: React.ReactNode }) {
     return <Navigate to="/onboarding" replace />;
   }
 
-  // Step 5: User has biometric enabled but hasn't unlocked this session → show lock screen
+  // Step 5: Check Subscription Status
+  // Only check after onboarding is completed.
+  // We ignore checking profile if it hasn't loaded (query result)
+  if (profile && !profile.subscription_active) {
+    return <Navigate to="/subscription-expired" replace />;
+  }
+
+  // Step 6: User has biometric enabled but hasn't unlocked this session → show lock screen
   if (userHasBiometric && !isUnlocked) {
     return (
       <BiometricLockScreen
@@ -178,7 +185,7 @@ export function OnboardingRoute({ children }: { children: React.ReactNode }) {
     );
   }
 
-  // Step 6: All checks passed → render children
+  // Step 7: All checks passed → render children
   return <>{children}</>;
 };
 

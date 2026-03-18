@@ -543,6 +543,18 @@ async function findOwnAccount(userId: string, recipientName: string): Promise<{ 
 
 // ─── Processa a transação e envia no WhatsApp ───
 async function processAndNotify(userId: string, phoneToReply: string, text: string, source: string, bankOverride?: string) {
+    // 0. Subscription Check (Premium Only)
+    const { data: profile } = await supabase
+        .from("profiles")
+        .select("subscription_active")
+        .eq("user_id", userId)
+        .single();
+
+    if (!profile?.subscription_active) {
+        console.log(`🛑 [Access Cut] Skipping notification for user ${userId} - No active subscription.`);
+        return { status: "ignored", reason: "inactive_subscription" };
+    }
+
     // Log de auditoria (Movido para antes do parse para debug)
     const { error: logError } = await supabase.from("whatsapp_logs").insert({
         phone_number: phoneToReply,
