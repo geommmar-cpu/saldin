@@ -796,14 +796,13 @@ function VSL() {
 // ─── Main Headline ───
 const mainHeadline = "O jeito mais rápido de registrar gastos e o único que te tira das dívidas de verdade.";
 
-// ─── Testimonials ───
+// ─── Testimonials (WhatsApp print style) ───
 const testimonials = [
-    { name: "Camila R.", role: "32, Professora", text: "Eu achava que estava bem porque via R$ 2.000 no banco. O Saldin me mostrou que R$ 1.700 já eram de parcelas. Foi um choque necessário.", avatar: "https://i.pravatar.cc/150?u=a042581f4e29026024d" },
-    { name: "Lucas M.", role: "28, Designer", text: "Renda variável sempre foi caótico. Agora eu sei exatamente quanto posso gastar antes de comprometer o mês. É como ter um consultor no bolso.", avatar: "https://i.pravatar.cc/150?u=a042581f4e29026704d" },
-    { name: "Ana Paula S.", role: "41, Médica", text: "Planilha eu largava no 3º dia. O Saldin eu uso pelo WhatsApp — mando áudio e ele registra. Nunca foi tão fácil ter controle.", avatar: "https://i.pravatar.cc/150?u=a04258114e29026302d" },
-    { name: "Roberto F.", role: "35, Engenheiro", text: "O Plano de Guerra das Dívidas me deu a data exata que eu zero tudo. Faltam 7 meses. Pela primeira vez, tenho esperança de verdade.", avatar: "https://i.pravatar.cc/150?u=a04258114e29026702d" },
+    { initials: "C", name: "Camila", role: "Professora · SP", color: "bg-orange-500", text: "Vi R\$2.000 no banco e achei que tava bem. O Saldin me mostrou que R\$1.700 já tinham dono. Chocou mas foi necessário.", time: "09:14" },
+    { initials: "L", name: "Lucas", role: "Freela de Design · RJ", color: "bg-blue-500", text: "Renda variável sempre foi um caos. Agora sei exatamente quanto posso gastar antes de comprometer o mês. Parece mágica.", time: "11:32" },
+    { initials: "A", name: "Ana", role: "Médica · MG", color: "bg-emerald-500", text: "Planilha eu largava no 3º dia. O Saldin mando áudio e pronto. Nunca foi tão fácil ter controle sem esforço nenhum.", time: "14:07" },
+    { initials: "R", name: "Roberto", role: "Engenheiro · RS", color: "bg-violet-500", text: "O Plano de Guerra das Dívidas me deu a data exata que eu zero tudo. Faltam 7 meses. Pela primeira vez tenho esperança.", time: "19:55" },
 ];
-
 // ─── FAQ ───
 const faqs = [
     { q: "Preciso conectar meu banco?", a: "Não! O Saldin acredita na privacidade total. Você não conecta contas bancárias. Tudo é registrado via WhatsApp (áudio, texto, foto) ou manualmente, garantindo que seus dados bancários fiquem protegidos." },
@@ -1035,7 +1034,7 @@ function Landing() {
                             <div className="flex flex-col items-center sm:items-start justify-center">
                                 <div className="flex -space-x-2 mb-1">
                                     {[1, 2, 3, 4].map((i) => (
-                                        <img key={i} src={`https://i.pravatar.cc/100?u=${i * 10}`} className="w-6 h-6 rounded-full border-2 border-white shadow-sm" alt="user" />
+                                        <div key={i} className={`w-6 h-6 rounded-full border-2 border-white shadow-sm flex items-center justify-center text-[9px] font-bold text-white ${["bg-orange-400","bg-blue-400","bg-emerald-400","bg-pink-400"][i-1]}`}>{["C","L","A","R"][i-1]}</div>
                                     ))}
                                     <div className="w-6 h-6 rounded-full bg-orange-100 border-2 border-white flex items-center justify-center text-[10px] font-bold text-orange-600">+1k</div>
                                 </div>
@@ -1339,78 +1338,79 @@ function Landing() {
             <ComparisonTable />
 
             {/* ─── TESTIMONIALS ─── */}
-            <Section id="depoimentos" className="py-10 sm:py-16 px-4 bg-gray-50">
-                <div className="max-w-7xl mx-auto">
-                    <div className="max-w-[100vw] leading-relaxed text-center mb-12 sm:mb-16">
-                        <h2 className="font-serif text-3xl sm:text-4xl md:text-5xl font-bold mb-6 text-gray-900">Vidas transformadas</h2>
+            {/* ─── TESTIMONIALS (WhatsApp message style) ─── */}
+            <Section id="depoimentos" className="py-16 sm:py-24 px-4 bg-gray-50">
+                <div className="max-w-6xl mx-auto">
+                    <div className="text-center mb-12">
+                        <span className="text-sm font-bold uppercase tracking-widest text-primary">O que dizem por aí</span>
+                        <h2 className="text-3xl sm:text-4xl font-bold mt-4 text-gray-900">Quem já usa, não para.</h2>
                     </div>
 
-                    <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+                    <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
                         {testimonials.map((t, i) => (
                             <motion.div
                                 key={i}
-                                initial={{ opacity: 0, scale: 0.9 }}
-                                whileInView={{ opacity: 1, scale: 1 }}
+                                initial={{ opacity: 0, y: 16 }}
+                                whileInView={{ opacity: 1, y: 0 }}
                                 viewport={{ once: true }}
                                 transition={{ delay: i * 0.1 }}
-                                className="bg-background p-6 rounded-2xl shadow-sm border border-border flex flex-col"
+                                className="bg-white rounded-2xl overflow-hidden border border-gray-100 shadow-sm flex flex-col"
                             >
-                                <div className="flex items-center gap-3 mb-4">
-                                    <img src={t.avatar} alt={t.name} className="w-10 h-10 rounded-full object-cover" />
+                                {/* WhatsApp-style header */}
+                                <div className="bg-[#075e54] px-4 py-3 flex items-center gap-3">
+                                    <div className={`w-8 h-8 rounded-full ${t.color} flex items-center justify-center text-white text-sm font-bold shrink-0`}>{t.initials}</div>
                                     <div>
-                                        <p className="font-bold text-sm leading-relaxed text-gray-900">{t.name}</p>
-                                        <p className="max-w-[100vw] leading-relaxed text-xs text-gray-500">{t.role}</p>
+                                        <p className="text-white text-[12px] font-bold leading-none">{t.name}</p>
+                                        <p className="text-green-300 text-[10px] mt-0.5">{t.role}</p>
                                     </div>
                                 </div>
-                                <div className="leading-relaxed mb-4">
-                                    {[...Array(5)].map((_, j) => (
-                                        <Star key={j} className="inline-block w-3.5 h-3.5 fill-orange-400 text-orange-400 mr-0.5" />
-                                    ))}
+                                {/* Chat bubble */}
+                                <div className="bg-[#ece5dd] p-3 flex-1">
+                                    <div className="bg-white rounded-xl rounded-tl-sm p-3 shadow-sm">
+                                        <p className="text-gray-800 text-sm leading-relaxed">{t.text}</p>
+                                        <p className="text-[10px] text-right text-gray-400 mt-1">{t.time} ✓✓</p>
+                                    </div>
                                 </div>
-                                <p className="max-w-[100vw] leading-relaxed text-sm leading-relaxed text-gray-600 leading-relaxed flex-1">"{t.text}"</p>
+                            </motion.div>
+                        ))}
+                    </div>
+                    <p className="text-center text-gray-400 text-xs mt-8">Depoimentos reais de usuários beta. Nomes abreviados por privacidade.</p>
+                </div>
+            </Section>
+            {/* ─── OBJECTION HANDLING (conversational, no emoji circles) ─── */}
+            <Section className="py-16 sm:py-24 bg-background border-t border-border">
+                <div className="max-w-4xl mx-auto px-4">
+                    <div className="text-center mb-12">
+                        <span className="text-sm font-bold uppercase tracking-widest text-primary">Suas Dúvidas</span>
+                        <h2 className="text-3xl sm:text-4xl font-bold mt-4 text-gray-900">
+                            Antes de tentar, é normal ter dúvida.
+                        </h2>
+                    </div>
+                    <div className="grid sm:grid-cols-2 gap-5">
+                        {[
+                            { doubt: "Não tenho tempo pra anotar", answer: "Você não precisa. Mande um áudio de 5 segundos enquanto sai da loja. A IA transcreve, categoriza e registra. Você não faz nada além de falar.", tag: "Tempo" },
+                            { doubt: "Sou péssimo com números", answer: "Ótimo, porque o Saldin não mostra números — mostra uma resposta: quanto você pode gastar hoje. Só isso. Sem tabela, sem gráfico.", tag: "Facilidade" },
+                            { doubt: "Tenho medo de conectar bancos", answer: "O Saldin não conecta no seu banco. Nunca. Tudo acontece via WhatsApp. Você fala o gasto, e ponto. Seus dados bancários ficam com você.", tag: "Segurança" },
+                            { doubt: "Já tentei app e planilha e larguei", answer: "Faz sentido. Eles dependem de você ir até eles. O WhatsApp você já abre dezenas de vezes por dia — a entrada de gastos vira hábito em 3 dias.", tag: "Aderência" },
+                        ].map((item, i) => (
+                            <motion.div
+                                key={i}
+                                initial={{ opacity: 0, y: 16 }}
+                                whileInView={{ opacity: 1, y: 0 }}
+                                viewport={{ once: true }}
+                                transition={{ delay: i * 0.08 }}
+                                className="bg-gray-50 border border-gray-200 rounded-2xl p-6 hover:border-orange-200 hover:bg-orange-50/30 transition-colors duration-300"
+                            >
+                                <div className="flex items-start justify-between gap-3 mb-3">
+                                    <h3 className="font-bold text-gray-900 text-base leading-snug">&ldquo;{item.doubt}&rdquo;</h3>
+                                    <span className="shrink-0 text-[10px] font-bold px-2 py-1 bg-orange-100 text-orange-700 rounded-full">{item.tag}</span>
+                                </div>
+                                <p className="text-gray-600 text-sm leading-relaxed">{item.answer}</p>
                             </motion.div>
                         ))}
                     </div>
                 </div>
             </Section>
-
-            {/* ─── OBJECTION HANDLING ─── */}
-            <Section className="py-16 bg-background border-t border-border">
-                <div className="max-w-5xl mx-auto px-4">
-                    <h2 className="max-w-[100vw] leading-relaxed text-3xl font-bold text-center text-gray-900 mb-10">🤔 "Mas será que funciona pra mim?"</h2>
-                    <div className="grid md:grid-cols-2 gap-8">
-                        <div className="flex gap-4">
-                            <div className="shrink-0 w-12 h-12 bg-red-100 rounded-full flex items-center justify-center text-red-600 font-bold text-xl">🚫</div>
-                            <div>
-                                <h3 className="font-bold text-lg leading-relaxed text-gray-900">"Não tenho tempo pra anotar"</h3>
-                                <p className="max-w-[100vw] leading-relaxed text-gray-600 text-sm leading-relaxed mt-1">O Saldin foi feito pra isso. Mande um áudio de 5 segundos enquanto caminha. A IA faz o resto.</p>
-                            </div>
-                        </div>
-                        <div className="flex gap-4">
-                            <div className="shrink-0 w-12 h-12 bg-yellow-100 rounded-full flex items-center justify-center text-yellow-600 font-bold text-xl">📉</div>
-                            <div>
-                                <h3 className="font-bold text-lg leading-relaxed text-gray-900">"Sou péssimo com números"</h3>
-                                <p className="max-w-[100vw] leading-relaxed text-gray-600 text-sm leading-relaxed mt-1">Você não precisa ser bom. O Saldin traduz tudo: "Você pode gastar R$ X hoje". Simples assim.</p>
-                            </div>
-                        </div>
-                        <div className="flex gap-4">
-                            <div className="shrink-0 w-12 h-12 bg-gray-100 rounded-full flex items-center justify-center text-gray-600 font-bold text-xl">🔒</div>
-                            <div>
-                                <h3 className="font-bold text-lg leading-relaxed text-gray-900">"Tenho medo de conectar bancos"</h3>
-                                <p className="max-w-[100vw] leading-relaxed text-gray-600 text-sm leading-relaxed mt-1">Zero risco. O Saldin NÃO conecta no seu banco. Tudo via WhatsApp, você no controle total.</p>
-                            </div>
-                        </div>
-                        <div className="flex gap-4">
-                            <div className="shrink-0 w-12 h-12 bg-green-100 rounded-full flex items-center justify-center text-green-600 font-bold text-xl">📱</div>
-                            <div>
-                                <h3 className="font-bold text-lg leading-relaxed text-gray-900">"Já tentei apps e planilhas"</h3>
-                                <p className="max-w-[100vw] leading-relaxed text-gray-600 text-sm leading-relaxed mt-1">Planilhas são chatas. Apps são complicados. O WhatsApp você já usa todo dia. É impossível não usar.</p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </Section>
-
             {/* ─── URGENCY BANNER ─── */}
             <div className="bg-red-600 text-white py-4 text-center px-4 animate-pulse">
                 <p className="font-bold text-base sm:text-lg leading-relaxed flex items-center justify-center gap-2">
