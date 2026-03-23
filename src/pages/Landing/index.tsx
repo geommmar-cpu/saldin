@@ -406,7 +406,7 @@ function FeatureShowcase() {
     }, [active]);
 
     return (
-        <Section id="como-funciona" className="py-16 sm:py-24 px-4 bg-background border-b border-border">
+        <Section id="como-funciona" className="py-16 sm:py-24 px-4 bg-white border-b border-border">
             <div className="max-w-6xl mx-auto">
                 {/* Header */}
                 <div className="text-center mb-12 sm:mb-16">
@@ -485,113 +485,33 @@ function FeatureShowcase() {
                         </p>
                     </div>
 
-                    {/* Right: Phone Mockup */}
-                    <div className="order-1 lg:order-2 flex justify-center">
-                        <div className="relative">
-                            {/* Phone frame */}
-                            <div className="relative w-[270px] sm:w-[295px] h-[540px] sm:h-[590px] bg-[#d0d1d6] rounded-[52px] shadow-[0_24px_60px_-12px_rgba(0,0,0,0.28),inset_0_0_2px_1px_rgba(255,255,255,0.7)] ring-4 ring-[#b4b5b9]/50 border-[6px] border-[#e3e3e5]">
-                                {/* Dynamic Island */}
-                                <div className="absolute top-4 left-1/2 -translate-x-1/2 w-[95px] h-[27px] bg-gray-950 rounded-full z-20" />
+                    {/* Right: Video Mockup */}
+                    <div className="order-1 lg:order-2 flex justify-center items-center py-4">
+                        <div className="relative bg-white rounded-3xl" style={{ isolation: "isolate" }}>
+                            <video
+                                autoPlay
+                                muted
+                                loop
+                                playsInline
 
-                                {/* Screen */}
-                                <div className="absolute inset-0 rounded-[47px] overflow-hidden bg-gray-950">
-                                    <AnimatePresence mode="wait">
-                                        <motion.div
-                                            key={active}
-                                            initial={{ opacity: 0 }}
-                                            animate={{ opacity: 1 }}
-                                            exit={{ opacity: 0 }}
-                                            transition={{ duration: 0.35 }}
-                                            className="w-full h-full relative"
-                                        >
-                                            {/* Video */}
-                                            <video
-                                                ref={videoRef}
-                                                autoPlay
-                                                muted
-                                                loop
-                                                playsInline
-                                                onLoadedData={() => setVideoLoaded(true)}
-                                                onError={() => setVideoLoaded(false)}
-                                                className={`w-full h-full object-cover transition-opacity duration-500 ${
-                                                    videoLoaded ? "opacity-100" : "opacity-0"
-                                                }`}
-                                            >
-                                                <source src={feature.videoSrc} type="video/mp4" />
-                                            </video>
 
-                                            {/* Placeholder (shown when no video) */}
-                                            {!videoLoaded && (
-                                                <div className="absolute inset-0 flex flex-col items-center justify-center gap-4 px-6">
-                                                    {/* Mockup WhatsApp header */}
-                                                    <div className="w-full">
-                                                        <div className="bg-[#075e54] px-4 py-3 flex items-center gap-3 rounded-t-lg">
-                                                            <div className="w-8 h-8 rounded-full bg-white/20 overflow-hidden border border-white/20">
-                                                                <img src="/logo-saldin-final.png" alt="" className="w-full h-full object-cover" />
-                                                            </div>
-                                                            <div>
-                                                                <p className="text-white text-[11px] font-bold">Saldin</p>
-                                                                <p className="text-green-300 text-[9px]">Online</p>
-                                                            </div>
-                                                        </div>
-                                                        <div className="bg-[#ece5dd] p-3 flex flex-col gap-3 rounded-b-lg">
-                                                            {/* User message bubble */}
-                                                            <div className="self-end bg-[#d9fdd3] rounded-2xl rounded-tr-sm px-3 py-2 max-w-[85%] shadow-sm">
-                                                                <div className={`w-8 h-8 rounded-lg ${feature.tagBg} ${feature.tagText} flex items-center justify-center mx-auto mb-1`}>
-                                                                    <feature.icon className="w-4 h-4" />
-                                                                </div>
-                                                                <p className="text-[10px] text-gray-600 font-medium text-center">{feature.hint}</p>
-                                                                <p className="text-[8px] text-right text-gray-400 mt-1">09:42 ✓✓</p>
-                                                            </div>
-                                                            {/* Bot response bubble */}
-                                                            <div className="self-start bg-white rounded-2xl rounded-tl-sm px-3 py-2 max-w-[90%] shadow-sm">
-                                                                <p className="text-[10px] font-bold text-gray-800 mb-1">✅ Registrado!</p>
-                                                                <p className="text-[9px] text-gray-500 leading-relaxed">Categoria detectada automaticamente. Saldo Livre atualizado.</p>
-                                                                <p className="text-[8px] text-right text-gray-400 mt-1">09:42</p>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                    <p className="text-white/30 text-[10px] text-center">Vídeo demonstrativo em breve</p>
-                                                </div>
-                                            )}
-                                        </motion.div>
-                                    </AnimatePresence>
-                                </div>
 
-                                {/* Side buttons */}
-                                <div className="absolute top-28 -left-[2px] w-[3px] h-8 bg-gray-400 rounded-l-md" />
-                                <div className="absolute top-44 -left-[2px] w-[3px] h-14 bg-gray-400 rounded-l-md" />
-                                <div className="absolute top-60 -left-[2px] w-[3px] h-14 bg-gray-400 rounded-l-md" />
-                                <div className="absolute top-48 -right-[2px] w-[3px] h-20 bg-gray-400 rounded-r-md" />
-                            </div>
+                                className="w-[280px] sm:w-[340px] lg:w-[380px] drop-shadow-2xl select-none pointer-events-none block"
+                                style={{ mixBlendMode: "multiply" }}
+                            >
+                                <source src="/_Mockup 01 - Saldin.mp4" type="video/mp4" />
+                            </video>
 
                             {/* Floating badge */}
-                            <AnimatePresence mode="wait">
-                                <motion.div
-                                    key={`badge-${active}`}
-                                    initial={{ opacity: 0, y: 8, scale: 0.95 }}
-                                    animate={{ opacity: 1, y: 0, scale: 1 }}
-                                    exit={{ opacity: 0, y: 8, scale: 0.95 }}
-                                    transition={{ type: "spring", stiffness: 400, damping: 30 }}
-                                    className="absolute -bottom-5 left-1/2 -translate-x-1/2 whitespace-nowrap bg-white rounded-full px-4 py-2 shadow-lg border border-border flex items-center gap-2"
-                                >
-                                    <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
-                                    <span className="text-xs font-bold text-gray-700">via WhatsApp · {feature.tag}</span>
-                                </motion.div>
-                            </AnimatePresence>
-
-                            {/* Tab dots */}
-                            <div className="absolute -right-8 top-1/2 -translate-y-1/2 flex flex-col gap-2">
-                                {SHOWCASE_FEATURES.map((_, i) => (
-                                    <button
-                                        key={i}
-                                        onClick={() => setActive(i)}
-                                        className={`w-2 h-2 rounded-full transition-all duration-300 ${
-                                            active === i ? "bg-orange-500 scale-125" : "bg-gray-300 hover:bg-gray-400"
-                                        }`}
-                                    />
-                                ))}
-                            </div>
+                            <motion.div
+                                initial={{ opacity: 0, y: 8 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                transition={{ delay: 0.6 }}
+                                className="absolute -bottom-6 left-1/2 -translate-x-1/2 whitespace-nowrap bg-white rounded-full px-4 py-2 shadow-lg border border-border flex items-center gap-2"
+                            >
+                                <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+                                <span className="text-xs font-bold text-gray-700">via WhatsApp</span>
+                            </motion.div>
                         </div>
                     </div>
                 </div>
