@@ -650,11 +650,13 @@ function SaleNotification() {
 // ─── Lite Video Component (Zero Weight Initial Load) ───
 function LiteVideo({
     videoId,
+    videoSrc,
     thumbnail,
     title,
     className = ""
 }: {
-    videoId: string;
+    videoId?: string;
+    videoSrc?: string;
     thumbnail: string;
     title?: string;
     className?: string;
@@ -689,14 +691,23 @@ function LiteVideo({
                     />
                 </>
             ) : (
-                <iframe
-                    src={`https://www.youtube.com/embed/${videoId}?autoplay=1&rel=0&modestbranding=1`}
-                    title="YouTube video player"
-                    frameBorder="0"
-                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-                    allowFullScreen
-                    className="w-full h-full"
-                ></iframe>
+                videoSrc ? (
+                    <video
+                        src={videoSrc}
+                        autoPlay
+                        controls
+                        className="w-full h-full object-cover"
+                    />
+                ) : (
+                    <iframe
+                        src={`https://www.youtube.com/embed/${videoId}?autoplay=1&rel=0&modestbranding=1`}
+                        title="YouTube video player"
+                        frameBorder="0"
+                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                        allowFullScreen
+                        className="w-full h-full"
+                    ></iframe>
+                )
             )}
         </div>
     );
@@ -706,7 +717,7 @@ function LiteVideo({
 function VSL() {
     return (
         <LiteVideo
-            videoId="dQw4w9WgXcQ" // TODO: Trocar pelo link real do VSL
+            videoSrc="/vsl - Saldin.mp4"
             thumbnail="https://images.unsplash.com/photo-1554224155-8d04cb21cd6c?auto=format&fit=crop&q=80&w=1000"
             title="Descubra como sobrar dinheiro todo mês (sem planilhas)"
         />
@@ -731,6 +742,57 @@ const faqs = [
     { q: "Posso cancelar quando quiser?", a: "Sim. Sem fidelidade, sem letras miúdas. Você gerencia sua assinatura direto no painel com um clique." },
     { q: "O WhatsApp é um robô ou humano?", a: "É uma Inteligência Artificial avançada, treinada para entender linguagem natural. Você fala como falaria com um amigo e ela entende." },
 ];
+
+// ─── Feature Block Component ───
+function FeatureBlock({
+    title, subtitle, icon: Icon, desc, mockup, reverse = false, bg = "bg-background",
+    id, onCta
+}: {
+    title: string; subtitle: string; icon: any; desc: string; mockup: React.ReactNode;
+    reverse?: boolean; bg?: string; id?: string; onCta: () => void
+}) {
+    return (
+        <Section id={id} className={`py-16 sm:py-24 ${bg} border-b border-border last:border-0 relative overflow-hidden`}>
+            {/* Background decorative elements */}
+            <div className={`absolute top-0 ${reverse ? 'left-0' : 'right-0'} w-96 h-96 bg-orange-100/30 rounded-full blur-[100px] -translate-y-1/2 ${reverse ? '-translate-x-1/2' : 'translate-x-1/2'} opacity-50`} />
+
+            <div className="max-w-7xl mx-auto px-4 grid lg:grid-cols-2 gap-12 lg:gap-24 items-center relative z-10">
+                <motion.div
+                    initial={{ opacity: 0, x: reverse ? 50 : -50 }}
+                    whileInView={{ opacity: 1, x: 0 }}
+                    viewport={{ once: true }}
+                    className={`flex flex-col gap-6 ${reverse ? 'lg:order-2' : ''}`}
+                >
+                    <div className="w-16 h-16 rounded-2xl bg-white shadow-md border border-orange-100 flex items-center justify-center">
+                        <Icon className="w-8 h-8 text-orange-600" />
+                    </div>
+                    <div>
+                        <span className="text-orange-600 font-bold uppercase tracking-widest text-[10px] sm:text-xs leading-relaxed mb-3 block">{subtitle}</span>
+                        <h3 className="text-4xl sm:text-5xl font-bold text-gray-900 mb-6 leading-[1.1] tracking-tight">{title}</h3>
+                        <p className="text-gray-500 text-lg sm:text-xl leading-relaxed max-w-xl">{desc}</p>
+                    </div>
+                    <Button
+                        size="lg"
+                        className="gradient-warm text-white rounded-full px-10 h-14 text-lg font-bold shadow-xl shadow-orange-500/20 hover:shadow-orange-500/40 transform hover:scale-105 transition-all w-full sm:w-fit mt-4"
+                        onClick={onCta}
+                    >
+                        Quero esse controle
+                        <ArrowRight className="w-5 h-5 ml-2" />
+                    </Button>
+                </motion.div>
+
+                <motion.div
+                    initial={{ opacity: 0, scale: 0.9, x: reverse ? -50 : 50 }}
+                    whileInView={{ opacity: 1, scale: 1, x: 0 }}
+                    viewport={{ once: true }}
+                    className={`relative ${reverse ? 'lg:order-1' : ''} flex justify-center w-full`}
+                >
+                    {mockup}
+                </motion.div>
+            </div>
+        </Section>
+    );
+}
 
 // ─── Comparison Table Component ───
 function ComparisonTable() {
@@ -1116,8 +1178,6 @@ function Landing() {
                 </div>
             </Section>
 
-            {/* ─── FEATURE SHOWCASE ─── */}
-            <FeatureShowcase />
 
             {/* ─── SOLUTION / MECHANISM SECTION ─── */}
             <Section id="mecanismo" className="py-10 sm:py-16 px-4 bg-gray-50/50 relative overflow-hidden">
@@ -1162,97 +1222,178 @@ function Landing() {
                 </div>
             </Section>
 
-            {/* ─── FEATURES GRID (BENTO) ─── */}
-            <Section id="funcionalidades" className="py-10 sm:py-16 px-4 bg-background">
-                <div className="max-w-7xl mx-auto">
-                    <div className="max-w-[100vw] leading-relaxed text-center mb-12 sm:mb-16">
-                        <h2 className="font-serif text-3xl sm:text-4xl md:text-5xl font-bold mb-4 sm:mb-6 text-gray-900">Funcionalidades Poderosas</h2>
-                        <p className="max-w-[100vw] leading-relaxed text-lg leading-relaxed sm:text-xl text-gray-500 max-w-2xl mx-auto">
-                            Tudo o que você precisa para dominar seu dinheiro, sem chatice.
-                        </p>
+
+            <FeatureShowcase />
+
+            {/* Feature 2: Saldo Livre de Verdade */}
+            <FeatureBlock
+                id="feature-saldo"
+                bg="bg-gray-50/50"
+                reverse
+                subtitle="Inteligência de Fluxo"
+                title="Saiba exatamente quanto pode gastar hoje. Sem sustos."
+                desc="O Saldin olha para o futuro por você. Ele já reserva o dinheiro das suas boletos, parcelas de cartão e metas. O que ele te mostra é o seu Saldo Livre de Verdade™."
+                icon={TrendingUp}
+                onCta={() => navigate("/auth")}
+                mockup={
+                    <div className="bg-white p-8 rounded-[40px] shadow-2xl border border-border max-w-[450px] w-full relative overflow-hidden">
+                        <div className="absolute top-0 right-0 w-32 h-32 bg-emerald-50 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2" />
+                        <div className="relative z-10">
+                            <div className="flex justify-between items-center mb-8">
+                                <span className="text-sm font-medium text-gray-400">Saldo Livre de Verdade™</span>
+                                <div className="px-2 py-1 rounded bg-emerald-100 text-emerald-700 text-[10px] font-bold">EM TEMPO REAL</div>
+                            </div>
+                            <div className="text-4xl sm:text-5xl font-bold text-gray-900 mb-2">R$ 432,50</div>
+                            <p className="text-emerald-600 text-xs font-bold mb-8 flex items-center gap-1">
+                                <CheckCircle className="w-3 h-3" /> Você está dentro do planejado
+                            </p>
+
+                            <div className="space-y-4">
+                                <div className="flex items-center gap-3 p-3 rounded-2xl bg-gray-50">
+                                    <div className="w-10 h-10 rounded-xl bg-background border border-border flex items-center justify-center text-teal-600"><CreditCard className="w-5 h-5"/></div>
+                                    <div className="flex-1">
+                                        <p className="text-[10px] text-gray-400 font-bold uppercase">Projetado (Cartões)</p>
+                                        <p className="text-sm font-bold text-gray-700">R$ 1.240,00</p>
+                                    </div>
+                                </div>
+                                <div className="flex items-center gap-3 p-3 rounded-2xl bg-gray-50">
+                                    <div className="w-10 h-10 rounded-xl bg-background border border-border flex items-center justify-center text-orange-600"><Zap className="w-5 h-5"/></div>
+                                    <div className="flex-1">
+                                        <p className="text-[10px] text-gray-400 font-bold uppercase">Contas Fixas</p>
+                                        <p className="text-sm font-bold text-gray-700">R$ 840,00</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
+                }
+            />
 
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-6 auto-rows-auto md:auto-rows-[300px]">
-                        {/* Feature 1: WhatsApp (Large) */}
-                        <motion.div
-                            whileHover={{ y: -5 }}
-                            className="md:col-span-2 row-span-1 rounded-3xl bg-[#f0fdf4] border border-green-100 p-6 sm:p-8 relative overflow-hidden flex flex-col md:flex-row justify-between group min-h-[320px]"
-                        >
-                            <div className="absolute top-0 right-0 w-64 h-64 bg-green-200/30 rounded-full blur-[80px] -translate-y-1/2 translate-x-1/2" />
+            {/* Feature 3: Gestão de Cartões */}
+            <FeatureBlock
+                id="feature-cards"
+                bg="bg-background"
+                subtitle="Faturas sob Controle"
+                title="Domine suas faturas antes que elas dominem você."
+                desc="Tenha uma visão única de todos os seus cartões. Saiba exatamente quanto cada parcela 'pequena' está comendo do seu futuro e receba alertas antes de estourar o limite."
+                icon={CreditCard}
+                onCta={() => navigate("/auth")}
+                mockup={
+                    <div className="relative w-full max-w-[480px]">
+                        <div className="grid grid-cols-2 gap-4">
+                            <div className="p-5 rounded-3xl bg-white shadow-xl border border-border -rotate-2">
+                                <div className="w-8 h-8 rounded-lg bg-teal-50 flex items-center justify-center text-teal-600 mb-4"><Smartphone className="w-4 h-4"/></div>
+                                <p className="text-[9px] font-bold text-gray-400 uppercase mb-1">Inter Platinum</p>
+                                <p className="text-lg font-bold text-gray-900 mb-3">R$ 2.450</p>
+                                <div className="w-full h-1.5 bg-gray-100 rounded-full overflow-hidden">
+                                    <div className="w-[85%] h-full bg-orange-500" />
+                                </div>
+                                <p className="text-[8px] text-orange-600 mt-2 font-bold">85% do Limite</p>
+                            </div>
+                            <div className="p-5 rounded-3xl bg-white shadow-xl border border-border rotate-3 translate-y-8">
+                                <div className="w-8 h-8 rounded-lg bg-indigo-50 flex items-center justify-center text-indigo-600 mb-4"><CreditCard className="w-4 h-4"/></div>
+                                <p className="text-[9px] font-bold text-gray-400 uppercase mb-1">Nubank Gold</p>
+                                <p className="text-lg font-bold text-gray-900 mb-3">R$ 890</p>
+                                <div className="w-full h-1.5 bg-gray-100 rounded-full overflow-hidden">
+                                    <div className="w-[30%] h-full bg-emerald-500" />
+                                </div>
+                                <p className="text-[8px] text-emerald-600 mt-2 font-bold">30% do Limite</p>
+                            </div>
+                        </div>
+                    </div>
+                }
+            />
 
-                            <div className="relative z-10 flex-1 flex flex-col justify-between pr-0 md:pr-12">
+            {/* Feature 4: Plano de Guerra */}
+            <FeatureBlock
+                id="feature-warplan"
+                bg="bg-gray-50/50"
+                reverse
+                subtitle="Livre-se das Dívidas"
+                title="Um Plano de Guerra desenhado para você vencer."
+                desc="O Saldin utiliza algoritmos matemáticos para calcular a ordem exata de pagamento das suas dívidas, minimizando juros e maximizando sua velocidade para sair do vermelho."
+                icon={Bomb}
+                onCta={() => navigate("/auth")}
+                mockup={
+                    <div className="bg-gray-950 p-8 rounded-[40px] shadow-2xl border border-white/5 max-w-[450px] w-full relative overflow-hidden text-white">
+                        <div className="absolute top-0 right-0 w-40 h-40 bg-red-500/10 rounded-full blur-3xl" />
+                        <div className="relative z-10">
+                            <div className="flex justify-between items-center mb-6">
+                                <span className="text-xs font-bold text-red-500 uppercase tracking-widest">Plano de Guerra Ativo</span>
+                                <div className="px-2 py-0.5 rounded bg-white/10 text-white text-[9px] font-bold uppercase">7 meses para o Zero</div>
+                            </div>
+                            <h4 className="text-xl font-bold mb-6">Próximo Passo Estratégico</h4>
+
+                            <div className="space-y-3">
+                                <div className="p-4 rounded-2xl bg-white/5 border border-white/10 flex justify-between items-center">
+                                    <div>
+                                        <p className="text-xs font-bold text-white mb-0.5">Cartão Visa - Itaú</p>
+                                        <p className="text-[10px] text-gray-500">Juros de 12.5% p.m.</p>
+                                    </div>
+                                    <div className="text-right">
+                                        <p className="text-xs font-bold text-red-400 mb-0.5">PAGAR AGORA</p>
+                                        <p className="text-[10px] text-gray-500">R$ 450,00</p>
+                                    </div>
+                                </div>
+                                <div className="p-4 rounded-2xl bg-white/5 border border-white/5 flex justify-between items-center opacity-40">
+                                    <div>
+                                        <p className="text-xs font-bold text-white mb-0.5">Empréstimo Pessoal</p>
+                                        <p className="text-[10px] text-gray-500">Juros de 4.2% p.m.</p>
+                                    </div>
+                                    <div className="text-right">
+                                        <p className="text-xs font-bold mb-0.5">AGUARDAR</p>
+                                        <p className="text-[10px] text-gray-500">Fluxo de Caixa</p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div className="mt-8 pt-6 border-t border-white/10">
+                                <div className="flex justify-between text-xs font-bold mb-2">
+                                    <span>Progresso Total</span>
+                                    <span className="text-orange-400">32%</span>
+                                </div>
+                                <div className="w-full h-2 bg-white/10 rounded-full overflow-hidden">
+                                    <div className="w-[32%] h-full bg-gradient-to-r from-red-500 to-orange-500" />
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                }
+            />
+
+            {/* Feature 5: Cobrança de Recebíveis */}
+            <FeatureBlock
+                id="feature-receivables"
+                subtitle="Receba no Prazo"
+                title="Quem te deve? O Saldin ajuda você a cobrar com um clique."
+                desc="Gerencie contas a receber e envie lembretes amigáveis de pagamento via WhatsApp. Transforme cobranças chatas em processos profissionais e organizados."
+                icon={Send}
+                onCta={() => navigate("/auth")}
+                mockup={
+                    <div className="relative p-8 bg-white rounded-[40px] shadow-2xl border border-border max-w-[400px] w-full group">
+                         <div className="absolute inset-0 bg-green-500/5 rounded-[40px] opacity-0 group-hover:opacity-100 transition-opacity" />
+                         <div className="relative z-10">
+                            <div className="flex items-center gap-4 mb-8">
+                                <div className="w-14 h-14 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 font-bold text-xl shadow-inner">JS</div>
                                 <div>
-                                    <div className="w-12 h-12 bg-background rounded-2xl flex items-center justify-center mb-4 shadow-sm border border-green-100">
-                                        <MessageCircle className="w-6 h-6 text-green-600" />
-                                    </div>
-                                    <h3 className="max-w-[100vw] leading-relaxed text-2xl font-bold mb-2 text-green-900">WhatsApp Inteligente</h3>
-                                    <p className="max-w-[100vw] leading-relaxed text-green-800/80 max-w-sm text-sm leading-relaxed sm:text-base mb-6">Envie áudio, foto de notas fiscais ou texto. Nossa IA processa e atualiza seu saldo em segundos.</p>
-                                </div>
-                                <div className="mt-auto">
-                                    <div className="inline-flex items-center gap-2 text-xs font-bold text-green-600 bg-background/50 px-3 py-1.5 rounded-full border border-green-100">
-                                        <Play className="w-3 h-3 fill-current" /> VÍDEO DEMONSTRAÇÃO
-                                    </div>
+                                    <p className="text-base font-bold text-gray-900 leading-none mb-1">João Silva</p>
+                                    <p className="text-[10px] text-gray-400 font-bold uppercase tracking-wider">Pendente: R$ 1.500,00</p>
                                 </div>
                             </div>
-
-                            <div className="relative z-10 w-full md:w-[320px] shrink-0 mt-6 md:mt-0">
-                                <LiteVideo
-                                    videoId="dQw4w9WgXcQ" // TODO: Trocar pelo vídeo do WhatsApp
-                                    thumbnail="https://images.unsplash.com/photo-1577563908411-5077b6dc7624?auto=format&fit=crop&q=80&w=600"
-                                    className="!aspect-[4/3] rounded-2xl"
-                                />
-                            </div>
-                        </motion.div>
-
-                        {/* Feature 2: Cards */}
-                        <motion.div
-                            whileHover={{ y: -5 }}
-                            className="rounded-3xl bg-background border border-border p-6 sm:p-8 flex flex-col justify-between shadow-sm relative overflow-hidden min-h-[200px]"
-                        >
-                            <div className="w-12 h-12 bg-teal-50 rounded-2xl flex items-center justify-center mb-4">
-                                <CreditCard className="w-6 h-6 text-teal-600" />
-                            </div>
-                            <div>
-                                <h3 className="max-w-[100vw] leading-relaxed text-xl font-bold mb-2 text-gray-900">Gestão de Cartões</h3>
-                                <p className="max-w-[100vw] leading-relaxed text-gray-500 text-sm leading-relaxed">Controle seus limites e veja o impacto das parcelas no futuro.</p>
-                            </div>
-                        </motion.div>
-
-                        {/* Feature 3: Debt War Plan */}
-                        <motion.div
-                            whileHover={{ y: -5 }}
-                            className="rounded-3xl bg-background border border-border p-6 sm:p-8 flex flex-col justify-between shadow-sm relative overflow-hidden min-h-[200px]"
-                        >
-                            <div className="w-12 h-12 bg-red-50 rounded-2xl flex items-center justify-center mb-4">
-                                <Bomb className="w-6 h-6 text-red-600" />
-                            </div>
-                            <div>
-                                <h3 className="max-w-[100vw] leading-relaxed text-xl font-bold mb-2 text-gray-900">Plano de Guerra</h3>
-                                <p className="max-w-[100vw] leading-relaxed text-gray-500 text-sm leading-relaxed">Estratégias matemáticas para acabar com as dívidas o mais rápido possível.</p>
-                            </div>
-                        </motion.div>
-
-                        {/* Feature 4: Receivables (Large) */}
-                        <motion.div
-                            whileHover={{ y: -5 }}
-                            className="md:col-span-2 rounded-3xl bg-orange-50 border border-orange-100 p-6 sm:p-8 flex flex-col justify-between relative overflow-hidden group min-h-[280px]"
-                        >
-                            <div className="relative z-10 w-full">
-                                <div className="w-12 h-12 bg-background rounded-2xl flex items-center justify-center mb-4 shadow-sm border border-orange-100">
-                                    <Send className="w-6 h-6 text-orange-600" />
+                            <div className="space-y-4">
+                                <div className="p-4 rounded-2xl bg-gray-50 border border-border flex justify-between items-center">
+                                    <span className="text-sm text-gray-600 font-medium">Aluguel Mensal</span>
+                                    <span className="text-sm font-bold text-gray-900">R$ 1.500,00</span>
                                 </div>
-                                <h3 className="max-w-[100vw] leading-relaxed text-2xl font-bold mb-2 text-orange-900">Cobrança de Recebíveis</h3>
-                                <p className="max-w-[100vw] leading-relaxed text-orange-800/80 max-w-lg text-sm leading-relaxed sm:text-base">Quem te deve? Organize e envie cobranças amigáveis e profissionais direto pelo WhatsApp com um clique.</p>
+                                <Button className="w-full bg-[#25D366] hover:bg-[#128C7E] text-white font-bold h-14 rounded-2xl flex items-center justify-center gap-2 border-0 shadow-lg shadow-green-500/20 transition-all active:scale-95">
+                                    <MessageCircle className="w-5 h-5 fill-current" /> Cobrar via WhatsApp
+                                </Button>
+                                <p className="text-center text-[10px] text-gray-400">Mensagem profissional e customizada pronta.</p>
                             </div>
-                            <div className="absolute bottom-6 right-6 flex -space-x-4">
-                                <div className="w-10 h-10 rounded-full bg-blue-500 border-2 border-white flex items-center justify-center text-xs text-white">JD</div>
-                                <div className="w-10 h-10 rounded-full bg-green-500 border-2 border-white flex items-center justify-center text-xs text-white">AM</div>
-                                <div className="w-10 h-10 rounded-full bg-yellow-500 border-2 border-white flex items-center justify-center text-xs text-white">LP</div>
-                            </div>
-                        </motion.div>
+                         </div>
                     </div>
-                </div>
-            </Section>
+                }
+            />
 
             {/* ─── COMPARISON TABLE ─── */}
             <ComparisonTable />
