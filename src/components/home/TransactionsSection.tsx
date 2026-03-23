@@ -203,9 +203,14 @@ export function TransactionsSection({
         navigate(`/expenses/cc-${item.id}`);
         break;
       case "subscription":
-        if (item.id.length > 30) {
+        // Projected subscriptions (id starts with "proj-") go to the subscriptions list
+        if (item.id.startsWith("proj-")) {
+          navigate(`/subscriptions`);
+        } else if (item.id.length > 30) {
+          // Real expense-based subscription (UUID)
           navigate(`/expenses/${item.id}`);
         } else {
+          // Credit card based subscription installment
           navigate(`/expenses/cc-${item.id}`);
         }
         break;
@@ -216,7 +221,6 @@ export function TransactionsSection({
           navigate(`/expenses/${item.id}`);
         }
     }
-
   };
 
   const typeIcon = (type: string) => {

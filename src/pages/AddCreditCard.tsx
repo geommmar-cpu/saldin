@@ -58,12 +58,15 @@ export default function AddCreditCard() {
   const canSubmit = cardName.trim() && closingDay && dueDay;
 
   const handleBankSelect = (bankKey: string) => {
-    setSelectedBank(bankKey);
+    const prevBank = BANK_LIST.find(b => b.key === selectedBank);
     const bank = BANK_LIST.find(b => b.key === bankKey);
-    if (bank && !cardName) {
+    setSelectedBank(bankKey);
+    // Auto-fill name if: field is empty OR still matches the previously auto-filled bank name
+    if (bank && (!cardName || cardName === prevBank?.name)) {
       setCardName(bank.name);
     }
   };
+
 
   const handleSubmit = async () => {
     if (!canSubmit) return;

@@ -1,10 +1,9 @@
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { CreditCard, AlertCircle, MessageCircle, ArrowRight, ShieldAlert } from "lucide-react";
+import { AlertCircle, MessageCircle, ShieldAlert } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
-import { supabase } from "@/lib/backendClient";
 
 export default function SubscriptionExpired() {
   const navigate = useNavigate();
@@ -15,10 +14,6 @@ export default function SubscriptionExpired() {
     navigate("/auth");
   };
 
-  const openHotmart = () => {
-    // Replace with actual Hotmart link if provided by user
-    window.open("https://hotmart.com", "_blank");
-  };
 
   const openSupport = () => {
     // Current support number from the UI (bot number)
@@ -60,9 +55,9 @@ export default function SubscriptionExpired() {
             </div>
             
             <div className="flex items-start gap-3">
-              <CreditCard className="w-5 h-5 text-primary shrink-0 mt-0.5" />
+              <MessageCircle className="w-5 h-5 text-primary shrink-0 mt-0.5" />
               <p className="max-w-[100vw] leading-relaxed text-sm leading-relaxed text-foreground">
-                <strong>Como resolver?</strong> Basta clicar no botão abaixo para ir ao Painel da Hotmart e atualizar seus dados de pagamento.
+                <strong>Como resolver?</strong> Entre em contato com o suporte via WhatsApp para regularizar o acesso à sua conta.
               </p>
             </div>
           </div>
@@ -70,16 +65,8 @@ export default function SubscriptionExpired() {
 
         <div className="flex flex-col gap-3">
           <Button 
-            onClick={openHotmart}
-            className="w-full h-14 text-lg font-bold rounded-2xl shadow-lg ring-offset-background transition-all hover:scale-[1.02] active:scale-[0.98]"
-          >
-            Regularizar Assinatura <ArrowRight className="ml-2 w-5 h-5" />
-          </Button>
-
-          <Button 
-            variant="outline" 
             onClick={openSupport}
-            className="w-full h-12 rounded-2xl gap-2 text-muted-foreground"
+            className="w-full h-14 text-lg font-bold rounded-2xl shadow-lg ring-offset-background transition-all hover:scale-[1.02] active:scale-[0.98] gap-2"
           >
             <MessageCircle className="w-5 h-5" /> Falar com Suporte
           </Button>

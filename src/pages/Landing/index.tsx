@@ -24,12 +24,48 @@ function Section({ children, className = "", id = "" }: { children: React.ReactN
             transition={{ duration: 0.6, ease: "easeOut" }}
             className={className}
         >
-      <title>Saldin | index</title>
-      <meta name="description" content="Manage your index easily with Saldin." />
-      <meta property="og:title" content="Saldin - index" />
-      <meta property="og:description" content="Manage your index easily with Saldin." />
-        
+            {children}
         </motion.section>
+    );
+}
+
+// ─── Sticky CTA Bar (appears after scroll) ───
+function StickyCtaBar({ onCta }: { onCta: () => void }) {
+    const [visible, setVisible] = useState(false);
+
+    useEffect(() => {
+        const handleScroll = () => setVisible(window.scrollY > 400);
+        window.addEventListener("scroll", handleScroll, { passive: true });
+        return () => window.removeEventListener("scroll", handleScroll);
+    }, []);
+
+    return (
+        <AnimatePresence>
+            {visible && (
+                <motion.div
+                    initial={{ y: 80, opacity: 0 }}
+                    animate={{ y: 0, opacity: 1 }}
+                    exit={{ y: 80, opacity: 0 }}
+                    transition={{ type: "spring", stiffness: 300, damping: 30 }}
+                    className="fixed bottom-0 left-0 right-0 z-[55] bg-gray-950/95 backdrop-blur-md border-t border-white/10 px-4 py-3 shadow-2xl"
+                >
+                    <div className="max-w-4xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-3">
+                        <div className="text-center sm:text-left">
+                            <p className="text-white font-bold text-sm sm:text-base leading-tight">
+                                🔥 Oferta de Lançamento — <span className="text-orange-400">4 dias grátis</span>
+                            </p>
+                            <p className="text-gray-400 text-xs mt-0.5">Cancele quando quiser · Sem cartão para trials</p>
+                        </div>
+                        <button
+                            onClick={onCta}
+                            className="w-full sm:w-auto shrink-0 gradient-warm text-white font-bold px-8 py-3 rounded-full text-sm shadow-lg shadow-orange-500/30 hover:scale-105 hover:shadow-orange-500/50 transition-all duration-200"
+                        >
+                            Começar Agora — É Grátis
+                        </button>
+                    </div>
+                </motion.div>
+            )}
+        </AnimatePresence>
     );
 }
 
@@ -303,23 +339,33 @@ function CalculationDemo() {
     );
 }
 
-// ─── Countdown Timer Component ───
+// ─── Countdown Timer Component (real deadline: next Sunday at midnight) ───
 function CountdownTimer() {
-    const [timeLeft, setTimeLeft] = useState(14400); // 4 hours in seconds
+    const getTimeLeft = () => {
+        const now = new Date();
+        const target = new Date();
+        // Next Sunday 23:59
+        const daysUntilSunday = (7 - now.getDay()) % 7 || 7;
+        target.setDate(now.getDate() + daysUntilSunday);
+        target.setHours(23, 59, 0, 0);
+        return Math.max(0, Math.floor((target.getTime() - now.getTime()) / 1000));
+    };
+
+    const [timeLeft, setTimeLeft] = useState(getTimeLeft);
 
     useEffect(() => {
-        const interval = setInterval(() => {
-            setTimeLeft((prev) => (prev > 0 ? prev - 1 : 14400));
-        }, 1000);
+        const interval = setInterval(() => setTimeLeft(getTimeLeft()), 1000);
         return () => clearInterval(interval);
     }, []);
 
-    const hours = Math.floor(timeLeft / 3600);
+    const days = Math.floor(timeLeft / 86400);
+    const hours = Math.floor((timeLeft % 86400) / 3600);
     const minutes = Math.floor((timeLeft % 3600) / 60);
     const seconds = timeLeft % 60;
 
     return (
         <span className="font-mono font-bold text-orange-200">
+            {days > 0 && <>{String(days).padStart(2, '0')}d </>}
             {String(hours).padStart(2, '0')}:{String(minutes).padStart(2, '0')}:{String(seconds).padStart(2, '0')}
         </span>
     );
@@ -327,11 +373,12 @@ function CountdownTimer() {
 
 // ─── Marquee Component ───
 const MARQUEE_ITEMS = [
-    { icon: Star, text: "Destaque da Semana", color: "text-yellow-500 fill-current" },
-    { icon: Users, text: "+5.000 Usuários Ativos", color: "text-blue-500" },
-    { icon: Shield, text: "Segurança Bancária", color: "text-green-500" },
-    { icon: Zap, text: "Atendimento em 10s", color: "text-orange-500" },
-    { icon: Smartphone, text: "100% via WhatsApp", color: "text-teal-500" },
+    { icon: Star, text: "#1 em Controle Financeiro via WhatsApp", color: "text-yellow-500 fill-current" },
+    { icon: Users, text: "+1.200 famílias com clareza financeira", color: "text-blue-500" },
+    { icon: Shield, text: "Sem acesso ao banco — 100% privado", color: "text-green-500" },
+    { icon: Zap, text: "Registro de gasto em 5 segundos", color: "text-orange-500" },
+    { icon: Smartphone, text: "Funciona no WhatsApp que você já tem", color: "text-teal-500" },
+    { icon: ThumbsUp, text: "Garantia de 7 dias ou seu dinheiro de volta", color: "text-emerald-400" },
 ];
 
 function Marquee() {
@@ -622,18 +669,18 @@ function Landing() {
 
     return (
         <div className="min-h-screen bg-background text-gray-900 font-sans selection:bg-orange-100 selection:text-orange-900 overflow-x-hidden">
+            <StickyCtaBar onCta={() => navigate("/auth")} />
             {/* ─── URGENCY NOTICE BAR ─── */}
-            <div className="bg-gradient-to-r from-orange-500 to-pink-600 text-white py-2.5 px-4 text-center text-xs sm:text-sm leading-relaxed font-semibold relative overflow-hidden z-[60] shadow-md">
+            <div className="bg-gray-950 text-white py-2.5 px-4 text-center text-xs sm:text-sm leading-relaxed font-semibold relative overflow-hidden z-[60]">
                 <p className="flex flex-wrap items-center justify-center gap-2 relative z-10">
-                    <Clock className="w-3 h-3 sm:w-4 sm:h-4 text-white animate-pulse" />
-                    <span className="opacity-95">Oferta de Lançamento: Bônus Exclusivos.</span>
-                    <span className="bg-background/20 px-2 py-0.5 rounded text-[10px] sm:text-xs font-bold uppercase tracking-wider ml-1">Restam 14 vagas</span>
-                    <span className="hidden sm:inline-block w-1 h-1 bg-background/40 rounded-full mx-1"></span>
-                    <span className="max-w-[100vw] leading-relaxed text-white/80 text-[10px] uppercase tracking-wide mr-1">Expira em:</span>
+                    <span className="w-2 h-2 rounded-full bg-green-400 animate-pulse shrink-0" />
+                    <span className="text-gray-300">Lançamento:</span>
+                    <span className="text-white font-bold">4 dias grátis + Bônus no plano Semestral</span>
+                    <span className="hidden sm:inline-block w-1 h-1 bg-white/20 rounded-full mx-1"></span>
+                    <span className="text-orange-400 text-[10px] uppercase tracking-wide">Oferta encerra em:</span>
                     <CountdownTimer />
                 </p>
-                {/* Subtle shine effect */}
-                <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent -translate-x-full animate-[shimmer_3s_infinite]" />
+                <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent -translate-x-full animate-[shimmer_4s_infinite]" />
             </div>
 
             {/* ─── NAVBAR ─── */}
@@ -696,31 +743,32 @@ function Landing() {
                         transition={{ duration: 0.8, ease: "easeOut" }}
                         className="max-w-[100vw] leading-relaxed text-center lg:text-left pt-6 sm:pt-0"
                     >
-                        <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-orange-50 text-orange-600 text-xs sm:text-sm leading-relaxed font-semibold mb-6 border border-orange-100">
+                        <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-orange-50 text-orange-700 text-xs sm:text-sm leading-relaxed font-bold mb-6 border border-orange-200">
                             <Sparkles className="w-3 h-3 sm:w-4 sm:h-4 fill-current" />
-                            A revolução no controle financeiro
+                            Registro de gastos em 5 segundos · via WhatsApp
                         </div>
 
                         <div className="leading-relaxed mb-4 sm:mb-6">
-                            <h1 className="font-serif text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold leading-[1.1] tracking-tighter text-gray-900 shadow-indigo-50">
-                                Pare de olhar o saldo do banco e veja seu <br />
-                                <span className="max-w-[100vw] leading-relaxed text-transparent bg-clip-text bg-gradient-to-r from-orange-600 via-pink-500 to-orange-400">
-                                    Saldo Livre de Verdade™.
+                            <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold leading-[1.08] tracking-tight text-gray-900">
+                                Seu banco mostra R$ 2.000.
+                                <br />
+                                <span className="text-transparent bg-clip-text bg-gradient-to-r from-orange-500 via-orange-600 to-pink-500">
+                                    R$ 1.700 já sumiram.
                                 </span>
                             </h1>
                         </div>
 
-                        <p className="max-w-[100vw] leading-relaxed text-lg leading-relaxed sm:text-xl text-gray-500 max-w-xl mx-auto lg:mx-0 mb-8 sm:mb-10 leading-relaxed px-4 lg:px-0">
-                            O único sistema que transforma seu WhatsApp em um detector de gastos e cria seu <strong className="max-w-[100vw] leading-relaxed text-gray-900 font-semibold">Plano de Guerra</strong> para zerar dívidas sem esforço e sem planilhas.
+                        <p className="text-lg sm:text-xl text-gray-600 max-w-xl mx-auto lg:mx-0 mb-8 sm:mb-10 leading-relaxed px-4 lg:px-0">
+                            O Saldin calcula seu <strong className="text-gray-900">Saldo Livre de Verdade™</strong> — o que sobra depois das parcelas futuras, contas fixas e dívidas. Tudo via WhatsApp. Sem planilha. Sem app novo.
                         </p>
 
                         <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center lg:justify-start px-8 sm:px-0">
                             <Button
                                 size="lg"
                                 onClick={() => navigate("/auth")}
-                                className="gradient-warm text-white border-0 h-12 sm:h-14 px-8 text-base sm:text-lg leading-relaxed font-bold rounded-full shadow-lg shadow-orange-500/25 hover:shadow-orange-500/40 hover:scale-105 transition-all w-full sm:w-auto"
+                                className="gradient-warm text-white border-0 h-12 sm:h-14 px-8 text-base sm:text-lg font-bold rounded-full shadow-lg shadow-orange-500/25 hover:shadow-orange-500/40 hover:scale-105 transition-all w-full sm:w-auto"
                             >
-                                Testar Grátis Agora
+                                Quero ver meu Saldo Livre
                                 <ArrowRight className="w-5 h-5 ml-2" />
                             </Button>
                             <div className="flex flex-col items-center sm:items-start justify-center">
@@ -728,25 +776,27 @@ function Landing() {
                                     {[1, 2, 3, 4].map((i) => (
                                         <img key={i} src={`https://i.pravatar.cc/100?u=${i * 10}`} className="w-6 h-6 rounded-full border-2 border-white shadow-sm" alt="user" />
                                     ))}
-                                    <div className="w-6 h-6 rounded-full bg-orange-100 border-2 border-white flex items-center justify-center text-[10px] font-bold text-orange-600">+500</div>
+                                    <div className="w-6 h-6 rounded-full bg-orange-100 border-2 border-white flex items-center justify-center text-[10px] font-bold text-orange-600">+1k</div>
                                 </div>
-                                <p className="max-w-[100vw] leading-relaxed text-[10px] sm:text-xs text-gray-400 font-medium">Junte-se a quem já tem clareza</p>
+                                <p className="text-[10px] sm:text-xs text-gray-500 font-medium">+1.200 famílias já têm clareza</p>
                             </div>
                             <Button
                                 variant="outline"
                                 size="lg"
                                 onClick={() => scrollTo("mecanismo")}
-                                className="h-12 sm:h-14 px-8 text-base sm:text-lg leading-relaxed rounded-full border-2 bg-background text-gray-700 hover:bg-gray-50 w-full sm:w-auto hidden sm:flex"
+                                className="h-12 sm:h-14 px-8 text-base sm:text-lg rounded-full border-2 bg-background text-gray-700 hover:bg-gray-50 w-full sm:w-auto hidden sm:flex"
                             >
                                 <Play className="w-4 h-4 ml-2 mr-2 fill-current" />
                                 Ver como funciona
                             </Button>
                         </div>
 
-                        <div className="mt-8 flex items-center justify-center lg:justify-start gap-4 text-xs sm:text-sm leading-relaxed text-gray-500">
-                            <span className="flex items-center gap-1"><Shield className="w-4 h-4 text-emerald-500" /> Criptografado</span>
+                        <div className="mt-8 flex items-center justify-center lg:justify-start gap-4 text-xs sm:text-sm text-gray-500">
+                            <span className="flex items-center gap-1"><Shield className="w-4 h-4 text-emerald-500" /> Sem acesso ao banco</span>
                             <span className="w-1 h-1 bg-gray-300 rounded-full" />
-                            <span className="flex items-center gap-1"><CheckCircle className="w-4 h-4 text-emerald-500" /> Ativação Imediata</span>
+                            <span className="flex items-center gap-1"><CheckCircle className="w-4 h-4 text-emerald-500" /> 4 dias grátis</span>
+                            <span className="w-1 h-1 bg-gray-300 rounded-full" />
+                            <span className="flex items-center gap-1"><Lock className="w-4 h-4 text-emerald-500" /> Cancele quando quiser</span>
                         </div>
                     </motion.div>
 
@@ -773,13 +823,18 @@ function Landing() {
                         <Button
                             size="lg"
                             onClick={() => navigate("/auth")}
-                            className="h-16 px-12 rounded-full text-xl font-bold bg-green-600 hover:bg-green-700 text-white shadow-xl shadow-green-600/30 hover:scale-105 transition-all w-full sm:w-auto animate-bounce-slow"
+                            className="h-14 sm:h-16 px-10 sm:px-12 rounded-full text-lg sm:text-xl font-bold gradient-warm text-white shadow-xl shadow-orange-500/30 hover:scale-105 hover:shadow-orange-500/50 transition-all w-full sm:w-auto"
                         >
-                            QUERO ASSUMIR O CONTROLE AGORA
+                            Quero meu Saldo Livre — Começar Grátis
+                            <ArrowRight className="w-5 h-5 ml-2" />
                         </Button>
-                        <p className="max-w-[100vw] leading-relaxed text-xs text-gray-400 mt-3 flex items-center justify-center gap-1">
-                            <Lock className="w-3 h-3" /> Compra segura • Garantia de 7 dias • Acesso imediato
-                        </p>
+                        <div className="mt-4 flex flex-wrap items-center justify-center gap-3 text-xs text-gray-400">
+                            <span className="flex items-center gap-1"><Lock className="w-3 h-3" /> Compra 100% segura</span>
+                            <span>·</span>
+                            <span className="flex items-center gap-1"><CheckCircle className="w-3 h-3 text-emerald-500" /> Garantia de 7 dias</span>
+                            <span>·</span>
+                            <span className="flex items-center gap-1"><Zap className="w-3 h-3 text-orange-400" /> Acesso em menos de 1 minuto</span>
+                        </div>
                     </div>
                 </div>
             </section>
@@ -1093,80 +1148,100 @@ function Landing() {
                 </p>
             </div>
 
-            {/* ─── WAITING LIST / PRICING ─── */}
+            {/* ─── PRICING ─── */}
             <Section id="pricing" className="py-10 sm:py-16 px-4 bg-gray-50">
                 <SaleNotification />
                 <div className="max-w-5xl mx-auto">
-                    <div className="max-w-[100vw] leading-relaxed text-center mb-10 sm:mb-12">
-                        <span className="max-w-[100vw] leading-relaxed text-sm leading-relaxed font-bold uppercase tracking-widest text-primary">Oferta de Lançamento</span>
-                        <h2 className="font-serif text-3xl sm:text-4xl md:text-5xl font-bold mt-4 mb-6 text-gray-900">Comece agora com 4 dias grátis</h2>
-                        <p className="max-w-[100vw] leading-relaxed text-gray-500 text-base sm:text-lg leading-relaxed max-w-xl mx-auto">
-                            Sem letras miúdas. Se não gostar, cancele com um clique.
+                    <div className="text-center mb-10 sm:mb-12">
+                        <span className="text-sm font-bold uppercase tracking-widest text-primary">Oferta de Lançamento</span>
+                        <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold mt-4 mb-3 text-gray-900">Comece com 4 dias grátis</h2>
+                        <p className="text-gray-500 text-base sm:text-lg max-w-xl mx-auto">
+                            Menos que um café por dia. Cancele quando quiser, sem burocracia.
                         </p>
                     </div>
 
                     <div className="grid md:grid-cols-3 gap-6 sm:gap-8 items-center">
                         {/* Monthly */}
-                        <div className="p-8 rounded-3xl bg-background/60 backdrop-blur-md border border-white/50 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all order-2 md:order-1">
-                            <h3 className="max-w-[100vw] leading-relaxed text-xl font-bold mb-2 text-gray-900">Mensal</h3>
-                            <div className="flex items-baseline gap-1 mb-6">
-                                <span className="max-w-[100vw] leading-relaxed text-3xl font-bold text-gray-900">R$ 19,90</span>
-                                <span className="max-w-[100vw] leading-relaxed text-gray-500">/mês</span>
+                        <div className="p-8 rounded-3xl bg-background border border-border shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all order-2 md:order-1">
+                            <h3 className="text-xl font-bold mb-1 text-gray-900">Mensal</h3>
+                            <p className="text-xs text-gray-400 mb-4">Para quem quer experimentar</p>
+                            <div className="flex items-baseline gap-1 mb-1">
+                                <span className="text-3xl font-bold text-gray-900">R$ 19,90</span>
+                                <span className="text-gray-500">/mês</span>
                             </div>
-                            <Button variant="outline" className="w-full rounded-full mb-6 border-border text-gray-700" onClick={() => navigate("/auth")}>Escolher Mensal</Button>
-                            <ul className="space-y-3 text-sm leading-relaxed text-gray-500">
-                                <li className="flex gap-2"><Check className="w-4 h-4 text-emerald-500" /> Acesso total</li>
-                                <li className="flex gap-2"><Check className="w-4 h-4 text-emerald-500" /> WhatsApp Ilimitado</li>
+                            <p className="text-xs text-gray-400 mb-6">≈ R$ 0,66 por dia</p>
+                            <Button variant="outline" className="w-full rounded-full mb-6 border-border text-gray-700 hover:bg-gray-50" onClick={() => navigate("/auth")}>Começar Grátis</Button>
+                            <ul className="space-y-3 text-sm text-gray-500">
+                                <li className="flex gap-2"><Check className="w-4 h-4 text-emerald-500 shrink-0" /> Acesso completo a tudo</li>
+                                <li className="flex gap-2"><Check className="w-4 h-4 text-emerald-500 shrink-0" /> WhatsApp ilimitado</li>
+                                <li className="flex gap-2"><Check className="w-4 h-4 text-emerald-500 shrink-0" /> Dashboard web</li>
                             </ul>
                         </div>
 
                         {/* Semester - Highlighted */}
-                        <div className="relative p-8 rounded-3xl bg-gray-900/90 backdrop-blur-xl text-white shadow-2xl scale-100 sm:scale-105 border border-white/10 order-1 md:order-2 ring-4 ring-orange-500/20 hover:scale-[1.07] transition-all">
-                            <div className="absolute -top-4 left-1/2 -translate-x-1/2 px-4 py-1.5 rounded-full bg-gradient-to-r from-orange-500 to-pink-500 text-white text-xs font-bold uppercase tracking-wide shadow-lg border border-white/20">
-                                🔥 Oferta Limitada
+                        <div className="relative p-8 rounded-3xl bg-gray-950 text-white shadow-2xl border border-white/10 order-1 md:order-2 ring-2 ring-orange-500/40 hover:-translate-y-2 transition-all">
+                            <div className="absolute -top-4 left-1/2 -translate-x-1/2 px-4 py-1.5 rounded-full gradient-warm text-white text-xs font-bold uppercase tracking-wide shadow-lg">
+                                🔥 Mais Popular
                             </div>
-                            <h3 className="max-w-[100vw] leading-relaxed text-xl font-bold mb-2">Semestral</h3>
-                            <div className="flex items-baseline gap-1 mb-2">
-                                <span className="max-w-[100vw] leading-relaxed text-4xl font-bold">R$ 14,90</span>
-                                <span className="max-w-[100vw] leading-relaxed text-gray-400">/mês</span>
+                            <h3 className="text-xl font-bold mb-1">Semestral</h3>
+                            <p className="text-xs text-gray-400 mb-4">Para quem quer resultado real</p>
+                            <div className="flex items-baseline gap-1 mb-1">
+                                <span className="text-gray-500 line-through text-lg mr-1">R$ 19,90</span>
+                                <span className="text-4xl font-bold text-white">R$ 14,90</span>
+                                <span className="text-gray-400">/mês</span>
                             </div>
-                            <p className="max-w-[100vw] leading-relaxed text-xs text-gray-400 mb-6">Cobrado R$ 89,90 a cada 6 meses</p>
+                            <p className="text-xs text-gray-400 mb-2">R$ 89,90 cobrado a cada 6 meses · ≈ R$ 0,50/dia</p>
+                            <div className="bg-orange-500/20 border border-orange-500/30 rounded-lg px-3 py-1.5 mb-6 text-center">
+                                <span className="text-orange-300 text-xs font-bold">Você economiza R$ 30,00 em 6 meses</span>
+                            </div>
 
                             {/* Bonuses */}
-                            <div className="leading-relaxed mb-6 p-4 rounded-xl bg-background/5 border border-white/10 relative overflow-hidden">
-                                <div className="absolute top-0 right-0 bg-yellow-400 text-foreground text-[10px] font-bold px-2 py-0.5 rounded-bl-lg">VALOR: R$ 197 (GRÁTIS)</div>
-                                <p className="max-w-[100vw] leading-relaxed text-xs font-bold text-orange-300 uppercase tracking-wider mb-3">🎁 Bônus Exclusivos (HOJE):</p>
+                            <div className="mb-6 p-4 rounded-xl bg-white/5 border border-white/10 relative overflow-hidden">
+                                <div className="absolute top-0 right-0 bg-yellow-400 text-gray-900 text-[10px] font-bold px-2 py-0.5 rounded-bl-lg">GRÁTIS</div>
+                                <p className="text-xs font-bold text-orange-300 uppercase tracking-wider mb-3">🎁 Bônus inclusos hoje:</p>
                                 <ul className="space-y-2 text-xs text-gray-300">
-                                    <li className="flex gap-2 items-start"><Star className="w-3.5 h-3.5 text-yellow-400 shrink-0 mt-0.5" /> <span>Guia: "Como sair das Dívidas em 30 Dias"</span></li>
-                                    <li className="flex gap-2 items-start"><Star className="w-3.5 h-3.5 text-yellow-400 shrink-0 mt-0.5" /> <span>Planilha Mestra de Planejamento</span></li>
-                                    <li className="flex gap-2 items-start"><Star className="w-3.5 h-3.5 text-yellow-400 shrink-0 mt-0.5" /> <span>Grupo Vip de Suporte</span></li>
+                                    <li className="flex gap-2 items-start"><Star className="w-3.5 h-3.5 text-yellow-400 shrink-0 mt-0.5" /> <span>Guia: "Sair das Dívidas em 30 Dias"</span></li>
+                                    <li className="flex gap-2 items-start"><Star className="w-3.5 h-3.5 text-yellow-400 shrink-0 mt-0.5" /> <span>Planilha Mestra de Orçamento</span></li>
+                                    <li className="flex gap-2 items-start"><Star className="w-3.5 h-3.5 text-yellow-400 shrink-0 mt-0.5" /> <span>Grupo VIP de Suporte</span></li>
                                 </ul>
                             </div>
 
-                            <Button className="w-full rounded-full gradient-warm border-0 font-bold h-12 mb-8 shadow-lg shadow-orange-500/25 hover:shadow-orange-500/50 hover:scale-105 transition-all" onClick={() => navigate("/auth")}>
-                                Garantir Bônus Agora
+                            <Button className="w-full rounded-full gradient-warm border-0 font-bold h-12 mb-6 shadow-lg shadow-orange-500/30 hover:shadow-orange-500/50 hover:scale-105 transition-all" onClick={() => navigate("/auth")}>
+                                Garantir com Bônus — 4 dias grátis
                             </Button>
-                            <ul className="space-y-3 text-sm leading-relaxed text-gray-300">
-                                <li className="flex gap-2"><Check className="w-4 h-4 text-emerald-400" /> Tudo do Mensal</li>
-                                <li className="flex gap-2"><Check className="w-4 h-4 text-emerald-400" /> 25% de Desconto</li>
-                                <li className="flex gap-2"><Check className="w-4 h-4 text-emerald-400" /> Prioridade no Suporte</li>
+                            <ul className="space-y-3 text-sm text-gray-300">
+                                <li className="flex gap-2"><Check className="w-4 h-4 text-emerald-400 shrink-0" /> Tudo do Mensal</li>
+                                <li className="flex gap-2"><Check className="w-4 h-4 text-emerald-400 shrink-0" /> 25% de desconto aplicado</li>
+                                <li className="flex gap-2"><Check className="w-4 h-4 text-emerald-400 shrink-0" /> Bônus exclusivos incluídos</li>
+                                <li className="flex gap-2"><Check className="w-4 h-4 text-emerald-400 shrink-0" /> Suporte prioritário</li>
                             </ul>
                         </div>
 
                         {/* Annual */}
-                        <div className="p-8 rounded-3xl bg-background/60 backdrop-blur-md border border-white/50 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all order-3 md:order-3">
-                            <h3 className="max-w-[100vw] leading-relaxed text-xl font-bold mb-2 text-gray-900">Anual</h3>
-                            <div className="flex items-baseline gap-1 mb-2">
-                                <span className="max-w-[100vw] leading-relaxed text-3xl font-bold text-gray-900">R$ 12,49</span>
-                                <span className="max-w-[100vw] leading-relaxed text-gray-500">/mês</span>
+                        <div className="p-8 rounded-3xl bg-background border border-border shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all order-3">
+                            <h3 className="text-xl font-bold mb-1 text-gray-900">Anual</h3>
+                            <p className="text-xs text-gray-400 mb-4">Para quem quer o máximo</p>
+                            <div className="flex items-baseline gap-1 mb-1">
+                                <span className="text-gray-500 line-through text-lg mr-1">R$ 19,90</span>
+                                <span className="text-3xl font-bold text-gray-900">R$ 12,49</span>
+                                <span className="text-gray-500">/mês</span>
                             </div>
-                            <p className="max-w-[100vw] leading-relaxed text-xs text-gray-500 mb-6">Cobrado R$ 149,90 por ano</p>
-                            <Button variant="outline" className="w-full rounded-full mb-6 border-border text-gray-700" onClick={() => navigate("/auth")}>Escolher Anual</Button>
-                            <ul className="space-y-3 text-sm leading-relaxed text-gray-500">
-                                <li className="flex gap-2"><Check className="w-4 h-4 text-emerald-500" /> Maior economia (37%)</li>
-                                <li className="flex gap-2"><Check className="w-4 h-4 text-emerald-500" /> Acesso Beta a novidades</li>
+                            <p className="text-xs text-gray-400 mb-6">R$ 149,90/ano · 37% de economia</p>
+                            <Button variant="outline" className="w-full rounded-full mb-6 border-border text-gray-700 hover:bg-gray-50" onClick={() => navigate("/auth")}>Começar Grátis</Button>
+                            <ul className="space-y-3 text-sm text-gray-500">
+                                <li className="flex gap-2"><Check className="w-4 h-4 text-emerald-500 shrink-0" /> Maior economia (37%)</li>
+                                <li className="flex gap-2"><Check className="w-4 h-4 text-emerald-500 shrink-0" /> Acesso antecipado a novidades</li>
+                                <li className="flex gap-2"><Check className="w-4 h-4 text-emerald-500 shrink-0" /> Todos os bônus incluídos</li>
                             </ul>
                         </div>
+                    </div>
+
+                    {/* Trust bar below pricing */}
+                    <div className="mt-10 flex flex-wrap items-center justify-center gap-6 text-sm text-gray-500">
+                        <span className="flex items-center gap-2"><Shield className="w-4 h-4 text-emerald-500" /> Pagamento seguro</span>
+                        <span className="flex items-center gap-2"><CheckCircle className="w-4 h-4 text-emerald-500" /> Garantia de 7 dias</span>
+                        <span className="flex items-center gap-2"><Lock className="w-4 h-4 text-emerald-500" /> Cancele quando quiser</span>
+                        <span className="flex items-center gap-2"><Zap className="w-4 h-4 text-orange-500" /> Acesso em menos de 1 minuto</span>
                     </div>
                 </div>
             </Section>
