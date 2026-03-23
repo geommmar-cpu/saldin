@@ -487,7 +487,7 @@ function FeatureShowcase() {
 
                     {/* Right: Video Mockup */}
                     <div className="order-1 lg:order-2 flex justify-center items-center py-4">
-                        <div className="relative bg-white rounded-3xl" style={{ isolation: "isolate" }}>
+                        <div className="relative">
                             <video
                                 autoPlay
                                 muted
@@ -496,10 +496,10 @@ function FeatureShowcase() {
 
 
 
-                                className="w-[280px] sm:w-[340px] lg:w-[380px] drop-shadow-2xl select-none pointer-events-none block"
-                                style={{ mixBlendMode: "multiply" }}
+                                className="w-[320px] sm:w-[420px] lg:w-[500px] xl:w-[540px] select-none pointer-events-none block"
+
                             >
-                                <source src="/_Mockup 01 - Saldin.mp4" type="video/mp4" />
+                                <source src="/_Mockup 01 - Saldin-Picsart-BackgroundRemover.mp4" type="video/mp4" />
                             </video>
 
                             {/* Floating badge */}
