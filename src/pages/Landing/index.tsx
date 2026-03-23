@@ -7,7 +7,8 @@ import {
     CheckCircle, ArrowRight, ChevronDown, Star, TrendingUp,
     AlertTriangle, Eye, EyeOff, DollarSign, Users, Lock,
     Smartphone, BarChart3, Wallet, Bomb, Send, X, Menu,
-    ChevronUp, Sparkles, Check, Play, UserCheck, ThumbsUp, Timer
+    ChevronUp, Sparkles, Check, Play, UserCheck, ThumbsUp, Timer,
+    Mic, Camera, FileText
 } from "lucide-react";
 import logoSaldin from "@/assets/logo-saldin-final.png";
 
@@ -336,6 +337,266 @@ function CalculationDemo() {
                 </p>
             </div>
         </div>
+    );
+}
+
+// ─── Feature Showcase Data ───
+const SHOWCASE_FEATURES = [
+    {
+        id: "texto",
+        icon: FileText,
+        tag: "Texto",
+        tagBg: "bg-emerald-100",
+        tagText: "text-emerald-700",
+        activeBorder: "border-emerald-400",
+        activeBg: "bg-emerald-50",
+        activeAccent: "bg-emerald-400",
+        title: "Mande uma mensagem de texto",
+        subtitle: "Do jeito que você fala",
+        desc: "\"Gastei 45 no almoço no cartão Inter em 2x.\" A IA entende, categoriza e registra. Sem menu, sem formulário.",
+        videoSrc: "/videos/feature-texto.mp4",
+        hint: "Ex: \"paguei 89 de mercado no débito\"",
+    },
+    {
+        id: "audio",
+        icon: Mic,
+        tag: "\u00c1udio",
+        tagBg: "bg-orange-100",
+        tagText: "text-orange-700",
+        activeBorder: "border-orange-400",
+        activeBg: "bg-orange-50",
+        activeAccent: "bg-orange-400",
+        title: "Grave um áudio de 5 segundos",
+        subtitle: "Enquanto dirige, caminha ou come",
+        desc: "Fale o gasto ao sair da loja. A IA transcreve, interpreta e já lança com valor, cartão e categoria certa.",
+        videoSrc: "/videos/feature-audio.mp4",
+        hint: "Funciona mesmo com ruído de fundo",
+    },
+    {
+        id: "imagem",
+        icon: Camera,
+        tag: "Imagem",
+        tagBg: "bg-blue-100",
+        tagText: "text-blue-700",
+        activeBorder: "border-blue-400",
+        activeBg: "bg-blue-50",
+        activeAccent: "bg-blue-400",
+        title: "Bata foto do cupom ou boleto",
+        subtitle: "IA lê e registra automaticamente",
+        desc: "Mande a foto da nota fiscal, cupom ou boleto. O Saldin extrai valor, estabelecimento e data — você não digita nada.",
+        videoSrc: "/videos/feature-imagem.mp4",
+        hint: "Funciona com boletos, NFe e cupons",
+    },
+];
+
+// ─── Feature Showcase Component ───
+function FeatureShowcase() {
+    const [active, setActive] = useState(0);
+    const videoRef = useRef<HTMLVideoElement>(null);
+    const [videoLoaded, setVideoLoaded] = useState(false);
+
+    const feature = SHOWCASE_FEATURES[active];
+
+    useEffect(() => {
+        setVideoLoaded(false);
+        if (videoRef.current) {
+            videoRef.current.load();
+            videoRef.current.play().catch(() => {});
+        }
+    }, [active]);
+
+    return (
+        <Section id="como-funciona" className="py-16 sm:py-24 px-4 bg-background border-b border-border">
+            <div className="max-w-6xl mx-auto">
+                {/* Header */}
+                <div className="text-center mb-12 sm:mb-16">
+                    <span className="text-sm font-bold uppercase tracking-widest text-primary">Como Funciona</span>
+                    <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold mt-4 mb-4 text-gray-900">
+                        3 formas de registrar.
+                        <br />
+                        <span className="text-transparent bg-clip-text bg-gradient-to-r from-orange-500 to-pink-500">
+                            Todas em menos de 5 segundos.
+                        </span>
+                    </h2>
+                    <p className="text-gray-500 text-base sm:text-lg max-w-xl mx-auto">
+                        Sem abrir app. Sem fazer login. Só mande uma mensagem no WhatsApp que você já tem.
+                    </p>
+                </div>
+
+                {/* Content */}
+                <div className="grid lg:grid-cols-2 gap-10 lg:gap-20 items-center">
+
+                    {/* Left: Feature tabs */}
+                    <div className="flex flex-col gap-3 sm:gap-4 order-2 lg:order-1">
+                        {SHOWCASE_FEATURES.map((f, i) => (
+                            <motion.button
+                                key={f.id}
+                                onClick={() => setActive(i)}
+                                whileHover={{ x: active === i ? 0 : 4 }}
+                                transition={{ type: "spring", stiffness: 400, damping: 30 }}
+                                className={`w-full text-left p-5 sm:p-6 rounded-2xl border-2 transition-all duration-300 ${
+                                    active === i
+                                        ? `${f.activeBorder} ${f.activeBg} shadow-md`
+                                        : "border-border bg-background hover:border-gray-300 hover:shadow-sm"
+                                }`}
+                            >
+                                <div className="flex items-start gap-4">
+                                    <div className={`shrink-0 w-10 h-10 rounded-xl flex items-center justify-center transition-colors ${
+                                        active === i ? `${f.tagBg} ${f.tagText}` : "bg-gray-100 text-gray-500"
+                                    }`}>
+                                        <f.icon className="w-5 h-5" />
+                                    </div>
+                                    <div className="flex-1 min-w-0">
+                                        <div className="flex items-center gap-2 mb-1">
+                                            <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${
+                                                active === i ? `${f.tagBg} ${f.tagText}` : "bg-gray-100 text-gray-500"
+                                            }`}>{f.tag}</span>
+                                            {active === i && (
+                                                <span className="text-[10px] text-gray-400 font-medium">{f.hint}</span>
+                                            )}
+                                        </div>
+                                        <h3 className="font-bold text-gray-900 text-base mb-0.5">{f.title}</h3>
+                                        <p className="text-xs text-gray-500 font-medium mb-2">{f.subtitle}</p>
+                                        <AnimatePresence mode="wait">
+                                            {active === i && (
+                                                <motion.p
+                                                    key={f.id}
+                                                    initial={{ opacity: 0, y: -6 }}
+                                                    animate={{ opacity: 1, y: 0 }}
+                                                    exit={{ opacity: 0, y: -6 }}
+                                                    transition={{ duration: 0.25 }}
+                                                    className="text-sm text-gray-600 leading-relaxed"
+                                                >
+                                                    {f.desc}
+                                                </motion.p>
+                                            )}
+                                        </AnimatePresence>
+                                    </div>
+                                    <div className={`shrink-0 w-2 h-2 rounded-full mt-2 transition-all ${
+                                        active === i ? `${f.activeAccent}` : "bg-gray-200"
+                                    }`} />
+                                </div>
+                            </motion.button>
+                        ))}
+
+                        {/* Bottom CTA */}
+                        <p className="text-xs text-center text-gray-400 pt-2">
+                            💡 Todas as formas funcionam juntas. Use a que for mais fácil no momento.
+                        </p>
+                    </div>
+
+                    {/* Right: Phone Mockup */}
+                    <div className="order-1 lg:order-2 flex justify-center">
+                        <div className="relative">
+                            {/* Phone frame */}
+                            <div className="relative w-[270px] sm:w-[295px] h-[540px] sm:h-[590px] bg-[#d0d1d6] rounded-[52px] shadow-[0_24px_60px_-12px_rgba(0,0,0,0.28),inset_0_0_2px_1px_rgba(255,255,255,0.7)] ring-4 ring-[#b4b5b9]/50 border-[6px] border-[#e3e3e5]">
+                                {/* Dynamic Island */}
+                                <div className="absolute top-4 left-1/2 -translate-x-1/2 w-[95px] h-[27px] bg-gray-950 rounded-full z-20" />
+
+                                {/* Screen */}
+                                <div className="absolute inset-0 rounded-[47px] overflow-hidden bg-gray-950">
+                                    <AnimatePresence mode="wait">
+                                        <motion.div
+                                            key={active}
+                                            initial={{ opacity: 0 }}
+                                            animate={{ opacity: 1 }}
+                                            exit={{ opacity: 0 }}
+                                            transition={{ duration: 0.35 }}
+                                            className="w-full h-full relative"
+                                        >
+                                            {/* Video */}
+                                            <video
+                                                ref={videoRef}
+                                                autoPlay
+                                                muted
+                                                loop
+                                                playsInline
+                                                onLoadedData={() => setVideoLoaded(true)}
+                                                onError={() => setVideoLoaded(false)}
+                                                className={`w-full h-full object-cover transition-opacity duration-500 ${
+                                                    videoLoaded ? "opacity-100" : "opacity-0"
+                                                }`}
+                                            >
+                                                <source src={feature.videoSrc} type="video/mp4" />
+                                            </video>
+
+                                            {/* Placeholder (shown when no video) */}
+                                            {!videoLoaded && (
+                                                <div className="absolute inset-0 flex flex-col items-center justify-center gap-4 px-6">
+                                                    {/* Mockup WhatsApp header */}
+                                                    <div className="w-full">
+                                                        <div className="bg-[#075e54] px-4 py-3 flex items-center gap-3 rounded-t-lg">
+                                                            <div className="w-8 h-8 rounded-full bg-white/20 overflow-hidden border border-white/20">
+                                                                <img src="/logo-saldin-final.png" alt="" className="w-full h-full object-cover" />
+                                                            </div>
+                                                            <div>
+                                                                <p className="text-white text-[11px] font-bold">Saldin</p>
+                                                                <p className="text-green-300 text-[9px]">Online</p>
+                                                            </div>
+                                                        </div>
+                                                        <div className="bg-[#ece5dd] p-3 flex flex-col gap-3 rounded-b-lg">
+                                                            {/* User message bubble */}
+                                                            <div className="self-end bg-[#d9fdd3] rounded-2xl rounded-tr-sm px-3 py-2 max-w-[85%] shadow-sm">
+                                                                <div className={`w-8 h-8 rounded-lg ${feature.tagBg} ${feature.tagText} flex items-center justify-center mx-auto mb-1`}>
+                                                                    <feature.icon className="w-4 h-4" />
+                                                                </div>
+                                                                <p className="text-[10px] text-gray-600 font-medium text-center">{feature.hint}</p>
+                                                                <p className="text-[8px] text-right text-gray-400 mt-1">09:42 ✓✓</p>
+                                                            </div>
+                                                            {/* Bot response bubble */}
+                                                            <div className="self-start bg-white rounded-2xl rounded-tl-sm px-3 py-2 max-w-[90%] shadow-sm">
+                                                                <p className="text-[10px] font-bold text-gray-800 mb-1">✅ Registrado!</p>
+                                                                <p className="text-[9px] text-gray-500 leading-relaxed">Categoria detectada automaticamente. Saldo Livre atualizado.</p>
+                                                                <p className="text-[8px] text-right text-gray-400 mt-1">09:42</p>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <p className="text-white/30 text-[10px] text-center">Vídeo demonstrativo em breve</p>
+                                                </div>
+                                            )}
+                                        </motion.div>
+                                    </AnimatePresence>
+                                </div>
+
+                                {/* Side buttons */}
+                                <div className="absolute top-28 -left-[2px] w-[3px] h-8 bg-gray-400 rounded-l-md" />
+                                <div className="absolute top-44 -left-[2px] w-[3px] h-14 bg-gray-400 rounded-l-md" />
+                                <div className="absolute top-60 -left-[2px] w-[3px] h-14 bg-gray-400 rounded-l-md" />
+                                <div className="absolute top-48 -right-[2px] w-[3px] h-20 bg-gray-400 rounded-r-md" />
+                            </div>
+
+                            {/* Floating badge */}
+                            <AnimatePresence mode="wait">
+                                <motion.div
+                                    key={`badge-${active}`}
+                                    initial={{ opacity: 0, y: 8, scale: 0.95 }}
+                                    animate={{ opacity: 1, y: 0, scale: 1 }}
+                                    exit={{ opacity: 0, y: 8, scale: 0.95 }}
+                                    transition={{ type: "spring", stiffness: 400, damping: 30 }}
+                                    className="absolute -bottom-5 left-1/2 -translate-x-1/2 whitespace-nowrap bg-white rounded-full px-4 py-2 shadow-lg border border-border flex items-center gap-2"
+                                >
+                                    <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+                                    <span className="text-xs font-bold text-gray-700">via WhatsApp · {feature.tag}</span>
+                                </motion.div>
+                            </AnimatePresence>
+
+                            {/* Tab dots */}
+                            <div className="absolute -right-8 top-1/2 -translate-y-1/2 flex flex-col gap-2">
+                                {SHOWCASE_FEATURES.map((_, i) => (
+                                    <button
+                                        key={i}
+                                        onClick={() => setActive(i)}
+                                        className={`w-2 h-2 rounded-full transition-all duration-300 ${
+                                            active === i ? "bg-orange-500 scale-125" : "bg-gray-300 hover:bg-gray-400"
+                                        }`}
+                                    />
+                                ))}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </Section>
     );
 }
 
@@ -841,38 +1102,45 @@ function Landing() {
 
             <Marquee />
 
-            {/* ─── WHO IS THIS FOR? (SEGMENTATION) ─── */}
-            <Section id="quem-e" className="py-16 bg-background border-y border-border">
+            {/* ─── WHO IS THIS FOR? (real quotes) ─── */}
+            <Section id="quem-e" className="py-16 sm:py-24 bg-gray-50 border-y border-border overflow-hidden">
                 <div className="max-w-6xl mx-auto px-4">
-                    <div className="max-w-[100vw] leading-relaxed text-center mb-12">
-                        <h2 className="max-w-[100vw] leading-relaxed text-3xl font-bold text-gray-900">Pra quem é o Saldin?</h2>
-                        <p className="max-w-[100vw] leading-relaxed text-gray-500 mt-2">Diga adeus à confusão se você se identifica com um destes:</p>
+                    <div className="text-center mb-12 sm:mb-16">
+                        <span className="text-sm font-bold uppercase tracking-widest text-primary">Você se reconhece?</span>
+                        <h2 className="text-3xl sm:text-4xl font-bold mt-4 mb-3 text-gray-900">
+                            Se você já falou alguma dessas frases,
+                            <br className="hidden sm:block" />
+                            <span className="text-transparent bg-clip-text bg-gradient-to-r from-orange-500 to-pink-500"> o Saldin é para você.</span>
+                        </h2>
                     </div>
-                    <div className="grid md:grid-cols-3 gap-6">
-                        <div className="p-6 bg-blue-50/50 rounded-2xl border border-blue-100 text-center hover:scale-105 transition-transform">
-                            <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4 text-3xl">💻</div>
-                            <h3 className="font-bold text-lg leading-relaxed text-gray-900 mb-2">Freelancers & Autônomos</h3>
-                            <p className="max-w-[100vw] leading-relaxed text-sm leading-relaxed text-gray-600">Que nunca sabem exatamente quanto vai entrar e misturam contas PJ com PF.</p>
-                        </div>
-                        <div className="p-6 bg-blue-50/50 rounded-2xl border border-blue-100 text-center hover:scale-105 transition-transform">
-                            <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4 text-3xl">🚀</div>
-                            <h3 className="font-bold text-lg leading-relaxed text-gray-900 mb-2">Quem odeia planilhas</h3>
-                            <p className="max-w-[100vw] leading-relaxed text-sm leading-relaxed text-gray-500">Para você que começa o mês organizado mas desiste na primeira semana por preguiça de abrir o Excel.</p>
-                        </div>
-                        <div className="p-6 bg-orange-50/50 rounded-2xl border border-orange-100 text-center hover:scale-105 transition-transform">
-                            <div className="w-16 h-16 bg-orange-100 rounded-full flex items-center justify-center mx-auto mb-4 text-3xl">🛡️</div>
-                            <h3 className="font-bold text-lg leading-relaxed text-gray-900 mb-2">Endividados & Focados</h3>
-                            <p className="max-w-[100vw] leading-relaxed text-sm leading-relaxed text-gray-500">Para você que quer saber a data EXATA em que estará livre das dívidas e precisa de um plano de guerra real.</p>
-                        </div>
-                        <div className="p-6 bg-emerald-50/50 rounded-2xl border border-emerald-100 text-center hover:scale-105 transition-transform">
-                            <div className="w-16 h-16 bg-emerald-100 rounded-full flex items-center justify-center mx-auto mb-4 text-3xl">💻</div>
-                            <h3 className="font-bold text-lg leading-relaxed text-gray-900 mb-2">Autônomos & Variáveis</h3>
-                            <p className="max-w-[100vw] leading-relaxed text-sm leading-relaxed text-gray-500">Para você que nunca sabe quanto pode gastar porque a renda muda todo mês. Tenha clareza do seu Saldo Livre.</p>
-                        </div>
+
+                    <div className="columns-1 sm:columns-2 lg:columns-3 gap-4">
+                        {[
+                            { quote: "Abri o app do banco, vi R$1.200. Aí lembrei que sai a fatura amanhã. Deve sobrar nada.", tag: "Assalariado", accent: "border-l-orange-400", tagColor: "bg-orange-100 text-orange-700" },
+                            { quote: "Sou freela. Esse mês entrou bem, mas semana que vem não sei. Fico com medo de gastar qualquer coisa.", tag: "Freelancer", accent: "border-l-blue-400", tagColor: "bg-blue-100 text-blue-700" },
+                            { quote: "Toda segunda-feira boto tudo na planilha. Até quarta já larguei.", tag: "Planilheiro frustrado", accent: "border-l-gray-400", tagColor: "bg-gray-100 text-gray-600" },
+                            { quote: "Meu marido não sabe quanto a gente gasta. Eu também não. A gente só descobre quando o cartão recusa.", tag: "Casal", accent: "border-l-pink-400", tagColor: "bg-pink-100 text-pink-700" },
+                            { quote: "Sei lá quanto devo ao total. Tem cartão, tem carnê, tem uma coisa financiada... não consigo ver tudo junto.", tag: "Endividado", accent: "border-l-red-400", tagColor: "bg-red-100 text-red-700" },
+                            { quote: "Recebo dia 5. Dia 12 já tô no limite. Não é falta de dinheiro — é falta de controle.", tag: "Fim de mês difícil", accent: "border-l-emerald-400", tagColor: "bg-emerald-100 text-emerald-700" },
+                        ].map((item, i) => (
+                            <motion.div
+                                key={i}
+                                initial={{ opacity: 0, y: 20 }}
+                                whileInView={{ opacity: 1, y: 0 }}
+                                viewport={{ once: true }}
+                                transition={{ delay: i * 0.08, duration: 0.5 }}
+                                className={`break-inside-avoid mb-4 bg-white rounded-2xl p-6 border-l-4 ${item.accent} shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all duration-300`}
+                            >
+                                <span className="text-5xl text-gray-100 font-serif leading-none select-none block -mb-2">&ldquo;</span>
+                                <p className="text-gray-800 font-medium text-base leading-relaxed mb-4">{item.quote}</p>
+                                <span className={`inline-block text-[11px] font-bold px-2.5 py-1 rounded-full ${item.tagColor}`}>{item.tag}</span>
+                            </motion.div>
+                        ))}
                     </div>
+
+                    <p className="text-center text-gray-400 text-sm mt-10">Se uma dessas frases te descreveu — você está no lugar certo. 👇</p>
                 </div>
             </Section>
-
             {/* ─── PROBLEM SECTION ─── */}
             <Section id="problema" className="py-16 sm:py-24 px-4 bg-background">
                 <div className="max-w-6xl mx-auto">
@@ -928,6 +1196,9 @@ function Landing() {
                     </div>
                 </div>
             </Section>
+
+            {/* ─── FEATURE SHOWCASE ─── */}
+            <FeatureShowcase />
 
             {/* ─── SOLUTION / MECHANISM SECTION ─── */}
             <Section id="mecanismo" className="py-10 sm:py-16 px-4 bg-gray-50/50 relative overflow-hidden">
