@@ -499,7 +499,7 @@ function FeatureShowcase() {
                                 className="w-[320px] sm:w-[420px] lg:w-[500px] xl:w-[540px] select-none pointer-events-none block"
 
                             >
-                                <source src="/mockup - maior.mp4" type="video/mp4" />
+                                <source src="/mockup - maior 2.mp4" type="video/mp4" />
                             </video>
 
                             {/* Floating badge */}
