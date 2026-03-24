@@ -1084,10 +1084,12 @@ function Landing() {
                         <Button
                             size="lg"
                             onClick={() => navigate("/auth")}
-                            className="h-14 sm:h-16 px-10 sm:px-12 rounded-full text-lg sm:text-xl font-bold gradient-warm text-white shadow-xl shadow-orange-500/30 hover:scale-105 hover:shadow-orange-500/50 transition-all w-full sm:w-auto whitespace-nowrap"
+                            className="min-h-[3.5rem] h-auto py-3 sm:py-0 sm:h-16 px-6 sm:px-12 rounded-full text-base sm:text-lg md:text-xl font-bold gradient-warm text-white shadow-xl shadow-orange-500/30 hover:scale-105 hover:shadow-orange-500/50 transition-all w-full sm:w-auto"
                         >
-                            Quero meu Saldo Livre — Começar Grátis
-                            <ArrowRight className="w-5 h-5 ml-2" />
+                            <span className="flex flex-wrap items-center justify-center gap-x-2 gap-y-1 text-center">
+                                Quero meu Saldo Livre <span className="hidden sm:inline">—</span><span className="sm:hidden">-</span> Começar Grátis
+                                <ArrowRight className="w-4 h-4 sm:w-5 sm:h-5 shrink-0" />
+                            </span>
                         </Button>
                         <div className="mt-4 flex flex-wrap items-center justify-center gap-3 text-xs text-gray-400">
                             <span className="flex items-center gap-1"><Lock className="w-3 h-3" /> Compra 100% segura</span>
