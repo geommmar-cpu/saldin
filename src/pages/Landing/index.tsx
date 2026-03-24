@@ -59,7 +59,7 @@ function StickyCtaBar({ onCta }: { onCta: () => void }) {
                         </div>
                         <button
                             onClick={onCta}
-                            className="w-full sm:w-auto shrink-0 gradient-warm text-white font-bold px-8 py-3 rounded-full text-sm shadow-lg shadow-orange-500/30 hover:scale-105 hover:shadow-orange-500/50 transition-all duration-200"
+                            className="w-full sm:w-auto shrink-0 gradient-warm text-white font-bold px-8 py-3 rounded-full text-sm shadow-lg shadow-orange-500/30 hover:scale-105 hover:shadow-orange-500/50 transition-all duration-200 whitespace-nowrap"
                         >
                             Começar Agora — É Grátis
                         </button>
@@ -83,13 +83,13 @@ function PhoneMockup() {
                         {/* Header: Transaction Confirmed */}
                         <div className="font-bold border-b border-border pb-2 mb-2 flex items-center gap-2 text-gray-800">
                             <div className="shrink-0 w-4 h-4 rounded-full border border-gray-400 flex items-center justify-center text-[10px] text-gray-500">✓</div>
-                            <span className="max-w-[100vw] leading-relaxed text-[11px] sm:text-xs tracking-wider">COMPRA PARCELADA REGISTRADA</span>
+                            <span className="leading-relaxed text-[11px] sm:text-xs tracking-wider">COMPRA PARCELADA REGISTRADA</span>
                         </div>
 
                         {/* Details */}
                         <div className="space-y-1 mb-3 text-gray-600 text-[11px] sm:text-xs">
                             <p><span className="font-semibold text-gray-800">Valor Total:</span> R$ 90,00</p>
-                            <p><span className="font-semibold text-gray-800">Parcelas:</span> <span className="max-w-[100vw] leading-relaxed text-gray-900 font-bold bg-gray-100 px-1 rounded">2x de R$ 45,00</span></p>
+                            <p><span className="font-semibold text-gray-800">Parcelas:</span> <span className="leading-relaxed text-gray-900 font-bold bg-gray-100 px-1 rounded">2x de R$ 45,00</span></p>
                             <p><span className="font-semibold text-gray-800">Cartão:</span> Inter (Final 4022)</p>
                             <p><span className="font-semibold text-gray-800">Categoria:</span> Restaurante</p>
                         </div>
@@ -140,7 +140,7 @@ function PhoneMockup() {
 
     // Mobile: scaled down (0.85), Desktop: full scale (1)
     return (
-        <div className="relative mx-auto w-[300px] h-[600px] transform scale-90 sm:scale-100 origin-top sm:origin-center">
+        <div className="relative mx-auto w-[280px] sm:w-[300px] h-[550px] sm:h-[600px] transform scale-[0.75] min-[375px]:scale-[0.85] sm:scale-100 origin-top sm:origin-center">
             {/* iPhone 15 Pro Frame - Silver / Natural Titanium */}
             <div className="relative h-full w-full bg-[#d0d1d6] rounded-[55px] shadow-[0_20px_50px_-12px_rgba(0,0,0,0.3),inset_0_0_2px_1px_rgba(255,255,255,0.7)] ring-4 ring-[#b4b5b9]/50 border-[6px] border-[#e3e3e5]">
 
@@ -156,8 +156,8 @@ function PhoneMockup() {
                             <img src={logoSaldin} alt="Saldin Logo" className="w-full h-full object-cover" />
                         </div>
                         <div>
-                            <p className="max-w-[100vw] leading-relaxed text-foreground text-sm leading-relaxed font-semibold">Saldin</p>
-                            <p className="max-w-[100vw] leading-relaxed text-emerald-600 text-[10px] font-medium">Online</p>
+                            <p className="leading-relaxed text-foreground text-sm font-semibold">Saldin</p>
+                            <p className="leading-relaxed text-emerald-600 text-[10px] font-medium">Online</p>
                         </div>
                     </div>
 
@@ -165,7 +165,7 @@ function PhoneMockup() {
                     <div className="flex-1 p-3 overflow-y-auto space-y-3 bg-[url('https://user-images.githubusercontent.com/15075759/28719144-86dc0f70-73b1-11e7-911d-60d70fcded21.png')] bg-repeat relative">
 
                         <div className="relative z-10 flex flex-col gap-3">
-                            <p className="max-w-[100vw] leading-relaxed text-center text-[10px] text-gray-500 my-2 bg-background/80 backdrop-blur-sm inline-block px-3 py-1 rounded-full mx-auto w-fit shadow-sm border border-border">Hoje</p>
+                            <p className="text-center text-[10px] text-gray-500 my-2 bg-background/80 backdrop-blur-sm inline-block px-3 py-1 rounded-full mx-auto w-fit shadow-sm border border-border">Hoje</p>
 
                             <AnimatePresence>
                                 {messages.map((msg, i) => (
@@ -268,12 +268,12 @@ function CalculationDemo() {
 
     return (
         <div className="bg-background/90 backdrop-blur-xl border border-border p-6 sm:p-8 rounded-3xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] max-w-lg w-full mx-auto">
-            <h3 className="max-w-[100vw] leading-relaxed text-xl font-bold mb-6 text-center text-gray-900">Descubra seu Saldo Livre</h3>
+            <h3 className="text-xl font-bold mb-6 text-center text-gray-900">Descubra seu Saldo Livre</h3>
 
             <div className="space-y-6">
                 <div className="space-y-2">
                     <div className="flex justify-between text-sm leading-relaxed">
-                        <label className="max-w-[100vw] leading-relaxed text-gray-500">Renda Líquida</label>
+                        <label className="text-gray-500">Renda Líquida</label>
                         <span className="font-semibold text-gray-900">R$ {income.toLocaleString()}</span>
                     </div>
                     <input
@@ -285,7 +285,7 @@ function CalculationDemo() {
 
                 <div className="space-y-2">
                     <div className="flex justify-between text-sm leading-relaxed">
-                        <label className="max-w-[100vw] leading-relaxed text-gray-500 flex items-center gap-2"><span className="w-2 h-2 rounded-full bg-impulse/80" /> Contas Fixas</label>
+                        <label className="text-gray-500 flex items-center gap-2"><span className="w-2 h-2 rounded-full bg-impulse/80" /> Contas Fixas</label>
                         <span className="font-semibold text-impulse">R$ {fixed.toLocaleString()}</span>
                     </div>
                     <input
@@ -297,7 +297,7 @@ function CalculationDemo() {
 
                 <div className="space-y-2">
                     <div className="flex justify-between text-sm leading-relaxed">
-                        <label className="max-w-[100vw] leading-relaxed text-gray-500 flex items-center gap-2"><span className="w-2 h-2 rounded-full bg-obligation" /> Parcelas Futuras</label>
+                        <label className="text-gray-500 flex items-center gap-2"><span className="w-2 h-2 rounded-full bg-obligation" /> Parcelas Futuras</label>
                         <span className="font-semibold text-obligation">R$ {installments.toLocaleString()}</span>
                     </div>
                     <input
@@ -309,15 +309,15 @@ function CalculationDemo() {
             </div>
 
             <div className="mt-8 pt-6 border-t border-dashed border-border">
-                <div className="max-w-[100vw] leading-relaxed text-center mb-2">
-                    <p className="max-w-[100vw] leading-relaxed text-sm leading-relaxed font-medium text-gray-400 uppercase tracking-wider">Saldo Livre de Verdade™</p>
+                <div className="text-center mb-2">
+                    <p className="text-sm leading-relaxed font-medium text-gray-400 uppercase tracking-wider">Saldo Livre de Verdade™</p>
                 </div>
                 <div className="flex justify-center items-center gap-2 mb-2">
                     <motion.span
                         key={trueBalance}
                         initial={{ scale: 0.8, opacity: 0 }}
                         animate={{ scale: 1, opacity: 1 }}
-                        className="max-w-[100vw] leading-relaxed text-4xl sm:text-5xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-emerald-600 to-teal-500"
+                        className="text-4xl sm:text-5xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-emerald-600 to-teal-500"
                     >
                         R$ {trueBalance.toLocaleString()}
                     </motion.span>
@@ -332,7 +332,7 @@ function CalculationDemo() {
                         />
                     </div>
                 </div>
-                <p className="max-w-[100vw] leading-relaxed text-center text-xs text-gray-400 mt-3">
+                <p className="text-center text-xs text-gray-400 mt-3">
                     Isso é o que REALMENTE sobra. Sem sustos.
                 </p>
             </div>
@@ -499,7 +499,7 @@ function FeatureShowcase() {
                                 className="w-[320px] sm:w-[420px] lg:w-[500px] xl:w-[540px] select-none pointer-events-none block"
 
                             >
-                                <source src="/_Mockup 01 - Saldin-Picsart-BackgroundRemover.mp4" type="video/mp4" />
+                                <source src="/mockup - maior.mp4" type="video/mp4" />
                             </video>
 
                             {/* Floating badge */}
@@ -637,9 +637,9 @@ function SaleNotification() {
                         <Check className="w-5 h-5 text-green-600" />
                     </div>
                     <div>
-                        <p className="max-w-[100vw] leading-relaxed text-xs font-bold text-gray-900">{data.name}</p>
-                        <p className="max-w-[100vw] leading-relaxed text-[10px] text-gray-500">acabou de assinar o plano <span className="max-w-[100vw] leading-relaxed text-orange-500 font-bold">Semestral</span></p>
-                        <p className="max-w-[100vw] leading-relaxed text-[9px] text-gray-400 mt-0.5">Há {data.time}</p>
+                        <p className="text-xs font-bold text-gray-900">{data.name}</p>
+                        <p className="text-[10px] text-gray-500">acabou de assinar o plano <span className="text-orange-500 font-bold">Semestral</span></p>
+                        <p className="text-[9px] text-gray-400 mt-0.5">Há {data.time}</p>
                     </div>
                 </motion.div>
             )}
@@ -679,7 +679,7 @@ function LiteVideo({
                     </div>
                     {title && (
                         <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent flex items-end p-4 sm:p-6 z-[5]">
-                            <p className="max-w-[100vw] leading-relaxed text-white font-bold text-base sm:text-xl md:text-2xl drop-shadow-md">
+                            <p className="leading-relaxed text-white font-bold text-base sm:text-xl md:text-2xl drop-shadow-md">
                                 {title}
                             </p>
                         </div>
@@ -796,56 +796,75 @@ function FeatureBlock({
 
 // ─── Comparison Table Component ───
 function ComparisonTable() {
+    const rows = [
+        { c: "Esforço Diário", b: "Alto (Categorizar)", p: "Infinito (Manual)", s: "Zero (Só falar)" },
+        { c: "Tempo Gasto", b: "15 min/dia", p: "1 hora/semana", s: "5 seg/transação" },
+        { c: "Visão de Futuro", b: "Não (Só passado)", p: "Só se configurar", s: "Sim (Saldo Livre)" },
+        { c: "Interface", b: "App Pesado", p: "Complexa", s: "WhatsApp" }
+    ];
+
     return (
-    <Section className="py-10 sm:py-16 bg-background border-b border-border">
-        <div className="max-w-4xl mx-auto px-4">
-            <div className="max-w-[100vw] leading-relaxed text-center mb-12">
-                <h2 className="font-serif text-3xl sm:text-4xl font-bold text-gray-900 mb-4">Por que o Saldin vence?</h2>
-                <p className="max-w-[100vw] leading-relaxed text-gray-500">A evolução natural do controle financeiro.</p>
+        <Section className="py-10 sm:py-24 bg-background border-b border-border">
+            <div className="max-w-4xl mx-auto px-4">
+                <div className="text-center mb-10 sm:mb-16">
+                    <h2 className="font-serif text-3xl sm:text-4xl font-bold text-gray-900 mb-4">Por que o Saldin vence?</h2>
+                    <p className="text-gray-500 text-sm sm:text-base">A evolução natural do controle financeiro pessoal.</p>
+                </div>
+
+                {/* Desktop view: Classic Table */}
+                <div className="hidden sm:block overflow-x-auto pb-4 pt-6">
+                    <table className="w-full text-left border-collapse min-w-[600px]">
+                        <thead>
+                            <tr>
+                                <th className="p-4 text-gray-400 font-medium text-sm leading-relaxed w-1/4"></th>
+                                <th className="p-4 text-center text-gray-400 font-medium text-sm leading-relaxed w-1/4">Apps de Banco</th>
+                                <th className="p-4 text-center text-gray-400 font-medium text-sm leading-relaxed w-1/4">Planilhas</th>
+                                <th className="p-4 text-center text-orange-600 font-bold text-lg leading-relaxed bg-orange-50 rounded-t-xl border-t border-x border-orange-100 w-1/4 relative">
+                                    <span className="absolute -top-3 left-1/2 -translate-x-1/2 bg-orange-600 text-white text-[10px] font-bold px-2 py-0.5 rounded-full uppercase tracking-wider whitespace-nowrap shadow-sm">Melhor Escolha</span>
+                                    Saldin
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody className="text-sm leading-relaxed sm:text-base">
+                            {rows.map((row, i) => (
+                                <tr key={i} className="border-b border-gray-50">
+                                    <td className="p-4 font-bold text-gray-700">{row.c}</td>
+                                    <td className="p-4 text-center text-gray-500">{row.b}</td>
+                                    <td className="p-4 text-center text-gray-500">{row.p}</td>
+                                    <td className={`p-4 text-center font-bold text-gray-900 bg-orange-50 border-x border-orange-100 ${i === rows.length - 1 ? 'rounded-b-xl border-b' : ''}`}>
+                                        {row.s}
+                                    </td>
+                                </tr>
+                            ))}
+                        </tbody>
+                    </table>
+                </div>
+
+                {/* Mobile view: Stacked vertical comparison */}
+                <div className="sm:hidden space-y-6">
+                    {rows.map((row, i) => (
+                        <div key={i} className="bg-white rounded-2xl border border-border shadow-sm overflow-hidden">
+                            <div className="bg-gray-50 px-4 py-3 border-b border-border">
+                                <h3 className="font-bold text-gray-900 text-sm">{row.c}</h3>
+                            </div>
+                            <div className="p-4 space-y-3">
+                                <div className="flex justify-between items-center text-xs">
+                                    <span className="text-gray-400">Outros (Apps/Planilhas)</span>
+                                    <span className="text-gray-500 line-through decoration-red-400/40">{row.b}</span>
+                                </div>
+                                <div className="flex justify-between items-center bg-orange-50/50 p-3 rounded-xl ring-1 ring-orange-100">
+                                    <span className="font-bold text-orange-900 text-sm">O Saldin</span>
+                                    <div className="flex items-center gap-1.5 font-bold text-orange-600 text-sm">
+                                        <Check className="w-4 h-4" />
+                                        <span>{row.s}</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    ))}
+                </div>
             </div>
-            <div className="overflow-x-auto pb-4 pt-6"> {/* Added pt-6 to avoid clipping the badge */}
-                <table className="w-full text-left border-collapse min-w-[600px]">
-                    <thead>
-                        <tr>
-                            <th className="p-4 text-gray-400 font-medium text-sm leading-relaxed w-1/4"></th>
-                            <th className="p-4 text-center text-gray-400 font-medium text-sm leading-relaxed w-1/4">Apps de Banco</th>
-                            <th className="p-4 text-center text-gray-400 font-medium text-sm leading-relaxed w-1/4">Planilhas</th>
-                            <th className="p-4 text-center text-orange-600 font-bold text-lg leading-relaxed bg-orange-50 rounded-t-xl border-t border-x border-orange-100 w-1/4 relative">
-                                <span className="absolute -top-3 left-1/2 -translate-x-1/2 bg-orange-600 text-white text-[10px] font-bold px-2 py-0.5 rounded-full uppercase tracking-wider whitespace-nowrap shadow-sm">Melhor Escolha</span>
-                                Saldin
-                            </th>
-                        </tr>
-                    </thead>
-                    <tbody className="max-w-[100vw] leading-relaxed text-sm leading-relaxed sm:text-base">
-                        <tr className="border-b border-gray-50">
-                            <td className="p-4 font-bold text-gray-700">Esforço Diário</td>
-                            <td className="p-4 text-center text-gray-500">Alto <span className="block text-xs opacity-70 font-normal">(Categorizar)</span></td>
-                            <td className="p-4 text-center text-gray-500">Infinito <span className="block text-xs opacity-70 font-normal">(Manual)</span></td>
-                            <td className="p-4 text-center font-bold text-gray-900 bg-orange-50 border-x border-orange-100">Zero <span className="block text-xs font-normal text-orange-700 opacity-80">(Só falar)</span></td>
-                        </tr>
-                        <tr className="border-b border-gray-50">
-                            <td className="p-4 font-bold text-gray-700">Tempo Gasto</td>
-                            <td className="p-4 text-center text-gray-500">15 min/dia</td>
-                            <td className="p-4 text-center text-gray-500">1 hora/semana</td>
-                            <td className="p-4 text-center font-bold text-gray-900 bg-orange-50 border-x border-orange-100">5 seg/transação</td>
-                        </tr>
-                        <tr className="border-b border-gray-50">
-                            <td className="p-4 font-bold text-gray-700">Visão de Futuro</td>
-                            <td className="p-4 text-center text-gray-500">Não <span className="block text-xs opacity-70 font-normal">(Só passado)</span></td>
-                            <td className="p-4 text-center text-gray-500">Só se configurar</td>
-                            <td className="p-4 text-center font-bold text-gray-900 bg-orange-50 border-x border-orange-100">Sim <span className="block text-xs font-normal text-orange-700 opacity-80">(Saldo Livre)</span></td>
-                        </tr>
-                        <tr>
-                            <td className="p-4 font-bold text-gray-700">Interface</td>
-                            <td className="p-4 text-center text-gray-500">App Pesado</td>
-                            <td className="p-4 text-center text-gray-500">Complexa</td>
-                            <td className="p-4 text-center font-bold text-gray-900 bg-orange-50 rounded-b-xl border-b border-x border-orange-100">WhatsApp</td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
-        </div>
-    </Section>
+        </Section>
     );
 }
 
@@ -861,7 +880,7 @@ function SecuritySection() {
             <h2 className="font-serif text-3xl sm:text-4xl font-bold text-gray-900 mb-6">
                 Sua privacidade é nossa obsessão.
             </h2>
-            <p className="max-w-[100vw] leading-relaxed text-gray-500 max-w-2xl mx-auto mb-12 text-base sm:text-lg leading-relaxed">
+            <p className="text-gray-500 max-w-2xl mx-auto mb-12 text-base sm:text-lg leading-relaxed">
                 Nós não vendemos seus dados. Nós não treinamos IA com suas informações pessoais. O que é seu, fica com você.
             </p>
 
@@ -872,7 +891,7 @@ function SecuritySection() {
                     </div>
                     <div>
                         <h3 className="font-bold text-gray-900 mb-1">Criptografia Militar</h3>
-                        <p className="max-w-[100vw] leading-relaxed text-sm leading-relaxed text-gray-500 leading-relaxed">Seus dados são embaralhados de ponta a ponta. Nem nossa equipe consegue ler.</p>
+                        <p className="text-sm leading-relaxed text-gray-500 leading-relaxed">Seus dados são embaralhados de ponta a ponta. Nem nossa equipe consegue ler.</p>
                     </div>
                 </div>
                 <div className="flex sm:flex-col items-center gap-4 sm:gap-2">
@@ -881,7 +900,7 @@ function SecuritySection() {
                     </div>
                     <div>
                         <h3 className="font-bold text-gray-900 mb-1">Sem Conexão Bancária</h3>
-                        <p className="max-w-[100vw] leading-relaxed text-sm leading-relaxed text-gray-500 leading-relaxed">Nunca pediremos sua senha do banco. O Saldin funciona sem risco de vazamentos.</p>
+                        <p className="text-sm leading-relaxed text-gray-500 leading-relaxed">Nunca pediremos sua senha do banco. O Saldin funciona sem risco de vazamentos.</p>
                     </div>
                 </div>
                 <div className="flex sm:flex-col items-center gap-4 sm:gap-2">
@@ -890,7 +909,7 @@ function SecuritySection() {
                     </div>
                     <div>
                         <h3 className="font-bold text-gray-900 mb-1">Dados Anônimos</h3>
-                        <p className="max-w-[100vw] leading-relaxed text-sm leading-relaxed text-gray-500 leading-relaxed">Para nossa IA, você é apenas um código. Sua identidade real é preservada.</p>
+                        <p className="text-sm leading-relaxed text-gray-500 leading-relaxed">Para nossa IA, você é apenas um código. Sua identidade real é preservada.</p>
                     </div>
                 </div>
             </div>
@@ -910,7 +929,7 @@ function Landing() {
     };
 
     return (
-        <div className="min-h-screen bg-background text-gray-900 font-sans selection:bg-orange-100 selection:text-orange-900 overflow-x-hidden">
+        <div className="min-h-screen forced-light font-sans selection:bg-orange-100 selection:text-orange-900 overflow-x-hidden">
             <StickyCtaBar onCta={() => navigate("/auth")} />
             {/* ─── URGENCY NOTICE BAR ─── */}
             <div className="bg-gray-950 text-white py-2.5 px-4 text-center text-xs sm:text-sm leading-relaxed font-semibold relative overflow-hidden z-[60]">
@@ -960,11 +979,11 @@ function Landing() {
                             className="md:hidden border-t border-border bg-background px-4 pb-6 shadow-xl"
                         >
                             <div className="flex flex-col gap-4 pt-4 text-base font-medium">
-                                <button onClick={() => scrollTo("problema")} className="max-w-[100vw] leading-relaxed text-left py-2 text-gray-600 border-b border-border">O Problema</button>
-                                <button onClick={() => scrollTo("funcionalidades")} className="max-w-[100vw] leading-relaxed text-left py-2 text-gray-600 border-b border-border">Funcionalidades</button>
-                                <button onClick={() => scrollTo("depoimentos")} className="max-w-[100vw] leading-relaxed text-left py-2 text-gray-600 border-b border-border">Depoimentos</button>
-                                <button onClick={() => scrollTo("faq")} className="max-w-[100vw] leading-relaxed text-left py-2 text-gray-600 border-b border-border">FAQ</button>
-                                <button onClick={() => navigate("/auth")} className="max-w-[100vw] leading-relaxed text-left py-2 text-primary font-bold">Entrar na minha conta</button>
+                                <button onClick={() => scrollTo("problema")} className="text-left py-2 text-gray-600 border-b border-border">O Problema</button>
+                                <button onClick={() => scrollTo("funcionalidades")} className="text-left py-2 text-gray-600 border-b border-border">Funcionalidades</button>
+                                <button onClick={() => scrollTo("depoimentos")} className="text-left py-2 text-gray-600 border-b border-border">Depoimentos</button>
+                                <button onClick={() => scrollTo("faq")} className="text-left py-2 text-gray-600 border-b border-border">FAQ</button>
+                                <button onClick={() => navigate("/auth")} className="text-left py-2 text-primary font-bold">Entrar na minha conta</button>
                             </div>
                         </motion.div>
                     )}
@@ -991,7 +1010,7 @@ function Landing() {
                         </div>
 
                         <div className="leading-relaxed mb-4 sm:mb-6">
-                            <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold leading-[1.08] tracking-tight text-gray-900">
+                            <h1 className="text-[1.85rem] min-[375px]:text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold leading-[1.1] tracking-tight text-gray-900 px-1 sm:px-0">
                                 Seu banco mostra R$ 2.000.
                                 <br />
                                 <span className="text-transparent bg-clip-text bg-gradient-to-r from-orange-500 via-orange-600 to-pink-500">
@@ -1056,7 +1075,7 @@ function Landing() {
                         <span className="inline-block py-1 px-3 rounded-full bg-red-100 text-red-600 text-xs font-bold uppercase tracking-wider mb-2 animate-pulse">
                             ⚠️ Assista antes que saia do ar
                         </span>
-                        <h2 className="max-w-[100vw] leading-relaxed text-xl sm:text-2xl font-bold text-gray-900">
+                        <h2 className="text-xl sm:text-2xl font-bold text-gray-900">
                             A verdade que os bancos não querem que você saiba sobre seu saldo.
                         </h2>
                     </div>
@@ -1065,7 +1084,7 @@ function Landing() {
                         <Button
                             size="lg"
                             onClick={() => navigate("/auth")}
-                            className="h-14 sm:h-16 px-10 sm:px-12 rounded-full text-lg sm:text-xl font-bold gradient-warm text-white shadow-xl shadow-orange-500/30 hover:scale-105 hover:shadow-orange-500/50 transition-all w-full sm:w-auto"
+                            className="h-14 sm:h-16 px-10 sm:px-12 rounded-full text-lg sm:text-xl font-bold gradient-warm text-white shadow-xl shadow-orange-500/30 hover:scale-105 hover:shadow-orange-500/50 transition-all w-full sm:w-auto whitespace-nowrap"
                         >
                             Quero meu Saldo Livre — Começar Grátis
                             <ArrowRight className="w-5 h-5 ml-2" />
@@ -1125,12 +1144,12 @@ function Landing() {
             {/* ─── PROBLEM SECTION ─── */}
             <Section id="problema" className="py-16 sm:py-24 px-4 bg-background">
                 <div className="max-w-6xl mx-auto">
-                    <div className="max-w-[100vw] leading-relaxed text-center mb-12 sm:mb-16">
-                        <span className="max-w-[100vw] leading-relaxed text-sm leading-relaxed font-bold uppercase tracking-widest text-impulse">O Ciclo da Frustração</span>
+                    <div className="text-center mb-12 sm:mb-16">
+                        <span className="text-sm font-bold uppercase tracking-widest text-impulse">O Ciclo da Frustração</span>
                         <h2 className="font-serif text-3xl sm:text-4xl md:text-5xl font-bold mt-4 mb-6 text-gray-900">
                             Por que você sente que o dinheiro some antes do dia 15?
                         </h2>
-                        <p className="max-w-[100vw] leading-relaxed text-lg leading-relaxed sm:text-xl text-gray-500 max-w-2xl mx-auto leading-relaxed">
+                        <p className="text-lg leading-relaxed sm:text-xl text-gray-500 max-w-2xl mx-auto leading-relaxed">
                             O app do banco foi feito para você gastar. O Saldin foi feito para você Prosperar — mostrando o que REALMENTE sobra.
                         </p>
                     </div>
@@ -1171,7 +1190,7 @@ function Landing() {
                                     <item.icon className={`w-6 h-6 sm:w-7 sm:h-7 ${item.color}`} />
                                 </div>
                                 <h3 className="font-serif text-xl sm:text-2xl font-bold mb-3 text-gray-900">{item.title}</h3>
-                                <p className="max-w-[100vw] leading-relaxed text-gray-500 leading-relaxed text-sm leading-relaxed sm:text-base">{item.desc}</p>
+                                <p className="text-gray-500 leading-relaxed text-sm leading-relaxed sm:text-base">{item.desc}</p>
                             </motion.div>
                         ))}
                     </div>
@@ -1498,11 +1517,16 @@ function Landing() {
                             <h3 className="text-xl font-bold mb-1 text-gray-900">Mensal</h3>
                             <p className="text-xs text-gray-400 mb-4">Para quem quer experimentar</p>
                             <div className="flex items-baseline gap-1 mb-1">
-                                <span className="text-3xl font-bold text-gray-900">R$ 19,90</span>
+                                <span className="text-3xl font-bold text-gray-900">R$ 47,00</span>
                                 <span className="text-gray-500">/mês</span>
                             </div>
-                            <p className="text-xs text-gray-400 mb-6">≈ R$ 0,66 por dia</p>
-                            <Button variant="outline" className="w-full rounded-full mb-6 border-border text-gray-700 hover:bg-gray-50" onClick={() => navigate("/auth")}>Começar Grátis</Button>
+                            <p className="text-xs text-gray-400 mb-6">≈ R$ 1,56 por dia</p>
+                            <Button 
+                                className="w-full rounded-full gradient-warm border-0 font-bold h-12 mb-6 shadow-lg shadow-orange-500/20 hover:shadow-orange-500/40 hover:scale-105 transition-all whitespace-nowrap px-4" 
+                                onClick={() => navigate("/auth")}
+                            >
+                                Começar 4 Dias Grátis
+                            </Button>
                             <ul className="space-y-3 text-sm text-gray-500">
                                 <li className="flex gap-2"><Check className="w-4 h-4 text-emerald-500 shrink-0" /> Acesso completo a tudo</li>
                                 <li className="flex gap-2"><Check className="w-4 h-4 text-emerald-500 shrink-0" /> WhatsApp ilimitado</li>
@@ -1517,14 +1541,16 @@ function Landing() {
                             </div>
                             <h3 className="text-xl font-bold mb-1">Semestral</h3>
                             <p className="text-xs text-gray-400 mb-4">Para quem quer resultado real</p>
-                            <div className="flex items-baseline gap-1 mb-1">
-                                <span className="text-gray-500 line-through text-lg mr-1">R$ 19,90</span>
-                                <span className="text-4xl font-bold text-white">R$ 14,90</span>
-                                <span className="text-gray-400">/mês</span>
+                            <div className="flex flex-wrap items-baseline gap-1.5 mb-1">
+                                <span className="text-gray-500 line-through text-base sm:text-lg">R$ 47,00</span>
+                                <div className="flex items-baseline gap-1">
+                                    <span className="text-3xl sm:text-4xl font-bold text-white">R$ 24,50</span>
+                                    <span className="text-gray-400 text-sm">/mês</span>
+                                </div>
                             </div>
-                            <p className="text-xs text-gray-400 mb-2">R$ 89,90 cobrado a cada 6 meses · ≈ R$ 0,50/dia</p>
+                            <p className="text-xs text-gray-400 mb-2">R$ 147,00 cobrado a cada 6 meses · ≈ R$ 0,81/dia</p>
                             <div className="bg-orange-500/20 border border-orange-500/30 rounded-lg px-3 py-1.5 mb-6 text-center">
-                                <span className="text-orange-300 text-xs font-bold">Você economiza R$ 30,00 em 6 meses</span>
+                                <span className="text-orange-300 text-xs font-bold">Você economiza R$ 135,00 em 6 meses</span>
                             </div>
 
                             {/* Bonuses */}
@@ -1538,8 +1564,11 @@ function Landing() {
                                 </ul>
                             </div>
 
-                            <Button className="w-full rounded-full gradient-warm border-0 font-bold h-12 mb-6 shadow-lg shadow-orange-500/30 hover:shadow-orange-500/50 hover:scale-105 transition-all" onClick={() => navigate("/auth")}>
-                                Garantir com Bônus — 4 dias grátis
+                            <Button 
+                                className="w-full rounded-full gradient-warm border-0 font-bold h-12 mb-6 shadow-xl shadow-orange-500/30 hover:shadow-orange-500/50 hover:scale-105 transition-all whitespace-nowrap px-4" 
+                                onClick={() => navigate("/auth")}
+                            >
+                                Garantir com Bônus
                             </Button>
                             <ul className="space-y-3 text-sm text-gray-300">
                                 <li className="flex gap-2"><Check className="w-4 h-4 text-emerald-400 shrink-0" /> Tudo do Mensal</li>
@@ -1553,13 +1582,20 @@ function Landing() {
                         <div className="p-8 rounded-3xl bg-background border border-border shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all order-3">
                             <h3 className="text-xl font-bold mb-1 text-gray-900">Anual</h3>
                             <p className="text-xs text-gray-400 mb-4">Para quem quer o máximo</p>
-                            <div className="flex items-baseline gap-1 mb-1">
-                                <span className="text-gray-500 line-through text-lg mr-1">R$ 19,90</span>
-                                <span className="text-3xl font-bold text-gray-900">R$ 12,49</span>
-                                <span className="text-gray-500">/mês</span>
+                            <div className="flex items-baseline gap-1.5 mb-1">
+                                <span className="text-gray-500 line-through text-lg">R$ 47,00</span>
+                                <div className="flex items-baseline gap-1">
+                                    <span className="text-3xl font-bold text-gray-900">R$ 20,58</span>
+                                    <span className="text-gray-500">/mês</span>
+                                </div>
                             </div>
-                            <p className="text-xs text-gray-400 mb-6">R$ 149,90/ano · 37% de economia</p>
-                            <Button variant="outline" className="w-full rounded-full mb-6 border-border text-gray-700 hover:bg-gray-50" onClick={() => navigate("/auth")}>Começar Grátis</Button>
+                            <p className="text-xs text-gray-400 mb-6">R$ 247,00/ano · 56% de economia</p>
+                            <Button 
+                                className="w-full rounded-full gradient-warm border-0 font-bold h-12 mb-6 shadow-lg shadow-orange-500/20 hover:shadow-orange-500/40 hover:scale-105 transition-all whitespace-nowrap px-4" 
+                                onClick={() => navigate("/auth")}
+                            >
+                                Começar 4 Dias Grátis
+                            </Button>
                             <ul className="space-y-3 text-sm text-gray-500">
                                 <li className="flex gap-2"><Check className="w-4 h-4 text-emerald-500 shrink-0" /> Maior economia (37%)</li>
                                 <li className="flex gap-2"><Check className="w-4 h-4 text-emerald-500 shrink-0" /> Acesso antecipado a novidades</li>
