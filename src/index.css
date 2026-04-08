@@ -192,6 +192,43 @@
     --input: 0 0% 100%;
     --ring: 0 0% 100%;
   }
+
+  /* FORCED LIGHT MODE (for Landing Page / Sales Folds) */
+  .forced-light {
+    --background: 40 30% 97%;
+    --foreground: 25 25% 15%;
+    --card: 40 25% 99%;
+    --card-foreground: 25 25% 15%;
+    --popover: 40 25% 99%;
+    --popover-foreground: 25 25% 15%;
+    --primary: 25 65% 50%;
+    --primary-foreground: 40 30% 98%;
+    --secondary: 35 15% 92%;
+    --secondary-foreground: 25 25% 25%;
+    --muted: 35 12% 90%;
+    --muted-foreground: 25 15% 45%;
+    --accent: 38 80% 55%;
+    --accent-foreground: 25 25% 12%;
+    --destructive: 12 75% 55%;
+    --destructive-foreground: 40 30% 98%;
+    --essential: 145 35% 45%;
+    --essential-foreground: 40 30% 98%;
+    --obligation: 210 25% 50%;
+    --obligation-foreground: 40 30% 98%;
+    --pleasure: 35 75% 55%;
+    --pleasure-foreground: 25 25% 12%;
+    --impulse: 12 75% 55%;
+    --impulse-foreground: 40 30% 98%;
+    --border: 35 20% 88%;
+    --input: 35 20% 88%;
+    --ring: 25 65% 50%;
+    --sidebar-background: 40 25% 96%;
+    --sidebar-foreground: 25 25% 25%;
+    --sidebar-border: 35 20% 88%;
+    --sidebar-ring: 25 65% 50%;
+    color: hsl(var(--foreground));
+    background-color: hsl(var(--background));
+  }
 }
 
 @layer base {

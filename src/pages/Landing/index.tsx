@@ -1536,23 +1536,48 @@ function Landing() {
                             </ul>
                         </div>
 
-                        {/* Semester - Highlighted */}
-                        <div className="relative p-8 rounded-3xl bg-gray-950 text-white shadow-2xl border border-white/10 order-1 md:order-2 ring-2 ring-orange-500/40 hover:-translate-y-2 transition-all">
-                            <div className="absolute -top-4 left-1/2 -translate-x-1/2 px-4 py-1.5 rounded-full gradient-warm text-white text-xs font-bold uppercase tracking-wide shadow-lg">
-                                🔥 Mais Popular
-                            </div>
-                            <h3 className="text-xl font-bold mb-1">Semestral</h3>
+                        {/* Semester */}
+                        <div className="p-8 rounded-3xl bg-background border border-border shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all order-3">
+                            <h3 className="text-xl font-bold mb-1 text-gray-900">Semestral</h3>
                             <p className="text-xs text-gray-400 mb-4">Para quem quer resultado real</p>
                             <div className="flex flex-wrap items-baseline gap-1.5 mb-1">
                                 <span className="text-gray-500 line-through text-base sm:text-lg">R$ 47,00</span>
                                 <div className="flex items-baseline gap-1">
-                                    <span className="text-3xl sm:text-4xl font-bold text-white">R$ 24,50</span>
+                                    <span className="text-3xl sm:text-4xl font-bold text-gray-900">R$ 24,50</span>
                                     <span className="text-gray-400 text-sm">/mês</span>
                                 </div>
                             </div>
-                            <p className="text-xs text-gray-400 mb-2">R$ 147,00 cobrado a cada 6 meses · ≈ R$ 0,81/dia</p>
+                            <p className="text-xs text-gray-400 mb-6">R$ 147,00 cobrado a cada 6 meses · ≈ R$ 0,81/dia</p>
+                            <Button 
+                                className="w-full rounded-full gradient-warm border-0 font-bold h-12 mb-6 shadow-lg shadow-orange-500/20 hover:shadow-orange-500/40 hover:scale-105 transition-all whitespace-nowrap px-4" 
+                                onClick={() => navigate("/auth")}
+                            >
+                                Começar 4 Dias Grátis
+                            </Button>
+                            <ul className="space-y-3 text-sm text-gray-500">
+                                <li className="flex gap-2"><Check className="w-4 h-4 text-emerald-500 shrink-0" /> Tudo do Mensal</li>
+                                <li className="flex gap-2"><Check className="w-4 h-4 text-emerald-500 shrink-0" /> 25% de desconto aplicado</li>
+                                <li className="flex gap-2"><Check className="w-4 h-4 text-emerald-500 shrink-0" /> Suporte prioritário</li>
+                            </ul>
+                        </div>
+
+                        {/* Annual - Highlighted */}
+                        <div className="relative p-8 rounded-3xl bg-gray-950 text-white shadow-2xl border border-white/10 order-1 md:order-2 ring-2 ring-orange-500/40 hover:-translate-y-2 transition-all">
+                            <div className="absolute -top-4 left-1/2 -translate-x-1/2 px-4 py-1.5 rounded-full gradient-warm text-white text-xs font-bold uppercase tracking-wide shadow-lg whitespace-nowrap">
+                                🔥 Melhor Custo-Benefício
+                            </div>
+                            <h3 className="text-xl font-bold mb-1">Anual</h3>
+                            <p className="text-xs text-gray-400 mb-4">Para quem quer o máximo</p>
+                            <div className="flex flex-wrap items-baseline gap-1.5 mb-1">
+                                <span className="text-gray-500 line-through text-base sm:text-lg">R$ 47,00</span>
+                                <div className="flex items-baseline gap-1">
+                                    <span className="text-3xl sm:text-4xl font-bold text-white">R$ 20,58</span>
+                                    <span className="text-gray-400 text-sm">/mês</span>
+                                </div>
+                            </div>
+                            <p className="text-xs text-gray-400 mb-2">R$ 247,00 por ano · ≈ R$ 0,67/dia</p>
                             <div className="bg-orange-500/20 border border-orange-500/30 rounded-lg px-3 py-1.5 mb-6 text-center">
-                                <span className="text-orange-300 text-xs font-bold">Você economiza R$ 135,00 em 6 meses</span>
+                                <span className="text-orange-300 text-xs font-bold">Você economiza R$ 317,00 por ano</span>
                             </div>
 
                             {/* Bonuses */}
@@ -1574,34 +1599,9 @@ function Landing() {
                             </Button>
                             <ul className="space-y-3 text-sm text-gray-300">
                                 <li className="flex gap-2"><Check className="w-4 h-4 text-emerald-400 shrink-0" /> Tudo do Mensal</li>
-                                <li className="flex gap-2"><Check className="w-4 h-4 text-emerald-400 shrink-0" /> 25% de desconto aplicado</li>
+                                <li className="flex gap-2"><Check className="w-4 h-4 text-emerald-400 shrink-0" /> 56% de economia real</li>
                                 <li className="flex gap-2"><Check className="w-4 h-4 text-emerald-400 shrink-0" /> Bônus exclusivos incluídos</li>
                                 <li className="flex gap-2"><Check className="w-4 h-4 text-emerald-400 shrink-0" /> Suporte prioritário</li>
-                            </ul>
-                        </div>
-
-                        {/* Annual */}
-                        <div className="p-8 rounded-3xl bg-background border border-border shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all order-3">
-                            <h3 className="text-xl font-bold mb-1 text-gray-900">Anual</h3>
-                            <p className="text-xs text-gray-400 mb-4">Para quem quer o máximo</p>
-                            <div className="flex items-baseline gap-1.5 mb-1">
-                                <span className="text-gray-500 line-through text-lg">R$ 47,00</span>
-                                <div className="flex items-baseline gap-1">
-                                    <span className="text-3xl font-bold text-gray-900">R$ 20,58</span>
-                                    <span className="text-gray-500">/mês</span>
-                                </div>
-                            </div>
-                            <p className="text-xs text-gray-400 mb-6">R$ 247,00/ano · 56% de economia</p>
-                            <Button 
-                                className="w-full rounded-full gradient-warm border-0 font-bold h-12 mb-6 shadow-lg shadow-orange-500/20 hover:shadow-orange-500/40 hover:scale-105 transition-all whitespace-nowrap px-4" 
-                                onClick={() => navigate("/auth")}
-                            >
-                                Começar 4 Dias Grátis
-                            </Button>
-                            <ul className="space-y-3 text-sm text-gray-500">
-                                <li className="flex gap-2"><Check className="w-4 h-4 text-emerald-500 shrink-0" /> Maior economia (37%)</li>
-                                <li className="flex gap-2"><Check className="w-4 h-4 text-emerald-500 shrink-0" /> Acesso antecipado a novidades</li>
-                                <li className="flex gap-2"><Check className="w-4 h-4 text-emerald-500 shrink-0" /> Todos os bônus incluídos</li>
                             </ul>
                         </div>
                     </div>

@@ -47,8 +47,15 @@ async function sendWhatsApp(to: string, text: string): Promise<void> {
         });
         const data = await resp.json();
         console.log(`✅ Response for ${normalizedToValue}:`, JSON.stringify(data));
-        if (data.error) console.error("❌ Meta API Error:", data.error);
-    } catch (e) { console.error(`❌ Failed:`, e); }
+        
+        // Log explicitly if failed
+        if (!resp.ok || data.error) {
+            console.error(`❌ Meta Send Error [${resp.status}]:`, JSON.stringify(data.error || data));
+            // Consider logging this to a persistent DB table in the future
+        }
+    } catch (e) { 
+        console.error(`❌ Fetch Exception for ${normalizedToValue}:`, e); 
+    }
 }
 
 async function sendWhatsAppInteractive(to: string, text: string, buttons: { id: string, title: string }[]): Promise<void> {
@@ -224,7 +231,19 @@ Deno.serve(async (req: Request) => {
         // 2. POST Handling (Messages)
         if (req.method !== "POST") return new Response("Method Not Allowed", { status: 405 });
 
-        const payload = await req.json();
+        // Log Headers for debugging Webhook integrity/Security
+        const headers: Record<string, string> = {};
+        req.headers.forEach((v, k) => headers[k] = v);
+        console.log("📝 Incoming Request Headers:", JSON.stringify(headers));
+
+        let payload;
+        try {
+            payload = await req.json();
+        } catch (err) {
+            console.error("❌ Failed to parse JSON payload:", err);
+            return new Response("Invalid JSON", { status: 400 });
+        }
+        
         console.log("📥 New Payload Received:", JSON.stringify(payload));
 
         // 1. Meta API Extraction (Strict)

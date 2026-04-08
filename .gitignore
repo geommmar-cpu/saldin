@@ -50,3 +50,5 @@ ngrok
 *.temp
 vite.config.ts.timestamp-*
 *.mjs
+.vercel
+.env*.local
