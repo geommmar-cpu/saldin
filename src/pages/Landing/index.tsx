@@ -638,7 +638,7 @@ function SaleNotification() {
                     </div>
                     <div>
                         <p className="text-xs font-bold text-gray-900">{data.name}</p>
-                        <p className="text-[10px] text-gray-500">acabou de assinar o plano <span className="text-orange-500 font-bold">Semestral</span></p>
+                        <p className="text-[10px] text-gray-500">acabou de assinar o plano <span className="text-orange-500 font-bold">Anual</span></p>
                         <p className="text-[9px] text-gray-400 mt-0.5">Há {data.time}</p>
                     </div>
                 </motion.div>
@@ -936,7 +936,7 @@ function Landing() {
                 <p className="flex flex-wrap items-center justify-center gap-2 relative z-10">
                     <span className="w-2 h-2 rounded-full bg-green-400 animate-pulse shrink-0" />
                     <span className="text-gray-300">Lançamento:</span>
-                    <span className="text-white font-bold">4 dias grátis + Bônus no plano Semestral</span>
+                    <span className="text-white font-bold">4 dias grátis + Bônus no plano Anual</span>
                     <span className="hidden sm:inline-block w-1 h-1 bg-white/20 rounded-full mx-1"></span>
                     <span className="text-orange-400 text-[10px] uppercase tracking-wide">Oferta encerra em:</span>
                     <CountdownTimer />
