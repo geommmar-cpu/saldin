@@ -23,14 +23,16 @@ BEGIN
       type,
       date,
       is_recurring,
+      bank_account_id,
       notes
     ) VALUES (
       NEW.user_id,
-      'Saldo inicial - ' || COALESCE(NEW.name, 'Conta'),
+      'Saldo inicial - ' || COALESCE(NEW.bank_name, 'Conta'),
       NEW.current_balance,
       'initial_balance',
       CURRENT_DATE,
       false,
+      NEW.id,
       'Receita gerada automaticamente ao cadastrar conta com saldo inicial.'
     );
   END IF;

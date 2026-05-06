@@ -11,10 +11,8 @@ import { cn } from "@/lib/utils";
 import { useExpenseById, useUpdateExpense } from "@/hooks/useExpenses";
 import { toast } from "sonner";
 import { parseCurrency, formatCurrency } from "@/lib/currency";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { Calendar } from "@/components/ui/calendar";
-import { format } from "date-fns";
-import { ptBR } from "date-fns/locale";
+import { toLocalDateString } from "@/lib/dateUtils";
+import { cn } from "@/lib/utils";
 
 export const EditExpense = () => {
   const navigate = useNavigate();
@@ -24,13 +22,13 @@ export const EditExpense = () => {
 
   const [amount, setAmount] = useState("");
   const [description, setDescription] = useState("");
-  const [date, setDate] = useState<Date | undefined>();
+  const [date, setDate] = useState<string>(toLocalDateString());
 
   useEffect(() => {
     if (expense) {
       setAmount(formatCurrency(Number(expense.amount), false));
       setDescription(expense.description || "");
-      setDate(new Date(expense.date || expense.created_at));
+      setDate(expense.date || toLocalDateString(new Date(expense.created_at)));
     }
   }, [expense]);
 
@@ -47,7 +45,7 @@ export const EditExpense = () => {
         id,
         amount: parsedAmount,
         description: description.trim() || "Gasto",
-        date: date ? toLocalDateString(date) : undefined,
+        date: date,
       });
       navigate("/");
     } catch (error) {
@@ -105,17 +103,15 @@ export const EditExpense = () => {
 
         <FadeIn delay={0.1} className="leading-relaxed mb-6">
           <Label className="max-w-[100vw] leading-relaxed text-sm leading-relaxed text-muted-foreground mb-2 block">Data</Label>
-          <Popover>
-            <PopoverTrigger asChild>
-              <Button variant="outline" className={cn("w-full justify-start text-left font-normal h-11", !date && "text-muted-foreground")}>
-                <CalendarIcon className="mr-2 h-4 w-4" />
-                {date ? format(date, "PPP", { locale: ptBR }) : "Selecionar data"}
-              </Button>
-            </PopoverTrigger>
-            <PopoverContent className="w-auto p-0" align="start">
-              <Calendar mode="single" selected={date} onSelect={setDate} initialFocus locale={ptBR} />
-            </PopoverContent>
-          </Popover>
+          <div className="relative">
+            <CalendarIcon className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground pointer-events-none" />
+            <input
+              type="date"
+              value={date}
+              onChange={(e) => setDate(e.target.value)}
+              className="w-full h-11 pl-11 pr-4 bg-transparent border border-input rounded-md outline-none focus:ring-2 focus:ring-primary/50 text-sm leading-relaxed"
+            />
+          </div>
         </FadeIn>
       </main>
 

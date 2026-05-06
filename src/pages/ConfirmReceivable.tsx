@@ -5,14 +5,11 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Card } from "@/components/ui/card";
-import { Calendar } from "@/components/ui/calendar";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { FadeIn, ScaleIn } from "@/components/ui/motion";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
 import { ArrowLeft, Calendar as CalendarIcon, User, DollarSign, Loader2, AlertCircle, Landmark, Handshake, Repeat } from "lucide-react";
-import { format } from "date-fns";
-import { ptBR } from "date-fns/locale";
+import { toLocalDateString } from "@/lib/dateUtils";
 import { cn } from "@/lib/utils";
 import { useCreateReceivable } from "@/hooks/useReceivables";
 import { useBankAccounts } from "@/hooks/useBankAccounts";
@@ -30,7 +27,7 @@ const ConfirmReceivable = () => {
 
   const [debtorName, setDebtorName] = useState("");
   const [description, setDescription] = useState("");
-  const [dueDate, setDueDate] = useState<Date | undefined>();
+  const [dueDate, setDueDate] = useState<string>(toLocalDateString());
   const [isLoan, setIsLoan] = useState(false);
   const [isInstallment, setIsInstallment] = useState(false);
   const [totalInstallments, setTotalInstallments] = useState("2");
@@ -88,7 +85,7 @@ const ConfirmReceivable = () => {
         debtor_name: debtorName.trim(),
         amount,
         description: description.trim() || null,
-        due_date: format(dueDate!, "yyyy-MM-dd"),
+        due_date: dueDate,
         status: "pending",
         type: isLoan ? "loan" : "simple",
         is_installment: isInstallment,
@@ -234,36 +231,19 @@ const ConfirmReceivable = () => {
             </div>
           </FadeIn>
 
-          {/* Date Picker */}
           <FadeIn delay={0.2} className="space-y-2">
             <Label className="max-w-[100vw] leading-relaxed text-sm leading-relaxed font-bold uppercase tracking-widest text-muted-foreground/80">
               {isInstallment ? "Data da 1ª Parcela" : "Data do Recebimento"}
             </Label>
-            <Popover>
-              <PopoverTrigger asChild>
-                <Button
-                  variant="outline"
-                  className={cn(
-                    "w-full h-12 justify-start text-left font-normal bg-secondary/30 border-none",
-                    !dueDate && "text-muted-foreground"
-                  )}
-                >
-                  <CalendarIcon className="mr-2 h-5 w-5" />
-                  {dueDate
-                    ? format(dueDate, "dd 'de' MMMM 'de' yyyy", { locale: ptBR })
-                    : "Selecione uma data"}
-                </Button>
-              </PopoverTrigger>
-              <PopoverContent className="w-auto p-0 z-50 bg-popover" align="start">
-                <Calendar
-                  mode="single"
-                  selected={dueDate}
-                  onSelect={setDueDate}
-                  initialFocus
-                  locale={ptBR}
-                />
-              </PopoverContent>
-            </Popover>
+            <div className="relative">
+              <CalendarIcon className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground pointer-events-none" />
+              <input
+                type="date"
+                value={dueDate}
+                onChange={(e) => setDueDate(e.target.value)}
+                className="w-full h-12 pl-11 pr-4 bg-secondary/30 border-none rounded-md outline-none focus:ring-2 focus:ring-primary/50 text-sm leading-relaxed"
+              />
+            </div>
           </FadeIn>
 
           {/* Installment Section */}

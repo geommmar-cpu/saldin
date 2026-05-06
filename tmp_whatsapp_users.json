@@ -1,0 +1,14 @@
+﻿{
+    "value":  [
+                  {
+                      "id":  "18293c10-4593-4520-aa1c-6899e21fe685",
+                      "user_id":  "fbb1426c-494c-48a5-a1f5-d892b759e4d4",
+                      "phone_number":  "5561984585912",
+                      "is_verified":  true,
+                      "created_at":  "2026-03-18T20:15:50.397295+00:00",
+                      "lid":  null,
+                      "capture_token":  "1ef2c47c4d14927c848f2ec94b9c52f0"
+                  }
+              ],
+    "Count":  1
+}

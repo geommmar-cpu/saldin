@@ -396,8 +396,8 @@ CREATE OR REPLACE FUNCTION public.create_initial_balance_income()
 RETURNS TRIGGER LANGUAGE plpgsql SECURITY DEFINER SET search_path = public AS $$
 BEGIN
   IF NEW.current_balance > 0 THEN
-    INSERT INTO public.incomes (user_id, description, amount, type, date, is_recurring, notes)
-    VALUES (NEW.user_id, 'Saldo inicial - ' || COALESCE(NEW.bank_name, 'Conta'), NEW.current_balance, 'initial_balance', CURRENT_DATE, false, 'Receita gerada automaticamente.');
+    INSERT INTO public.incomes (user_id, description, amount, type, date, is_recurring, bank_account_id, notes)
+    VALUES (NEW.user_id, 'Saldo inicial - ' || COALESCE(NEW.bank_name, 'Conta'), NEW.current_balance, 'initial_balance', CURRENT_DATE, false, NEW.id, 'Receita gerada automaticamente.');
   END IF;
   RETURN NEW;
 END;

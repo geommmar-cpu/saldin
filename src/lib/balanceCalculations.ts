@@ -151,7 +151,7 @@ export function calculateBalances(
   let saldoBruto = 0;
   if (bankTotal !== undefined) {
     const confirmedUnlinkedIncome = filteredIncomes
-      .filter(i => !(i as any).bank_account_id)
+      .filter(i => !(i as any).bank_account_id && (i as any).type !== 'initial_balance')
       .reduce((sum, i) => sum + Number(i.amount), 0);
     const confirmedUnlinkedExpenses = filteredExpenses
       .filter(e => !(e as any).bank_account_id && (e as any).status === "confirmed")

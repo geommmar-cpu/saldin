@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { toLocalDateString, parseLocalDate } from "@/lib/dateUtils";
+import { toLocalDateString } from "@/lib/dateUtils";
 import { useNavigate, useParams } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -12,10 +12,8 @@ import { cn } from "@/lib/utils";
 import { useReceivableById, useUpdateReceivable } from "@/hooks/useReceivables";
 import { toast } from "sonner";
 import { parseCurrency, formatCurrency } from "@/lib/currency";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { Calendar } from "@/components/ui/calendar";
-import { format } from "date-fns";
-import { ptBR } from "date-fns/locale";
+import { toLocalDateString } from "@/lib/dateUtils";
+import { cn } from "@/lib/utils";
 
 export const EditReceivable = () => {
   const navigate = useNavigate();
@@ -26,14 +24,14 @@ export const EditReceivable = () => {
   const [debtorName, setDebtorName] = useState("");
   const [amount, setAmount] = useState("");
   const [description, setDescription] = useState("");
-  const [dueDate, setDueDate] = useState<Date | undefined>();
+  const [dueDate, setDueDate] = useState<string>(toLocalDateString());
 
   useEffect(() => {
     if (receivable) {
       setDebtorName(receivable.debtor_name || "");
       setAmount(formatCurrency(Number(receivable.amount), false));
       setDescription(receivable.description || "");
-      if (receivable.due_date) setDueDate(parseLocalDate(receivable.due_date));
+      if (receivable.due_date) setDueDate(receivable.due_date);
     }
   }, [receivable]);
 
@@ -51,7 +49,7 @@ export const EditReceivable = () => {
         debtor_name: debtorName.trim(),
         amount: parsedAmount,
         description: description.trim() || null,
-        due_date: toLocalDateString(dueDate),
+        due_date: dueDate,
       });
       navigate("/");
     } catch (error) {
@@ -117,17 +115,15 @@ export const EditReceivable = () => {
 
         <FadeIn delay={0.15} className="leading-relaxed mb-6">
           <Label className="max-w-[100vw] leading-relaxed text-sm leading-relaxed text-muted-foreground mb-2 block">Data de vencimento</Label>
-          <Popover>
-            <PopoverTrigger asChild>
-              <Button variant="outline" className={cn("w-full justify-start text-left font-normal h-11", !dueDate && "text-muted-foreground")}>
-                <CalendarIcon className="mr-2 h-4 w-4" />
-                {dueDate ? format(dueDate, "PPP", { locale: ptBR }) : "Selecionar data"}
-              </Button>
-            </PopoverTrigger>
-            <PopoverContent className="w-auto p-0" align="start">
-              <Calendar mode="single" selected={dueDate} onSelect={setDueDate} initialFocus locale={ptBR} />
-            </PopoverContent>
-          </Popover>
+          <div className="relative">
+            <CalendarIcon className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground pointer-events-none" />
+            <input
+              type="date"
+              value={dueDate}
+              onChange={(e) => setDueDate(e.target.value)}
+              className="w-full h-11 pl-11 pr-4 bg-transparent border border-input rounded-md outline-none focus:ring-2 focus:ring-primary/50 text-sm leading-relaxed"
+            />
+          </div>
         </FadeIn>
       </main>
 
