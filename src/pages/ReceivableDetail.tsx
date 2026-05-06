@@ -222,10 +222,8 @@ const ReceivableDetail = () => {
             <div className="flex items-center gap-4 mb-6">
               <div className={cn(
                 "w-16 h-16 rounded-2xl flex items-center justify-center shadow-soft",
-                 
                 (receivable as any).type === "loan" ? "bg-primary/10" : "bg-muted"
               )}>
-                // eslint-disable-next-line @typescript-eslint/no-explicit-any
                 {(receivable as any).type === "loan" ? (
                   <Handshake className="w-8 h-8 text-primary" />
                 ) : (
@@ -235,10 +233,8 @@ const ReceivableDetail = () => {
               <div className="flex-1">
                 <p className="font-serif text-2xl font-semibold flex items-center gap-2">
                   {receivable.debtor_name}
-                  // eslint-disable-next-line @typescript-eslint/no-explicit-any
                   {(receivable as any).is_installment && (
                     <span className="max-w-[100vw] leading-relaxed text-sm leading-relaxed font-sans font-bold text-muted-foreground bg-secondary px-2 py-0.5 rounded-lg">
-                      // eslint-disable-next-line @typescript-eslint/no-explicit-any
                       {(receivable as any).installment_number}/{(receivable as any).total_installments}
                     </span>
                   )}
@@ -258,7 +254,6 @@ const ReceivableDetail = () => {
                     </span>
                   </div>
 
-                  // eslint-disable-next-line @typescript-eslint/no-explicit-any
                   {(receivable as any).type === "loan" && (
                     <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-primary/10 text-primary text-[10px] font-bold uppercase tracking-wider">
                       <Handshake className="w-3 h-3" />
@@ -306,18 +301,14 @@ const ReceivableDetail = () => {
                   <div className="flex-1">
                     <p className="max-w-[100vw] leading-relaxed text-[10px] font-bold uppercase tracking-wider text-muted-foreground">Receber na conta</p>
                     <p className="max-w-[100vw] leading-relaxed text-sm leading-relaxed font-semibold">
-                      // eslint-disable-next-line @typescript-eslint/no-explicit-any
                       {(receivable as any).bank_account
-                         
                         ? ((receivable as any).bank_account.name || (receivable as any).bank_account.bank_name)
-                         
                         : (receivable as any).bank_account_id ? "Conta Vinculada" : "Não definida"}
                     </p>
                   </div>
                 </div>
 
                 {/* Source Account (If loan) */}
-                // eslint-disable-next-line @typescript-eslint/no-explicit-any
                 {(receivable as any).type === "loan" && (
                   <div className="flex items-center gap-3 p-3 rounded-2xl bg-secondary/20">
                     <div className="w-10 h-10 rounded-xl bg-card text-muted-foreground flex items-center justify-center">
@@ -326,11 +317,8 @@ const ReceivableDetail = () => {
                     <div className="flex-1">
                       <p className="max-w-[100vw] leading-relaxed text-[10px] font-bold uppercase tracking-wider text-muted-foreground">Saiu da conta</p>
                       <p className="max-w-[100vw] leading-relaxed text-sm leading-relaxed font-semibold">
-                        // eslint-disable-next-line @typescript-eslint/no-explicit-any
                         {(receivable as any).source_account
-                           
                           ? ((receivable as any).source_account.name || (receivable as any).source_account.bank_name)
-                           
                           : (receivable as any).source_account_id ? "Conta de Origem" : "Não definida"}
                       </p>
                     </div>

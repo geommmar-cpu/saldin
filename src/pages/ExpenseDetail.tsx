@@ -149,7 +149,6 @@ export const ExpenseDetail = () => {
                 </div>
                 <div>
                   <p className="max-w-[100vw] leading-relaxed text-xs text-muted-foreground">Cartão</p>
-                  // eslint-disable-next-line @typescript-eslint/no-explicit-any
                   <p className="max-w-[100vw] leading-relaxed text-sm leading-relaxed font-medium">{(displayData as any).card_name}</p>
                 </div>
               </div>

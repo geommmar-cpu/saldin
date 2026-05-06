@@ -160,7 +160,6 @@ export const IncomeDetail = () => {
               <div>
                 <p className="max-w-[100vw] leading-relaxed text-xs text-muted-foreground">Origem</p>
                 <p className="max-w-[100vw] leading-relaxed text-sm leading-relaxed font-medium">
-                  // eslint-disable-next-line @typescript-eslint/no-explicit-any
                   {(income as any).bank_account?.name || (income as any).bank_account?.bank_name || "Registro manual"}
                 </p>
               </div>
