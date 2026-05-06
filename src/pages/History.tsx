@@ -119,11 +119,6 @@ const HistoryItemCard = ({ item, onClick }: HistoryItemCardProps) => {
         item.pending && "border-accent border-2 bg-accent/5"
       )}
     >
-      <title>Saldin | History</title>
-      <meta name="description" content="Manage your history easily with Saldin." />
-      <meta property="og:title" content="Saldin - History" />
-      <meta property="og:description" content="Manage your history easily with Saldin." />
-        
       {/* Icon */}
       <div
         className={cn(
@@ -517,6 +512,11 @@ export const History = () => {
 
   return (
     <div className="min-h-screen bg-background pb-24">
+      <title>Saldin | Histórico</title>
+      <meta name="description" content="Acompanhe seu histórico financeiro completo no Saldin." />
+      <meta property="og:title" content="Saldin - Histórico" />
+      <meta property="og:description" content="Acompanhe seu histórico financeiro completo no Saldin." />
+
       {/* Header */}
       <header className="px-5 pt-safe-top sticky top-0 bg-background/95 backdrop-blur-sm z-10">
         <div className="pt-4 pb-2 flex items-center justify-between">

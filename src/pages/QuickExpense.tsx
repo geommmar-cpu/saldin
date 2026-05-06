@@ -304,10 +304,6 @@ export const QuickExpense = () => {
     if (showSuccess) {
         return (
             <div className="min-h-screen bg-background flex flex-col items-center justify-center gap-6 px-6">
-      <title>Saldin | QuickExpense</title>
-      <meta name="description" content="Manage your quickexpense easily with Saldin." />
-      <meta property="og:title" content="Saldin - QuickExpense" />
-      <meta property="og:description" content="Manage your quickexpense easily with Saldin." />
         
                 <motion.div
                     initial={{ scale: 0 }} animate={{ scale: 1 }}
@@ -336,6 +332,10 @@ export const QuickExpense = () => {
     // ── Render ───────────────────────────────────────────────────────────────────
     return (
         <div className="min-h-screen bg-background flex flex-col">
+            <title>Saldin | Gasto Rápido</title>
+            <meta name="description" content="Registre seus gastos instantaneamente com o modo rápido do Saldin." />
+            <meta property="og:title" content="Saldin - Gasto Rápido" />
+            <meta property="og:description" content="Registre seus gastos instantaneamente com o modo rápido do Saldin." />
 
             {/* Header */}
             <div className="flex items-center gap-3 px-4 pt-4 pb-2 border-b border-border bg-background/80 backdrop-blur-xl sticky top-0 z-40">

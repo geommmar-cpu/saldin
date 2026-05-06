@@ -99,10 +99,6 @@ export const Expenses = () => {
   if (isLoading) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center pb-24">
-      <title>Saldin | Expenses</title>
-      <meta name="description" content="Manage your expenses easily with Saldin." />
-      <meta property="og:title" content="Saldin - Expenses" />
-      <meta property="og:description" content="Manage your expenses easily with Saldin." />
         
         <Loader2 className="w-8 h-8 animate-spin text-muted-foreground" />
         <BottomNav />
@@ -112,6 +108,11 @@ export const Expenses = () => {
 
   return (
     <div className="min-h-screen bg-background pb-24">
+      <title>Saldin | Gastos</title>
+      <meta name="description" content="Gerencie seus gastos e acompanhe sua saúde financeira no Saldin." />
+      <meta property="og:title" content="Saldin - Gastos" />
+      <meta property="og:description" content="Gerencie seus gastos e acompanhe sua saúde financeira no Saldin." />
+
       {/* Header */}
       <header className="px-5 pt-safe-top sticky top-0 bg-background/95 backdrop-blur-sm z-10 border-b border-border">
         <div className="pt-4 pb-3 flex items-center justify-between">

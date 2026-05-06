@@ -150,10 +150,6 @@ const ReceivableDetail = () => {
   if (isLoading) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
-      <title>Saldin | ReceivableDetail</title>
-      <meta name="description" content="Manage your receivabledetail easily with Saldin." />
-      <meta property="og:title" content="Saldin - ReceivableDetail" />
-      <meta property="og:description" content="Manage your receivabledetail easily with Saldin." />
         
         <Loader2 className="w-8 h-8 animate-spin text-muted-foreground" />
       </div>
@@ -179,6 +175,10 @@ const ReceivableDetail = () => {
 
   return (
     <div className="min-h-screen bg-background">
+      <title>Saldin | Detalhes do Recebível</title>
+      <meta name="description" content="Veja os detalhes do valor a receber no Saldin." />
+      <meta property="og:title" content="Saldin - Detalhes do Recebível" />
+      <meta property="og:description" content="Veja os detalhes do valor a receber no Saldin." />
       {/* Header */}
       <header className="px-5 pt-safe-top">
         <div className="pt-4 pb-4">
