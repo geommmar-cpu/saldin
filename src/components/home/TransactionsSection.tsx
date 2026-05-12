@@ -64,7 +64,8 @@ export function TransactionsSection({
 
       const txDate = e.date ? parseLocalDate(e.date) : new Date(e.created_at);
       const isSub = e.description?.startsWith("Assinatura: ");
-      const isPending = e.status === "pending" || !e.category_id;
+      const isPendingStatus = e.status === "pending";
+      const needsConfirmation = isPendingStatus || !e.category_id;
 
       items.push({
         id: e.id,
@@ -73,10 +74,10 @@ export function TransactionsSection({
         description: `${e.description}${installmentLabel}`,
         date: txDate,
         icon: isSub ? Calendar : Receipt,
-        color: isSub ? "text-primary" : (isPending ? "text-muted-foreground" : "text-impulse"),
-        bg: isSub ? "bg-primary/10" : (isPending ? "bg-muted" : "bg-impulse/10"),
+        color: isSub ? "text-primary" : (isPendingStatus ? "text-muted-foreground" : "text-impulse"),
+        bg: isSub ? "bg-primary/10" : (isPendingStatus ? "bg-muted" : "bg-impulse/10"),
         status: e.status,
-        pending: isPending,
+        pending: needsConfirmation,
       });
     });
 
