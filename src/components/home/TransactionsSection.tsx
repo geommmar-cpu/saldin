@@ -64,18 +64,19 @@ export function TransactionsSection({
 
       const txDate = e.date ? parseLocalDate(e.date) : new Date(e.created_at);
       const isSub = e.description?.startsWith("Assinatura: ");
+      const isPending = e.status === "pending" || !e.category_id;
 
       items.push({
         id: e.id,
         type: isSub ? "subscription" : "expense",
         amount: Number(e.amount),
         description: `${e.description}${installmentLabel}`,
-        date: new Date(e.created_at),
+        date: txDate,
         icon: isSub ? Calendar : Receipt,
-        color: isSub ? "text-primary" : "text-impulse",
-        bg: isSub ? "bg-primary/10" : "bg-impulse/10",
+        color: isSub ? "text-primary" : (isPending ? "text-muted-foreground" : "text-impulse"),
+        bg: isSub ? "bg-primary/10" : (isPending ? "bg-muted" : "bg-impulse/10"),
         status: e.status,
-        pending: e.status === "pending" || !e.category_id,
+        pending: isPending,
       });
     });
 
