@@ -10,11 +10,11 @@ import {
   ArrowLeft, Check, Utensils, Car, Gamepad2, Home, CreditCard,
   MoreHorizontal, RefreshCw, Calendar, Users, User, ChevronDown,
   Banknote, Smartphone, CreditCard as CreditCardIcon, Loader2, QrCode,
-  Search, Plus, AlertTriangle
+  Search, Plus, AlertTriangle, Edit2, Trash2
 } from "lucide-react";
 import { formatCurrency } from "@/lib/balanceCalculations";
 import { cn } from "@/lib/utils";
-import { useCreateExpense, useCreateBulkExpenses, useUpdateExpense, useExpenseById } from "@/hooks/useExpenses";
+import { useCreateExpense, useCreateBulkExpenses, useUpdateExpense, useExpenseById, useDeleteExpense } from "@/hooks/useExpenses";
 import { addMonths, format } from "date-fns";
 import { useCreateCreditCardPurchase, useCreditCards } from "@/hooks/useCreditCards";
 import { useCreateReceivable } from "@/hooks/useReceivables";
@@ -23,6 +23,7 @@ import { useCashAccount } from "@/hooks/useCashAccount";
 import { useSubscriptions } from "@/hooks/useSubscriptions";
 import { useAuth } from "@/hooks/useAuth";
 import { toast } from "sonner";
+import { DeleteExpenseDialog } from "@/components/expense/DeleteExpenseDialog";
 import {
   defaultCategories,
   categoryGroups,
@@ -104,6 +105,8 @@ export const ConfirmExpense = () => {
   const updateBankBalance = useUpdateBankBalance();
   const createReceivable = useCreateReceivable();
   const { ensureCashAccount, cashAccountId, isCreating: isCreatingCash } = useCashAccount();
+  const deleteExpense = useDeleteExpense();
+  const [showDeleteDialog, setShowDeleteDialog] = useState(false);
 
   // Hooks
   const { data: existingExpense, isLoading: isLoadingExpense } = useExpenseById(id && !id.startsWith("proj-") && id !== "new" ? id : undefined);
@@ -211,6 +214,17 @@ export const ConfirmExpense = () => {
       setStep("expense");
     } else {
       navigate("/");
+    }
+  };
+
+  const handleDelete = async () => {
+    if (!id || isNew) return;
+    try {
+      await deleteExpense.mutateAsync({ id, softDelete: existingExpense?.source !== "manual" });
+      setShowDeleteDialog(false);
+      navigate("/");
+    } catch (error) {
+      console.error("Error deleting expense:", error);
     }
   };
 
@@ -501,6 +515,16 @@ export const ConfirmExpense = () => {
             </p>
             <h1 className="font-serif text-xl font-semibold">Novo Gasto</h1>
           </div>
+          {!isNew && (
+            <div className="flex items-center">
+              <Button variant="ghost" size="icon" onClick={() => navigate(`/expenses/${id}/edit`)}>
+                <Edit2 className="w-5 h-5" />
+              </Button>
+              <Button variant="ghost" size="icon" onClick={() => setShowDeleteDialog(true)} className="text-destructive hover:text-destructive">
+                <Trash2 className="w-5 h-5" />
+              </Button>
+            </div>
+          )}
         </div>
       </header>
 
@@ -1282,6 +1306,15 @@ export const ConfirmExpense = () => {
           )}
         </div>
       </div>
+
+      <DeleteExpenseDialog
+        open={showDeleteDialog}
+        onOpenChange={setShowDeleteDialog}
+        onConfirm={handleDelete}
+        isRecurring={existingExpense?.is_installment || false}
+        isFromIntegration={existingExpense?.source !== "manual"}
+        isLoading={deleteExpense.isPending}
+      />
     </div>
   );
 };
