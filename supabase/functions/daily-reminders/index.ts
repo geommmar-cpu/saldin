@@ -28,8 +28,9 @@ import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
 const SUPABASE_URL = Deno.env.get("SUPABASE_URL")!;
 const SERVICE_ROLE_KEY = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
-const META_ACCESS_TOKEN = Deno.env.get("META_ACCESS_TOKEN")!;
-const META_PHONE_NUMBER_ID = Deno.env.get("META_PHONE_NUMBER_ID")!;
+const EVOLUTION_API_URL = Deno.env.get("EVOLUTION_API_URL")!;
+const EVOLUTION_API_KEY = Deno.env.get("EVOLUTION_API_KEY")!;
+const EVOLUTION_INSTANCE = Deno.env.get("EVOLUTION_INSTANCE")!;
 
 const supabase = createClient(SUPABASE_URL, SERVICE_ROLE_KEY);
 
@@ -43,30 +44,30 @@ function normalizeBRPhone(phone: string): string {
 }
 
 async function sendWhatsApp(to: string, text: string): Promise<void> {
-  const normalized = normalizeBRPhone(to);
-  const url = `https://graph.facebook.com/v22.0/${META_PHONE_NUMBER_ID}/messages`;
+  const number = to.split('@')[0];
+  const url = `${EVOLUTION_API_URL}/message/sendText/${EVOLUTION_INSTANCE}`;
+  
   try {
     const resp = await fetch(url, {
       method: "POST",
       headers: {
-        Authorization: `Bearer ${META_ACCESS_TOKEN}`,
+        "apikey": EVOLUTION_API_KEY,
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        messaging_product: "whatsapp",
-        to: normalized,
-        type: "text",
-        text: { body: text },
+        number: number,
+        text: text,
+        options: { delay: 1200, presence: "composing" }
       }),
     });
     const data = await resp.json();
-    if (data.error) {
-      console.error(`❌ WA Error for ${normalized}:`, JSON.stringify(data.error));
+    if (!resp.ok) {
+      console.error(`❌ Evolution Error for ${number}:`, JSON.stringify(data));
     } else {
-      console.log(`✅ Reminder sent to ${normalized}`);
+      console.log(`✅ Reminder sent to ${number}`);
     }
   } catch (e) {
-    console.error(`❌ Failed to send to ${normalized}:`, e);
+    console.error(`❌ Failed to send to ${number}:`, e);
   }
 }
 
@@ -110,10 +111,13 @@ async function buildAlertsForUser(userId: string): Promise<string[]> {
     .eq("user_id", userId)
     .eq("status", "pending");
 
+  const todayMidnight = new Date(today.getFullYear(), today.getMonth(), today.getDate());
+
   for (const r of receivables || []) {
     if (!r.due_date) continue;
-    const dueDate = new Date(r.due_date);
-    const days = Math.ceil((dueDate.getTime() - today.getTime()) / 86400000);
+    const [year, month, day] = r.due_date.split("-").map(Number);
+    const dueDate = new Date(year, month - 1, day);
+    const days = Math.round((dueDate.getTime() - todayMidnight.getTime()) / 86400000);
 
     if (days < 0) {
       alerts.push(
@@ -140,6 +144,30 @@ async function buildAlertsForUser(userId: string): Promise<string[]> {
       const missing = Number(g.target_amount) - Number(g.current_amount);
       alerts.push(
         `🎯 Meta *${g.name}* quase lá! Faltam apenas ${fmt.format(missing)}.`
+      );
+    }
+  }
+
+  // ── 4. Pending Expenses due ≤ 3 days ─────────────────────────────────────
+  const { data: pendingExpenses } = await supabase
+    .from("expenses")
+    .select("description, amount, date")
+    .eq("user_id", userId)
+    .eq("status", "pending");
+
+  for (const e of pendingExpenses || []) {
+    if (!e.date) continue;
+    const [year, month, day] = e.date.split("-").map(Number);
+    const dueDate = new Date(year, month - 1, day);
+    const days = Math.round((dueDate.getTime() - todayMidnight.getTime()) / 86400000);
+
+    if (days < 0) {
+      alerts.push(
+        `⚠️ Gasto ATRASADO: *${e.description}* (${fmt.format(Number(e.amount))}) venceu há ${Math.abs(days)} dia${Math.abs(days) > 1 ? "s" : ""}.`
+      );
+    } else if (days <= 3) {
+      alerts.push(
+        `🔔 Pagar *${e.description}*: ${fmt.format(Number(e.amount))} vence ${dayLabel(days)}.`
       );
     }
   }

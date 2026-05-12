@@ -239,30 +239,42 @@ export const QuickExpense = () => {
 
                 const purchaseDate = new Date(date + "T12:00:00");
                 const totalInstalls = installments > 1 ? installments : 1;
+                const todayStr = toLocalDateString();
 
                 if (totalInstalls > 1) {
                     const groupId = crypto.randomUUID();
-                    await createBulkExpenses.mutateAsync(
-                        Array.from({ length: totalInstalls }, (_, i) => ({
+                    const expensesToCreate = Array.from({ length: totalInstalls }, (_, i) => {
+                        const itemDate = format(addMonths(purchaseDate, i), "yyyy-MM-dd");
+                        return {
                             amount: numericAmount,
                             description: description || selectedCategory?.name || "Gasto",
-                            status: "confirmed" as const,
+                            status: (itemDate > todayStr ? "pending" : "confirmed") as const,
                             source: "manual" as const,
                             is_installment: false,
                             total_installments: totalInstalls,
                             installment_number: i + 1,
                             installment_group_id: groupId,
                             bank_account_id: bankId ?? undefined,
-                            date: format(addMonths(purchaseDate, i), "yyyy-MM-dd"),
+                            date: itemDate,
                             category_id: finalCategoryId,
-                        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                        })) as any
-                    );
+                        };
+                    });
+                    
+                    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                    await createBulkExpenses.mutateAsync(expensesToCreate as any);
+                    
+                    if (bankId) {
+                        const confirmedCount = expensesToCreate.filter(e => e.status === "confirmed").length;
+                        if (confirmedCount > 0) {
+                            await updateBankBalance.mutateAsync({ accountId: bankId, delta: -(numericAmount * confirmedCount) });
+                        }
+                    }
                 } else {
+                    const isFuture = date > todayStr;
                     await createExpense.mutateAsync({
                         amount: numericAmount,
                         description: description || selectedCategory?.name || "Gasto",
-                        status: "confirmed",
+                        status: isFuture ? "pending" : "confirmed",
                         source: "manual",
                         is_installment: false,
                         installment_number: 1,
@@ -271,10 +283,10 @@ export const QuickExpense = () => {
                         category_id: finalCategoryId,
                     // eslint-disable-next-line @typescript-eslint/no-explicit-any
                     } as any);
-                }
-
-                if (bankId) {
-                    await updateBankBalance.mutateAsync({ accountId: bankId, delta: -numericAmount });
+                    
+                    if (bankId && !isFuture) {
+                        await updateBankBalance.mutateAsync({ accountId: bankId, delta: -numericAmount });
+                    }
                 }
             }
 
