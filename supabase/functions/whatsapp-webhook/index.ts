@@ -2,15 +2,15 @@
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 import { analyzeText } from "./ai-service.ts";
 import { processImage } from "./image-service.ts";
-import { transcribeAudio } from "./audio-service.ts";
+import { transcribeAudioWithGemini } from "./gemini-service.ts";
 import { processTransaction, getBalance, getLastTransactions, getPreferredAccount, getImportantAlerts } from "./financial-service.ts";
 import { generateTransactionCode, formatPremiumMessage, handleExcluirCommand, handleEditarCommand, processEditStep } from "./transactionCommandHandler.ts";
 
 const SUPABASE_URL = Deno.env.get("SUPABASE_URL")!;
 const SERVICE_ROLE_KEY = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
-const EVOLUTION_API_URL = Deno.env.get("EVOLUTION_API_URL")!;
-const EVOLUTION_API_KEY = Deno.env.get("EVOLUTION_API_KEY")!;
-const EVOLUTION_INSTANCE = Deno.env.get("EVOLUTION_INSTANCE")!;
+const EVOLUTION_API_URL = Deno.env.get("EVOLUTION_API_URL") || "";
+const EVOLUTION_API_KEY = Deno.env.get("EVOLUTION_API_KEY") || "";
+const EVOLUTION_INSTANCE = Deno.env.get("EVOLUTION_INSTANCE") || "";
 
 const supabaseAdmin = createClient(SUPABASE_URL, SERVICE_ROLE_KEY);
 
@@ -36,35 +36,21 @@ async function sendWhatsApp(to: string, text: string): Promise<void> {
             })
         });
         const data = await resp.json();
-        if (!resp.ok) console.error(`❌ Evolution Send Error [${resp.status}]:`, JSON.stringify(data));
+        if (resp.ok) {
+            console.log(`✅ Message sent to Evolution successfully:`, JSON.stringify(data));
+        } else {
+            console.error(`❌ Evolution Send Error [${resp.status}]:`, JSON.stringify(data));
+        }
     } catch (e) { 
         console.error(`❌ Fetch Exception for ${number}:`, e); 
     }
 }
 
-async function sendWhatsAppInteractive(to: string, text: string, buttons: { id: string, title: string }[]): Promise<void> {
-    if (!EVOLUTION_API_URL || !EVOLUTION_API_KEY || !EVOLUTION_INSTANCE) return;
+async function sendWhatsAppWithLinks(to: string, text: string, buttons: { id: string, title: string }[]): Promise<void> {
     const number = to.split('@')[0];
-
-    try {
-        const url = `${EVOLUTION_API_URL}/message/sendButtons/${EVOLUTION_INSTANCE}`;
-        const resp = await fetch(url, {
-            method: "POST",
-            headers: { "Content-Type": "application/json", "apikey": EVOLUTION_API_KEY },
-            body: JSON.stringify({
-                number: number,
-                buttonText: text,
-                buttons: buttons.map(b => ({
-                    buttonId: b.id,
-                    buttonText: { displayText: b.title },
-                    type: "reply"
-                })),
-                options: { delay: 1000, presence: "composing" }
-            })
-        });
-        const data = await resp.json();
-        if (!resp.ok) console.error(`❌ Evolution Buttons Error:`, JSON.stringify(data));
-    } catch (e) { console.error(`❌ Evolution Buttons Failed:`, e); }
+    const options = buttons.map((b, i) => `*${i + 1}* - ${b.title.replace('🗑️ ', '').replace('📝 ', '')}`).join('\n');
+    const fullText = `${text}\n\n${options}\n\n_Responda apenas o número da opção._`;
+    await sendWhatsApp(to, fullText);
 }
 
 async function markMessageAsRead(remoteJid: string, messageId: string): Promise<void> {
@@ -96,25 +82,48 @@ async function sendTypingIndicator(to: string): Promise<void> {
     } catch (e) { console.error("Error sending typing indicator:", e); }
 }
 
-async function downloadMedia(messageId: string, base64FromPayload?: string): Promise<ArrayBuffer | null> {
+async function downloadMedia(messageKey: any, base64FromPayload?: string): Promise<ArrayBuffer | null> {
     try {
         let base64 = base64FromPayload;
 
         if (!base64) {
+            const messageId = messageKey.id;
             console.log(`📥 [Evolution] Downloading media via API for message: ${messageId}`);
-            const url = `${EVOLUTION_API_URL}/message/getBase64FromMediaMessage/${EVOLUTION_INSTANCE}`;
-            const resp = await fetch(url, {
-                method: "POST",
-                headers: { "Content-Type": "application/json", "apikey": EVOLUTION_API_KEY },
-                body: JSON.stringify({ message: { key: { id: messageId } } })
-            });
+            
+            // Tentamos primeiro o endpoint /chat (mais comum em versões novas)
+            const endpoints = [
+                `${EVOLUTION_API_URL}/chat/getBase64FromMediaMessage/${EVOLUTION_INSTANCE}`,
+                `${EVOLUTION_API_URL}/message/getBase64FromMediaMessage/${EVOLUTION_INSTANCE}`
+            ];
 
-            if (!resp.ok) return null;
-            const data = await resp.json();
-            base64 = data.base64;
+            for (const url of endpoints) {
+                console.log(`📥 [Evolution] Trying endpoint: ${url}`);
+                const resp = await fetch(url, {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json", "apikey": EVOLUTION_API_KEY },
+                    body: JSON.stringify({ message: { key: messageKey } })
+                });
+
+                if (resp.ok) {
+                    const data = await resp.json();
+                    base64 = data.base64;
+                    if (base64) {
+                        console.log(`✅ [Evolution] Media downloaded successfully from ${url.includes('/chat/') ? '/chat' : '/message'}`);
+                        break;
+                    }
+                } else {
+                    const errorText = await resp.text();
+                    console.warn(`⚠️ [Evolution] Endpoint ${url} failed: ${resp.status} - ${errorText}`);
+                }
+            }
+        } else {
+            console.log(`📥 [Evolution] Using base64 from payload (Length: ${base64.length})`);
         }
 
-        if (!base64) return null;
+        if (!base64) {
+            console.error("❌ [Evolution] Could not retrieve base64 from any source.");
+            return null;
+        }
 
         const binaryString = atob(base64.split(',')[1] || base64);
         const bytes = new Uint8Array(binaryString.length);
@@ -158,6 +167,12 @@ async function getCategoryId(userId: string, categoryName: string, type: "income
 // ─── MAIN HANDLER ───
 
 Deno.serve(async (req: Request) => {
+    console.log(`🚀 [System] Incoming Request: ${req.method}`);
+    
+    if (!EVOLUTION_API_URL || !EVOLUTION_INSTANCE) {
+        console.error("❌ CRITICAL: EVOLUTION_API_URL or EVOLUTION_INSTANCE is missing from environment variables!");
+    }
+
     const startTime = Date.now();
     let logId: string | null = null;
 
@@ -295,19 +310,33 @@ Deno.serve(async (req: Request) => {
             textToAnalyze = messageContent.extendedTextMessage?.text || "";
         }
         else if (messageType === "audioMessage") {
-            const buffer = await downloadMedia(messageId, data.base64);
+            // Raio-X do áudio
+            console.log("🔍 [Raio-X Áudio] Chaves em data:", Object.keys(data).join(", "));
+            if (messageContent.audioMessage) {
+                console.log("🔍 [Raio-X Áudio] Chaves em audioMessage:", Object.keys(messageContent.audioMessage).join(", "));
+            }
+
+            const b64 = data.base64 || payload.base64 || messageContent.audioMessage?.base64 || data.message?.audioMessage?.base64;
+            console.log(`🎤 Audio detected. Final Base64 length: ${b64?.length || 0}`);
+            
+            const buffer = await downloadMedia(data.key, b64);
             if (buffer) {
                 try {
-                    textToAnalyze = await transcribeAudio(buffer, messageContent.audioMessage?.mimetype);
+                    console.log(`🎤 Buffer ready (${buffer.byteLength} bytes). Calling Gemini...`);
+                    textToAnalyze = await transcribeAudioWithGemini(buffer, messageContent.audioMessage?.mimetype);
+                    console.log(`🎤 Gemini Result: "${textToAnalyze}"`);
                 } catch (err) {
-                    console.error("Transcription error:", err);
-                    await sendWhatsApp(phoneToSend, "❌ Erro ao processar o áudio.");
+                    console.error("❌ Audio Processing Flow Error:", err);
+                    await sendWhatsApp(phoneToSend, "❌ Desculpe, tive um problema ao ouvir seu áudio. Pode tentar mandar por texto?");
                     return new Response("Audio Error", { status: 200 });
                 }
+            } else {
+                console.error("❌ Failed to get audio buffer.");
             }
         }
         else if (messageType === "imageMessage") {
-            const buffer = await downloadMedia(messageId, data.base64);
+            const b64 = data.base64 || payload.base64 || messageContent.imageMessage?.base64 || data.message?.imageMessage?.base64;
+            const buffer = await downloadMedia(data.key, b64);
             if (buffer) {
                 try {
                     intent = await processImage(buffer);
@@ -330,14 +359,35 @@ Deno.serve(async (req: Request) => {
 
         // 4. Command & Edit Flow
         if (textToAnalyze) {
-            const cleanText = textToAnalyze.trim();
-            const normalizedCmd = cleanText.toLowerCase().replace(/[^\w\s]/gi, '');
+            const userInput = textToAnalyze.trim();
+            const normalizedCmd = userInput.toLowerCase().replace(/[^\w\s]/gi, '');
+            
+            // Check for ongoing states (Edit or Post-Transaction Menu)
+            const { data: state } = await supabaseAdmin.from('conversation_states').select('*').eq('user_id', userId).maybeSingle();
 
-            const editResult = await processEditStep(userId, cleanText);
-            if (editResult.success) {
-                await sendWhatsApp(phoneToSend, editResult.message);
-                if (logId) await supabaseAdmin.from("whatsapp_logs").update({ processed: true }).eq("id", logId);
-                return new Response("Edit Step OK", { status: 200 });
+            if (state) {
+                // A. Post-transaction numeric menu (1=Delete, 2=Edit)
+                if (state.step === 'post_transaction_action') {
+                    const lastCode = state.context?.last_transaction_code;
+                    if (userInput === '1') {
+                        const result = await handleExcluirCommand(userId, lastCode);
+                        await sendWhatsApp(phoneToSend, result.message);
+                        await supabaseAdmin.from('conversation_states').delete().eq('user_id', userId);
+                        return new Response("Deleted", { status: 200 });
+                    } else if (userInput === '2') {
+                        const result = await handleEditarCommand(userId, lastCode);
+                        await sendWhatsApp(phoneToSend, result.message);
+                        return new Response("Editing", { status: 200 });
+                    }
+                }
+
+                // B. Existing multi-step editing
+                const editResult = await processEditStep(userId, userInput);
+                if (editResult.success) {
+                    await sendWhatsApp(phoneToSend, editResult.message);
+                    if (logId) await supabaseAdmin.from("whatsapp_logs").update({ processed: true }).eq("id", logId);
+                    return new Response("Edit Step OK", { status: 200 });
+                }
             }
 
             // B. SAUDAÇÕES E AJUDA
@@ -374,8 +424,8 @@ Deno.serve(async (req: Request) => {
             }
 
             // 3. Normal Commands
-            const deleteMatch = cleanText.match(/(?:excluir|deletar|remover)(?:\s+)?([A-Z2-9]{4})?/i);
-            if (deleteMatch && (deleteMatch[1] || cleanText.toLowerCase().trim() === 'excluir')) {
+            const deleteMatch = userInput.match(/(?:excluir|deletar|remover)(?:\s+)?([A-Z2-9]{4})?/i);
+            if (deleteMatch && (deleteMatch[1] || userInput.toLowerCase().trim() === 'excluir')) {
                 const code = deleteMatch[1]?.toUpperCase().trim();
                 if (!code) {
                     await sendWhatsApp(phoneToSend, "🤔 Qual transação você deseja excluir? Por favor, use o formato: *excluir [ID]* (ex: _excluir A1B2_).");
@@ -387,8 +437,8 @@ Deno.serve(async (req: Request) => {
                 return new Response("Delete", { status: 200 });
             }
 
-            const editMatch = cleanText.match(/(?:editar|alterar|mudar)(?:\s+)?([A-Z2-9]{4})?/i);
-            if (editMatch && (editMatch[1] || cleanText.toLowerCase().trim() === 'editar')) {
+            const editMatch = userInput.match(/(?:editar|alterar|mudar)(?:\s+)?([A-Z2-9]{4})?/i);
+            if (editMatch && (editMatch[1] || userInput.toLowerCase().trim() === 'editar')) {
                 const code = editMatch[1]?.toUpperCase().trim();
                 if (!code) {
                     await sendWhatsApp(phoneToSend, "🤔 Qual transação você deseja editar? Por favor, use o formato: *editar [ID]* (ex: _editar A1B2_).");
@@ -425,6 +475,7 @@ Deno.serve(async (req: Request) => {
 
         // 5. AI Analysis
         if (textToAnalyze && !intent) {
+            console.log(`🤖 Starting AI Analysis for: "${textToAnalyze}"`);
             intent = await analyzeText(textToAnalyze);
         }
 
@@ -472,11 +523,21 @@ Deno.serve(async (req: Request) => {
 
             for (const item of intent.items) {
                 try {
+                    console.log(`📂 Finding category for: ${item.categoria_sugerida}`);
                     const categoryId = await getCategoryId(userId, item.categoria_sugerida, item.tipo === "receita" ? "income" : "expense");
-                    const { id: targetAccountId, isCreditCard } = await getPreferredAccount(userId, item.metodo_pagamento);
+                    
+                    console.log(`💳 Finding account for: ${item.metodo_pagamento}`);
+                    const { id: targetAccountId, isCreditCard, name: accName } = await getPreferredAccount(userId, item.metodo_pagamento);
+                    
+                    if (!targetAccountId) {
+                        console.error(`❌ No account found for user ${userId} and method ${item.metodo_pagamento}`);
+                        continue;
+                    }
+
                     const tCode = generateTransactionCode();
                     lastTCode = tCode;
 
+                    console.log(`🚀 Executing processTransaction for ${item.descricao}...`);
                     const result = await processTransaction({
                         userId,
                         type: item.tipo === "receita" ? "income" : "expense",
@@ -487,6 +548,7 @@ Deno.serve(async (req: Request) => {
                         transactionCode: tCode,
                         isCreditCard: isCreditCard
                     });
+                    console.log(`✅ Transaction saved: ${result.id}`);
 
                     const valStr = new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(item.valor);
                     const icon = item.tipo === 'receita' ? '💰' : '💸';
@@ -503,7 +565,8 @@ Deno.serve(async (req: Request) => {
                             type: item.tipo === "receita" ? "income" : "expense",
                             transaction_code: tCode,
                             account_balance: result.account_balance
-                        }, { new_balance: result.new_balance }, alerts);
+                        }, { new_balance: result.new_balance }, alerts) || "✅ Transação registrada!";
+                        console.log(`📝 Generated Summary: ${summaryMsg}`);
                     } else {
                         summaryMsg += `${icon} *${item.descricao}*\n   Valor: *${valStr}*\n   ID: \`${tCode}\`\n\n`;
                     }
@@ -515,11 +578,22 @@ Deno.serve(async (req: Request) => {
 
             if (totalProcessed > 0) {
                 if (isSingle) {
-                    await sendWhatsAppInteractive(phoneToSend, summaryMsg, [
+                    console.log(`💬 Sending confirmation with links to ${phoneToSend}`);
+                    
+                    // Salvar estado para permitir resposta numérica (1 ou 2)
+                    await supabaseAdmin.from('conversation_states').upsert({
+                        user_id: userId,
+                        step: 'post_transaction_action',
+                        context: { last_transaction_code: lastTCode },
+                        updated_at: new Date().toISOString()
+                    });
+
+                    await sendWhatsAppWithLinks(phoneToSend, summaryMsg, [
                         { id: `excluir_${lastTCode}`, title: "🗑️ Excluir" },
                         { id: `editar_${lastTCode}`, title: "📝 Editar" }
                     ]);
                 } else {
+                    console.log(`💬 Sending summary message to ${phoneToSend}`);
                     const balance = await getBalance(userId);
                     const alerts = await getImportantAlerts(userId);
                     const balStr = new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(balance);

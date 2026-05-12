@@ -283,10 +283,9 @@ export function useUpdateReceivable() {
       if (isMarkingAsReceived && receivable) {
          
         const bankAccountId = (updates as any).bank_account_id || receivable.bank_account_id;
+        const amount = Number(receivable.amount);
 
         if (bankAccountId) {
-          const amount = Number(receivable.amount);
-
           // Atualizar saldo do banco
           const { data: account } = await db
             .from("bank_accounts")
@@ -302,21 +301,22 @@ export function useUpdateReceivable() {
                 updated_at: new Date().toISOString()
               })
               .eq("id", bankAccountId);
-
-            // Criar registro de receita
-            await db
-              .from("incomes")
-              .insert({
-                user_id: user.id,
-                description: `Recebimento: ${receivable.debtor_name}${receivable.installment_number ? ` (${receivable.installment_number}/${receivable.total_installments})` : ""}`,
-                amount: amount,
-                date: format(new Date(), "yyyy-MM-dd"),
-                bank_account_id: bankAccountId,
-                type: "other",
-                notes: `Recebido de: ${receivable.debtor_name}`
-              });
           }
         }
+
+        // Criar registro de receita (mesmo sem conta bancária, para contar no Saldo Livre e Extrato)
+        await db
+          .from("incomes")
+          .insert({
+            user_id: user.id,
+            description: `Recebimento: ${receivable.debtor_name}${receivable.installment_number ? ` (${receivable.installment_number}/${receivable.total_installments})` : ""}`,
+            amount: amount,
+            date: format(new Date(), "yyyy-MM-dd"),
+            bank_account_id: bankAccountId || null,
+            type: "other",
+            status: "received",
+            notes: `Recebido de: ${receivable.debtor_name}`
+          });
       }
 
       // 3. Atualizar o recebível

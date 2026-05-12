@@ -193,14 +193,13 @@ export async function getBalance(userId: string): Promise<number> {
     // 2. Unlinked Transactions (Confirmed but not in a bank account yet)
     // Incomes
     const { data: unlinkedIncomes } = await supabaseAdmin.from('incomes')
-        .select('amount')
+        .select('amount, type')
         .eq('user_id', userId)
         .is('bank_account_id', null)
-        .or('status.eq.received,status.eq.confirmed')
         .gte('date', monthStart)
         .lte('date', monthEnd);
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const confirmedUnlinkedIncome = unlinkedIncomes?.reduce((acc: number, i: any) => acc + Number(i.amount), 0) || 0;
+    const confirmedUnlinkedIncome = unlinkedIncomes?.filter((i: any) => i.type !== 'initial_balance').reduce((acc: number, i: any) => acc + Number(i.amount), 0) || 0;
 
     // Expenses
     const { data: unlinkedExpenses } = await supabaseAdmin.from('expenses')
@@ -229,11 +228,24 @@ export async function getBalance(userId: string): Promise<number> {
 
     // Active debts
     const { data: debts } = await supabaseAdmin.from('debts')
-        .select('total_amount, installment_amount, is_installment')
+        .select('total_amount, installment_amount, is_installment, total_installments, created_at')
         .eq('user_id', userId)
         .eq('status', 'active');
+    
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const debtTotal = debts?.reduce((acc: number, d: any) => acc + Number(d.is_installment ? (d.installment_amount || 0) : d.total_amount), 0) || 0;
+    const activeDebts = debts?.filter((d: any) => {
+        const debtStart = new Date(d.created_at);
+        if (debtStart > new Date(monthEnd)) return false;
+        if (d.is_installment && d.total_installments) {
+             const msStart = new Date(monthStart).getTime();
+             const dStart = debtStart.getTime();
+             const monthsFromStart = Math.floor((msStart - dStart) / (30 * 24 * 60 * 60 * 1000));
+             return monthsFromStart < d.total_installments;
+        }
+        return true;
+    }) || [];
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const debtTotal = activeDebts.reduce((acc: number, d: any) => acc + Number(d.is_installment ? (d.installment_amount || 0) : d.total_amount), 0);
 
     // CC Installments for the month
     const { data: ccInstallments } = await supabaseAdmin.from('credit_card_installments')
@@ -244,7 +256,22 @@ export async function getBalance(userId: string): Promise<number> {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const ccTotal = ccInstallments?.reduce((acc: number, inst: any) => acc + Number(inst.amount), 0) || 0;
 
-    const saldoComprometido = pendingTotal + debtTotal + ccTotal;
+    // Subscriptions
+    const { data: subs } = await supabaseAdmin.from('subscriptions')
+        .select('amount, frequency, last_generated_date')
+        .eq('user_id', userId)
+        .eq('status', 'active');
+    
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const subsTotal = subs?.filter((s: any) => {
+        if (!s.last_generated_date) return true;
+        return new Date(s.last_generated_date).getTime() < new Date(monthStart).getTime();
+    }).reduce((acc: number, s: any) => {
+        if (s.frequency === 'yearly') return acc + (Number(s.amount) / 12);
+        return acc + Number(s.amount);
+    }, 0) || 0;
+
+    const saldoComprometido = pendingTotal + debtTotal + ccTotal + subsTotal;
 
     // 4. Goals Saved (Saldo Guardado)
     const { data: goals } = await supabaseAdmin.from('goals')
